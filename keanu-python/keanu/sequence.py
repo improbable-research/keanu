@@ -1,4 +1,4 @@
-from typing import Callable, Generator, Dict, Optional, Any, Iterator, Iterable, Union
+from typing import Callable, Generator, Dict, Optional, Any, Iterator, Iterable, Union, Collection
 
 from py4j.java_gateway import java_import, is_instance_of
 from py4j.java_collections import ListConverter
@@ -11,7 +11,8 @@ from keanu.context import KeanuContext
 from keanu.functional import BiConsumer
 from keanu.functional import Consumer
 from keanu.functional import JavaIterator
-from keanu.vertex import Vertex, cast_to_double_vertex, vertex_constructor_param_types
+from keanu.vertex import Vertex, cast_to_double_vertex, vertex_constructor_param_types, DoubleProxy, shape_types, \
+    IntegerProxy, BooleanProxy
 from keanu.vertex.label import _VertexLabel
 
 k = KeanuContext()
@@ -108,11 +109,32 @@ class Sequence(JavaObjectWrapper):
         return SequenceItem(self.unwrap().getLastItem())
 
     @staticmethod
-    def proxy_for(label: str) -> str:
+    def proxy_label_for(label: str) -> str:
         """
-        >>> Sequence.proxy_for("foo")
+        >>> Sequence.proxy_label_for("foo")
         'proxy_for.foo'
         """
         label_java = _VertexLabel(label).unwrap()
-        proxy_label_java = k.jvm_view().SequenceBuilder.proxyFor(label_java)
+        proxy_label_java = k.jvm_view().SequenceBuilder.proxyLabelFor(label_java)
         return proxy_label_java.getQualifiedName()
+
+    @staticmethod
+    def double_proxy_for(label: str, shape: Collection[int] = ()) -> Vertex:
+        """
+        Creates a proxy vertex for the given label
+        """
+        return DoubleProxy(shape, Sequence.proxy_label_for(label))
+
+    @staticmethod
+    def integer_proxy_for(label: str, shape: Collection[int] = ()) -> Vertex:
+        """
+        Creates a proxy vertex for the given label
+        """
+        return IntegerProxy(shape, Sequence.proxy_label_for(label))
+
+    @staticmethod
+    def boolean_proxy_for(label: str, shape: Collection[int] = ()) -> Vertex:
+        """
+        Creates a proxy vertex for the given label
+        """
+        return BooleanProxy(shape, Sequence.proxy_label_for(label))

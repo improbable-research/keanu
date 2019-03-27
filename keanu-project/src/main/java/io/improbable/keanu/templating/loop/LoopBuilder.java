@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
@@ -91,7 +90,6 @@ public class LoopBuilder {
         private final int maxLoopCount;
         private final boolean throwWhenMaxCountIsReached;
         private final VertexLabel VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL = new VertexLabel("loop_value_out_when_always_true");
-        private final VertexLabel VALUE_IN_WHEN_ALWAYS_TRUE_LABEL = SequenceBuilder.proxyFor(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
@@ -146,9 +144,9 @@ public class LoopBuilder {
                 .count(maxLoopCount)
                 .withFactory((item) -> {
                     // inputs
-                    DoubleVertex valueInWhenAlwaysTrue = new DoubleProxyVertex(VALUE_IN_WHEN_ALWAYS_TRUE_LABEL);
-                    BooleanVertex stillLooping = new BooleanProxyVertex(Loop.STILL_LOOPING_LABEL);
-                    DoubleVertex valueIn = new DoubleProxyVertex(Loop.VALUE_IN_LABEL);
+                    DoubleVertex valueInWhenAlwaysTrue = SequenceBuilder.doubleProxyFor(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
+                    BooleanVertex stillLooping = SequenceBuilder.booleanProxyFor(LOOP_LABEL);
+                    DoubleVertex valueIn = SequenceBuilder.doubleProxyFor(Loop.VALUE_OUT_LABEL);
                     item.addAll(valueInWhenAlwaysTrue, stillLooping, valueIn);
 
                     // intermediate

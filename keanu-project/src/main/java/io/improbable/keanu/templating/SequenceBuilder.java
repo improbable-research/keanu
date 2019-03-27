@@ -4,6 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -42,10 +45,39 @@ public class SequenceBuilder<T> {
         Sequence build();
     }
 
-    public static VertexLabel proxyFor(VertexLabel label) {
+    public static VertexLabel proxyLabelFor(VertexLabel label) {
         return label.withExtraNamespace(PROXY_LABEL_MARKER);
     }
 
+    public static DoubleProxyVertex doubleProxyFor(VertexLabel label) {
+        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        return new DoubleProxyVertex(vertexLabel);
+    }
+
+    public static DoubleProxyVertex doubleProxyFor(VertexLabel label, long[] shape) {
+        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        return new DoubleProxyVertex(shape, vertexLabel);
+    }
+
+    public static IntegerProxyVertex integerProxyFor(VertexLabel label) {
+        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        return new IntegerProxyVertex(vertexLabel);
+    }
+
+    public static IntegerProxyVertex integerProxyFor(VertexLabel label, long[] shape) {
+        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        return new IntegerProxyVertex(shape, vertexLabel);
+    }
+
+    public static BooleanProxyVertex booleanProxyFor(VertexLabel label) {
+        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        return new BooleanProxyVertex(vertexLabel);
+    }
+
+    public static BooleanProxyVertex booleanProxyFor(VertexLabel label, long[] shape) {
+        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        return new BooleanProxyVertex(shape, vertexLabel);
+    }
 
     public SequenceBuilder<T> withInitialState(Vertex<?> vertex) {
         return withInitialState(VertexDictionary.of(vertex));

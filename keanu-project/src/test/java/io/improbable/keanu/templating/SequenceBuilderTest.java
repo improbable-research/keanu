@@ -246,7 +246,6 @@ public class SequenceBuilderTest {
     public void youCanCreateATimeSeriesFromSequenceFromACount() {
 
         VertexLabel xLabel = new VertexLabel("x");
-        VertexLabel xPreviousLabel = SequenceBuilder.proxyFor(xLabel);
         VertexLabel yLabel = new VertexLabel("y");
 
         Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
@@ -256,7 +255,7 @@ public class SequenceBuilderTest {
             .withInitialState(xLabel, initialX)
             .count(10)
             .withFactory((item) -> {
-                DoubleVertex xPrevious = new DoubleProxyVertex(xPreviousLabel);
+                DoubleVertex xPrevious = SequenceBuilder.doubleProxyFor(xLabel);
                 DoubleVertex x = new ExponentialVertex(xPrevious);
                 IntegerVertex y = new PoissonVertex(x);
                 item.add(xPrevious);
@@ -267,6 +266,7 @@ public class SequenceBuilderTest {
 
 
         Vertex<DoubleTensor> previousX = initialX;
+        VertexLabel xPreviousLabel = SequenceBuilder.proxyLabelFor(xLabel);
 
         for (SequenceItem item : sequence) {
             Vertex<DoubleTensor> xPreviousProxy = item.get(xPreviousLabel);
@@ -291,7 +291,6 @@ public class SequenceBuilderTest {
     public void youCanCreateATimeSeriesFromSequenceFromAnIterator() {
 
         VertexLabel xLabel = new VertexLabel("x");
-        VertexLabel xPreviousLabel = SequenceBuilder.proxyFor(xLabel);
         VertexLabel yLabel = new VertexLabel("y");
 
         Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
@@ -301,7 +300,7 @@ public class SequenceBuilderTest {
             .withInitialState(xLabel, initialX)
             .fromIterator(ys.iterator())
             .withFactory((item, observedY) -> {
-                DoubleVertex xPreviousProxy = new DoubleProxyVertex(xPreviousLabel);
+                DoubleVertex xPreviousProxy = SequenceBuilder.doubleProxyFor(xLabel);
                 DoubleVertex x = new ExponentialVertex(xPreviousProxy);
                 IntegerVertex y = new PoissonVertex(x);
                 y.observe(observedY);
@@ -313,6 +312,7 @@ public class SequenceBuilderTest {
 
 
         Vertex<DoubleTensor> previousX = initialX;
+        VertexLabel xPreviousLabel = SequenceBuilder.proxyLabelFor(xLabel);
 
         for (SequenceItem item : sequence) {
             Vertex<DoubleTensor> xPreviousProxy = item.get(xPreviousLabel);
@@ -494,14 +494,9 @@ public class SequenceBuilderTest {
         DoubleVertex two = new ConstantDoubleVertex(2);
         DoubleVertex half = new ConstantDoubleVertex(0.5);
 
-        VertexLabel x1InputLabel = SequenceBuilder.proxyFor(x1Label);
-        VertexLabel x2InputLabel = SequenceBuilder.proxyFor(x2Label);
-        VertexLabel x3InputLabel = SequenceBuilder.proxyFor(x3Label);
-        VertexLabel x4InputLabel = SequenceBuilder.proxyFor(x4Label);
-
         Consumer<SequenceItem> factory1 = sequenceItem -> {
-            DoubleProxyVertex x1Input = new DoubleProxyVertex(x1InputLabel);
-            DoubleProxyVertex x2Input = new DoubleProxyVertex(x2InputLabel);
+            DoubleProxyVertex x1Input = SequenceBuilder.doubleProxyFor(x1Label);
+            DoubleProxyVertex x2Input = SequenceBuilder.doubleProxyFor(x2Label);
 
             DoubleVertex x1Output = x1Input.multiply(two).setLabel(x1Label);
             DoubleVertex x3Output = x2Input.multiply(two).setLabel(x3Label);
@@ -510,8 +505,8 @@ public class SequenceBuilderTest {
         };
 
         Consumer<SequenceItem> factory2 = sequenceItem -> {
-            DoubleProxyVertex x3Input = new DoubleProxyVertex(x3InputLabel);
-            DoubleProxyVertex x4Input = new DoubleProxyVertex(x4InputLabel);
+            DoubleProxyVertex x3Input = SequenceBuilder.doubleProxyFor(x3Label);
+            DoubleProxyVertex x4Input = SequenceBuilder.doubleProxyFor(x4Label);
 
             DoubleVertex x2Output = x3Input.multiply(half).setLabel(x2Label);
             DoubleVertex x4Output = x4Input.multiply(half).setLabel(x4Label);
@@ -537,6 +532,12 @@ public class SequenceBuilderTest {
             .build();
 
         assertThat(sequence.size(), equalTo(5));
+
+        VertexLabel x1InputLabel = SequenceBuilder.proxyLabelFor(x1Label);
+        VertexLabel x2InputLabel = SequenceBuilder.proxyLabelFor(x2Label);
+        VertexLabel x3InputLabel = SequenceBuilder.proxyLabelFor(x3Label);
+        VertexLabel x4InputLabel = SequenceBuilder.proxyLabelFor(x4Label);
+
         for (SequenceItem item : sequence.asList()) {
             checkSequenceOutputLinksToInput(item, x1InputLabel, x1Label);
             checkSequenceOutputLinksToInput(item, x2InputLabel, x3Label);
