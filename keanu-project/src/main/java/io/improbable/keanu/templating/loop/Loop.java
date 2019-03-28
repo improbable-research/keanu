@@ -50,7 +50,7 @@ public class Loop {
     public static final VertexLabel VALUE_OUT_LABEL = new VertexLabel("loop_value_out");
     public static final VertexLabel CONDITION_LABEL = new VertexLabel("loop_condition");
     public static final VertexLabel VALUE_IN_LABEL = SequenceBuilder.proxyLabelFor(VALUE_OUT_LABEL);
-    public static final VertexLabel LOOP_LABEL = SequenceBuilder.proxyLabelFor(new VertexLabel("loop"));
+    public static final VertexLabel STILL_LOOPING_LABEL = SequenceBuilder.proxyLabelFor(new VertexLabel("loop"));
     public static final int DEFAULT_MAX_COUNT = 100;
     private final Sequence sequence;
     private final boolean throwWhenMaxCountIsReached;
@@ -122,7 +122,7 @@ public class Loop {
     }
 
     private void checkIfMaxCountHasBeenReached(SequenceItem item) throws LoopDidNotTerminateException {
-        BooleanVertex stillLooping = item.get(LOOP_LABEL);
+        BooleanVertex stillLooping = item.get(STILL_LOOPING_LABEL);
         if (!stillLooping.getValue().allFalse()) {
             String errorMessage = "Loop has exceeded its max count " + sequence.size();
             if (throwWhenMaxCountIsReached) {

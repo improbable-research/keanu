@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import static io.improbable.keanu.templating.SequenceBuilder.proxyLabelFor;
 import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
 import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
 import static io.improbable.keanu.vertices.VertexMatchers.hasLabel;
@@ -265,7 +266,7 @@ public class SequenceBuilderTest {
 
 
         Vertex<DoubleTensor> previousX = initialX;
-        VertexLabel xPreviousLabel = SequenceBuilder.proxyLabelFor(xLabel);
+        VertexLabel xPreviousLabel = proxyLabelFor(xLabel);
 
         for (SequenceItem item : sequence) {
             Vertex<DoubleTensor> xPreviousProxy = item.get(xPreviousLabel);
@@ -310,7 +311,7 @@ public class SequenceBuilderTest {
 
 
         Vertex<DoubleTensor> previousX = initialX;
-        VertexLabel xPreviousLabel = SequenceBuilder.proxyLabelFor(xLabel);
+        VertexLabel xPreviousLabel = proxyLabelFor(xLabel);
 
         for (SequenceItem item : sequence) {
             Vertex<DoubleTensor> xPreviousProxy = item.get(xPreviousLabel);
@@ -531,16 +532,11 @@ public class SequenceBuilderTest {
 
         assertThat(sequence.size(), equalTo(5));
 
-        VertexLabel x1InputLabel = SequenceBuilder.proxyLabelFor(x1Label);
-        VertexLabel x2InputLabel = SequenceBuilder.proxyLabelFor(x2Label);
-        VertexLabel x3InputLabel = SequenceBuilder.proxyLabelFor(x3Label);
-        VertexLabel x4InputLabel = SequenceBuilder.proxyLabelFor(x4Label);
-
         for (SequenceItem item : sequence.asList()) {
-            checkSequenceOutputLinksToInput(item, x1InputLabel, x1Label);
-            checkSequenceOutputLinksToInput(item, x2InputLabel, x3Label);
-            checkSequenceOutputLinksToInput(item, x3InputLabel, x2Label);
-            checkSequenceOutputLinksToInput(item, x4InputLabel, x4Label);
+            checkSequenceOutputLinksToInput(item, proxyLabelFor(x1Label), x1Label);
+            checkSequenceOutputLinksToInput(item, proxyLabelFor(x2Label), x3Label);
+            checkSequenceOutputLinksToInput(item, proxyLabelFor(x3Label), x2Label);
+            checkSequenceOutputLinksToInput(item, proxyLabelFor(x4Label), x4Label);
         }
 
         checkOutputEquals(sequence, x1Label, 128.);

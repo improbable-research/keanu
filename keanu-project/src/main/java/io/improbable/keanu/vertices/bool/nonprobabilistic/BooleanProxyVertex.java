@@ -36,14 +36,9 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
     }
 
     @Override
-    public void addScopeToLabel(String scope) {
-        super.setLabel(this.getLabel().withExtraNamespace(scope));
-    }
-
-    @Override
     public <V extends Vertex<BooleanTensor>> V setLabel(VertexLabel label) {
-        if (this.getLabel() != null) {
-            throw new RuntimeException("You should not set the label on a Proxy Vertex");
+        if (this.getLabel() != null && !this.getLabel().getUnqualifiedName().equals(label.getUnqualifiedName())) {
+            throw new RuntimeException("You should not change the label on a Proxy Vertex");
         }
         return super.setLabel(label);
     }

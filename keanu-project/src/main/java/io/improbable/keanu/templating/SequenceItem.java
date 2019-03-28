@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
-import static io.improbable.keanu.templating.SequenceBuilder.PROXY_LABEL_MARKER;
 
 public class SequenceItem implements VertexDictionary {
 
@@ -58,11 +57,7 @@ public class SequenceItem implements VertexDictionary {
             throw new IllegalArgumentException("Key " + label + " already exists");
         }
         contents.put(label, v);
-        if (v instanceof ProxyVertex) {
-            ((ProxyVertex) v).addScopeToLabel(getUniqueName());
-        } else {
-            v.setLabel(label);
-        }
+        v.setLabel(label);
         return v;
     }
 
@@ -113,7 +108,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public DoubleProxyVertex addDoubleProxyFor(VertexLabel label) {
-        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
         DoubleProxyVertex newVertex = new DoubleProxyVertex(vertexLabel);
         this.add(newVertex);
         return newVertex;
@@ -127,7 +122,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public DoubleProxyVertex addDoubleProxyFor(VertexLabel label, long[] shape) {
-        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
         DoubleProxyVertex newVertex = new DoubleProxyVertex(shape, vertexLabel);
         this.add(newVertex);
         return newVertex;
@@ -140,7 +135,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public IntegerProxyVertex addIntegerProxyFor(VertexLabel label) {
-        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
         IntegerProxyVertex newVertex = new IntegerProxyVertex(vertexLabel);
         this.add(newVertex);
         return newVertex;
@@ -154,7 +149,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public IntegerProxyVertex addIntegerProxyFor(VertexLabel label, long[] shape) {
-        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
         IntegerProxyVertex newVertex = new IntegerProxyVertex(shape, vertexLabel);
         this.add(newVertex);
         return newVertex;
@@ -167,7 +162,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public BooleanProxyVertex addBooleanProxyFor(VertexLabel label) {
-        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
         BooleanProxyVertex newVertex = new BooleanProxyVertex(vertexLabel);
         this.add(newVertex);
         return newVertex;
@@ -181,7 +176,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public BooleanProxyVertex addBooleanProxyFor(VertexLabel label, long[] shape) {
-        VertexLabel vertexLabel = label.withExtraNamespace(PROXY_LABEL_MARKER);
+        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
         BooleanProxyVertex newVertex = new BooleanProxyVertex(shape, vertexLabel);
         this.add(newVertex);
         return newVertex;

@@ -20,7 +20,7 @@ import java.util.function.Consumer;
  */
 public class SequenceBuilder<T> {
 
-    static final String PROXY_LABEL_MARKER = "proxy_for";
+    private static final String PROXY_LABEL_MARKER = "proxy_for";
     private VertexDictionary initialState;
     private Map<VertexLabel, VertexLabel> transitionMapping = Collections.emptyMap();
 

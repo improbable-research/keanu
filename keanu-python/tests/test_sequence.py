@@ -172,16 +172,11 @@ def test_you_can_use_multiple_factories_to_build_sequences() -> None:
 
     assert sequence.size() == 5
 
-    x1_input_label = Sequence.proxy_label_for(x1_label)
-    x2_input_label = Sequence.proxy_label_for(x2_label)
-    x3_input_label = Sequence.proxy_label_for(x3_label)
-    x4_input_label = Sequence.proxy_label_for(x4_label)
-
     for item in sequence:
-        __check_sequence_output_links_to_input(item, x1_input_label, x1_label)
-        __check_sequence_output_links_to_input(item, x2_input_label, x3_label)
-        __check_sequence_output_links_to_input(item, x3_input_label, x2_label)
-        __check_sequence_output_links_to_input(item, x4_input_label, x4_label)
+        __check_sequence_output_links_to_input(item, Sequence.proxy_label_for(x1_label), x1_label)
+        __check_sequence_output_links_to_input(item, Sequence.proxy_label_for(x2_label), x3_label)
+        __check_sequence_output_links_to_input(item, Sequence.proxy_label_for(x3_label), x2_label)
+        __check_sequence_output_links_to_input(item, Sequence.proxy_label_for(x4_label), x4_label)
 
     __check_output_equals(sequence, x1_label, 128)
     __check_output_equals(sequence, x2_label, 2)
