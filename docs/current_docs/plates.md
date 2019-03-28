@@ -81,8 +81,7 @@ BayesianNetwork network = new BayesianNetwork(seedVertex.getConnectedGraph());
 
 //Within `network` our vertices will have the labels of the form:
 //Keanu-Example.Sequence_Item_<<timestep>>.<<unique-hash>>.<<label>>
-List<Vertex> allXVertices = network.getVerticesInNamespace("Keanu-Example");
-allXVertices.removeIf(vertex -> !vertex.getLabel().getUnqualifiedName().equals("x"));
+List<Vertex> allXVertices = network.getVerticesIgnoringNamespace(x1Label.getUnqualifiedName());
 
 //You can also get a vertex from a specific timestep
 Vertex x1Retrieved = sequence.getLastItem().get(x1Label);

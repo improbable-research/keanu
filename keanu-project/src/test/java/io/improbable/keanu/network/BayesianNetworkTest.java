@@ -153,6 +153,24 @@ public class BayesianNetworkTest {
     }
 
     @Test
+    public void networkReturnsAllWithLabelInnerLabel() {
+        BooleanVertex a0 = new BernoulliVertex(0.5);
+        BooleanVertex a1 = new BernoulliVertex(0.5);
+        BooleanVertex b0 = new BernoulliVertex(0.5);
+        BooleanVertex c = new BernoulliVertex(0.5);
+
+        a0.setLabel(new VertexLabel("root", "a", "0"));
+        a1.setLabel(new VertexLabel("root", "a", "1"));
+        b0.setLabel(new VertexLabel("root", "b", "0"));
+
+        BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
+        List<Vertex> verticesInNamespace = net.getVerticesIgnoringNamespace("0");
+
+        assertThat(verticesInNamespace.size(), equalTo(2));
+        assertTrue(verticesInNamespace.containsAll(Arrays.asList(a0, b0)));
+    }
+
+    @Test
     public void throwsIfVertexWithLabelIsNotInBayesianNetwork() {
         BernoulliVertex vertexInNetwork = new BernoulliVertex(0.5);
         vertexInNetwork.setLabel(LABEL_A);
