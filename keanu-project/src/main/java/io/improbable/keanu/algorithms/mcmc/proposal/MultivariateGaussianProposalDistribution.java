@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
-import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
