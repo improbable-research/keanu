@@ -19,6 +19,7 @@ k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.templating.SequenceBuilder")
 java_import(k.jvm_view(), "io.improbable.keanu.vertices.SimpleVertexDictionary")
+java_import(k.jvm_view(), "io.improbable.keanu.templating.SequenceItem")
 
 
 class SequenceItem(JavaObjectWrapper):
@@ -43,6 +44,33 @@ class SequenceItem(JavaObjectWrapper):
             get_unqualified_name_or_proxy_name(k, v): Vertex._from_java_vertex(v)
             for k, v in self.unwrap().getContents().items()
         }
+
+    def add_double_proxy_for(self, label: str, shape: Collection[int] = None) -> Vertex:
+        """
+        Creates a proxy vertex for the given label and adds to the sequence item
+        """
+        if shape is None:
+            return Vertex._from_java_vertex(self.unwrap().addDoubleProxyFor(_VertexLabel(label).unwrap()))
+        else:
+            return Vertex._from_java_vertex(self.unwrap().addDoubleProxyFor(_VertexLabel(label).unwrap(), shape))
+
+    def add_integer_proxy_for(self, label: str, shape: Collection[int] = None) -> Vertex:
+        """
+        Creates a proxy vertex for the given label and adds to the sequence item
+        """
+        if shape is None:
+            return Vertex._from_java_vertex(self.unwrap().addIntegerProxyFor(_VertexLabel(label).unwrap()))
+        else:
+            return Vertex._from_java_vertex(self.unwrap().addIntegerProxyFor(_VertexLabel(label).unwrap(), shape))
+
+    def add_boolean_proxy_for(self, label: str, shape: Collection[int] = None) -> Vertex:
+        """
+        Creates a proxy vertex for the given label and adds to the sequence item
+        """
+        if shape is None:
+            return Vertex._from_java_vertex(self.unwrap().addBooleanProxyFor(_VertexLabel(label).unwrap()))
+        else:
+            return Vertex._from_java_vertex(self.unwrap().addBooleanProxyFor(_VertexLabel(label).unwrap(), shape))
 
 
 class Sequence(JavaObjectWrapper):
@@ -117,24 +145,3 @@ class Sequence(JavaObjectWrapper):
         label_java = _VertexLabel(label).unwrap()
         proxy_label_java = k.jvm_view().SequenceBuilder.proxyLabelFor(label_java)
         return proxy_label_java.getQualifiedName()
-
-    @staticmethod
-    def double_proxy_for(label: str, shape: Collection[int] = ()) -> Vertex:
-        """
-        Creates a proxy vertex for the given label
-        """
-        return DoubleProxy(shape, Sequence.proxy_label_for(label))
-
-    @staticmethod
-    def integer_proxy_for(label: str, shape: Collection[int] = ()) -> Vertex:
-        """
-        Creates a proxy vertex for the given label
-        """
-        return IntegerProxy(shape, Sequence.proxy_label_for(label))
-
-    @staticmethod
-    def boolean_proxy_for(label: str, shape: Collection[int] = ()) -> Vertex:
-        """
-        Creates a proxy vertex for the given label
-        """
-        return BooleanProxy(shape, Sequence.proxy_label_for(label))

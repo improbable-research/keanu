@@ -93,8 +93,8 @@ public class SequenceExample {
             // Define the Proxy Vertices which stand in for a Vertex from the previous SequenceItem.
             // They will be automatically wired up when you construct the Sequence.
             // i.e. these are the 'inputs' to our SequenceItem
-            DoubleProxyVertex x1Input = SequenceBuilder.doubleProxyFor(x1Label);
-            DoubleProxyVertex x2Input = SequenceBuilder.doubleProxyFor(x2Label);
+            DoubleProxyVertex x1Input = sequenceItem.addDoubleProxyFor(x1Label);
+            DoubleProxyVertex x2Input = sequenceItem.addDoubleProxyFor(x2Label);
 
             DoubleVertex x1Output = x1Input.multiply(two).setLabel(x1Label);
             DoubleVertex x2Output = x2Input.plus(x1Output).setLabel(x2Label);

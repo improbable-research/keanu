@@ -255,10 +255,9 @@ public class SequenceBuilderTest {
             .withInitialState(xLabel, initialX)
             .count(10)
             .withFactory((item) -> {
-                DoubleVertex xPrevious = SequenceBuilder.doubleProxyFor(xLabel);
+                DoubleVertex xPrevious = item.addDoubleProxyFor(xLabel);
                 DoubleVertex x = new ExponentialVertex(xPrevious);
                 IntegerVertex y = new PoissonVertex(x);
-                item.add(xPrevious);
                 item.add(xLabel, x);
                 item.add(yLabel, y);
             })
@@ -300,11 +299,10 @@ public class SequenceBuilderTest {
             .withInitialState(xLabel, initialX)
             .fromIterator(ys.iterator())
             .withFactory((item, observedY) -> {
-                DoubleVertex xPreviousProxy = SequenceBuilder.doubleProxyFor(xLabel);
+                DoubleVertex xPreviousProxy = item.addDoubleProxyFor(xLabel);
                 DoubleVertex x = new ExponentialVertex(xPreviousProxy);
                 IntegerVertex y = new PoissonVertex(x);
                 y.observe(observedY);
-                item.add(xPreviousProxy);
                 item.add(xLabel, x);
                 item.add(yLabel, y);
             })
@@ -495,23 +493,23 @@ public class SequenceBuilderTest {
         DoubleVertex half = new ConstantDoubleVertex(0.5);
 
         Consumer<SequenceItem> factory1 = sequenceItem -> {
-            DoubleProxyVertex x1Input = SequenceBuilder.doubleProxyFor(x1Label);
-            DoubleProxyVertex x2Input = SequenceBuilder.doubleProxyFor(x2Label);
+            DoubleProxyVertex x1Input = sequenceItem.addDoubleProxyFor(x1Label);
+            DoubleProxyVertex x2Input = sequenceItem.addDoubleProxyFor(x2Label);
 
             DoubleVertex x1Output = x1Input.multiply(two).setLabel(x1Label);
             DoubleVertex x3Output = x2Input.multiply(two).setLabel(x3Label);
 
-            sequenceItem.addAll(x1Input, x2Input, x1Output, x3Output);
+            sequenceItem.addAll(x1Output, x3Output);
         };
 
         Consumer<SequenceItem> factory2 = sequenceItem -> {
-            DoubleProxyVertex x3Input = SequenceBuilder.doubleProxyFor(x3Label);
-            DoubleProxyVertex x4Input = SequenceBuilder.doubleProxyFor(x4Label);
+            DoubleProxyVertex x3Input = sequenceItem.addDoubleProxyFor(x3Label);
+            DoubleProxyVertex x4Input = sequenceItem.addDoubleProxyFor(x4Label);
 
             DoubleVertex x2Output = x3Input.multiply(half).setLabel(x2Label);
             DoubleVertex x4Output = x4Input.multiply(half).setLabel(x4Label);
 
-            sequenceItem.addAll(x3Input, x4Input, x2Output, x4Output);
+            sequenceItem.addAll(x2Output, x4Output);
         };
 
         DoubleVertex x1Start = new ConstantDoubleVertex(4).setLabel(x1Label);

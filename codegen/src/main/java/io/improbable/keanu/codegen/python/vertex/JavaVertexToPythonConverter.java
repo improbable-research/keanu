@@ -123,7 +123,6 @@ class JavaVertexToPythonConverter {
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "Collection[Vertex]";
         } else if (VertexLabel.class.isAssignableFrom(parameterType)) {
-            //In python we treat vertex labels as simple strings
             return "str";
         } else {
             throw new NotImplementedException(String.format("Mapping from Java type %s is not defined.", parameterType.getName()));
@@ -176,7 +175,6 @@ class JavaVertexToPythonConverter {
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex_array(" + pythonParameter + ")";
         } else if (VertexLabel.class.isAssignableFrom(parameterType)) {
-            //This must happen because the constructor of _VertexLabel handles namespace generation
             return "_VertexLabel(" + pythonParameter + ")";
         } else {
             throw new IllegalArgumentException("Failed to Encode " + pythonParameter + " of type: " + parameterType);

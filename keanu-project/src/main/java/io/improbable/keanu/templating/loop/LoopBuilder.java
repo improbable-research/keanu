@@ -144,10 +144,9 @@ public class LoopBuilder {
                 .count(maxLoopCount)
                 .withFactory((item) -> {
                     // inputs
-                    DoubleVertex valueInWhenAlwaysTrue = SequenceBuilder.doubleProxyFor(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
-                    BooleanVertex stillLooping = SequenceBuilder.booleanProxyFor(LOOP_LABEL);
-                    DoubleVertex valueIn = SequenceBuilder.doubleProxyFor(Loop.VALUE_OUT_LABEL);
-                    item.addAll(valueInWhenAlwaysTrue, stillLooping, valueIn);
+                    DoubleVertex valueInWhenAlwaysTrue = item.addDoubleProxyFor(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
+                    BooleanVertex stillLooping = item.addBooleanProxyFor(LOOP_LABEL);
+                    DoubleVertex valueIn = item.addDoubleProxyFor(Loop.VALUE_OUT_LABEL);
 
                     // intermediate
                     BooleanVertex condition = conditionFunction.apply(item);

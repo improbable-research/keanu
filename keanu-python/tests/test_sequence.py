@@ -76,10 +76,9 @@ def test_you_can_build_a_time_series() -> None:
     initial_x = 1.
 
     def create_time_step(sequence_item):
-        x_previous = Sequence.double_proxy_for(x_label)
+        x_previous = sequence_item.add_double_proxy_for(x_label)
         x = Exponential(x_previous)
         y = Poisson(x)
-        sequence_item.add(x_previous)
         sequence_item.add(x, label=x_label)
         sequence_item.add(y, label=y_label)
 
@@ -133,30 +132,26 @@ def test_you_can_use_multiple_factories_to_build_sequences() -> None:
     half = ConstantDouble(0.5)
 
     def factory1(sequence_item):
-        x1_input = Sequence.double_proxy_for(x1_label)
-        x2_input = Sequence.double_proxy_for(x2_label)
+        x1_input = sequence_item.add_double_proxy_for(x1_label)
+        x2_input = sequence_item.add_double_proxy_for(x2_label)
 
         x1_output = x1_input * two
         x1_output.set_label(x1_label)
         x3_output = x2_input * two
         x3_output.set_label(x3_label)
 
-        sequence_item.add(x1_input)
-        sequence_item.add(x2_input)
         sequence_item.add(x1_output)
         sequence_item.add(x3_output)
 
     def factory2(sequence_item):
-        x3_input = Sequence.double_proxy_for(x3_label)
-        x4_input = Sequence.double_proxy_for(x4_label)
+        x3_input = sequence_item.add_double_proxy_for(x3_label)
+        x4_input = sequence_item.add_double_proxy_for(x4_label)
 
         x2_output = x3_input * half
         x2_output.set_label(x2_label)
         x4_output = x4_input * half
         x4_output.set_label(x4_label)
 
-        sequence_item.add(x3_input)
-        sequence_item.add(x4_input)
         sequence_item.add(x2_output)
         sequence_item.add(x4_output)
 
@@ -198,11 +193,10 @@ def test_last_item_retrieved_correctly() -> None:
     x_label = "x"
 
     def factory(sequence_item):
-        x = Sequence.double_proxy_for(x_label)
+        x = sequence_item.add_double_proxy_for(x_label)
         x_out = x * Const(2.0)
         x_out.set_label(x_label)
         sequence_item.add(x_out)
-        sequence_item.add(x)
 
     x_start = ConstantDouble(1.0)
     initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {x_label: x_start}
