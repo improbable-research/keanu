@@ -51,7 +51,7 @@ public class MultivariateGaussianProposalDistribution implements ProposalDistrib
             throw new ClassCastException("Only DoubleTensor values are supported - not " + ofValue.getClass().getSimpleName());
         }
 
-        ContinuousDistribution proposalDistribution = Gaussian.withParameters((DoubleTensor) ofValue, sigmas.get(variable));
+        Gaussian proposalDistribution = (Gaussian) Gaussian.withParameters((DoubleTensor) ofValue, sigmas.get(variable));
         return proposalDistribution.logProb((DoubleTensor) givenValue).sum();
     }
 
