@@ -26,6 +26,10 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
         return new SimpleBooleanTensor(scalarValue);
     }
 
+    static BooleanTensor vector(boolean... values) {
+        return create(values, values.length);
+    }
+
     static BooleanTensor trues(long... shape) {
         return new SimpleBooleanTensor(true, shape);
     }
@@ -34,10 +38,10 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
         return new SimpleBooleanTensor(false, shape);
     }
 
-     /**
-     * @param dimension  the dimension along which toStack are stacked
-     * @param toStack    an array of BooleanTensor's of the same shape
-     * @return  a BooleanTensor with toStack joined along a new dimension
+    /**
+     * @param dimension the dimension along which toStack are stacked
+     * @param toStack   an array of BooleanTensor's of the same shape
+     * @return a BooleanTensor with toStack joined along a new dimension
      * <p>
      * e.g. A, B, C = BooleanTensor.trues(4, 2)
      * <p>
