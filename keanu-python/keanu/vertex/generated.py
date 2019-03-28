@@ -152,7 +152,7 @@ def BooleanIf(predicate: vertex_constructor_param_types, thn: vertex_constructor
 
 
 def BooleanProxy(shape: Collection[int], label: str) -> Vertex:
-    return Boolean(context.jvm_view().BooleanProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label).unwrap())
+    return Boolean(context.jvm_view().BooleanProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label))
 
 
 def CastToBoolean(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -255,7 +255,7 @@ def DoubleIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_
 
 
 def DoubleProxy(shape: Collection[int], label: str) -> Vertex:
-    return Double(context.jvm_view().DoubleProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label).unwrap())
+    return Double(context.jvm_view().DoubleProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label))
 
 
 def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -708,7 +708,7 @@ def IntegerIf(predicate: vertex_constructor_param_types, thn: vertex_constructor
 
 
 def IntegerProxy(shape: Collection[int], label: str) -> Vertex:
-    return Integer(context.jvm_view().IntegerProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label).unwrap())
+    return Integer(context.jvm_view().IntegerProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label))
 
 
 def IntegerAddition(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

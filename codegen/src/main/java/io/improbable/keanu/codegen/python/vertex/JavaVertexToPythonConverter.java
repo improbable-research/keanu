@@ -177,7 +177,7 @@ class JavaVertexToPythonConverter {
             return "cast_to_vertex_array(" + pythonParameter + ")";
         } else if (VertexLabel.class.isAssignableFrom(parameterType)) {
             //This must happen because the constructor of _VertexLabel handles namespace generation
-            return "_VertexLabel(" + pythonParameter + ").unwrap()";
+            return "_VertexLabel(" + pythonParameter + ")";
         } else {
             throw new IllegalArgumentException("Failed to Encode " + pythonParameter + " of type: " + parameterType);
         }
