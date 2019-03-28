@@ -109,7 +109,11 @@ def __check_sequence_output_links_to_input(item: SequenceItem, previous_output_l
     assert optional_output_of_previous_timestep is not None
     assert next(input_children, None) is None
 
-    assert optional_output_of_previous_timestep.get_label_without_outer_namespace() == current_input_label
+    label = optional_output_of_previous_timestep.get_label()
+    assert label is not None
+
+    without_namespace = ".".join(label.split(".")[2:])
+    assert without_namespace == current_input_label
 
 
 def __check_output_equals(sequence: Sequence, label: str, desired_output: float) -> None:

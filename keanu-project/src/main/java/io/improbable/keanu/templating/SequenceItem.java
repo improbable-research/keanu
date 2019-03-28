@@ -20,9 +20,19 @@ public class SequenceItem implements VertexDictionary {
     private static Pattern NAME_REGEX = Pattern.compile(NAME_PREFIX + "-?[\\d]+$");
 
     private Map<VertexLabel, Vertex<?>> contents;
+    private int itemPosition;
+    private int uniqueIdentifier;
+    private String identifyingNamespace;
 
-    public SequenceItem() {
+    public SequenceItem(int itemPosition, int uniqueIdentifier) {
+        this(itemPosition, uniqueIdentifier, null);
+    }
+
+    public SequenceItem(int itemPosition, int uniqueIdentifier, String identifyingNamespace) {
         this.contents = new HashMap<>();
+        this.itemPosition = itemPosition;
+        this.uniqueIdentifier = uniqueIdentifier;
+        this.identifyingNamespace = identifyingNamespace;
     }
 
     public <T extends Vertex<?>> void addAll(T... vertices) {
@@ -66,12 +76,23 @@ public class SequenceItem implements VertexDictionary {
         return copyOf(this.contents);
     }
 
+    public int getPosition() {
+        return this.itemPosition;
+    }
+
     private String getUniqueName() {
-        return NAME_PREFIX + this.hashCode();
+        return NAME_PREFIX + this.itemPosition;
     }
 
     private VertexLabel scoped(VertexLabel label) {
-        return label.withExtraNamespace(getUniqueName());
+        VertexLabel scopedLabel = label
+            .withExtraNamespace(String.valueOf(this.uniqueIdentifier))
+            .withExtraNamespace(getUniqueName());
+
+        if (this.identifyingNamespace != null) {
+            scopedLabel = scopedLabel.withExtraNamespace(this.identifyingNamespace);
+        }
+        return scopedLabel;
     }
 
     @Override
@@ -86,7 +107,7 @@ public class SequenceItem implements VertexDictionary {
 
     @Override
     public SequenceItem withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
-        SequenceItem item = new SequenceItem();
+        SequenceItem item = new SequenceItem(this.itemPosition, this.uniqueIdentifier, this.identifyingNamespace);
         item.addAll(contents);
         item.addAll(extraEntries);
         return item;

@@ -1,11 +1,13 @@
 package io.improbable.snippet;
 
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.templating.Sequence;
 import io.improbable.keanu.templating.SequenceBuilder;
 import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.SimpleVertexDictionary;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -112,9 +114,26 @@ public class SequenceExample {
 
         Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(dictionary)
+            .withIdentifyingNamespace("Keanu-Example")
             .count(5)
             .withFactory(factory)
             .build();
+
+        //We can now do a few things:
+        Vertex<?> seedVertex = sequence.getLastItem().get(x1Label);
+        BayesianNetwork network = new BayesianNetwork(seedVertex.getConnectedGraph());
+
+        //Within `network` our vertices will have the labels of the form:
+        //Keanu-Example.Sequence_Item_<<timestep>>.<<unique-hash>>.<<label>>
+        List<Vertex> allXVertices = network.getVerticesInNamespace("Keanu-Example");
+        allXVertices.removeIf(vertex -> !vertex.getLabel().getUnqualifiedName().equals("x"));
+
+        //You can also get a vertex from a specific timestep
+        Vertex x1Retrieved = sequence.getLastItem().get(x1Label);
+
+        //Finally, you may need to use the save/load interface on `network` and will need a way of accessing timesteps
+        //without having access to the `sequence` object
+        x1Retrieved = network.getVerticesInNamespace("Keanu-Example", "Sequence_Item_0").get(0);
 
         //%%SNIPPET_END%% SequenceTimeSeries
 

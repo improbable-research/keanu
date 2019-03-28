@@ -60,10 +60,11 @@ class Sequence(JavaObjectWrapper):
     def __init__(self,
                  factories: Union[Callable[..., None], Iterable[Callable[..., None]]] = None,
                  count: int = None,
+                 namespace_identifier: str = None,
                  data_generator: Iterator[Dict[str, Any]] = None,
                  initial_state: Dict[str, vertex_constructor_param_types] = None):
 
-        builder = k.jvm_view().SequenceBuilder()
+        builder = k.jvm_view().SequenceBuilder().withIdentifyingNamespace(namespace_identifier)
 
         if initial_state is not None:
             initial_state_java = k.to_java_map(

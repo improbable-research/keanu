@@ -314,6 +314,7 @@ public class SequenceBuilderTest {
 
         Vertex<DoubleTensor> previousX = initialX;
 
+        int i = 0;
         for (SequenceItem item : sequence) {
             Vertex<DoubleTensor> xPreviousProxy = item.get(xPreviousLabel);
             Vertex<DoubleTensor> x = item.get(xLabel);
@@ -321,7 +322,11 @@ public class SequenceBuilderTest {
             assertThat(xPreviousProxy.getParents(), contains(previousX));
             assertThat(x.getParents(), contains(xPreviousProxy));
             assertThat(y.getParents(), contains(x));
+            Optional<String> desiredLabelOuterNamespace = Optional.of("Sequence_Item_" + i);
+            assertThat(x.getLabel().getOuterNamespace(), is(desiredLabelOuterNamespace));
+            assertThat(y.getLabel().getOuterNamespace(), is(desiredLabelOuterNamespace));
             previousX = x;
+            i++;
         }
     }
 
@@ -485,6 +490,47 @@ public class SequenceBuilderTest {
     }
 
     @Test
+    public void testStillWorksWithNamespaceIdentifier() {
+        VertexLabel xLabel = new VertexLabel("x");
+        VertexLabel xPreviousLabel = SequenceBuilder.proxyFor(xLabel);
+        VertexLabel yLabel = new VertexLabel("y");
+        String uniqueNamespace = "UNIQUE";
+
+        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
+        List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
+
+        Sequence sequence = new SequenceBuilder<Integer>()
+            .withInitialState(xLabel, initialX)
+            .withIdentifyingNamespace(uniqueNamespace)
+            .fromIterator(ys.iterator())
+            .withFactory((item, observedY) -> {
+                DoubleVertex xPreviousProxy = new DoubleProxyVertex(xPreviousLabel);
+                DoubleVertex x = new ExponentialVertex(xPreviousProxy);
+                IntegerVertex y = new PoissonVertex(x);
+                y.observe(observedY);
+                item.add(xPreviousProxy);
+                item.add(xLabel, x);
+                item.add(yLabel, y);
+            })
+            .build();
+
+
+        Vertex<DoubleTensor> previousX = initialX;
+
+        for (SequenceItem item : sequence) {
+            Vertex<DoubleTensor> xPreviousProxy = item.get(xPreviousLabel);
+            Vertex<DoubleTensor> x = item.get(xLabel);
+            Vertex<DoubleTensor> y = item.get(yLabel);
+            assertThat(xPreviousProxy.getParents(), contains(previousX));
+            assertThat(x.getParents(), contains(xPreviousProxy));
+            assertThat(y.getParents(), contains(x));
+            assertThat(x.getLabel().getOuterNamespace(), is(Optional.of(uniqueNamespace)));
+            assertThat(y.getLabel().getOuterNamespace(), is(Optional.of(uniqueNamespace)));
+            previousX = x;
+        }
+    }
+
+    @Test
     public void youCanCreateSequenceFromMultipleFactories() {
         VertexLabel x1Label = new VertexLabel("x1");
         VertexLabel x2Label = new VertexLabel("x2");
@@ -566,6 +612,6 @@ public class SequenceBuilderTest {
 
         Optional<Vertex> optionalOutputOfPreviousTimestep = inputChildren.stream().findFirst();
         assertThat(optionalOutputOfPreviousTimestep.isPresent(), is(true));
-        assertThat(optionalOutputOfPreviousTimestep.get().getLabel().withoutOuterNamespace(), is(currentInputLabel));
+        assertThat(optionalOutputOfPreviousTimestep.get().getLabel().withoutOuterNamespace().withoutOuterNamespace(), is(currentInputLabel));
     }
 }

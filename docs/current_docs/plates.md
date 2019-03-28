@@ -70,15 +70,32 @@ VertexDictionary dictionary = SimpleVertexDictionary.of(x1Start, x2Start);
 
 Sequence sequence = new SequenceBuilder<Integer>()
     .withInitialState(dictionary)
+    .withIdentifyingNamespace("Keanu-Example")
     .count(5)
     .withFactory(factory)
     .build();
+
+//We can now do a few things:
+Vertex<?> seedVertex = sequence.getLastItem().get(x1Label);
+BayesianNetwork network = new BayesianNetwork(seedVertex.getConnectedGraph());
+
+//Within `network` our vertices will have the labels of the form:
+//Keanu-Example.Sequence_Item_<<timestep>>.<<unique-hash>>.<<label>>
+List<Vertex> allXVertices = network.getVerticesInNamespace("Keanu-Example");
+allXVertices.removeIf(vertex -> !vertex.getLabel().getUnqualifiedName().equals("x"));
+
+//You can also get a vertex from a specific timestep
+Vertex x1Retrieved = sequence.getLastItem().get(x1Label);
+
+//Finally, you may need to use the save/load interface on `network` and will need a way of accessing timesteps
+//without having access to the `sequence` object
+x1Retrieved = network.getVerticesInNamespace("Keanu-Example", "Sequence_Item_0").get(0);
 
 ```
 
 Note: by using the `.withFactories` method on the builder, rather than the `.withFactory`, it is possible
 to have factories which use proxy input vertices which are defined in other factories.
-i.e. your vertices can cross factories.
+i.e. your vertices can cross factories. 
 
 ## Observing many associated data points
 
