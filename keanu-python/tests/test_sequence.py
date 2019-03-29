@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional
 
 import pytest
+import re
 
 from keanu.sequence import Sequence, SequenceItem
 from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, ConstantDouble, \
@@ -221,3 +222,34 @@ def test_last_item_retrieved_correctly() -> None:
     assert x_proxy is not None
     assert x_output.get_value() == 4
     assert x_proxy.get_value() == 2
+
+
+def test_you_can_name_a_sequence() -> None:
+    x_label = "x"
+    x_input_label = Sequence.proxy_for(x_label)
+
+    def factory(sequence_item):
+        x = DoubleProxy((), x_input_label)
+        x_out = x * Const(2.0)
+        x_out.set_label(x_label)
+        sequence_item.add(x_out)
+        sequence_item.add(x)
+
+    x_start = ConstantDouble(1.0)
+    initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {x_label: x_start}
+    sequence_name = "My_Awesome_Sequence"
+
+    sequence = Sequence(count=2, factories=factory, initial_state=initial_state, name=sequence_name)
+
+    sequence_item_contents = sequence.get_last_item().get_contents()
+    x_output = sequence_item_contents.get(x_label)
+    x_proxy = sequence_item_contents.get(Sequence.proxy_for(x_label))
+
+    assert x_output is not None
+    assert x_proxy is not None
+    assert x_output.get_value() == 4
+    assert x_proxy.get_value() == 2
+
+    x_output_label = x_output.get_label()
+    assert x_output_label is not None
+    assert re.match("My_Awesome_Sequence.Sequence_Item_1.\d+.x", x_output_label)

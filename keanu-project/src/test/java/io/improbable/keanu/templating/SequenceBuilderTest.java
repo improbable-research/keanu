@@ -47,6 +47,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -613,5 +614,38 @@ public class SequenceBuilderTest {
         Optional<Vertex> optionalOutputOfPreviousTimestep = inputChildren.stream().findFirst();
         assertThat(optionalOutputOfPreviousTimestep.isPresent(), is(true));
         assertThat(optionalOutputOfPreviousTimestep.get().getLabel().withoutOuterNamespace().withoutOuterNamespace(), is(currentInputLabel));
+    }
+
+    @Test
+    public void testYouCanNameANamespace() {
+        VertexLabel xLabel = new VertexLabel("x");
+        VertexLabel xInputLabel = SequenceBuilder.proxyFor(xLabel);
+
+        DoubleVertex two = new ConstantDoubleVertex(2.0);
+
+        Consumer<SequenceItem> factory = sequenceItem -> {
+            DoubleProxyVertex xInput = new DoubleProxyVertex(xInputLabel);
+            DoubleVertex xOutput = xInput.multiply(two).setLabel(xLabel);
+
+            sequenceItem.addAll(xInput, xOutput);
+        };
+
+        DoubleVertex xInitial = new ConstantDoubleVertex(1.0).setLabel(xLabel);
+        String sequenceName = "My_Awesome_Sequence";
+        VertexDictionary initialState = SimpleVertexDictionary.of(xInitial);
+
+        Sequence sequence = new SequenceBuilder()
+            .withInitialState(initialState)
+            .named(sequenceName)
+            .count(2)
+            .withFactory(factory)
+            .build();
+
+        Vertex<? extends DoubleTensor> xOutput = sequence.getLastItem().get(xLabel);
+        assertThat(xOutput.getValue().scalar(), is(4.0));
+        assertThat(xOutput.getLabel().getQualifiedName(), notNullValue());
+        assertThat(xOutput.getLabel().getOuterNamespace(), is(Optional.of(sequenceName)));
+        assertThat(xOutput.getLabel().getQualifiedName(), startsWith("My_Awesome_Sequence.Sequence_Item_1."));
+        assertThat(xOutput.getLabel().getUnqualifiedName(), is("x"));
     }
 }
