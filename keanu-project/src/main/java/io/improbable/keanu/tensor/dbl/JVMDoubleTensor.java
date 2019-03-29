@@ -106,27 +106,23 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     public static JVMDoubleTensor arange(double start, double end, double stepSize) {
         int steps = (int) Math.ceil((end - start) / stepSize);
-        double[] buffer = new double[steps];
 
-        double position = start;
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = position;
-            position += stepSize;
-        }
-
-        return new JVMDoubleTensor(buffer, new long[]{buffer.length});
+        return linearBufferCreate(start, steps, stepSize);
     }
 
     public static JVMDoubleTensor linspace(double start, double end, int numberOfPoints) {
 
         double stepSize = (end - start) / (numberOfPoints - 1);
 
+        return linearBufferCreate(start, numberOfPoints, stepSize);
+    }
+
+    private static JVMDoubleTensor linearBufferCreate(double start, int numberOfPoints, double stepSize) {
         double[] buffer = new double[numberOfPoints];
 
-        double position = start;
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = position;
-            position += stepSize;
+        double currentValue = start;
+        for (int i = 0; i < buffer.length; i++, currentValue += stepSize) {
+            buffer[i] = currentValue;
         }
 
         return new JVMDoubleTensor(buffer, new long[]{buffer.length});
