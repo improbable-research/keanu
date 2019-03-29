@@ -1,10 +1,13 @@
 package io.improbable.keanu.templating;
 
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.Vertex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 public class Sequence implements Iterable<SequenceItem> {
 
@@ -37,5 +40,21 @@ public class Sequence implements Iterable<SequenceItem> {
             throw new SequenceConstructionException("Sequence is empty!");
         }
         return this.asList().get(this.size() - 1);
+    }
+
+    public BayesianNetwork toBayesianNetwork() {
+        if (containedItems.size() == 0) {
+            throw new RuntimeException("Bayesian Network construction failed because the Sequence contains no SequenceItems");
+        }
+        Optional<Vertex<?>> seedVertex = containedItems
+            .get(0)
+            .getContents()
+            .values()
+            .stream()
+            .findFirst();
+        if (!seedVertex.isPresent()) {
+            throw new RuntimeException("Bayesian Network construction failed because there are no vertices in the Sequence");
+        }
+        return new BayesianNetwork(seedVertex.get().getConnectedGraph());
     }
 }

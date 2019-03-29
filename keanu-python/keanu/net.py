@@ -1,9 +1,12 @@
 from py4j.java_gateway import java_import
+
+from py4j.java_gateway import JavaObject
 from .base import JavaObjectWrapper
 from .context import KeanuContext
 from .vertex.base import Vertex
 from .keanu_random import KeanuRandom
-from typing import Any, Iterator, Iterable, Optional
+from typing import Any, Iterator, Iterable, Optional, Union
+from collections.abc import Iterable as IterableCollection
 from .vertex.label import _VertexLabel
 
 k = KeanuContext()
@@ -15,10 +18,12 @@ java_import(k.jvm_view(), "io.improbable.keanu.network.KeanuProbabilisticModelWi
 
 class BayesNet(JavaObjectWrapper):
 
-    def __init__(self, vertices: Iterable[Any]) -> None:
-        java_vertices = k.to_java_object_list(vertices)
-
-        super(BayesNet, self).__init__(k.jvm_view().BayesianNetwork(java_vertices))
+    def __init__(self, vertices_or_java_object: Union[Iterable[Any], JavaObject]) -> None:
+        if isinstance(vertices_or_java_object, IterableCollection):
+            java_vertices = k.to_java_object_list(vertices_or_java_object)
+            super(BayesNet, self).__init__(k.jvm_view().BayesianNetwork(java_vertices))
+        else:
+            super(BayesNet, self).__init__(vertices_or_java_object)
 
     def iter_latent_or_observed_vertices(self) -> Iterator[Vertex]:
         return Vertex._to_generator(self.unwrap().getLatentOrObservedVertices())

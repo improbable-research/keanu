@@ -76,8 +76,7 @@ Sequence sequence = new SequenceBuilder<Integer>()
     .build();
 
 // We can now put all the vertices in the sequence into a Bayes Net:
-Vertex<?> seedVertex = sequence.getLastItem().get(x1Label);
-BayesianNetwork network = new BayesianNetwork(seedVertex.getConnectedGraph());
+BayesianNetwork network = sequence.toBayesianNetwork();
 
 // Within `network` our vertices will have the labels of the form:
 // Keanu-Example.Sequence_Item_<<index>>.<<hash>>.<<vertex-label>>

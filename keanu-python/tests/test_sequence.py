@@ -253,3 +253,26 @@ def test_you_can_name_a_sequence() -> None:
     x_output_label = x_output.get_label()
     assert x_output_label is not None
     assert re.match("My_Awesome_Sequence.Sequence_Item_1.\d+.x", x_output_label)
+
+
+def test_you_can_get_a_bayes_net_from_a_sequence() -> None:
+    x_label = "x"
+    x_input_label = Sequence.proxy_for(x_label)
+
+    def factory(sequence_item):
+        x = DoubleProxy((), x_input_label)
+        x_out = x * Const(2.0)
+        x_out.set_label(x_label)
+        sequence_item.add(x_out)
+        sequence_item.add(x)
+
+    x_start = ConstantDouble(1.0)
+    initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {x_label: x_start}
+
+    sequence = Sequence(count=2, factories=factory, initial_state=initial_state)
+    net = sequence.to_bayes_net()
+    for item in sequence:
+        vertex = item.get(x_label)
+        full_label = vertex.get_label()
+        assert full_label is not None
+        assert net.get_vertex_by_label(full_label) is not None

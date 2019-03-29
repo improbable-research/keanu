@@ -648,4 +648,36 @@ public class SequenceBuilderTest {
         assertThat(xOutput.getLabel().getQualifiedName(), startsWith("My_Awesome_Sequence.Sequence_Item_1."));
         assertThat(xOutput.getLabel().getUnqualifiedName(), is("x"));
     }
+
+    @Test
+    public void testYouCanGetVerticesFromSequenceBayesianNetwork() {
+        VertexLabel xLabel = new VertexLabel("x");
+        VertexLabel xInputLabel = SequenceBuilder.proxyFor(xLabel);
+
+        DoubleVertex two = new ConstantDoubleVertex(2.0);
+
+        Consumer<SequenceItem> factory = sequenceItem -> {
+            DoubleProxyVertex xInput = new DoubleProxyVertex(xInputLabel);
+            DoubleVertex xOutput = xInput.multiply(two).setLabel(xLabel);
+
+            sequenceItem.addAll(xInput, xOutput);
+        };
+
+        DoubleVertex xInitial = new ConstantDoubleVertex(1.0).setLabel(xLabel);
+        VertexDictionary initialState = SimpleVertexDictionary.of(xInitial);
+
+        Sequence sequence = new SequenceBuilder()
+            .withInitialState(initialState)
+            .count(2)
+            .withFactory(factory)
+            .build();
+        BayesianNetwork network = sequence.toBayesianNetwork();
+
+        for (SequenceItem sequenceItem : sequence) {
+            Vertex xVertex = sequenceItem.get(xLabel);
+            VertexLabel fullLabel = xVertex.getLabel();
+            assertThat(network.getVertexByLabel(fullLabel), is(xVertex));
+        }
+
+    }
 }

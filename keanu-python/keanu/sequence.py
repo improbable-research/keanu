@@ -6,6 +6,7 @@ from py4j.java_collections import ListConverter
 from functools import partial
 from collections.abc import Iterable as CollectionsIterable
 
+from keanu import BayesNet
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.functional import BiConsumer
@@ -107,6 +108,9 @@ class Sequence(JavaObjectWrapper):
 
     def get_last_item(self) -> SequenceItem:
         return SequenceItem(self.unwrap().getLastItem())
+
+    def to_bayes_net(self) -> BayesNet:
+        return BayesNet(self.unwrap().toBayesianNetwork())
 
     @staticmethod
     def proxy_for(label: str) -> str:
