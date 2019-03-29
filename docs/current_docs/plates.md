@@ -94,6 +94,11 @@ for (SequenceItem item : sequence) {
     Vertex x2Retrieved = item.get(x2Label);
 }
 
+// Or you can get the SequenceItem as a list to retrieve an item at a specific index
+List<SequenceItem> sequenceItems = sequence.asList();
+SequenceItem secondSequenceItem = sequenceItems.get(1);
+Vertex x2InSecondSequenceItem = secondSequenceItem.get(x2Label);
+
 // Finally, you may need to use the save/load interface on `network` and will need a way of accessing timesteps
 // without having access to the `sequence` object
 x1Retrieved = network.getVerticesInNamespace("Keanu-Example", "Sequence_Item_0").get(0);
