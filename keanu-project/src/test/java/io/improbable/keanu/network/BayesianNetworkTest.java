@@ -136,14 +136,10 @@ public class BayesianNetworkTest {
 
     @Test
     public void networkReturnsVerticesInNamespace() {
-        BooleanVertex a0 = new BernoulliVertex(0.5);
-        BooleanVertex a1 = new BernoulliVertex(0.5);
-        BooleanVertex b0 = new BernoulliVertex(0.5);
+        BooleanVertex a0 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "a", "0"));
+        BooleanVertex a1 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "a", "1"));
+        BooleanVertex b0 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "b", "0"));
         BooleanVertex c = new BernoulliVertex(0.5);
-
-        a0.setLabel(new VertexLabel("root", "a", "0"));
-        a1.setLabel(new VertexLabel("root", "a", "1"));
-        b0.setLabel(new VertexLabel("root", "b", "0"));
 
         BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
         List<Vertex> verticesInNamespace = net.getVerticesInNamespace("root");
@@ -153,15 +149,11 @@ public class BayesianNetworkTest {
     }
 
     @Test
-    public void networkReturnsAllWithLabelInnerLabel() {
-        BooleanVertex a0 = new BernoulliVertex(0.5);
-        BooleanVertex a1 = new BernoulliVertex(0.5);
-        BooleanVertex b0 = new BernoulliVertex(0.5);
+    public void networkReturnsAllWithSameInnerLabel() {
+        BooleanVertex a0 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "a", "0"));
+        BooleanVertex a1 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "a", "1"));
+        BooleanVertex b0 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "b", "0"));
         BooleanVertex c = new BernoulliVertex(0.5);
-
-        a0.setLabel(new VertexLabel("root", "a", "0"));
-        a1.setLabel(new VertexLabel("root", "a", "1"));
-        b0.setLabel(new VertexLabel("root", "b", "0"));
 
         BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
         List<Vertex> verticesInNamespace = net.getVerticesIgnoringNamespace("0");
@@ -172,12 +164,10 @@ public class BayesianNetworkTest {
 
     @Test
     public void throwsIfVertexWithLabelIsNotInBayesianNetwork() {
-        BernoulliVertex vertexInNetwork = new BernoulliVertex(0.5);
-        vertexInNetwork.setLabel(LABEL_A);
+        BernoulliVertex vertexInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_A);
         BayesianNetwork network = new BayesianNetwork(vertexInNetwork.getConnectedGraph());
 
-        BernoulliVertex vertexNotInNetwork = new BernoulliVertex(0.5);
-        vertexNotInNetwork.setLabel(LABEL_B);
+        BernoulliVertex vertexNotInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_B);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(String.format("Vertex with label %s was not found in BayesianNetwork", LABEL_B));

@@ -114,24 +114,32 @@ public class SequenceExample {
 
         Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(dictionary)
-            .withIdentifyingNamespace("Keanu-Example")
+            .named("Keanu-Example")
             .count(5)
             .withFactory(factory)
             .build();
 
-        //We can now do a few things:
+        // We can now put all the vertices in the sequence into a Bayes Net:
         Vertex<?> seedVertex = sequence.getLastItem().get(x1Label);
         BayesianNetwork network = new BayesianNetwork(seedVertex.getConnectedGraph());
 
-        //Within `network` our vertices will have the labels of the form:
-        //Keanu-Example.Sequence_Item_<<timestep>>.<<unique-hash>>.<<label>>
+        // Within `network` our vertices will have the labels of the form:
+        // Keanu-Example.Sequence_Item_<<index>>.<<hash>>.<<vertex-label>>
+        // where the <<hash>> is a unique identifier for the Sequence.
+        // You can get all the vertices with a particular name, regardless of which SequenceItem they belong to.
         List<Vertex> allXVertices = network.getVerticesIgnoringNamespace(x1Label.getUnqualifiedName());
 
-        //You can also get a vertex from a specific timestep
+        // You get vertices from specific sequence items
+        // For instance here we retrieve a vertex from the last sequence item
         Vertex x1Retrieved = sequence.getLastItem().get(x1Label);
 
-        //Finally, you may need to use the save/load interface on `network` and will need a way of accessing timesteps
-        //without having access to the `sequence` object
+        // Or you can iterate over all the sequence items using an iterator
+        for (SequenceItem item : sequence) {
+            Vertex x2Retrieved = item.get(x2Label);
+        }
+
+        // Finally, you may need to use the save/load interface on `network` and will need a way of accessing timesteps
+        // without having access to the `sequence` object
         x1Retrieved = network.getVerticesInNamespace("Keanu-Example", "Sequence_Item_0").get(0);
 
         //%%SNIPPET_END%% SequenceTimeSeries

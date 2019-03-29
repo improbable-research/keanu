@@ -52,7 +52,7 @@ public class SequenceBuilder<T> {
         return withInitialState(VertexDictionary.of(vertex));
     }
 
-    public SequenceBuilder<T> withIdentifyingNamespace(String namespace) {
+    public SequenceBuilder<T> named(String namespace) {
         this.identifyingNamespace = namespace;
         return this;
     }
@@ -254,8 +254,8 @@ public class SequenceBuilder<T> {
 
     /**
      * This function is best described by how it operates on labels passed to it:
-     *  1. `Sequence_Item_TIMESTEP.HASHCODE.proxy_for.LABEL` -> `proxy_for.LABEL`
-     *  2. `IDENTIFYING_NAMESPACE.Sequence_Item_TIMESTEP.HASHCODE.proxy_for.LABEL` ->  `proxy_for.LABEL`
+     *  1. `Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` -> `proxy_for.LABEL`
+     *  2. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` ->  `proxy_for.LABEL`
      */
     private VertexLabel getProxyLabel(VertexLabel proxyLabel) {
         if (this.identifyingNamespace != null) {

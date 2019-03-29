@@ -501,7 +501,7 @@ public class SequenceBuilderTest {
 
         Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(xLabel, initialX)
-            .withIdentifyingNamespace(uniqueNamespace)
+            .named(uniqueNamespace)
             .fromIterator(ys.iterator())
             .withFactory((item, observedY) -> {
                 DoubleVertex xPreviousProxy = new DoubleProxyVertex(xPreviousLabel);

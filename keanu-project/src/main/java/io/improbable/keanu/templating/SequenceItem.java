@@ -20,19 +20,19 @@ public class SequenceItem implements VertexDictionary {
     private static Pattern NAME_REGEX = Pattern.compile(NAME_PREFIX + "-?[\\d]+$");
 
     private Map<VertexLabel, Vertex<?>> contents;
-    private int itemPosition;
-    private int uniqueIdentifier;
-    private String identifyingNamespace;
+    private int index;
+    private int uniqueSequenceIdentifier;
+    private String sequenceName;
 
-    public SequenceItem(int itemPosition, int uniqueIdentifier) {
-        this(itemPosition, uniqueIdentifier, null);
+    public SequenceItem(int index, int uniqueSequenceIdentifier) {
+        this(index, uniqueSequenceIdentifier, null);
     }
 
-    public SequenceItem(int itemPosition, int uniqueIdentifier, String identifyingNamespace) {
+    public SequenceItem(int index, int uniqueSequenceIdentifier, String sequenceName) {
         this.contents = new HashMap<>();
-        this.itemPosition = itemPosition;
-        this.uniqueIdentifier = uniqueIdentifier;
-        this.identifyingNamespace = identifyingNamespace;
+        this.index = index;
+        this.uniqueSequenceIdentifier = uniqueSequenceIdentifier;
+        this.sequenceName = sequenceName;
     }
 
     public <T extends Vertex<?>> void addAll(T... vertices) {
@@ -76,21 +76,24 @@ public class SequenceItem implements VertexDictionary {
         return copyOf(this.contents);
     }
 
-    public int getPosition() {
-        return this.itemPosition;
+    /**
+     * @return the index of the sequence item in the overall {@link Sequence}
+     */
+    public int getIndex() {
+        return this.index;
     }
 
-    private String getUniqueName() {
-        return NAME_PREFIX + this.itemPosition;
+    private String getName() {
+        return NAME_PREFIX + this.index;
     }
 
     private VertexLabel scoped(VertexLabel label) {
         VertexLabel scopedLabel = label
-            .withExtraNamespace(String.valueOf(this.uniqueIdentifier))
-            .withExtraNamespace(getUniqueName());
+            .withExtraNamespace(String.valueOf(this.uniqueSequenceIdentifier))
+            .withExtraNamespace(getName());
 
-        if (this.identifyingNamespace != null) {
-            scopedLabel = scopedLabel.withExtraNamespace(this.identifyingNamespace);
+        if (this.sequenceName != null) {
+            scopedLabel = scopedLabel.withExtraNamespace(this.sequenceName);
         }
         return scopedLabel;
     }
@@ -107,7 +110,7 @@ public class SequenceItem implements VertexDictionary {
 
     @Override
     public SequenceItem withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
-        SequenceItem item = new SequenceItem(this.itemPosition, this.uniqueIdentifier, this.identifyingNamespace);
+        SequenceItem item = new SequenceItem(this.index, this.uniqueSequenceIdentifier, this.sequenceName);
         item.addAll(contents);
         item.addAll(extraEntries);
         return item;
