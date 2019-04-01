@@ -46,7 +46,7 @@ class ProposalDistribution(JavaObjectWrapper):
                 raise TypeError("Gaussian Proposal Distribution requires a sigma or a list of sigmas for each latent")
 
         elif sigma is not None:
-            raise TypeError('Parameter sigma is not valid unless type is "gaussian" ')
+            raise TypeError('Parameter sigma is not valid unless type is "gaussian"')
 
         if type_ == "prior":
             if latents is None:
