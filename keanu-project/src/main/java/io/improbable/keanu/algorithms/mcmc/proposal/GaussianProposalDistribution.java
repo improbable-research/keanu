@@ -5,6 +5,7 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
+import org.nd4j.base.Preconditions;
 
 import java.util.*;
 
@@ -34,6 +35,7 @@ public class GaussianProposalDistribution implements ProposalDistribution {
     }
 
     public GaussianProposalDistribution(Map<? extends Variable, DoubleTensor> sigmas, List<ProposalListener> listeners) {
+        Preconditions.checkArgument(sigmas.size() > 0, "Gaussian proposal requires at least one sigma");
         this.sigmas = sigmas;
         this.proposalNotifier = new ProposalNotifier(listeners);
     }
@@ -44,6 +46,9 @@ public class GaussianProposalDistribution implements ProposalDistribution {
         for (Variable variable : variables) {
             if (!(variable.getValue() instanceof DoubleTensor)) {
                 throw new IllegalStateException("Gaussian proposal function cannot be used for discrete variable " + variable);
+            }
+            if (!sigmas.containsKey(variable)) {
+                throw new IllegalStateException("Gaussian proposal is missing a sigma for variable " + variable);
             }
             DoubleTensor sample = random.nextGaussian(variable.getShape(), (DoubleTensor) variable.getValue(), sigmas.get(variable));
             proposal.setProposal(variable, sample);
@@ -57,7 +62,9 @@ public class GaussianProposalDistribution implements ProposalDistribution {
         if (!(ofValue instanceof DoubleTensor)) {
             throw new ClassCastException("Only DoubleTensor values are supported - not " + ofValue.getClass().getSimpleName());
         }
-
+        if (!sigmas.containsKey(variable)) {
+            throw new IllegalStateException("Gaussian proposal is missing a sigma for variable " + variable);
+        }
         Gaussian proposalDistribution = (Gaussian) Gaussian.withParameters((DoubleTensor) ofValue, sigmas.get(variable));
         return proposalDistribution.logProb((DoubleTensor) givenValue).sum();
     }

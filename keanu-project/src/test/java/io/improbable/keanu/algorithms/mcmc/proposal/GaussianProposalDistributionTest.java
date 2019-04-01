@@ -7,6 +7,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -121,5 +123,28 @@ public class GaussianProposalDistributionTest {
         thrown.expectMessage("Gaussian proposal function cannot be used for discrete variable");
         PoissonVertex poisson = new PoissonVertex(1.);
         proposalDistribution.getProposal(ImmutableSet.of(poisson), KeanuRandom.getDefaultRandom());
+    }
+
+    @Test
+    public void itThrowsIfAnEmptySigmaMapIsSpecified() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Gaussian proposal requires at least one sigma");
+        new GaussianProposalDistribution(new HashMap<>());
+    }
+
+    @Test
+    public void getProposalThrowsIfProposalIsMissingASigmaForAVariable() {
+        CauchyVertex notInProposalDistribution = new CauchyVertex(1., 1.);
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage("Gaussian proposal is missing a sigma for variable " + notInProposalDistribution);
+        proposalDistribution.getProposal(ImmutableSet.of(notInProposalDistribution), KeanuRandom.getDefaultRandom());
+    }
+
+    @Test
+    public void logProbThrowsIfProposalIsMissingASigmaForAVariable() {
+        CauchyVertex notInProposalDistribution = new CauchyVertex(1., 1.);
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage("Gaussian proposal is missing a sigma for variable " + notInProposalDistribution);
+        proposalDistribution.logProb(notInProposalDistribution, DoubleTensor.scalar(1.), DoubleTensor.scalar(2.));
     }
 }
