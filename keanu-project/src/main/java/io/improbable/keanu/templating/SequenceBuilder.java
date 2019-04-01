@@ -23,7 +23,7 @@ public class SequenceBuilder<T> {
     private static final String PROXY_LABEL_MARKER = "proxy_for";
     private VertexDictionary initialState;
     private Map<VertexLabel, VertexLabel> transitionMapping = Collections.emptyMap();
-    private String identifyingNamespace;
+    private String sequenceName;
 
     private interface ItemCount {
         int getCount();
@@ -52,8 +52,8 @@ public class SequenceBuilder<T> {
         return withInitialState(VertexDictionary.of(vertex));
     }
 
-    public SequenceBuilder<T> named(String namespace) {
-        this.identifyingNamespace = namespace;
+    public SequenceBuilder<T> named(String sequenceName) {
+        this.sequenceName = sequenceName;
         return this;
     }
 
@@ -204,7 +204,7 @@ public class SequenceBuilder<T> {
             VertexDictionary previousVertices = initialState;
             int i = 0;
             while (iter.hasNext()) {
-                SequenceItem item = new SequenceItem(i, this.hashCode(), identifyingNamespace);
+                SequenceItem item = new SequenceItem(i, this.hashCode(), sequenceName);
                 factories.forEach(factory -> factory.accept(item, iter.next()));
                 connectTransitionVariables(previousVertices, item, transitionMapping);
                 sequence.add(item);
@@ -258,7 +258,7 @@ public class SequenceBuilder<T> {
      *  2. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` ->  `proxy_for.LABEL`
      */
     private VertexLabel getProxyLabel(VertexLabel proxyLabel) {
-        if (this.identifyingNamespace != null) {
+        if (this.sequenceName != null) {
             proxyLabel = proxyLabel.withoutOuterNamespace();
         }
         return proxyLabel.withoutOuterNamespace().withoutOuterNamespace();
@@ -281,7 +281,7 @@ public class SequenceBuilder<T> {
             Sequence sequence = new Sequence(count.getCount());
             VertexDictionary previousItem = initialState;
             for (int i = 0; i < count.getCount(); i++) {
-                SequenceItem item = new SequenceItem(i, this.hashCode(), identifyingNamespace);
+                SequenceItem item = new SequenceItem(i, this.hashCode(), sequenceName);
                 factories.forEach(factory -> factory.accept(item));
                 connectTransitionVariables(previousItem, item, transitionMapping);
                 sequence.add(item);
