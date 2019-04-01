@@ -1,6 +1,7 @@
 from typing import List, Any, Callable, Dict, Union, cast
 
-from py4j.java_gateway import java_import
+from py4j.java_gateway import java_import, JavaObject
+from py4j.java_collections import JavaList, JavaMap
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
@@ -11,13 +12,11 @@ from keanu.vertex import Vertex
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution")
-java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.proposal.MultivariateGaussianProposalDistribution")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution")
 
 proposal_distribution_types: Dict[str, Callable] = {
     "gaussian": k.jvm_view().GaussianProposalDistribution,
-    "multivariate_gaussian": k.jvm_view().MultivariateGaussianProposalDistribution,
-    "prior": k.jvm_view().PriorProposalDistribution,
+    "prior": k.jvm_view().PriorProposalDistribution
 }
 
 
@@ -29,24 +28,25 @@ class ProposalDistribution(JavaObjectWrapper):
                  sigma: Union[tensor_arg_types, List[tensor_arg_types]] = None,
                  listeners: List[Any] = []) -> None:
         ctor = proposal_distribution_types[type_]
-        args = []
+        args: List[Union[JavaMap, JavaList, JavaObject]] = []
 
         if type_ == "gaussian":
-            if not isinstance(sigma, runtime_tensor_arg_types):
-                raise TypeError("Gaussian Proposal Distribution requires a value for sigma")
+            if latents is None or len(latents) <= 0:
+                raise TypeError("Gaussian Proposal Distribution requires values for latents")
 
-            args.append(Tensor(sigma).unwrap())
-        elif type_ == "multivariate_gaussian":
-            if latents is None:
-                raise TypeError("Multivariate Gaussian Proposal Distribution requires values for latents")
-            if not isinstance(sigma, list) or len(sigma) <= 0 or len(sigma) != len(latents) or not isinstance(
+            if isinstance(sigma, runtime_tensor_arg_types):
+                sigma_as_tensor = Tensor(sigma).unwrap()
+                args.append(k.to_java_object_list(latents))
+                args.append(sigma_as_tensor)
+            elif isinstance(sigma, list) and len(sigma) == len(latents) and isinstance(
                     sigma[0], runtime_tensor_arg_types):
-                raise TypeError("Multivariate Gaussian Proposal Distribution requires a list of sigmas for each latent")
+                sigma_as_tensors = [Tensor(s) for s in sigma]
+                args.append(k.to_java_map(dict(zip(latents, sigma_as_tensors))))
+            else:
+                raise TypeError("Gaussian Proposal Distribution requires a sigma or a list of sigmas for each latent")
 
-            sigma_as_tensors = [Tensor(s) for s in sigma]
-            args.append(k.to_java_map(dict(zip(latents, sigma_as_tensors))))
         elif sigma is not None:
-            raise TypeError('Parameter sigma is not valid unless type is "gaussian" or "multivariate_gaussian"')
+            raise TypeError('Parameter sigma is not valid unless type is "gaussian" ')
 
         if type_ == "prior":
             if latents is None:

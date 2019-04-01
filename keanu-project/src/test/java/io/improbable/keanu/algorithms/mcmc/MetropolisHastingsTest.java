@@ -14,6 +14,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -24,6 +25,7 @@ import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -207,10 +209,11 @@ public class MetropolisHastingsTest {
 
         Cobserved.observe(46.0);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
+        List<? extends Vertex> sampleFrom = Arrays.asList(A, B, Cobserved);
+        BayesianNetwork bayesNet = new BayesianNetwork(sampleFrom);
         bayesNet.probeForNonZeroProbability(100);
 
-        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
+        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(sampleFrom, DoubleTensor.scalar(1.));
         MetropolisHastings metropolisHastings = MetropolisHastings.builder()
             .proposalDistribution(proposalDistribution)
             .rejectionStrategy(new RollbackAndCascadeOnRejection())
@@ -249,7 +252,7 @@ public class MetropolisHastingsTest {
             A, DoubleTensor.scalar(1.),
             B, DoubleTensor.scalar(1.)
         );
-        ProposalDistribution proposalDistribution = new MultivariateGaussianProposalDistribution(sigmas);
+        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(sigmas);
         MetropolisHastings metropolisHastings = MetropolisHastings.builder()
             .proposalDistribution(proposalDistribution)
             .rejectionStrategy(new RollbackAndCascadeOnRejection())

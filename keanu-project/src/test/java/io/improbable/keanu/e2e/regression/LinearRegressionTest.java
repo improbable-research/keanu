@@ -7,7 +7,6 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.RollbackAndCascadeOnRejection;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
-import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.model.regression.RegressionModel;
@@ -148,10 +147,8 @@ public class LinearRegressionTest {
 
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData(smallRawDataSize);
 
-        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(0.25));
-
         SamplingModelFitting sampling = new SamplingModelFitting(model -> MetropolisHastings.builder()
-            .proposalDistribution(proposalDistribution)
+            .proposalDistribution(new GaussianProposalDistribution(model.getLatentVariables(), DoubleTensor.scalar(0.25)))
             .variableSelector(MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR)
             .rejectionStrategy(new RollbackAndCascadeOnRejection())
             .build(),
