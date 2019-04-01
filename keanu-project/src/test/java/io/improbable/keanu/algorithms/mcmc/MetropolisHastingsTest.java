@@ -25,7 +25,6 @@ import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -198,42 +197,6 @@ public class MetropolisHastingsTest {
 
     @Test
     public void youCanUseAGaussianProposal() {
-
-        DoubleVertex A = new GaussianVertex(20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(20.0, 1.0);
-
-        A.setValue(20.0);
-        B.setValue(20.0);
-
-        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
-
-        Cobserved.observe(46.0);
-
-        List<? extends Vertex> sampleFrom = Arrays.asList(A, B, Cobserved);
-        BayesianNetwork bayesNet = new BayesianNetwork(sampleFrom);
-        bayesNet.probeForNonZeroProbability(100);
-
-        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(sampleFrom, DoubleTensor.scalar(1.));
-        MetropolisHastings metropolisHastings = MetropolisHastings.builder()
-            .proposalDistribution(proposalDistribution)
-            .rejectionStrategy(new RollbackAndCascadeOnRejection())
-            .build();
-
-        NetworkSamples posteriorSamples = metropolisHastings.getPosteriorSamples(
-            new KeanuProbabilisticModel(bayesNet),
-            Arrays.asList(A, B),
-            1000
-        );
-
-        double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages().scalar();
-        double averagePosteriorB = posteriorSamples.getDoubleTensorSamples(B).getAverages().scalar();
-
-        double actual = averagePosteriorA + averagePosteriorB;
-        assertEquals(44.0, actual, 0.1);
-    }
-
-     @Test
-    public void youCanUseAMultivariateGaussianProposal() {
 
         DoubleVertex A = new GaussianVertex(20.0, 1.0);
         DoubleVertex B = new GaussianVertex(20.0, 1.0);

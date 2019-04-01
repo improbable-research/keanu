@@ -14,7 +14,11 @@ public class GaussianProposalDistribution implements ProposalDistribution {
     private final ProposalNotifier proposalNotifier;
 
     public GaussianProposalDistribution(List<? extends Variable> variables, DoubleTensor sigma) {
-        this(toSigmasMap(variables, sigma));
+        this(variables, sigma, Collections.emptyList());
+    }
+
+    public GaussianProposalDistribution(List<? extends Variable> variables, DoubleTensor sigma, List<ProposalListener> listeners) {
+        this(toSigmasMap(variables, sigma), listeners);
     }
 
     private static Map<? extends Variable, DoubleTensor> toSigmasMap(Collection<? extends Variable> variables, DoubleTensor sigma) {
