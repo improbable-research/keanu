@@ -43,7 +43,7 @@ This example shows you how you can write a simple time series model using Sequen
 
 Note: by using the `.withFactories` method on the builder, rather than the `.withFactory`, it is possible
 to have factories which use proxy input vertices which are defined in other factories.
-i.e. your vertices can cross factories.
+i.e. your vertices can cross factories. 
 
 ## Observing many associated data points
 

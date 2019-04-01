@@ -52,6 +52,12 @@ public class BayesianNetwork {
             .collect(Collectors.toList());
     }
 
+    public List<Vertex> getVerticesIgnoringNamespace(String innerNamespace) {
+        return vertices.stream()
+            .filter(v -> v.getLabel() != null && v.getLabel().getUnqualifiedName().equals(innerNamespace))
+            .collect(Collectors.toList());
+    }
+
     private Map<VertexLabel, Vertex> buildLabelMap(Set<? extends Vertex> vertices) {
         Map<VertexLabel, Vertex> labelMap = new HashMap<>();
         for (Vertex v : vertices) {

@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional
 
 import pytest
+import re
 
 from keanu.sequence import Sequence, SequenceItem
 from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, ConstantDouble, \
@@ -109,7 +110,11 @@ def __check_sequence_output_links_to_input(item: SequenceItem, previous_output_l
     assert optional_output_of_previous_timestep is not None
     assert next(input_children, None) is None
 
-    assert optional_output_of_previous_timestep.get_label_without_outer_namespace() == current_input_label
+    label = optional_output_of_previous_timestep.get_label()
+    assert label is not None
+
+    without_namespace = ".".join(label.split(".")[2:])
+    assert without_namespace == current_input_label
 
 
 def __check_output_equals(sequence: Sequence, label: str, desired_output: float) -> None:
@@ -206,3 +211,53 @@ def test_last_item_retrieved_correctly() -> None:
     assert x_proxy is not None
     assert x_output.get_value() == 4
     assert x_proxy.get_value() == 2
+
+
+def test_you_can_name_a_sequence() -> None:
+    x_label = "x"
+
+    def factory(sequence_item):
+        x = sequence_item.add_double_proxy_for(x_label)
+        x_out = x * Const(2.0)
+        x_out.set_label(x_label)
+        sequence_item.add(x_out)
+
+    x_start = ConstantDouble(1.0)
+    initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {x_label: x_start}
+    sequence_name = "My_Awesome_Sequence"
+
+    sequence = Sequence(count=2, factories=factory, initial_state=initial_state, name=sequence_name)
+
+    sequence_item_contents = sequence.get_last_item().get_contents()
+    x_output = sequence_item_contents.get(x_label)
+    x_proxy = sequence_item_contents.get(Sequence.proxy_label_for(x_label))
+
+    assert x_output is not None
+    assert x_proxy is not None
+    assert x_output.get_value() == 4
+    assert x_proxy.get_value() == 2
+
+    x_output_label = x_output.get_label()
+    assert x_output_label is not None
+    assert re.match("My_Awesome_Sequence.Sequence_Item_1.\d+.x", x_output_label)
+
+
+def test_you_can_get_a_bayes_net_from_a_sequence() -> None:
+    x_label = "x"
+
+    def factory(sequence_item):
+        x = sequence_item.add_double_proxy_for(x_label)
+        x_out = x * Const(2.0)
+        x_out.set_label(x_label)
+        sequence_item.add(x_out)
+
+    x_start = ConstantDouble(1.0)
+    initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {x_label: x_start}
+
+    sequence = Sequence(count=2, factories=factory, initial_state=initial_state)
+    net = sequence.to_bayes_net()
+    for item in sequence:
+        vertex = item.get(x_label)
+        full_label = vertex.get_label()
+        assert full_label is not None
+        assert net.get_vertex_by_label(full_label) is not None

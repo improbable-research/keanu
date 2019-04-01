@@ -6,6 +6,7 @@ from py4j.java_collections import ListConverter
 from functools import partial
 from collections.abc import Iterable as CollectionsIterable
 
+from keanu import BayesNet
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.functional import BiConsumer
@@ -89,10 +90,11 @@ class Sequence(JavaObjectWrapper):
     def __init__(self,
                  factories: Union[Callable[..., None], Iterable[Callable[..., None]]] = None,
                  count: int = None,
+                 name: str = None,
                  data_generator: Iterator[Dict[str, Any]] = None,
                  initial_state: Dict[str, vertex_constructor_param_types] = None):
 
-        builder = k.jvm_view().SequenceBuilder()
+        builder = k.jvm_view().SequenceBuilder().named(name)
 
         if initial_state is not None:
             initial_state_java = k.to_java_map(
@@ -135,6 +137,13 @@ class Sequence(JavaObjectWrapper):
 
     def get_last_item(self) -> SequenceItem:
         return SequenceItem(self.unwrap().getLastItem())
+
+    def to_bayes_net(self) -> BayesNet:
+        bayes_net: BayesNet = JavaObjectWrapper(self.unwrap().toBayesianNetwork())  # type: ignore
+        #  A hack that assumes BayesNet.__init__ has no unique behaviour
+        #  This is necessary because the BayesNet constructor takes a set of vertices (not a java object)
+        bayes_net.__class__ = BayesNet
+        return bayes_net
 
     @staticmethod
     def proxy_label_for(label: str) -> str:
