@@ -110,7 +110,11 @@ class Sequence(JavaObjectWrapper):
         return SequenceItem(self.unwrap().getLastItem())
 
     def to_bayes_net(self) -> BayesNet:
-        return BayesNet(self.unwrap().toBayesianNetwork())
+        bayes_net: BayesNet = JavaObjectWrapper(self.unwrap().toBayesianNetwork())  # type: ignore
+        #  A hack that assumes BayesNet.__init__ has no unique behaviour
+        #  This is necessary because the BayesNet constructor takes a set of vertices (not a java object)
+        bayes_net.__class__ = BayesNet
+        return bayes_net
 
     @staticmethod
     def proxy_for(label: str) -> str:
