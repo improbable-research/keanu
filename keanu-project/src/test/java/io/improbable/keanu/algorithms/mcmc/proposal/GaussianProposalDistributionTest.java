@@ -136,7 +136,7 @@ public class GaussianProposalDistributionTest {
     public void getProposalThrowsIfProposalIsMissingASigmaForAVariable() {
         CauchyVertex notInProposalDistribution = new CauchyVertex(1., 1.);
         thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Gaussian proposal is missing a sigma for variable " + notInProposalDistribution);
+        thrown.expectMessage("A sigma was not specified for variable " + notInProposalDistribution);
         proposalDistribution.getProposal(ImmutableSet.of(notInProposalDistribution), KeanuRandom.getDefaultRandom());
     }
 
@@ -144,7 +144,7 @@ public class GaussianProposalDistributionTest {
     public void logProbThrowsIfProposalIsMissingASigmaForAVariable() {
         CauchyVertex notInProposalDistribution = new CauchyVertex(1., 1.);
         thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Gaussian proposal is missing a sigma for variable " + notInProposalDistribution);
+        thrown.expectMessage("A sigma was not specified for variable " + notInProposalDistribution);
         proposalDistribution.logProb(notInProposalDistribution, DoubleTensor.scalar(1.), DoubleTensor.scalar(2.));
     }
 }

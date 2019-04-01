@@ -48,7 +48,7 @@ public class GaussianProposalDistribution implements ProposalDistribution {
                 throw new IllegalStateException("Gaussian proposal function cannot be used for discrete variable " + variable);
             }
             if (!sigmas.containsKey(variable)) {
-                throw new IllegalStateException("Gaussian proposal is missing a sigma for variable " + variable);
+                throw new IllegalStateException("A sigma was not specified for variable " + variable);
             }
             DoubleTensor sample = random.nextGaussian(variable.getShape(), (DoubleTensor) variable.getValue(), sigmas.get(variable));
             proposal.setProposal(variable, sample);
@@ -63,7 +63,7 @@ public class GaussianProposalDistribution implements ProposalDistribution {
             throw new ClassCastException("Only DoubleTensor values are supported - not " + ofValue.getClass().getSimpleName());
         }
         if (!sigmas.containsKey(variable)) {
-            throw new IllegalStateException("Gaussian proposal is missing a sigma for variable " + variable);
+            throw new IllegalStateException("A sigma was not specified for variable " + variable);
         }
         Gaussian proposalDistribution = (Gaussian) Gaussian.withParameters((DoubleTensor) ofValue, sigmas.get(variable));
         return proposalDistribution.logProb((DoubleTensor) givenValue).sum();
