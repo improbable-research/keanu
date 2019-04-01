@@ -1,11 +1,13 @@
 package io.improbable.snippet;
 
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.templating.Sequence;
 import io.improbable.keanu.templating.SequenceBuilder;
 import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.SimpleVertexDictionary;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -112,9 +114,37 @@ public class SequenceExample {
 
         Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(dictionary)
+            .named("Keanu-Example")
             .count(5)
             .withFactory(factory)
             .build();
+
+        // We can now put all the vertices in the sequence into a Bayes Net:
+        BayesianNetwork network = sequence.toBayesianNetwork();
+
+        // Within `network` our vertices will have the labels of the form:
+        // Keanu-Example.Sequence_Item_<<index>>.<<hash>>.<<vertex-label>>
+        // where the <<hash>> is a unique identifier for the Sequence.
+        // You can get all the vertices with a particular name, regardless of which SequenceItem they belong to.
+        List<Vertex> allXVertices = network.getVerticesIgnoringNamespace(x1Label.getUnqualifiedName());
+
+        // You get vertices from specific sequence items
+        // For instance here we retrieve a vertex from the last sequence item
+        Vertex x1Retrieved = sequence.getLastItem().get(x1Label);
+
+        // Or you can iterate over all the sequence items using an iterator
+        for (SequenceItem item : sequence) {
+            Vertex x2Retrieved = item.get(x2Label);
+        }
+
+        // Or you can get the SequenceItem as a list to retrieve an item at a specific index
+        List<SequenceItem> sequenceItems = sequence.asList();
+        SequenceItem secondSequenceItem = sequenceItems.get(1);
+        Vertex x2InSecondSequenceItem = secondSequenceItem.get(x2Label);
+
+        // Finally, you may need to use the save/load interface on `network` and will need a way of accessing timesteps
+        // without having access to the `sequence` object
+        x1Retrieved = network.getVerticesInNamespace("Keanu-Example", "Sequence_Item_0").get(0);
 
         //%%SNIPPET_END%% SequenceTimeSeries
 

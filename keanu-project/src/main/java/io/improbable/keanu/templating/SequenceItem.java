@@ -20,9 +20,19 @@ public class SequenceItem implements VertexDictionary {
     private static Pattern NAME_REGEX = Pattern.compile(NAME_PREFIX + "-?[\\d]+$");
 
     private Map<VertexLabel, Vertex<?>> contents;
+    private int index;
+    private int uniqueSequenceIdentifier;
+    private String sequenceName;
 
-    public SequenceItem() {
+    public SequenceItem(int index, int uniqueSequenceIdentifier) {
+        this(index, uniqueSequenceIdentifier, null);
+    }
+
+    public SequenceItem(int index, int uniqueSequenceIdentifier, String sequenceName) {
         this.contents = new HashMap<>();
+        this.index = index;
+        this.uniqueSequenceIdentifier = uniqueSequenceIdentifier;
+        this.sequenceName = sequenceName;
     }
 
     public <T extends Vertex<?>> void addAll(T... vertices) {
@@ -66,12 +76,26 @@ public class SequenceItem implements VertexDictionary {
         return copyOf(this.contents);
     }
 
-    private String getUniqueName() {
-        return NAME_PREFIX + this.hashCode();
+    /**
+     * @return the index of the sequence item in the overall {@link Sequence}
+     */
+    public int getIndex() {
+        return this.index;
+    }
+
+    private String getName() {
+        return NAME_PREFIX + this.index;
     }
 
     private VertexLabel scoped(VertexLabel label) {
-        return label.withExtraNamespace(getUniqueName());
+        VertexLabel scopedLabel = label
+            .withExtraNamespace(String.valueOf(this.uniqueSequenceIdentifier))
+            .withExtraNamespace(getName());
+
+        if (this.sequenceName != null) {
+            scopedLabel = scopedLabel.withExtraNamespace(this.sequenceName);
+        }
+        return scopedLabel;
     }
 
     @Override
@@ -86,7 +110,7 @@ public class SequenceItem implements VertexDictionary {
 
     @Override
     public SequenceItem withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
-        SequenceItem item = new SequenceItem();
+        SequenceItem item = new SequenceItem(this.index, this.uniqueSequenceIdentifier, this.sequenceName);
         item.addAll(contents);
         item.addAll(extraEntries);
         return item;
