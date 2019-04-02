@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
@@ -28,12 +29,20 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
         this(Tensor.SCALAR_SHAPE, label);
     }
 
+    @ExportVertexToPythonBindings
     public BooleanProxyVertex(long[] shape, VertexLabel label) {
         super(shape);
-        this.setLabel(label);
+        setLabel(label);
     }
 
-    @ExportVertexToPythonBindings
+    @Override
+    public <V extends Vertex<BooleanTensor>> V setLabel(VertexLabel label) {
+        if (this.getLabel() != null && !this.getLabel().getUnqualifiedName().equals(label.getUnqualifiedName())) {
+            throw new RuntimeException("You should not change the label on a Proxy Vertex");
+        }
+        return super.setLabel(label);
+    }
+
     public BooleanProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) String label) {
         this(shape, new VertexLabel(label));
     }

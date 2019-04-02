@@ -43,10 +43,9 @@ public class SequenceBuilder<T> {
         Sequence build();
     }
 
-    public static VertexLabel proxyFor(VertexLabel label) {
+    public static VertexLabel proxyLabelFor(VertexLabel label) {
         return label.withExtraNamespace(PROXY_LABEL_MARKER);
     }
-
 
     public SequenceBuilder<T> withInitialState(Vertex<?> vertex) {
         return withInitialState(VertexDictionary.of(vertex));

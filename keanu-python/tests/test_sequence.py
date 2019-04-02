@@ -72,16 +72,14 @@ def test_you_can_build_a_time_series() -> None:
     """
     x_label = "x"
     y_label = "y"
-    x_previous_label = Sequence.proxy_for(x_label)
 
     num_items = 10
     initial_x = 1.
 
     def create_time_step(sequence_item):
-        x_previous = DoubleProxy((), x_previous_label)
+        x_previous = sequence_item.add_double_proxy_for(x_label)
         x = Exponential(x_previous)
         y = Poisson(x)
-        sequence_item.add(x_previous)
         sequence_item.add(x, label=x_label)
         sequence_item.add(y, label=y_label)
 
@@ -89,6 +87,8 @@ def test_you_can_build_a_time_series() -> None:
     assert sequence.size() == num_items
 
     x_from_previous_step = None
+    x_previous_label = Sequence.proxy_label_for(x_label)
+
     for item in sequence:
         x_previous_proxy = item.get(x_previous_label)
         x = item.get(x_label)
@@ -136,36 +136,27 @@ def test_you_can_use_multiple_factories_to_build_sequences() -> None:
     two = ConstantDouble(2)
     half = ConstantDouble(0.5)
 
-    x1_input_label = Sequence.proxy_for(x1_label)
-    x2_input_label = Sequence.proxy_for(x2_label)
-    x3_input_label = Sequence.proxy_for(x3_label)
-    x4_input_label = Sequence.proxy_for(x4_label)
-
     def factory1(sequence_item):
-        x1_input = DoubleProxy((), x1_input_label)
-        x2_input = DoubleProxy((), x2_input_label)
+        x1_input = sequence_item.add_double_proxy_for(x1_label)
+        x2_input = sequence_item.add_double_proxy_for(x2_label)
 
         x1_output = x1_input * two
         x1_output.set_label(x1_label)
         x3_output = x2_input * two
         x3_output.set_label(x3_label)
 
-        sequence_item.add(x1_input)
-        sequence_item.add(x2_input)
         sequence_item.add(x1_output)
         sequence_item.add(x3_output)
 
     def factory2(sequence_item):
-        x3_input = DoubleProxy((), x3_input_label)
-        x4_input = DoubleProxy((), x4_input_label)
+        x3_input = sequence_item.add_double_proxy_for(x3_label)
+        x4_input = sequence_item.add_double_proxy_for(x4_label)
 
         x2_output = x3_input * half
         x2_output.set_label(x2_label)
         x4_output = x4_input * half
         x4_output.set_label(x4_label)
 
-        sequence_item.add(x3_input)
-        sequence_item.add(x4_input)
         sequence_item.add(x2_output)
         sequence_item.add(x4_output)
 
@@ -187,10 +178,10 @@ def test_you_can_use_multiple_factories_to_build_sequences() -> None:
     assert sequence.size() == 5
 
     for item in sequence:
-        __check_sequence_output_links_to_input(item, x1_input_label, x1_label)
-        __check_sequence_output_links_to_input(item, x2_input_label, x3_label)
-        __check_sequence_output_links_to_input(item, x3_input_label, x2_label)
-        __check_sequence_output_links_to_input(item, x4_input_label, x4_label)
+        __check_sequence_output_links_to_input(item, Sequence.proxy_label_for(x1_label), x1_label)
+        __check_sequence_output_links_to_input(item, Sequence.proxy_label_for(x2_label), x3_label)
+        __check_sequence_output_links_to_input(item, Sequence.proxy_label_for(x3_label), x2_label)
+        __check_sequence_output_links_to_input(item, Sequence.proxy_label_for(x4_label), x4_label)
 
     __check_output_equals(sequence, x1_label, 128)
     __check_output_equals(sequence, x2_label, 2)
@@ -200,14 +191,12 @@ def test_you_can_use_multiple_factories_to_build_sequences() -> None:
 
 def test_last_item_retrieved_correctly() -> None:
     x_label = "x"
-    x_input_label = Sequence.proxy_for(x_label)
 
     def factory(sequence_item):
-        x = DoubleProxy((), x_input_label)
+        x = sequence_item.add_double_proxy_for(x_label)
         x_out = x * Const(2.0)
         x_out.set_label(x_label)
         sequence_item.add(x_out)
-        sequence_item.add(x)
 
     x_start = ConstantDouble(1.0)
     initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {x_label: x_start}
@@ -216,7 +205,7 @@ def test_last_item_retrieved_correctly() -> None:
 
     sequence_item_contents = sequence.get_last_item().get_contents()
     x_output = sequence_item_contents.get(x_label)
-    x_proxy = sequence_item_contents.get(Sequence.proxy_for(x_label))
+    x_proxy = sequence_item_contents.get(Sequence.proxy_label_for(x_label))
 
     assert x_output is not None
     assert x_proxy is not None
@@ -226,14 +215,12 @@ def test_last_item_retrieved_correctly() -> None:
 
 def test_you_can_name_a_sequence() -> None:
     x_label = "x"
-    x_input_label = Sequence.proxy_for(x_label)
 
     def factory(sequence_item):
-        x = DoubleProxy((), x_input_label)
+        x = sequence_item.add_double_proxy_for(x_label)
         x_out = x * Const(2.0)
         x_out.set_label(x_label)
         sequence_item.add(x_out)
-        sequence_item.add(x)
 
     x_start = ConstantDouble(1.0)
     initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {x_label: x_start}
@@ -243,7 +230,7 @@ def test_you_can_name_a_sequence() -> None:
 
     sequence_item_contents = sequence.get_last_item().get_contents()
     x_output = sequence_item_contents.get(x_label)
-    x_proxy = sequence_item_contents.get(Sequence.proxy_for(x_label))
+    x_proxy = sequence_item_contents.get(Sequence.proxy_label_for(x_label))
 
     assert x_output is not None
     assert x_proxy is not None
@@ -257,14 +244,12 @@ def test_you_can_name_a_sequence() -> None:
 
 def test_you_can_get_a_bayes_net_from_a_sequence() -> None:
     x_label = "x"
-    x_input_label = Sequence.proxy_for(x_label)
 
     def factory(sequence_item):
-        x = DoubleProxy((), x_input_label)
+        x = sequence_item.add_double_proxy_for(x_label)
         x_out = x * Const(2.0)
         x_out.set_label(x_label)
         sequence_item.add(x_out)
-        sequence_item.add(x)
 
     x_start = ConstantDouble(1.0)
     initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {x_label: x_start}
