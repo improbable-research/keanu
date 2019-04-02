@@ -95,9 +95,11 @@ List<SequenceItem> sequenceItems = sequence.asList();
 SequenceItem secondSequenceItem = sequenceItems.get(1);
 Vertex x2InSecondSequenceItem = secondSequenceItem.get(x2Label);
 
-// Finally, you may need to use the save/load interface on `network` and will need a way of accessing timesteps
-// without having access to the `sequence` object
-x1Retrieved = network.getVerticesInNamespace("Keanu-Example", "Sequence_Item_0").get(0);
+// Finally, you may need to use the save/load interface on `network`
+// If you do this, you can actually use Keanu to reconstruct the Sequence
+ProtobufLoader loader = new ProtobufLoader();
+Sequence reconstructedSequence = loader.loadSequence(new FileInputStream(new File("file_name.proto")));
+x1Retrieved = reconstructedSequence.asList().get(0).get(x1Label);
 
 ```
 

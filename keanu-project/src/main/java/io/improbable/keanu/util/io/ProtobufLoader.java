@@ -75,6 +75,13 @@ public class ProtobufLoader implements NetworkLoader {
         return bayesNet;
     }
 
+    /**
+     * This will attempt to reconstruct a Sequence from a saved BayesNet.
+     * If more than one sequence is found, it will throw an exception.
+     * @param inputStream input stream of the protobuf file to load from
+     * @return A reconstructed Sequence
+     * @throws IOException If the network cannot be loaded from the input stream
+     */
     public Sequence loadSequence(InputStream inputStream) throws IOException {
         Collection<Sequence> sequences = loadSequences(inputStream);
         if (sequences.size() != 1) {
@@ -83,8 +90,14 @@ public class ProtobufLoader implements NetworkLoader {
         return sequences.stream().findFirst().get();
     }
 
-    public Collection<Sequence> loadSequences(InputStream input) throws IOException {
-        KeanuSavedBayesNet.ProtoModel parsedModel = KeanuSavedBayesNet.ProtoModel.parseFrom(input);
+    /**
+     * This will attempt to reconstruct all Sequences from a saved BayesNet
+     * @param inputStream input stream of the protobuf file to load from
+     * @return A collection of all the reconstructed Sequence
+     * @throws IOException If the network cannot be loaded from the input stream
+     */
+    public Collection<Sequence> loadSequences(InputStream inputStream) throws IOException {
+        KeanuSavedBayesNet.ProtoModel parsedModel = KeanuSavedBayesNet.ProtoModel.parseFrom(inputStream);
         SavedBayesNet.Graph graph = parsedModel.getGraph();
         Map<SavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
         Map<Integer, Sequence> sequences = new HashMap<>();
