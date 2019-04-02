@@ -101,7 +101,7 @@ public class SequenceExample {
             DoubleVertex x1Output = x1Input.multiply(two).setLabel(x1Label);
             DoubleVertex x2Output = x2Input.plus(x1Output).setLabel(x2Label);
 
-            sequenceItem.addAll(x1Input, x2Input, x1Output, x2Output);
+            sequenceItem.addAll(x1Output, x2Output);
         };
 
         // Create the starting values of our sequence

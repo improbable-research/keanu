@@ -12,6 +12,8 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -132,10 +134,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public DoubleProxyVertex addDoubleProxyFor(VertexLabel label) {
-        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
-        DoubleProxyVertex newVertex = new DoubleProxyVertex(vertexLabel);
-        this.add(newVertex);
-        return newVertex;
+        return addProxyFor(label, DoubleProxyVertex::new);
     }
 
     /**
@@ -146,10 +145,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public DoubleProxyVertex addDoubleProxyFor(VertexLabel label, long[] shape) {
-        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
-        DoubleProxyVertex newVertex = new DoubleProxyVertex(shape, vertexLabel);
-        this.add(newVertex);
-        return newVertex;
+        return addProxyFor(label, shape, DoubleProxyVertex::new);
     }
 
     /**
@@ -159,10 +155,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public IntegerProxyVertex addIntegerProxyFor(VertexLabel label) {
-        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
-        IntegerProxyVertex newVertex = new IntegerProxyVertex(vertexLabel);
-        this.add(newVertex);
-        return newVertex;
+        return addProxyFor(label, IntegerProxyVertex::new);
     }
 
     /**
@@ -173,10 +166,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public IntegerProxyVertex addIntegerProxyFor(VertexLabel label, long[] shape) {
-        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
-        IntegerProxyVertex newVertex = new IntegerProxyVertex(shape, vertexLabel);
-        this.add(newVertex);
-        return newVertex;
+        return addProxyFor(label, shape, IntegerProxyVertex::new);
     }
 
     /**
@@ -186,10 +176,7 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public BooleanProxyVertex addBooleanProxyFor(VertexLabel label) {
-        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
-        BooleanProxyVertex newVertex = new BooleanProxyVertex(vertexLabel);
-        this.add(newVertex);
-        return newVertex;
+        return addProxyFor(label, BooleanProxyVertex::new);
     }
 
     /**
@@ -200,8 +187,16 @@ public class SequenceItem implements VertexDictionary {
      * @return a newly created {@link ProxyVertex}
      */
     public BooleanProxyVertex addBooleanProxyFor(VertexLabel label, long[] shape) {
-        VertexLabel vertexLabel = SequenceBuilder.proxyLabelFor(label);
-        BooleanProxyVertex newVertex = new BooleanProxyVertex(shape, vertexLabel);
+        return addProxyFor(label, shape, BooleanProxyVertex::new);
+    }
+
+    private <T extends Vertex<?>> T addProxyFor(VertexLabel label, Function<VertexLabel, T> factoryMethod) {
+        return addProxyFor(label, null, (shape, vertexLabel) -> factoryMethod.apply(vertexLabel));
+    }
+
+    private <T extends Vertex<?>> T addProxyFor(VertexLabel label, long[] shape, BiFunction<long[], VertexLabel, T> factoryMethod) {
+        VertexLabel proxyLabel = SequenceBuilder.proxyLabelFor(label);
+        T newVertex = factoryMethod.apply(shape, proxyLabel);
         this.add(newVertex);
         return newVertex;
     }
