@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -28,12 +29,20 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
         this(Tensor.SCALAR_SHAPE, label);
     }
 
+    @ExportVertexToPythonBindings
     public IntegerProxyVertex(long[] shape, VertexLabel label) {
         super(shape);
         setLabel(label);
     }
 
-    @ExportVertexToPythonBindings
+    @Override
+    public <V extends Vertex<IntegerTensor>> V setLabel(VertexLabel label) {
+        if (this.getLabel() != null && !this.getLabel().getUnqualifiedName().equals(label.getUnqualifiedName())) {
+            throw new RuntimeException("You should not change the label on a Proxy Vertex");
+        }
+        return super.setLabel(label);
+    }
+
     public IntegerProxyVertex(@LoadShape long[] tensorShape, @LoadVertexParam(LABEL_NAME) String label) {
         this(tensorShape, new VertexLabel(label));
     }

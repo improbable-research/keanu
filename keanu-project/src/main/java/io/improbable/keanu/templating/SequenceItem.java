@@ -5,10 +5,15 @@ import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -120,5 +125,79 @@ public class SequenceItem implements VertexDictionary {
         return contents.values().stream()
             .filter(v -> v instanceof ProxyVertex)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * This method creates a {@link ProxyVertex} and adds it to the sequence item
+     * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     * @param label the label of the corresponding vertex from the previous item.
+     * @return a newly created {@link ProxyVertex}
+     */
+    public DoubleProxyVertex addDoubleProxyFor(VertexLabel label) {
+        return addProxyFor(label, DoubleProxyVertex::new);
+    }
+
+    /**
+     * This method creates a {@link ProxyVertex} and adds it to the sequence item
+     * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     * @param label the label of the corresponding vertex from the previous item.
+     * @param shape the shape of the corresponding vertex from the previous item.
+     * @return a newly created {@link ProxyVertex}
+     */
+    public DoubleProxyVertex addDoubleProxyFor(VertexLabel label, long[] shape) {
+        return addProxyFor(label, shape, DoubleProxyVertex::new);
+    }
+
+    /**
+     * This method creates a {@link ProxyVertex} and adds it to the sequence item
+     * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     * @param label the label of the corresponding vertex from the previous item.
+     * @return a newly created {@link ProxyVertex}
+     */
+    public IntegerProxyVertex addIntegerProxyFor(VertexLabel label) {
+        return addProxyFor(label, IntegerProxyVertex::new);
+    }
+
+    /**
+     * This method creates a {@link ProxyVertex} and adds it to the sequence item
+     * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     * @param label the label of the corresponding vertex from the previous item.
+     * @param shape the shape of the corresponding vertex from the previous item.
+     * @return a newly created {@link ProxyVertex}
+     */
+    public IntegerProxyVertex addIntegerProxyFor(VertexLabel label, long[] shape) {
+        return addProxyFor(label, shape, IntegerProxyVertex::new);
+    }
+
+    /**
+     * This method creates a {@link ProxyVertex} and adds it to the sequence item
+     * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     * @param label the label of the corresponding vertex from the previous item.
+     * @return a newly created {@link ProxyVertex}
+     */
+    public BooleanProxyVertex addBooleanProxyFor(VertexLabel label) {
+        return addProxyFor(label, BooleanProxyVertex::new);
+    }
+
+    /**
+     * This method creates a {@link ProxyVertex} and adds it to the sequence item
+     * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     * @param label the label of the corresponding vertex from the previous item.
+     * @param shape the shape of the corresponding vertex from the previous item.
+     * @return a newly created {@link ProxyVertex}
+     */
+    public BooleanProxyVertex addBooleanProxyFor(VertexLabel label, long[] shape) {
+        return addProxyFor(label, shape, BooleanProxyVertex::new);
+    }
+
+    private <T extends Vertex<?>> T addProxyFor(VertexLabel label, Function<VertexLabel, T> factoryMethod) {
+        return addProxyFor(label, null, (shape, vertexLabel) -> factoryMethod.apply(vertexLabel));
+    }
+
+    private <T extends Vertex<?>> T addProxyFor(VertexLabel label, long[] shape, BiFunction<long[], VertexLabel, T> factoryMethod) {
+        VertexLabel proxyLabel = SequenceBuilder.proxyLabelFor(label);
+        T newVertex = factoryMethod.apply(shape, proxyLabel);
+        this.add(newVertex);
+        return newVertex;
     }
 }
