@@ -44,23 +44,20 @@ DoubleVertex two = new ConstantDoubleVertex(2);
 VertexLabel x1Label = new VertexLabel("x1");
 VertexLabel x2Label = new VertexLabel("x2");
 
-// Define labels for the Proxy Vertices which stand in for a Vertex from the previous SequenceItem.
-// They will be automatically wired up when you construct the Sequence.
-// i.e. these are the 'inputs' to our SequenceItem
-VertexLabel x1InputLabel = SequenceBuilder.proxyFor(x1Label);
-VertexLabel x2InputLabel = SequenceBuilder.proxyFor(x2Label);
-
 // Define a factory method that creates proxy vertices using the proxy vertex labels and then uses these
 // to define the computation graph of the Sequence.
 // Note we have labeled the output vertices of this SequenceItem
 Consumer<SequenceItem> factory = sequenceItem -> {
-    DoubleProxyVertex x1Input = new DoubleProxyVertex(x1InputLabel);
-    DoubleProxyVertex x2Input = new DoubleProxyVertex(x2InputLabel);
+    // Define the Proxy Vertices which stand in for a Vertex from the previous SequenceItem.
+    // They will be automatically wired up when you construct the Sequence.
+    // i.e. these are the 'inputs' to our SequenceItem
+    DoubleProxyVertex x1Input = sequenceItem.addDoubleProxyFor(x1Label);
+    DoubleProxyVertex x2Input = sequenceItem.addDoubleProxyFor(x2Label);
 
     DoubleVertex x1Output = x1Input.multiply(two).setLabel(x1Label);
     DoubleVertex x2Output = x2Input.plus(x1Output).setLabel(x2Label);
 
-    sequenceItem.addAll(x1Input, x2Input, x1Output, x2Output);
+    sequenceItem.addAll(x1Output, x2Output);
 };
 
 // Create the starting values of our sequence
@@ -70,15 +67,43 @@ VertexDictionary dictionary = SimpleVertexDictionary.of(x1Start, x2Start);
 
 Sequence sequence = new SequenceBuilder<Integer>()
     .withInitialState(dictionary)
+    .named("Keanu-Example")
     .count(5)
     .withFactory(factory)
     .build();
+
+// We can now put all the vertices in the sequence into a Bayes Net:
+BayesianNetwork network = sequence.toBayesianNetwork();
+
+// Within `network` our vertices will have the labels of the form:
+// Keanu-Example.Sequence_Item_<<index>>.<<hash>>.<<vertex-label>>
+// where the <<hash>> is a unique identifier for the Sequence.
+// You can get all the vertices with a particular name, regardless of which SequenceItem they belong to.
+List<Vertex> allXVertices = network.getVerticesIgnoringNamespace(x1Label.getUnqualifiedName());
+
+// You get vertices from specific sequence items
+// For instance here we retrieve a vertex from the last sequence item
+Vertex x1Retrieved = sequence.getLastItem().get(x1Label);
+
+// Or you can iterate over all the sequence items using an iterator
+for (SequenceItem item : sequence) {
+    Vertex x2Retrieved = item.get(x2Label);
+}
+
+// Or you can get the SequenceItem as a list to retrieve an item at a specific index
+List<SequenceItem> sequenceItems = sequence.asList();
+SequenceItem secondSequenceItem = sequenceItems.get(1);
+Vertex x2InSecondSequenceItem = secondSequenceItem.get(x2Label);
+
+// Finally, you may need to use the save/load interface on `network` and will need a way of accessing timesteps
+// without having access to the `sequence` object
+x1Retrieved = network.getVerticesInNamespace("Keanu-Example", "Sequence_Item_0").get(0);
 
 ```
 
 Note: by using the `.withFactories` method on the builder, rather than the `.withFactory`, it is possible
 to have factories which use proxy input vertices which are defined in other factories.
-i.e. your vertices can cross factories.
+i.e. your vertices can cross factories. 
 
 ## Observing many associated data points
 

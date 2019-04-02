@@ -34,12 +34,20 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
         this(Tensor.SCALAR_SHAPE, label);
     }
 
+    @ExportVertexToPythonBindings
     public DoubleProxyVertex(long[] shape, VertexLabel label) {
         super(shape);
-        this.setLabel(label);
+        setLabel(label);
     }
 
-    @ExportVertexToPythonBindings
+    @Override
+    public <V extends Vertex<DoubleTensor>> V setLabel(VertexLabel label) {
+        if (this.getLabel() != null && !this.getLabel().getUnqualifiedName().equals(label.getUnqualifiedName())) {
+            throw new RuntimeException("You should not change the label on a Proxy Vertex");
+        }
+        return super.setLabel(label);
+    }
+
     public DoubleProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_PARAM_NAME) String label) {
         this(shape, new VertexLabel(label));
     }
