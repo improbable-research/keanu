@@ -198,12 +198,13 @@ public class SequenceBuilder<T> {
         }
 
         public Sequence build() throws SequenceConstructionException {
-            Sequence sequence = new Sequence(this.size);
+            int uniqueSequenceIdentifier = this.hashCode();
+            Sequence sequence = new Sequence(this.size, uniqueSequenceIdentifier, sequenceName);
             Iterator<T> iter = data.getIterator();
             VertexDictionary previousVertices = initialState;
             int i = 0;
             while (iter.hasNext()) {
-                SequenceItem item = new SequenceItem(i, this.hashCode(), sequenceName);
+                SequenceItem item = new SequenceItem(i, uniqueSequenceIdentifier, sequenceName);
                 factories.forEach(factory -> factory.accept(item, iter.next()));
                 connectTransitionVariables(previousVertices, item, transitionMapping);
                 sequence.add(item);
@@ -218,7 +219,7 @@ public class SequenceBuilder<T> {
         Collection<Vertex<?>> proxyVertices = item.getProxyVertices();
 
         for (Vertex<?> proxy : proxyVertices) {
-            VertexLabel proxyLabel = getProxyLabel(proxy.getLabel());
+            VertexLabel proxyLabel = getUnscopedLabel(proxy.getLabel(), this.sequenceName);
             VertexLabel defaultParentLabel = getDefaultParentLabel(proxyLabel);
             VertexLabel parentLabel = transitionMapping.getOrDefault(proxyLabel, defaultParentLabel);
 
@@ -253,11 +254,16 @@ public class SequenceBuilder<T> {
 
     /**
      * This function is best described by how it operates on labels passed to it:
-     *  1. `Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` -> `proxy_for.LABEL`
-     *  2. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` ->  `proxy_for.LABEL`
+     *  1. `Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` becomes `proxy_for.LABEL`
+     *  2. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` becomes  `proxy_for.LABEL`
+     *  3. `Sequence_Item_INDEX.HASHCODE.LABEL` becomes `LABEL`
+     *  4. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.LABEL` becomes  `LABEL`
+     * @param proxyLabel Label to be unscoped
+     * @param sequenceName Name of the sequence from which the label was found
+     * @return unscoped label
      */
-    private VertexLabel getProxyLabel(VertexLabel proxyLabel) {
-        if (this.sequenceName != null) {
+    public static VertexLabel getUnscopedLabel(VertexLabel proxyLabel, String sequenceName) {
+        if (sequenceName != null) {
             proxyLabel = proxyLabel.withoutOuterNamespace();
         }
         return proxyLabel.withoutOuterNamespace().withoutOuterNamespace();
@@ -277,10 +283,11 @@ public class SequenceBuilder<T> {
 
 
         public Sequence build() throws SequenceConstructionException {
-            Sequence sequence = new Sequence(count.getCount());
+            int uniqueSequenceIdentifier = this.hashCode();
+            Sequence sequence = new Sequence(count.getCount(), uniqueSequenceIdentifier, sequenceName);
             VertexDictionary previousItem = initialState;
             for (int i = 0; i < count.getCount(); i++) {
-                SequenceItem item = new SequenceItem(i, this.hashCode(), sequenceName);
+                SequenceItem item = new SequenceItem(i, uniqueSequenceIdentifier, sequenceName);
                 factories.forEach(factory -> factory.accept(item));
                 connectTransitionVariables(previousItem, item, transitionMapping);
                 sequence.add(item);

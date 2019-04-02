@@ -12,9 +12,21 @@ import java.util.Optional;
 public class Sequence implements Iterable<SequenceItem> {
 
     private List<SequenceItem> containedItems;
+    private int uniqueIdentifier;
+    private String name;
 
-    public Sequence(int reservedSize) {
+    public Sequence(int reservedSize, int uniqueIdentifier, String name) {
         containedItems = new ArrayList<>(reservedSize);
+        this.uniqueIdentifier = uniqueIdentifier;
+        this.name = name;
+    }
+
+    public int getUniqueIdentifier() {
+        return this.uniqueIdentifier;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public int size() {

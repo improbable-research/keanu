@@ -3,6 +3,10 @@ package io.improbable.keanu.util.io;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.templating.Sequence;
+import io.improbable.keanu.templating.SequenceBuilder;
+import io.improbable.keanu.templating.SequenceConstructionException;
+import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
@@ -11,13 +15,16 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
@@ -40,10 +47,12 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -54,6 +63,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 
 public class ProtobufTest {
@@ -491,9 +501,16 @@ public class ProtobufTest {
         for (Map.Entry<String, Class> param : requiredParams.entrySet()) {
             assertThat("Class must save all required params: " + vertexClass,
                 storedParams, hasKey(param.getKey()));
-            assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
-                    + storedParams.get(param.getKey()) + ", " + param.getValue(),
-                param.getValue().isAssignableFrom(storedParams.get(param.getKey())));
+            if (param.getKey().equals("label")) {
+                //Labels are stored as strings and are parsed into VertexLabels at load time
+                assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
+                        + storedParams.get(param.getKey()) + ", " + param.getValue(),
+                    String.class.isAssignableFrom(storedParams.get(param.getKey())));
+            } else {
+                assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
+                        + storedParams.get(param.getKey()) + ", " + param.getValue(),
+                    param.getValue().isAssignableFrom(storedParams.get(param.getKey())));
+            }
         }
     }
 
@@ -546,6 +563,193 @@ public class ProtobufTest {
         }
 
         return requiredParameters;
+    }
+
+    @Test
+    public void youCanConstructSingleSequenceItem() throws IOException {
+        VertexLabel xLabel = new VertexLabel("x");
+
+        DoubleVertex two = new ConstantDoubleVertex(2.0);
+
+        Consumer<SequenceItem> factory = sequenceItem -> {
+            DoubleProxyVertex xInput = sequenceItem.addDoubleProxyFor(xLabel);
+            DoubleVertex xOutput = xInput.multiply(two).setLabel(xLabel);
+
+            sequenceItem.add(xOutput);
+        };
+
+        DoubleVertex xInitial = new ConstantDoubleVertex(1.0).setLabel(xLabel);
+        VertexDictionary initialState = SimpleVertexDictionary.of(xInitial);
+
+        Sequence sequence = new SequenceBuilder()
+            .withInitialState(initialState)
+            .count(2)
+            .withFactory(factory)
+            .build();
+        BayesianNetwork network = sequence.toBayesianNetwork();
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        ProtobufSaver saver = new ProtobufSaver(network);
+        saver.save(writer, true);
+        ProtobufLoader loader = new ProtobufLoader();
+        Sequence reconstructedSequence = loader.loadSequence(new ByteArrayInputStream(writer.toByteArray()));
+
+        assertThat(reconstructedSequence.size(), is(2));
+        assertThat(reconstructedSequence.getUniqueIdentifier(), is(sequence.getUniqueIdentifier()));
+
+        List<SequenceItem> originalList = sequence.asList();
+        VertexLabel xProxyLabel = SequenceBuilder.proxyLabelFor(xLabel);
+        reconstructedSequence.forEach(sequenceItem -> {
+            SequenceItem originalItem = originalList.get(sequenceItem.getIndex());
+            assertThat(sequenceItem.getContents().keySet(), is(originalItem.getContents().keySet()));
+            assertThat(sequenceItem.get(xLabel), notNullValue());
+            assertThat(sequenceItem.get(xProxyLabel), notNullValue());
+        });
+
+        Vertex<? extends DoubleTensor> outputVertex = reconstructedSequence.getLastItem().get(xLabel);
+        double actualOutputValue = outputVertex.getValue().scalar();
+        assertThat(actualOutputValue, is(4.0));
+    }
+
+    @Test
+    public void youCanConstructASequenceItem() throws IOException {
+        VertexLabel xLabel = new VertexLabel("x");
+        Sequence sequence = constructSimpleSequence(null, xLabel);
+        BayesianNetwork network = sequence.toBayesianNetwork();
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        ProtobufSaver saver = new ProtobufSaver(network);
+        saver.save(writer, true);
+        ProtobufLoader loader = new ProtobufLoader();
+        Sequence reconstructedSequence = loader.loadSequence(new ByteArrayInputStream(writer.toByteArray()));
+
+        assertThat(reconstructedSequence.size(), is(2));
+        assertThat(reconstructedSequence.getUniqueIdentifier(), is(sequence.getUniqueIdentifier()));
+
+        assertSequenceContains(sequence, reconstructedSequence, xLabel, SequenceBuilder.proxyLabelFor(xLabel));
+    }
+
+    @Test
+    public void itThrowsWhenManyAreStoredButOneIsRequested() throws IOException {
+        expectedException.expect(SequenceConstructionException.class);
+        expectedException.expectMessage("The provided BayesianNetwork contains more than one Sequence");
+
+        VertexLabel x1Label = new VertexLabel("x1");
+        VertexLabel x2Label = new VertexLabel("x2");
+        VertexLabel outputLabel = new VertexLabel("OUTPUT");
+        String sequence1Label = "Sequence_1";
+        String sequence2Label = "Sequence_2";
+
+        Sequence sequence1 = constructSimpleSequence(sequence1Label, x1Label);
+        Sequence sequence2 = constructSimpleSequence(sequence2Label, x2Label);
+
+        DoubleVertex output1 = sequence1.getLastItem().get(x1Label);
+        DoubleVertex output2 = sequence2.getLastItem().get(x2Label);
+
+        DoubleVertex masterOutput = output1.multiply(output2).setLabel(outputLabel);
+
+        BayesianNetwork network = new BayesianNetwork(masterOutput.getConnectedGraph());
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        ProtobufSaver saver = new ProtobufSaver(network);
+        saver.save(writer, true);
+        ProtobufLoader loader = new ProtobufLoader();
+        loader.loadSequence(new ByteArrayInputStream(writer.toByteArray()));
+    }
+
+    @Test
+    public void youCanConstructManySequenceItems() throws IOException {
+        VertexLabel x1Label = new VertexLabel("x1");
+        VertexLabel x2Label = new VertexLabel("x2");
+        VertexLabel outputLabel = new VertexLabel("OUTPUT");
+        String sequence1Label = "Sequence_1";
+        String sequence2Label = "Sequence_2";
+
+        Sequence sequence1 = constructSimpleSequence(sequence1Label, x1Label);
+        Sequence sequence2 = constructSimpleSequence(sequence2Label, x2Label);
+
+        DoubleVertex output1 = sequence1.getLastItem().get(x1Label);
+        DoubleVertex output2 = sequence2.getLastItem().get(x2Label);
+
+        DoubleVertex masterOutput = output1.multiply(output2).setLabel(outputLabel);
+
+        BayesianNetwork network = new BayesianNetwork(masterOutput.getConnectedGraph());
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        ProtobufSaver saver = new ProtobufSaver(network);
+        saver.save(writer, true);
+        ProtobufLoader loader = new ProtobufLoader();
+        Collection<Sequence> reconstructedSequences = loader.loadSequences(new ByteArrayInputStream(writer.toByteArray()));
+
+        Sequence reconstructedSequence1 = getSequenceAndCheckNotNull(reconstructedSequences, sequence1Label);
+        Sequence reconstructedSequence2 = getSequenceAndCheckNotNull(reconstructedSequences, sequence2Label);
+
+        assertThat(reconstructedSequences.size(), is(2));
+        assertThat(reconstructedSequence1.getUniqueIdentifier(), is(sequence1.getUniqueIdentifier()));
+        assertThat(reconstructedSequence2.getUniqueIdentifier(), is(sequence2.getUniqueIdentifier()));
+        assertThat(reconstructedSequence1.size(), is(2));
+        assertThat(reconstructedSequence2.size(), is(2));
+        assertThat(reconstructedSequence1.getName(), is(sequence1Label));
+        assertThat(reconstructedSequence2.getName(), is(sequence2Label));
+
+        VertexLabel x1ProxyLabel = SequenceBuilder.proxyLabelFor(x1Label);
+        VertexLabel x2ProxyLabel = SequenceBuilder.proxyLabelFor(x2Label);
+        assertSequenceContains(sequence1, reconstructedSequence1, x1Label, x1ProxyLabel);
+        assertSequenceContains(sequence2, reconstructedSequence2, x2Label, x2ProxyLabel);
+
+        BayesianNetwork reconstructedNetwork = sequence1.toBayesianNetwork();
+        Vertex reconstructedMasterOutput = reconstructedNetwork.getVertexByLabel(outputLabel);
+        assertThat(reconstructedMasterOutput, notNullValue());
+        assertThat(((DoubleTensor) reconstructedMasterOutput.getValue()).scalar(), is(16.0));
+    }
+
+    private void assertSequenceContains(Sequence sequence, Sequence reconstructedSequence, VertexLabel xLabel, VertexLabel xProxyLabel) {
+        List<SequenceItem> originalList = sequence.asList();
+        reconstructedSequence.forEach(sequenceItem -> {
+            SequenceItem originalItem = originalList.get(sequenceItem.getIndex());
+            assertThat(sequenceItem.getContents().keySet(), is(originalItem.getContents().keySet()));
+            assertThat(sequenceItem.get(xLabel), notNullValue());
+            assertThat(sequenceItem.get(xProxyLabel), notNullValue());
+        });
+
+        Vertex<? extends DoubleTensor> outputVertex2 = reconstructedSequence.getLastItem().get(xLabel);
+        double actualOutputValue2 = outputVertex2.getValue().scalar();
+        assertThat(actualOutputValue2, is(4.0));
+    }
+
+    private Sequence getSequenceAndCheckNotNull(Collection<Sequence> sequences, String sequenceName) {
+        Sequence reconstructedSequence = sequences
+            .stream()
+            .filter(sequence -> sequence.getName().equals(sequenceName))
+            .findFirst()
+            .orElse(null);
+        assertThat(reconstructedSequence, notNullValue());
+        return reconstructedSequence;
+    }
+
+    private Sequence constructSimpleSequence(String sequenceName, VertexLabel outputLabel) {
+        DoubleVertex two = new ConstantDoubleVertex(2.0);
+
+        Consumer<SequenceItem> factory = sequenceItem -> {
+            DoubleProxyVertex xInput = sequenceItem.addDoubleProxyFor(outputLabel);
+            DoubleVertex xOutput = xInput.multiply(two).setLabel(outputLabel);
+
+            sequenceItem.add(xOutput);
+        };
+
+        DoubleVertex xInitial = new ConstantDoubleVertex(1.0).setLabel(outputLabel);
+        VertexDictionary initialState = SimpleVertexDictionary.of(xInitial);
+
+        SequenceBuilder builder = new SequenceBuilder();
+        if (sequenceName != null) {
+            builder = builder.named(sequenceName);
+        }
+
+        return builder
+            .withInitialState(initialState)
+            .count(2)
+            .withFactory(factory)
+            .build();
     }
 
 }

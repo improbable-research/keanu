@@ -18,6 +18,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<IntegerVertex>, NonProbabilistic<IntegerTensor> {
 
     private static final String LABEL_NAME = "label";
+    private static final String PARENT_NAME = "parent";
 
     /**
      * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
@@ -35,6 +36,12 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
         setLabel(label);
     }
 
+    public IntegerProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) VertexLabel label, @LoadVertexParam(PARENT_NAME) IntegerVertex parent) {
+        super(shape);
+        setLabel(label);
+        setParent(parent);
+    }
+
     @Override
     public <V extends Vertex<IntegerTensor>> V setLabel(VertexLabel label) {
         if (this.getLabel() != null && !this.getLabel().getUnqualifiedName().equals(label.getUnqualifiedName())) {
@@ -43,7 +50,7 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
         return super.setLabel(label);
     }
 
-    public IntegerProxyVertex(@LoadShape long[] tensorShape, @LoadVertexParam(LABEL_NAME) String label) {
+    public IntegerProxyVertex(long[] tensorShape, String label) {
         this(tensorShape, new VertexLabel(label));
     }
 
@@ -58,6 +65,7 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
         setParents(newParent);
     }
 
+    @SaveVertexParam(PARENT_NAME)
     public IntegerVertex getParent() {
         return (IntegerVertex) Iterables.getOnlyElement(getParents(), null);
     }

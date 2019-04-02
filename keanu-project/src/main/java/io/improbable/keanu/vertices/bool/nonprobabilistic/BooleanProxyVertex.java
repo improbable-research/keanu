@@ -18,6 +18,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<BooleanVertex>, NonProbabilistic<BooleanTensor> {
 
     private final static String LABEL_NAME = "label";
+    private final static String PARENT_NAME = "parent";
 
     /**
      * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
@@ -30,9 +31,15 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
     }
 
     @ExportVertexToPythonBindings
-    public BooleanProxyVertex(long[] shape, VertexLabel label) {
+    public BooleanProxyVertex(long[] shape,VertexLabel label) {
         super(shape);
         setLabel(label);
+    }
+
+    public BooleanProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) VertexLabel label, @LoadVertexParam(PARENT_NAME) BooleanVertex parent) {
+        super(shape);
+        setLabel(label);
+        setParent(parent);
     }
 
     @Override
@@ -43,7 +50,7 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
         return super.setLabel(label);
     }
 
-    public BooleanProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) String label) {
+    public BooleanProxyVertex(long[] shape, String label) {
         this(shape, new VertexLabel(label));
     }
 
@@ -58,6 +65,7 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
         setParents(newParent);
     }
 
+    @SaveVertexParam(PARENT_NAME)
     public BooleanVertex getParent() {
         return (BooleanVertex) Iterables.getOnlyElement(getParents(), null);
     }

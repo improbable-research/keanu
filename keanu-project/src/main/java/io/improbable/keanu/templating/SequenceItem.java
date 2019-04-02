@@ -21,7 +21,7 @@ import static com.google.common.collect.ImmutableMap.copyOf;
 
 public class SequenceItem implements VertexDictionary {
 
-    private static final String NAME_PREFIX = "Sequence_Item_";
+    public static final String NAME_PREFIX = "Sequence_Item_";
     private static Pattern NAME_REGEX = Pattern.compile(NAME_PREFIX + "-?[\\d]+$");
 
     private Map<VertexLabel, Vertex<?>> contents;

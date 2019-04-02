@@ -7,12 +7,16 @@ import com.google.common.primitives.Longs;
 import com.google.gson.internal.Primitives;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkLoader;
+import io.improbable.keanu.templating.Sequence;
+import io.improbable.keanu.templating.SequenceConstructionException;
+import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -25,9 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static io.improbable.keanu.templating.SequenceBuilder.getUnscopedLabel;
+import static java.lang.Integer.parseInt;
 
 public class ProtobufLoader implements NetworkLoader {
 
@@ -66,6 +74,124 @@ public class ProtobufLoader implements NetworkLoader {
 
         return bayesNet;
     }
+
+    public Sequence loadSequence(InputStream inputStream) throws IOException {
+        Collection<Sequence> sequences = loadSequences(inputStream);
+        if (sequences.size() != 1) {
+            throw new SequenceConstructionException("The provided BayesianNetwork contains more than one Sequence");
+        }
+        return sequences.stream().findFirst().get();
+    }
+
+    public Collection<Sequence> loadSequences(InputStream input) throws IOException {
+        KeanuSavedBayesNet.ProtoModel parsedModel = KeanuSavedBayesNet.ProtoModel.parseFrom(input);
+        SavedBayesNet.Graph graph = parsedModel.getGraph();
+        Map<SavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
+        Map<Integer, Sequence> sequences = new HashMap<>();
+
+        for (SavedBayesNet.Vertex vertex : graph.getVerticesList()) {
+            Vertex newVertex = createVertexFromProtoBuf(vertex, instantiatedVertices);
+            VertexLabel label = newVertex.getLabel();
+            if (label != null) {
+                int sequenceItemIndex = isInSequenceItem(label);
+                if (sequenceItemIndex >= 0) {
+                    String sequenceName = getSequenceName(label);
+                    int sequenceHash = getSequenceHash(label, sequenceName);
+
+                    Sequence sequence = getOrCreateSequence(sequences, sequenceHash, sequenceName);
+                    SequenceItem item = getOrCreateSequenceItem(sequence, sequenceItemIndex, sequenceHash, sequenceName);
+
+                    //Removes the scope from a label because this is required by the sequenceItem.add() method
+                    VertexLabel newLabel = getUnscopedLabel(label, sequenceName);
+                    newVertex.setLabel(newLabel);
+
+                    item.add(newVertex);
+                }
+            }
+
+            instantiatedVertices.put(vertex.getId(), newVertex);
+        }
+
+        BayesianNetwork bayesNet = new BayesianNetwork(instantiatedVertices.values());
+
+        loadDefaultValues(graph.getDefaultStateList(), instantiatedVertices, bayesNet);
+
+        return sequences.values();
+    }
+
+    /**
+     * Finds if a vertex is part of a SequenceItem or not.
+     * @param label label of the vertex being parsed.
+     * @return -1 if not in sequenceItem. Otherwise returns sequenceItem index.
+     */
+    private int isInSequenceItem(VertexLabel label) {
+        String outerNamespace = label.getOuterNamespace().orElse(null);
+        if (outerNamespace == null) {
+            return -1;
+        }
+        if (outerNamespace.startsWith(SequenceItem.NAME_PREFIX)) {
+            return parseInt(outerNamespace.replaceFirst(SequenceItem.NAME_PREFIX, ""));
+        }
+        outerNamespace = label.withoutOuterNamespace().getOuterNamespace().orElse(null);
+        if (outerNamespace == null) {
+            return -1;
+        }
+        return parseInt(outerNamespace.replaceFirst(SequenceItem.NAME_PREFIX, ""));
+    }
+
+    /**
+     * Tries to get the unique sequence name from a vertex label
+     * @param label
+     * @return will return null if there is not a unique sequence name
+     */
+    private String getSequenceName(VertexLabel label) {
+        String outerNamespace = label.getOuterNamespace().orElse(null);
+        if (outerNamespace != null && outerNamespace.startsWith(SequenceItem.NAME_PREFIX)) {
+            outerNamespace = null;
+        }
+        return outerNamespace;
+    }
+
+    private int getSequenceHash(VertexLabel label, String sequenceName) {
+        VertexLabel withHashAsOuterNamespace = label.withoutOuterNamespace();
+        if (sequenceName != null) {
+            withHashAsOuterNamespace = withHashAsOuterNamespace.withoutOuterNamespace();
+        }
+        String hashLabel = withHashAsOuterNamespace.getOuterNamespace()
+            .orElseThrow(() -> new SequenceConstructionException("Could not parse the sequence hash in the vertex label"));
+        return parseInt(hashLabel);
+    }
+
+    private boolean sequenceContainsKey(Sequence sequence, int index) {
+        List<SequenceItem> sequenceItems = sequence.asList();
+        if (index >= sequenceItems.size()) {
+            return false;
+        }
+        return sequenceItems.get(index) != null;
+    }
+
+    private Sequence getOrCreateSequence(Map<Integer, Sequence> sequences, int sequenceHash, String sequenceName) {
+        Sequence sequence;
+        if (sequences.containsKey(sequenceHash)) {
+            sequence = sequences.get(sequenceHash);
+        } else {
+            sequence = new Sequence(0, sequenceHash, sequenceName);
+            sequences.put(sequenceHash, sequence);
+        }
+        return sequence;
+    }
+
+    private SequenceItem getOrCreateSequenceItem(Sequence sequence, int sequenceItemIndex, int sequenceHash, String sequenceName) {
+        SequenceItem sequenceItem;
+        if (sequenceContainsKey(sequence, sequenceItemIndex)) {
+            sequenceItem = sequence.asList().get(sequenceItemIndex);
+        } else {
+            sequenceItem = new SequenceItem(sequenceItemIndex, sequenceHash, sequenceName);
+            sequence.add(sequenceItem);
+        }
+        return sequenceItem;
+    }
+
 
     @Override
     public void loadValue(DoubleVertex vertex) {
@@ -196,8 +322,9 @@ public class ProtobufLoader implements NetworkLoader {
         Map<String, Object> parameterMap = getParameterMap(vertex, existingVertices);
         Vertex newVertex = instantiateVertex(vertexClass, parameterMap, vertex);
 
-        if (!vertex.getLabel().isEmpty()) {
-            newVertex.setLabel(vertex.getLabel());
+        if (!vertex.getLabel().isEmpty() && !(newVertex instanceof ProxyVertex)) {
+            VertexLabel newLabel = VertexLabel.parseLabel(vertex.getLabel());
+            newVertex.setLabel(newLabel);
         }
 
         return newVertex;
@@ -239,9 +366,13 @@ public class ProtobufLoader implements NetworkLoader {
             if (parameter == null) {
                 throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
                     + paramAnnotation.value());
-            } else {
-                return parameter;
             }
+            String annotationName = methodParameter.getAnnotation(LoadVertexParam.class).value();
+            if (annotationName.equals("label")) {
+                return VertexLabel.parseLabel((String) parameter);
+            }
+
+            return parameter;
         } else if (methodParameter.getAnnotation(LoadShape.class) != null) {
             if (vertex.getShapeCount() == 0) {
                 return Tensor.SCALAR_SHAPE;

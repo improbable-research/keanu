@@ -88,4 +88,15 @@ public class VertexLabel {
 
         return Objects.hash(namespace, name);
     }
+
+    public static VertexLabel parseLabel(String label) {
+        List<String> namespaces = Arrays.asList(label.split("\\."));
+        if (namespaces.size() == 0) {
+            return new VertexLabel(label);
+        }
+        if (namespaces.size() == 1) {
+            return new VertexLabel(namespaces.get(0));
+        }
+        return new VertexLabel(namespaces.subList(0, namespaces.size() - 1), namespaces.get(namespaces.size() - 1));
+    }
 }
