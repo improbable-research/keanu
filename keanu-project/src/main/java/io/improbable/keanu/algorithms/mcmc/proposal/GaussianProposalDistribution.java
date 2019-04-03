@@ -5,28 +5,27 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Singular;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@Builder
 public class GaussianProposalDistribution implements ProposalDistribution {
 
-    @Singular
-    @NonNull
     private final Map<? extends Variable, DoubleTensor> sigmas;
+    private final DoubleTensor defaultSigma;
+    private final ProposalNotifier proposalNotifier;
 
-    @NonNull
-    @Builder.Default
-    private final DoubleTensor defaultSigma = DoubleTensor.scalar(1.0);
+    private GaussianProposalDistribution(Map<? extends Variable, DoubleTensor> sigmas, double defaultSigma, ProposalNotifier proposalNotifier) {
+        this.sigmas = sigmas;
+        this.defaultSigma = DoubleTensor.scalar(defaultSigma);
+        this.proposalNotifier = proposalNotifier;
+    }
 
-    @NonNull
-    @Builder.Default
-    private final ProposalNotifier proposalNotifier = new ProposalNotifier(Collections.emptyList());
+    public static GaussianProposalDistributionBuilder builder() {
+        return new GaussianProposalDistributionBuilder();
+    }
 
     @Override
     public Proposal getProposal(Set<? extends Variable> variables, KeanuRandom random) {
@@ -56,5 +55,34 @@ public class GaussianProposalDistribution implements ProposalDistribution {
     @Override
     public void onProposalRejected() {
         proposalNotifier.notifyProposalRejected();
+    }
+
+    public static class GaussianProposalDistributionBuilder {
+
+        private Map<Variable, DoubleTensor> sigmas = new HashMap<>();
+        private double defaultSigma;
+        private ProposalNotifier proposalNotifier = new ProposalNotifier(Collections.emptyList());
+
+        private GaussianProposalDistributionBuilder() {
+        }
+
+        public GaussianProposalDistributionBuilder sigma(Variable sigmaKey, DoubleTensor sigmaValue) {
+            sigmas.put(sigmaKey, sigmaValue);
+            return this;
+        }
+
+        public GaussianProposalDistributionBuilder defaultSigma(double defaultSigma) {
+            this.defaultSigma = defaultSigma;
+            return this;
+        }
+
+        public GaussianProposalDistributionBuilder proposalNotifier(ProposalNotifier proposalNotifier) {
+            this.proposalNotifier = proposalNotifier;
+            return this;
+        }
+
+        public GaussianProposalDistribution build() {
+            return new GaussianProposalDistribution(sigmas, defaultSigma, proposalNotifier);
+        }
     }
 }

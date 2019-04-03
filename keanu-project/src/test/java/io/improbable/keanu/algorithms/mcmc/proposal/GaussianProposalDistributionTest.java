@@ -7,7 +7,6 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;
@@ -18,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +58,10 @@ public class GaussianProposalDistributionTest {
             vertex1, sigmaForVertex1,
             vertex2, sigmaForVertex2
         );
-        proposalDistribution = GaussianProposalDistribution.builder().sigmas(sigmas).build();
+        proposalDistribution = GaussianProposalDistribution.builder()
+            .sigma(vertex1, sigmaForVertex1)
+            .sigma(vertex2, sigmaForVertex2)
+            .build();
     }
 
     @Before
@@ -73,8 +74,8 @@ public class GaussianProposalDistributionTest {
         when(vertex1.getValue()).thenReturn(currentStateForVertex1);
         when(vertex2.getValue()).thenReturn(currentStateForVertex2);
 
-        when(vertex1.getShape()).thenReturn(new long[] {2});
-        when(vertex2.getShape()).thenReturn(new long[] {2});
+        when(vertex1.getShape()).thenReturn(new long[]{2});
+        when(vertex2.getShape()).thenReturn(new long[]{2});
 
         proposal = new Proposal();
         proposal.setProposal(vertex1, proposedStateForVertex1);
@@ -107,7 +108,8 @@ public class GaussianProposalDistributionTest {
         ProposalListener listener2 = mock(ProposalListener.class);
         List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
         proposalDistribution = GaussianProposalDistribution.builder()
-            .sigmas(sigmas)
+            .sigma(vertex1, sigmaForVertex1)
+            .sigma(vertex2, sigmaForVertex2)
             .proposalNotifier(new ProposalNotifier(listeners))
             .build();
         Set<Variable> variables = ImmutableSet.of(vertex1, vertex2);

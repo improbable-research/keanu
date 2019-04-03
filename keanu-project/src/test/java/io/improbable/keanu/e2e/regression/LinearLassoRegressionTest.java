@@ -125,7 +125,7 @@ public class LinearLassoRegressionTest {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData(smallRawDataSize);
 
         SamplingModelFitting sampling = new SamplingModelFitting(model -> MetropolisHastings.builder()
-            .proposalDistribution(GaussianProposalDistribution.builder().defaultSigma(DoubleTensor.scalar(0.25)).build())
+            .proposalDistribution(GaussianProposalDistribution.builder().defaultSigma(0.25).build())
             .variableSelector(MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR)
             .rejectionStrategy(new RollbackAndCascadeOnRejection())
             .build(),
