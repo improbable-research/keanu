@@ -101,7 +101,7 @@ public class LinearRidgeRegressionTest {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData(smallRawDataSize);
 
         SamplingModelFitting sampling = new SamplingModelFitting(model -> MetropolisHastings.builder()
-            .proposalDistribution(new GaussianProposalDistribution(model.getLatentVariables(), DoubleTensor.scalar(0.25)))
+            .proposalDistribution(GaussianProposalDistribution.builder().defaultSigma(DoubleTensor.scalar(0.25)).build())
             .variableSelector(MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR)
             .rejectionStrategy(new RollbackAndCascadeOnRejection())
             .build(),

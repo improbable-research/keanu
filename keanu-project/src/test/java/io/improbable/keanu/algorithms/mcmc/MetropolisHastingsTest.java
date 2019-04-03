@@ -204,20 +204,17 @@ public class MetropolisHastingsTest {
         B.setValue(20.0);
 
         DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
-
         Cobserved.observe(46.0);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-        bayesNet.probeForNonZeroProbability(100);
 
-        Map<Variable, DoubleTensor> sigmas = ImmutableMap.of(
-            A, DoubleTensor.scalar(1.),
-            B, DoubleTensor.scalar(1.)
-        );
-        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(sigmas);
+        ProposalDistribution proposalDistribution =  GaussianProposalDistribution.builder()
+            .sigma(A, DoubleTensor.scalar(1.5))
+            .sigma(B, DoubleTensor.scalar(1.5))
+            .build();
+
         MetropolisHastings metropolisHastings = MetropolisHastings.builder()
             .proposalDistribution(proposalDistribution)
-            .rejectionStrategy(new RollbackAndCascadeOnRejection())
             .build();
 
         NetworkSamples posteriorSamples = metropolisHastings.getPosteriorSamples(

@@ -60,7 +60,7 @@ public class GaussianProposalDistributionTest {
             vertex1, sigmaForVertex1,
             vertex2, sigmaForVertex2
         );
-        proposalDistribution = new GaussianProposalDistribution(sigmas);
+        proposalDistribution = GaussianProposalDistribution.builder().sigmas(sigmas).build();
     }
 
     @Before
@@ -106,7 +106,10 @@ public class GaussianProposalDistributionTest {
         ProposalListener listener1 = mock(ProposalListener.class);
         ProposalListener listener2 = mock(ProposalListener.class);
         List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
-        proposalDistribution = new GaussianProposalDistribution(sigmas, listeners);
+        proposalDistribution = GaussianProposalDistribution.builder()
+            .sigmas(sigmas)
+            .proposalNotifier(new ProposalNotifier(listeners))
+            .build();
         Set<Variable> variables = ImmutableSet.of(vertex1, vertex2);
         Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
         verify(listener1).onProposalCreated(proposal);
@@ -125,26 +128,4 @@ public class GaussianProposalDistributionTest {
         proposalDistribution.getProposal(ImmutableSet.of(poisson), KeanuRandom.getDefaultRandom());
     }
 
-    @Test
-    public void itThrowsIfAnEmptySigmaMapIsSpecified() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Gaussian proposal requires at least one sigma");
-        new GaussianProposalDistribution(new HashMap<>());
-    }
-
-    @Test
-    public void getProposalThrowsIfProposalIsMissingASigmaForAVariable() {
-        CauchyVertex notInProposalDistribution = new CauchyVertex(1., 1.);
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("A sigma was not specified for variable " + notInProposalDistribution);
-        proposalDistribution.getProposal(ImmutableSet.of(notInProposalDistribution), KeanuRandom.getDefaultRandom());
-    }
-
-    @Test
-    public void logProbThrowsIfProposalIsMissingASigmaForAVariable() {
-        CauchyVertex notInProposalDistribution = new CauchyVertex(1., 1.);
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("A sigma was not specified for variable " + notInProposalDistribution);
-        proposalDistribution.logProb(notInProposalDistribution, DoubleTensor.scalar(1.), DoubleTensor.scalar(2.));
-    }
 }
