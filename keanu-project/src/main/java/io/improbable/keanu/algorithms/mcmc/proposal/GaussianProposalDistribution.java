@@ -60,7 +60,7 @@ public class GaussianProposalDistribution implements ProposalDistribution {
     public static class GaussianProposalDistributionBuilder {
 
         private Map<Variable, DoubleTensor> sigmas = new HashMap<>();
-        private double defaultSigma;
+        private double defaultSigma = 1.0;
         private ProposalNotifier proposalNotifier = new ProposalNotifier(Collections.emptyList());
 
         private GaussianProposalDistributionBuilder() {
