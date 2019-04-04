@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Iterable, Dict, List, Tuple
+from typing import Any, Iterable, Dict, List, Tuple, Union
 
 from numpy import ndenumerate, ndarray
 from py4j.java_collections import JavaList
@@ -10,7 +10,7 @@ from keanu.context import KeanuContext
 from keanu.net import BayesNet, ProbabilisticModel, ProbabilisticModelWithGradient
 from keanu.plots import traceplot
 from keanu.tensor import Tensor
-from keanu.vartypes import sample_types, sample_generator_types, numpy_types, sample_generator_dict_type
+from keanu.vartypes import sample_types, sample_generator_types, numpy_types, sample_generator_dict_type, tensor_arg_types
 from keanu.vertex.base import Vertex
 
 COLUMN_HEADER_FOR_SCALAR = (0,)
@@ -43,9 +43,10 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
     :param proposal_distribution: The proposal distribution for Metropolis Hastings. Options are 'gaussian' and 'prior'.
     :param latents: All latent vertices.
     :param proposal_listeners: Listeners for proposal creation and rejection. Options are :class:`keanu.algorithm.AcceptanceRateTracker`.
-    :param proposal_distribution_sigma: Parameter sigma for 'gaussian' proposal distribution.
+    :param proposal_distribution_sigma: Parameter sigma (a single sigma or a list of sigmas for each latent) for 'gaussian' proposal distribution
 
     :raises TypeError: If you pass `proposal_listener` without specifying `proposal_distribution`.
+    :raises TypeError: If you choose 'gaussian' as `proposal_distribution` but did not specify `latents`.
     :raises TypeError: If you choose 'gaussian' as `proposal_distribution` but did not specify `proposal_distribution_sigma`.
     :raises TypeError: If you choose 'prior' as `proposal_distribution` but did not pass latent vertices.
     """
@@ -54,7 +55,7 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
                  proposal_distribution: str,
                  latents: Iterable[Vertex],
                  proposal_listeners=[],
-                 proposal_distribution_sigma: numpy_types = None):
+                 proposal_distribution_sigma: Union[tensor_arg_types, List[tensor_arg_types]] = None):
         if (proposal_distribution is None and len(proposal_listeners) > 0):
             raise TypeError("If you pass in proposal_listeners you must also specify proposal_distribution")
 
@@ -159,6 +160,7 @@ def sample(net: BayesNet,
     """
 
     sample_from = list(sample_from)
+    id_to_label = __check_if_vertices_are_labelled(sample_from)
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from)
@@ -172,7 +174,6 @@ def sample(net: BayesNet,
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
-    id_to_label = __check_if_vertices_are_labelled(sample_from)
     if __all_scalar(sample_from):
         vertex_samples = __create_single_indexed_samples(network_samples, vertices_unwrapped, id_to_label)
     else:
