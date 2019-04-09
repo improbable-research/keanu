@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.NetworkSaver;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -46,10 +45,5 @@ public class ConstantIntegerVertex extends IntegerVertex implements ConstantVert
     @SaveVertexParam(CONSTANT_NAME)
     public IntegerTensor getConstantValue() {
         return getValue();
-    }
-
-    protected String getBaseDescription() {
-        Tensor value = this.getConstantValue();
-        return createBaseDescription(value);
     }
 }

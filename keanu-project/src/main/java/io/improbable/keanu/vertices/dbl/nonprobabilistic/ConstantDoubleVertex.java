@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.NetworkSaver;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -60,10 +59,5 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     @SaveVertexParam(CONSTANT_NAME)
     public DoubleTensor getConstantValue() {
         return getValue();
-    }
-
-    protected String getBaseDescription() {
-        Tensor value = this.getConstantValue();
-        return createBaseDescription(value);
     }
 }

@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -15,6 +16,17 @@ import static org.hamcrest.core.Is.is;
 public class DescriptionGeneratorTest {
 
     DescriptionCreator descriptionCreator = new DescriptionCreator();
+
+    @Test
+    public void testBinomialVertexDescriptionCreatedCorrectly() {
+        DoubleVertex two = new ConstantDoubleVertex(2.0);
+        IntegerVertex three = new ConstantIntegerVertex(3).setLabel("Three");
+        BinomialVertex binomialVertex = new BinomialVertex(two, three);
+
+        String description = descriptionCreator.createDescription(binomialVertex);
+
+        assertThat(description, is("This Vertex = BinomialVertex(p=Const(2.0), n=Three)"));
+    }
 
     @Test
     public void testSimpleDescriptionsCreatedCorrectly() {
