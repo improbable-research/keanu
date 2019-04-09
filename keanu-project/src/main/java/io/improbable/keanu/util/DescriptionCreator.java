@@ -3,6 +3,7 @@ package io.improbable.keanu.util;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
@@ -30,16 +31,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static io.improbable.keanu.util.DescriptionUtils.createBinomialDescription;
-import static io.improbable.keanu.util.DescriptionUtils.createBooleanBinaryOpDescription;
-import static io.improbable.keanu.util.DescriptionUtils.createIfStringDescription;
-
 public class DescriptionCreator {
 
-    private static Map<Class, String> delimiters = new HashMap<>();
-    private static Map<Class, String> booleanBinaryOperators = new HashMap<>();
+    private Map<Class, String> delimiters;
 
-    static {
+    public DescriptionCreator() {
+        delimiters = new HashMap<>();
         delimiters.put(AdditionVertex.class, " + ");
         delimiters.put(IntegerAdditionVertex.class, " + ");
         delimiters.put(DifferenceVertex.class, " - ");
@@ -47,14 +44,14 @@ public class DescriptionCreator {
         delimiters.put(MultiplicationVertex.class, " * ");
         delimiters.put(IntegerMultiplicationVertex.class, " * ");
         delimiters.put(DivisionVertex.class, " / ");
-        booleanBinaryOperators.put(AndBinaryVertex.class, " && ");
-        booleanBinaryOperators.put(EqualsVertex.class, " == ");
-        booleanBinaryOperators.put(GreaterThanOrEqualVertex.class, " >= ");
-        booleanBinaryOperators.put(GreaterThanVertex.class, " > ");
-        booleanBinaryOperators.put(LessThanOrEqualVertex.class, " <= ");
-        booleanBinaryOperators.put(LessThanVertex.class, " < ");
-        booleanBinaryOperators.put(NotEqualsVertex.class, " != ");
-        booleanBinaryOperators.put(OrBinaryVertex.class, " || ");
+        delimiters.put(AndBinaryVertex.class, " && ");
+        delimiters.put(EqualsVertex.class, " == ");
+        delimiters.put(GreaterThanOrEqualVertex.class, " >= ");
+        delimiters.put(GreaterThanVertex.class, " > ");
+        delimiters.put(LessThanOrEqualVertex.class, " <= ");
+        delimiters.put(LessThanVertex.class, " < ");
+        delimiters.put(NotEqualsVertex.class, " != ");
+        delimiters.put(OrBinaryVertex.class, " || ");
     }
 
     private static <T extends Tensor> String getBaseDescription(Vertex<T> vertex) {
@@ -73,7 +70,7 @@ public class DescriptionCreator {
         }
     }
 
-    static <T extends Tensor> String createDescriptionAllowingLabels(Vertex<T> vertex) {
+    <T extends Tensor> String createDescriptionAllowingLabels(Vertex<T> vertex) {
         Collection<Vertex> parents = vertex.getParents();
 
         if (vertex.getLabel() != null) {
@@ -87,7 +84,7 @@ public class DescriptionCreator {
         return recursiveDescriptionStep(vertex, true);
     }
 
-    private static <T extends Tensor> String recursiveDescriptionStep(Vertex<T> vertex, boolean includeBrackets) {
+    private <T extends Tensor> String recursiveDescriptionStep(Vertex<T> vertex, boolean includeBrackets) {
         String irregularDescription = checkForIrregularExpressions(vertex, includeBrackets);
         if (irregularDescription != null) {
             return irregularDescription;
@@ -96,7 +93,7 @@ public class DescriptionCreator {
         Stream<String> parentStream = vertex
             .getParents()
             .stream()
-            .map(DescriptionCreator::createDescriptionAllowingLabels);
+            .map(this::createDescriptionAllowingLabels);
 
         String[] parentStrings = parentStream.toArray(String[]::new);
 
@@ -127,7 +124,7 @@ public class DescriptionCreator {
      * @return An String equation describing how this vertex is calculated.<br>
      * E.g. "This Vertex = that + (three * Const(4))"
      */
-    public static <T extends Tensor> String createDescription(Vertex<T> vertex) {
+    public <T extends Tensor> String createDescription(Vertex<T> vertex) {
         Collection<Vertex> parents = vertex.getParents();
 
         if (parents.size() == 0) {
@@ -143,11 +140,11 @@ public class DescriptionCreator {
         return thisLabel + " = " + recursiveDescriptionStep(vertex, false);
     }
 
-    private static <T extends Tensor> String getDescriptionDelimiter(Vertex<T> vertex) {
+    private <T extends Tensor> String getDescriptionDelimiter(Vertex<T> vertex) {
         return delimiters.getOrDefault(vertex.getClass(), ", ");
     }
 
-    private static <T extends Tensor> String checkForIrregularExpressions(Vertex<T> vertex, boolean includeBrackets) {
+    private <T extends Tensor> String checkForIrregularExpressions(Vertex<T> vertex, boolean includeBrackets) {
         if (vertex instanceof BinomialVertex) {
             createBinomialDescription((BinomialVertex) vertex, includeBrackets);
         } else if (vertex instanceof BooleanIfVertex) {
@@ -171,9 +168,60 @@ public class DescriptionCreator {
         } else if (vertex instanceof BooleanBinaryOpVertex) {
             return createBooleanBinaryOpDescription(
                 (BooleanBinaryOpVertex) vertex,
-                booleanBinaryOperators.getOrDefault(vertex.getClass(), ", "),
+                delimiters.getOrDefault(vertex.getClass(), ", "),
                 includeBrackets);
         }
         return null;
+    }
+
+
+
+    String createIfStringDescription(BooleanVertex predicate, Vertex thn, Vertex els, boolean includeBrackets) {
+        StringBuilder builder = new StringBuilder();
+
+        if (includeBrackets) {
+            builder.append("(");
+        }
+        builder.append(createDescriptionAllowingLabels(predicate));
+        builder.append(" ? ");
+        builder.append(createDescriptionAllowingLabels(thn));
+        builder.append(" : ");
+        builder.append(createDescriptionAllowingLabels(els));
+        if (includeBrackets) {
+            builder.append(")");
+        }
+
+        return builder.toString();
+    }
+
+    String createBinomialDescription(BinomialVertex binomialVertex, boolean includeBrackets) {
+        String pString = createDescriptionAllowingLabels(binomialVertex.getP());
+        String nString = createDescriptionAllowingLabels(binomialVertex.getN());
+
+        return new StringBuilder(includeBrackets ? "(" : "")
+            .append("Binomial(p=")
+            .append(pString)
+            .append(", n=")
+            .append(nString)
+            .append(")")
+            .append(includeBrackets ? ")" : "")
+            .toString();
+    }
+
+    <X extends Tensor, Y extends Tensor> String createBooleanBinaryOpDescription(BooleanBinaryOpVertex<X, Y> opVertex, String operation, boolean includeBrackets) {
+        StringBuilder builder = new StringBuilder();
+
+        if (includeBrackets) {
+            builder.append("(");
+        }
+
+        builder.append(createDescriptionAllowingLabels(opVertex.getA()));
+        builder.append(operation);
+        builder.append(createDescriptionAllowingLabels(opVertex.getB()));
+
+        if (includeBrackets) {
+            builder.append(")");
+        }
+        return builder.toString();
     }
 }

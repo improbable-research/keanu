@@ -9,11 +9,12 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.junit.Test;
 
-import static io.improbable.keanu.util.DescriptionCreator.createDescription;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 public class DescriptionGeneratorTest {
+
+    DescriptionCreator descriptionCreator = new DescriptionCreator();
 
     @Test
     public void testSimpleDescriptionsCreatedCorrectly() {
@@ -22,7 +23,7 @@ public class DescriptionGeneratorTest {
         DoubleVertex four = new ConstantDoubleVertex(4.0).setLabel("Four");
 
         DoubleVertex result = two.multiply(three).minus(four);
-        String description = createDescription(result);
+        String description = descriptionCreator.createDescription(result);
 
         assertThat(description, is("This Vertex = (Const(2.0) * Three) - Four"));
     }
@@ -34,7 +35,7 @@ public class DescriptionGeneratorTest {
         IntegerVertex four = new ConstantIntegerVertex(4).setLabel("Four");
 
         IntegerVertex result = two.multiply(three).plus(four);
-        String description = createDescription(result);
+        String description = descriptionCreator.createDescription(result);
 
         assertThat(description, is("This Vertex = (Const(2) * Three) + Four"));
     }
@@ -47,7 +48,7 @@ public class DescriptionGeneratorTest {
         DoubleVertex four = new ConstantDoubleVertex(4.0).setLabel("Four");
 
         DoubleVertex result = If.isTrue(predicate).then(three).orElse(four);
-        String description = createDescription(result);
+        String description = descriptionCreator.createDescription(result);
 
         assertThat(description, is("This Vertex = Const(false) ? Three : Four"));
     }
@@ -67,11 +68,11 @@ public class DescriptionGeneratorTest {
         BooleanVertex predicate5 = falze.or(falze);
         BooleanVertex predicate6 = falze.and(falze);
 
-        assertThat(createDescription(predicate1), is("This Vertex = Const(2.0) >= three"));
-        assertThat(createDescription(predicate2), is("This Vertex = Const(2.0) > three"));
-        assertThat(createDescription(predicate3), is("This Vertex = Const(2.0) <= three"));
-        assertThat(createDescription(predicate4), is("This Vertex = Const(2.0) < three"));
-        assertThat(createDescription(predicate5), is("This Vertex = Const(false) || Const(false)"));
-        assertThat(createDescription(predicate6), is("This Vertex = Const(false) && Const(false)"));
+        assertThat(descriptionCreator.createDescription(predicate1), is("This Vertex = Const(2.0) >= three"));
+        assertThat(descriptionCreator.createDescription(predicate2), is("This Vertex = Const(2.0) > three"));
+        assertThat(descriptionCreator.createDescription(predicate3), is("This Vertex = Const(2.0) <= three"));
+        assertThat(descriptionCreator.createDescription(predicate4), is("This Vertex = Const(2.0) < three"));
+        assertThat(descriptionCreator.createDescription(predicate5), is("This Vertex = Const(false) || Const(false)"));
+        assertThat(descriptionCreator.createDescription(predicate6), is("This Vertex = Const(false) && Const(false)"));
     }
 }
