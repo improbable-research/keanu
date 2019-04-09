@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static io.improbable.keanu.templating.SequenceBuilder.getUnscopedLabel;
 import static java.lang.Integer.parseInt;
@@ -104,24 +105,7 @@ public class ProtobufLoader implements NetworkLoader {
 
         for (SavedBayesNet.Vertex vertex : graph.getVerticesList()) {
             Vertex newVertex = createVertexFromProtoBuf(vertex, instantiatedVertices);
-            VertexLabel label = newVertex.getLabel();
-            if (label != null) {
-                int sequenceItemIndex = isInSequenceItem(label);
-                if (sequenceItemIndex >= 0) {
-                    String sequenceName = getSequenceName(label);
-                    int sequenceHash = getSequenceHash(label, sequenceName);
-
-                    Sequence sequence = getOrCreateSequence(sequences, sequenceHash, sequenceName);
-                    SequenceItem item = getOrCreateSequenceItem(sequence, sequenceItemIndex, sequenceHash, sequenceName);
-
-                    //Removes the scope from a label because this is required by the sequenceItem.add() method
-                    VertexLabel newLabel = getUnscopedLabel(label, sequenceName);
-                    newVertex.setLabel(newLabel);
-
-                    item.add(newVertex);
-                }
-            }
-
+            addVertexToSequences(newVertex, sequences);
             instantiatedVertices.put(vertex.getId(), newVertex);
         }
 
@@ -137,19 +121,39 @@ public class ProtobufLoader implements NetworkLoader {
      * @param label label of the vertex being parsed.
      * @return -1 if not in sequenceItem. Otherwise returns sequenceItem index.
      */
-    private int isInSequenceItem(VertexLabel label) {
+    private Optional<Integer> getSequenceItemIndex(VertexLabel label) {
         String outerNamespace = label.getOuterNamespace().orElse(null);
         if (outerNamespace == null) {
-            return -1;
+            return Optional.empty();
         }
         if (outerNamespace.startsWith(SequenceItem.NAME_PREFIX)) {
-            return parseInt(outerNamespace.replaceFirst(SequenceItem.NAME_PREFIX, ""));
+            return Optional.of(parseInt(outerNamespace.replaceFirst(SequenceItem.NAME_PREFIX, "")));
         }
         outerNamespace = label.withoutOuterNamespace().getOuterNamespace().orElse(null);
         if (outerNamespace == null) {
-            return -1;
+            return Optional.empty();
         }
-        return parseInt(outerNamespace.replaceFirst(SequenceItem.NAME_PREFIX, ""));
+        return Optional.of(parseInt(outerNamespace.replaceFirst(SequenceItem.NAME_PREFIX, "")));
+    }
+
+    private void addVertexToSequences(Vertex<?> vertex, Map<Integer, Sequence> sequences) {
+        VertexLabel label = vertex.getLabel();
+        if (label != null) {
+            Optional<Integer> sequenceItemIndex = getSequenceItemIndex(label);
+            if (sequenceItemIndex.isPresent()) {
+                String sequenceName = getSequenceName(label);
+                int sequenceHash = getSequenceHash(label, sequenceName);
+
+                Sequence sequence = getOrCreateSequence(sequences, sequenceHash, sequenceName);
+                SequenceItem item = getOrCreateSequenceItem(sequence, sequenceItemIndex.get(), sequenceHash, sequenceName);
+
+                //Removes the scope from a label because this is required by the sequenceItem.add() method
+                VertexLabel newLabel = getUnscopedLabel(label, sequenceName);
+                vertex.setLabel(newLabel);
+
+                item.add(vertex);
+            }
+        }
     }
 
     /**
@@ -194,7 +198,7 @@ public class ProtobufLoader implements NetworkLoader {
         return sequence;
     }
 
-    private SequenceItem getOrCreateSequenceItem(Sequence sequence, int sequenceItemIndex, int sequenceHash, String sequenceName) {
+    private SequenceItem getOrCreateSequenceItem(Sequence sequence, Integer sequenceItemIndex, int sequenceHash, String sequenceName) {
         SequenceItem sequenceItem;
         if (sequenceContainsKey(sequence, sequenceItemIndex)) {
             sequenceItem = sequence.asList().get(sequenceItemIndex);
