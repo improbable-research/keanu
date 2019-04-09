@@ -134,6 +134,7 @@ public class DescriptionCreator {
             if (vertex.getLabel() == null) {
                 return "<<Unlabelled Leaf Vertex>>";
             }
+
             return "Vertex with no parents and label: " + vertex.getLabel().toString();
         }
 
