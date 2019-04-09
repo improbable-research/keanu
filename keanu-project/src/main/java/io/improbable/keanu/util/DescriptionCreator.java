@@ -18,20 +18,17 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.ProbabilisticBoolean;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.ProbabilisticInteger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -110,14 +107,23 @@ public class DescriptionCreator {
             return irregularDescription.get();
         }
 
+        if (delimiters.containsKey(vertex.getClass())) {
+            CharSequence delimiter = delimiters.get(vertex.getClass());
+            return getDelimiterVertexDescription(vertex, delimiter, includeBrackets);
+        }
+
+        Optional<String> saveLoadDescription = tryCreateDescriptionFromSaveLoadAnnotations(vertex, includeBrackets);
+        return saveLoadDescription.orElseGet(() -> getDelimiterVertexDescription(vertex, ", ", includeBrackets));
+
+    }
+
+    private String getDelimiterVertexDescription(Vertex<?> vertex, CharSequence delimiter, boolean includeBrackets) {
         Stream<String> parentStream = vertex
             .getParents()
             .stream()
             .map(parent -> generateDescription(parent, true, true));
 
         String[] parentStrings = parentStream.toArray(String[]::new);
-
-        CharSequence delimiter = getDescriptionDelimiter(vertex);
 
         StringBuilder builder = new StringBuilder();
 
@@ -128,7 +134,6 @@ public class DescriptionCreator {
         if (includeBrackets) {
             builder.append(")");
         }
-
         return builder.toString();
     }
 
@@ -187,8 +192,6 @@ public class DescriptionCreator {
                 delimiters.getOrDefault(vertex.getClass(), ", "),
                 includeBrackets);
             return Optional.of(booleanBinaryDescription);
-        } else if (vertex instanceof ProbabilisticInteger || vertex instanceof ProbabilisticDouble || vertex instanceof ProbabilisticBoolean) {
-            return tryCreateDistributionDescription(vertex, includeBrackets);
         }
 
         return Optional.empty();
@@ -232,7 +235,7 @@ public class DescriptionCreator {
         return Optional.of(builder.toString());
     }
 
-    private Optional<String> tryCreateDistributionDescription(Vertex vertex, boolean includeBrackets) {
+    private Optional<String> tryCreateDescriptionFromSaveLoadAnnotations(Vertex vertex, boolean includeBrackets) {
         Optional<Constructor<?>> vertexConstructor = Arrays.stream(vertex.getClass().getConstructors())
             .filter(constructor -> Arrays.stream(constructor.getParameterAnnotations())
                 .anyMatch(annotationsList -> annotationsList.length > 0))
