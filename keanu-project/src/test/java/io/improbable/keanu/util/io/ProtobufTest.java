@@ -7,6 +7,7 @@ import io.improbable.keanu.templating.Sequence;
 import io.improbable.keanu.templating.SequenceBuilder;
 import io.improbable.keanu.templating.SequenceConstructionException;
 import io.improbable.keanu.templating.SequenceItem;
+import io.improbable.keanu.templating.SequenceLoader;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
@@ -593,7 +594,7 @@ public class ProtobufTest {
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork reloadedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
-        Sequence reconstructedSequence = Sequence.loadFromBayesNet(reloadedNetwork);
+        Sequence reconstructedSequence = SequenceLoader.loadFromBayesNet(reloadedNetwork);
 
         assertThat(reconstructedSequence.size(), is(2));
         assertThat(reconstructedSequence.getUniqueIdentifier(), is(sequence.getUniqueIdentifier()));
@@ -623,7 +624,7 @@ public class ProtobufTest {
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork reconstructedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
-        Sequence reconstructedSequence = Sequence.loadFromBayesNet(reconstructedNetwork);
+        Sequence reconstructedSequence = SequenceLoader.loadFromBayesNet(reconstructedNetwork);
 
         assertThat(reconstructedSequence.size(), is(2));
         assertThat(reconstructedSequence.getUniqueIdentifier(), is(sequence.getUniqueIdentifier()));
@@ -657,7 +658,7 @@ public class ProtobufTest {
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork reconstructedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
-        Sequence reconstructedSequence = Sequence.loadFromBayesNet(reconstructedNetwork);
+        Sequence reconstructedSequence = SequenceLoader.loadFromBayesNet(reconstructedNetwork);
     }
 
     @Test
@@ -683,7 +684,7 @@ public class ProtobufTest {
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork reconstructedNetworks = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
-        Collection<Sequence> reconstructedSequences = Sequence.loadMultipleSequencesFromBayesNet(reconstructedNetworks);
+        Collection<Sequence> reconstructedSequences = SequenceLoader.loadMultipleSequencesFromBayesNet(reconstructedNetworks);
 
         Sequence reconstructedSequence1 = getSequenceAndCheckNotNull(reconstructedSequences, sequence1Label);
         Sequence reconstructedSequence2 = getSequenceAndCheckNotNull(reconstructedSequences, sequence2Label);
