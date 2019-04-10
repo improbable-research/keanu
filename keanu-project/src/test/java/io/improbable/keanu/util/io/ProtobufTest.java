@@ -592,7 +592,8 @@ public class ProtobufTest {
         ProtobufSaver saver = new ProtobufSaver(network);
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
-        Sequence reconstructedSequence = loader.loadSequence(new ByteArrayInputStream(writer.toByteArray()));
+        BayesianNetwork reloadedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        Sequence reconstructedSequence = Sequence.loadFromBayesNet(reloadedNetwork);
 
         assertThat(reconstructedSequence.size(), is(2));
         assertThat(reconstructedSequence.getUniqueIdentifier(), is(sequence.getUniqueIdentifier()));
@@ -621,7 +622,8 @@ public class ProtobufTest {
         ProtobufSaver saver = new ProtobufSaver(network);
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
-        Sequence reconstructedSequence = loader.loadSequence(new ByteArrayInputStream(writer.toByteArray()));
+        BayesianNetwork reconstructedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        Sequence reconstructedSequence = Sequence.loadFromBayesNet(reconstructedNetwork);
 
         assertThat(reconstructedSequence.size(), is(2));
         assertThat(reconstructedSequence.getUniqueIdentifier(), is(sequence.getUniqueIdentifier()));
@@ -654,7 +656,8 @@ public class ProtobufTest {
         ProtobufSaver saver = new ProtobufSaver(network);
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
-        loader.loadSequence(new ByteArrayInputStream(writer.toByteArray()));
+        BayesianNetwork reconstructedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        Sequence reconstructedSequence = Sequence.loadFromBayesNet(reconstructedNetwork);
     }
 
     @Test
@@ -679,7 +682,8 @@ public class ProtobufTest {
         ProtobufSaver saver = new ProtobufSaver(network);
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
-        Collection<Sequence> reconstructedSequences = loader.loadSequences(new ByteArrayInputStream(writer.toByteArray()));
+        BayesianNetwork reconstructedNetworks = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        Collection<Sequence> reconstructedSequences = Sequence.loadMultipleSequencesFromBayesNet(reconstructedNetworks);
 
         Sequence reconstructedSequence1 = getSequenceAndCheckNotNull(reconstructedSequences, sequence1Label);
         Sequence reconstructedSequence2 = getSequenceAndCheckNotNull(reconstructedSequences, sequence2Label);
