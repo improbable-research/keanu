@@ -219,7 +219,7 @@ public class SequenceBuilder<T> {
         Collection<Vertex<?>> proxyVertices = item.getProxyVertices();
 
         for (Vertex<?> proxy : proxyVertices) {
-            VertexLabel proxyLabel = getUnscopedLabel(proxy.getLabel(), this.sequenceName);
+            VertexLabel proxyLabel = getUnscopedLabel(proxy.getLabel(), this.sequenceName != null);
             VertexLabel defaultParentLabel = getDefaultParentLabel(proxyLabel);
             VertexLabel parentLabel = transitionMapping.getOrDefault(proxyLabel, defaultParentLabel);
 
@@ -259,11 +259,11 @@ public class SequenceBuilder<T> {
      *  3. `Sequence_Item_INDEX.HASHCODE.LABEL` becomes `LABEL`
      *  4. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.LABEL` becomes  `LABEL`
      * @param proxyLabel Label to be unscoped
-     * @param sequenceName Name of the sequence from which the label was found
+     * @param hasSequenceName Whether the sequence has a name
      * @return unscoped label
      */
-    public static VertexLabel getUnscopedLabel(VertexLabel proxyLabel, String sequenceName) {
-        if (sequenceName != null) {
+    public static VertexLabel getUnscopedLabel(VertexLabel proxyLabel, boolean hasSequenceName) {
+        if (hasSequenceName) {
             proxyLabel = proxyLabel.withoutOuterNamespace();
         }
         return proxyLabel.withoutOuterNamespace().withoutOuterNamespace();

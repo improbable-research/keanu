@@ -11,7 +11,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.improbable.keanu.templating.SequenceBuilder.getUnscopedLabel;
-import static java.lang.Integer.parseInt;
+import static io.improbable.keanu.templating.SequenceItem.getSequenceHash;
+import static io.improbable.keanu.templating.SequenceItem.getSequenceItemIndex;
+import static io.improbable.keanu.templating.SequenceItem.getSequenceName;
 
 public class SequenceLoader {
 
@@ -37,62 +39,19 @@ public class SequenceLoader {
         if (label != null) {
             Optional<Integer> sequenceItemIndex = getSequenceItemIndex(label);
             if (sequenceItemIndex.isPresent()) {
-                String sequenceName = getSequenceName(label);
-                int sequenceHash = getSequenceHash(label, sequenceName);
+                Optional<String> sequenceName = getSequenceName(label);
+                int sequenceHash = getSequenceHash(label, sequenceName.isPresent());
 
-                Sequence sequence = getOrCreateSequence(sequences, sequenceHash, sequenceName);
-                SequenceItem item = getOrCreateSequenceItem(sequence, sequenceItemIndex.get(), sequenceHash, sequenceName);
+                Sequence sequence = getOrCreateSequence(sequences, sequenceHash, sequenceName.orElse(null));
+                SequenceItem item = getOrCreateSequenceItem(sequence, sequenceItemIndex.get(), sequenceHash, sequenceName.orElse(null));
 
                 //Removes the scope from a label because this is required by the sequenceItem.add() method
-                VertexLabel newLabel = getUnscopedLabel(label, sequenceName);
+                VertexLabel newLabel = getUnscopedLabel(label, sequenceName.isPresent());
                 vertex.setLabel(newLabel);
 
                 item.add(vertex);
             }
         }
-    }
-
-    /**
-     * Finds if a vertex is part of a SequenceItem or not.
-     * @param label label of the vertex being parsed.
-     * @return -1 if not in sequenceItem. Otherwise returns sequenceItem index.
-     */
-    private static Optional<Integer> getSequenceItemIndex(VertexLabel label) {
-        String outerNamespace = label.getOuterNamespace().orElse(null);
-        if (outerNamespace == null) {
-            return Optional.empty();
-        }
-        if (outerNamespace.startsWith(SequenceItem.NAME_PREFIX)) {
-            return Optional.of(parseInt(outerNamespace.replaceFirst(SequenceItem.NAME_PREFIX, "")));
-        }
-        outerNamespace = label.withoutOuterNamespace().getOuterNamespace().orElse(null);
-        if (outerNamespace == null) {
-            return Optional.empty();
-        }
-        return Optional.of(parseInt(outerNamespace.replaceFirst(SequenceItem.NAME_PREFIX, "")));
-    }
-
-    /**
-     * Tries to get the unique sequence name from a vertex label
-     * @param label
-     * @return will return null if there is not a unique sequence name
-     */
-    private static String getSequenceName(VertexLabel label) {
-        String outerNamespace = label.getOuterNamespace().orElse(null);
-        if (outerNamespace != null && outerNamespace.startsWith(SequenceItem.NAME_PREFIX)) {
-            outerNamespace = null;
-        }
-        return outerNamespace;
-    }
-
-    private static int getSequenceHash(VertexLabel label, String sequenceName) {
-        VertexLabel withHashAsOuterNamespace = label.withoutOuterNamespace();
-        if (sequenceName != null) {
-            withHashAsOuterNamespace = withHashAsOuterNamespace.withoutOuterNamespace();
-        }
-        String hashLabel = withHashAsOuterNamespace.getOuterNamespace()
-            .orElseThrow(() -> new SequenceConstructionException("Could not parse the sequence hash in the vertex label"));
-        return parseInt(hashLabel);
     }
 
     private static boolean sequenceContainsKey(Sequence sequence, int index) {

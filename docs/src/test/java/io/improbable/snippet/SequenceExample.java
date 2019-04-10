@@ -4,6 +4,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.templating.Sequence;
 import io.improbable.keanu.templating.SequenceBuilder;
 import io.improbable.keanu.templating.SequenceItem;
+import io.improbable.keanu.templating.SequenceLoader;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.util.io.ProtobufLoader;
@@ -153,7 +154,7 @@ public class SequenceExample {
         // Now you can actually use Keanu to reconstruct the Sequence object
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork reconstructedNetwork = loader.loadNetwork(new FileInputStream(new File("file_name.proto")));
-        Sequence reconstructedSequence = Sequence.loadFromBayesNet(reconstructedNetwork);
+        Sequence reconstructedSequence = SequenceLoader.loadFromBayesNet(reconstructedNetwork);
         x1Retrieved = reconstructedSequence.asList().get(0).get(x1Label);
 
         //%%SNIPPET_END%% SequenceTimeSeries
