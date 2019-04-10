@@ -198,7 +198,7 @@ public class SequenceBuilder<T> {
         }
 
         public Sequence build() throws SequenceConstructionException {
-            int uniqueSequenceIdentifier = this.hashCode();
+            int uniqueSequenceIdentifier = this.factories.hashCode();
             Sequence sequence = new Sequence(this.size, uniqueSequenceIdentifier, sequenceName);
             Iterator<T> iter = data.getIterator();
             VertexDictionary previousVertices = initialState;
@@ -283,7 +283,7 @@ public class SequenceBuilder<T> {
 
 
         public Sequence build() throws SequenceConstructionException {
-            int uniqueSequenceIdentifier = this.hashCode();
+            int uniqueSequenceIdentifier = this.factories.hashCode();
             Sequence sequence = new Sequence(count.getCount(), uniqueSequenceIdentifier, sequenceName);
             VertexDictionary previousItem = initialState;
             for (int i = 0; i < count.getCount(); i++) {
