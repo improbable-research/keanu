@@ -118,14 +118,14 @@ public class JsonTest {
     @Test
     public void loadFailsIfParentVertexInfoIsMissing() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex due to missing parent: mu");
+        expectedException.expectMessage("Failed to create vertex due to missing parameter: mu");
         tryLoadingNetwork(JSON_MISSING_PARENT_VERTEX_FILE);
     }
 
     @Test
     public void loadFailsIfHyperparameterIsMissing() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex due to missing parent: mu");
+        expectedException.expectMessage("Failed to create vertex due to missing parameter: mu");
         tryLoadingNetwork(JSON_MISSING_HYPERPARAMETER_FILE);
     }
 
