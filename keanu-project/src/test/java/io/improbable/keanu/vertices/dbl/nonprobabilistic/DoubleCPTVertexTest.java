@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -60,7 +61,7 @@ public class DoubleCPTVertexTest {
     }
 
     private void assertDiffFromACondition(boolean left, boolean right, DoubleTensor expected) {
-        DoubleCPTVertex doubleCPTVertex = doubleCPTNetwork(left, right);
+        DoubleCPTVertex<Boolean> doubleCPTVertex = doubleCPTNetwork(left, right);
 
         DoubleTensor actualReverse = Differentiator.reverseModeAutoDiff(doubleCPTVertex, A).withRespectTo(A);
         DoubleTensor actualForward = Differentiator.forwardModeAutoDiff(A, doubleCPTVertex).of(doubleCPTVertex);
