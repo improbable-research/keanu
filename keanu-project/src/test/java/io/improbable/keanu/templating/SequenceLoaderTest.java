@@ -151,7 +151,7 @@ public class SequenceLoaderTest {
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork reconstructedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
-        Collection<Sequence> reconstructedSequences = SequenceLoader.loadMultipleSequencesFromBayesNet(reconstructedNetwork);
+        Collection<Sequence> reconstructedSequences = SequenceLoader.loadMultipleSequencesFromBayesNet(reconstructedNetwork).values();
 
         Sequence reconstructedSequence1 = getSequenceAndCheckNotNull(reconstructedSequences, sequence1Label);
 

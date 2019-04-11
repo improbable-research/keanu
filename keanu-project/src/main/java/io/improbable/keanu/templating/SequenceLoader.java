@@ -18,14 +18,14 @@ import static io.improbable.keanu.templating.SequenceItem.parseSequenceName;
 public class SequenceLoader {
 
     public static Sequence loadFromBayesNet(BayesianNetwork network) {
-        Collection<Sequence> sequences = loadMultipleSequencesFromBayesNet(network);
+        Collection<Sequence> sequences = loadMultipleSequencesFromBayesNet(network).values();
         if (sequences.size() != 1) {
             throw new SequenceConstructionException("The provided BayesianNetwork contains more than one Sequence");
         }
         return sequences.stream().findFirst().get();
     }
 
-    public static Collection<Sequence> loadMultipleSequencesFromBayesNet(BayesianNetwork network) {
+    public static Map<Integer, Sequence> loadMultipleSequencesFromBayesNet(BayesianNetwork network) {
         List<Vertex> vertices = network.getAllVertices();
         Map<Integer, Sequence> sequences = new HashMap<>();
         for (Vertex vertex : vertices) {
@@ -34,7 +34,7 @@ public class SequenceLoader {
         if (sequences.size() == 0) {
             throw new SequenceConstructionException("The provided BayesianNetwork contains no Sequences");
         }
-        return sequences.values();
+        return sequences;
     }
 
     private static void addVertexToSequences(Vertex<?> vertex, Map<Integer, Sequence> sequences) {
