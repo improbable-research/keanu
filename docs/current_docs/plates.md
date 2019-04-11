@@ -102,7 +102,8 @@ saver.save(new FileOutputStream(new File("file_name.proto")), false);
 
 // Now you can actually use Keanu to reconstruct the Sequence object
 ProtobufLoader loader = new ProtobufLoader();
-Sequence reconstructedSequence = loader.loadSequence(new FileInputStream(new File("file_name.proto")));
+BayesianNetwork reconstructedNetwork = loader.loadNetwork(new FileInputStream(new File("file_name.proto")));
+Sequence reconstructedSequence = SequenceLoader.loadFromBayesNet(reconstructedNetwork);
 x1Retrieved = reconstructedSequence.asList().get(0).get(x1Label);
 
 ```

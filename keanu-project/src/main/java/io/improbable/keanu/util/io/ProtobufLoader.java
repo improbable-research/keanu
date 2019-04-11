@@ -213,10 +213,17 @@ public class ProtobufLoader implements NetworkLoader {
         Object[] arguments = new Object[constructorParameters.length];
 
         for (int i = 0; i < constructorParameters.length; i++) {
-            arguments[i] = getParameter(constructorParameters[i], paramMap, vertex);
+            Object parameter = getParameter(constructorParameters[i], paramMap, vertex);
+            arguments[i] = parameter;
 
-            Class argumentClass = arguments[i].getClass();
-            Class parameterClass = Primitives.wrap(constructorParameters[i].getType());
+            Class argumentClass;
+            Class parameterClass;
+            if (parameter != null) {
+                argumentClass = arguments[i].getClass();
+            } else {
+                argumentClass = constructorParameters[i].getType();
+            }
+            parameterClass = Primitives.wrap(constructorParameters[i].getType());
 
             if (!parameterClass.isAssignableFrom(argumentClass)) {
                 throw new IllegalArgumentException("Incorrect Parameter Type specified.  Got: "
@@ -238,7 +245,7 @@ public class ProtobufLoader implements NetworkLoader {
 
         if ((paramAnnotation = methodParameter.getAnnotation(LoadVertexParam.class)) != null) {
             Object parameter = paramMap.get(paramAnnotation.value());
-            if (parameter == null) {
+            if (parameter == null && !paramAnnotation.isNullable()) {
                 throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
                     + paramAnnotation.value());
             }

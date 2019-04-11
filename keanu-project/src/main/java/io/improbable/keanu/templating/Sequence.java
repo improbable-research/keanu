@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class Sequence implements Iterable<SequenceItem> {
 
-    private final List<SequenceItem> containedItems;
+    private final ArrayList<SequenceItem> containedItems;
     private final int uniqueIdentifier;
     private final String name;
 
@@ -34,7 +34,11 @@ public class Sequence implements Iterable<SequenceItem> {
     }
 
     public void add(SequenceItem p) {
-        containedItems.add(p);
+        int index = p.getIndex();
+        while (containedItems.size() <= index) {
+            containedItems.add(null);
+        }
+        containedItems.set(index, p);
     }
 
     public List<SequenceItem> asList() {

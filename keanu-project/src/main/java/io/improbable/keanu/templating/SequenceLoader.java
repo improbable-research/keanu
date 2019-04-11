@@ -48,7 +48,7 @@ public class SequenceLoader {
                 //Removes the scope from a label because this is required by the sequenceItem.add() method
                 VertexLabel newLabel = getUnscopedLabel(label, sequenceName.isPresent());
                 vertex.setLabel(newLabel);
-
+                System.out.println("Adding " + sequenceItemIndex + " " + sequenceName + " " + sequenceHash + " " + newLabel.getUnqualifiedName());
                 item.add(vertex);
             }
         }

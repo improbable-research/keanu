@@ -683,10 +683,11 @@ public class ProtobufTest {
         ProtobufSaver saver = new ProtobufSaver(network);
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
-        BayesianNetwork reconstructedNetworks = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
-        Collection<Sequence> reconstructedSequences = SequenceLoader.loadMultipleSequencesFromBayesNet(reconstructedNetworks);
+        BayesianNetwork reconstructedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        Collection<Sequence> reconstructedSequences = SequenceLoader.loadMultipleSequencesFromBayesNet(reconstructedNetwork);
 
         Sequence reconstructedSequence1 = getSequenceAndCheckNotNull(reconstructedSequences, sequence1Label);
+
         Sequence reconstructedSequence2 = getSequenceAndCheckNotNull(reconstructedSequences, sequence2Label);
 
         assertThat(reconstructedSequences.size(), is(2));
@@ -702,8 +703,8 @@ public class ProtobufTest {
         assertSequenceContains(sequence1, reconstructedSequence1, x1Label, x1ProxyLabel);
         assertSequenceContains(sequence2, reconstructedSequence2, x2Label, x2ProxyLabel);
 
-        BayesianNetwork reconstructedNetwork = sequence1.toBayesianNetwork();
-        Vertex reconstructedMasterOutput = reconstructedNetwork.getVertexByLabel(outputLabel);
+        BayesianNetwork reconstructedNetwork1 = sequence1.toBayesianNetwork();
+        Vertex reconstructedMasterOutput = reconstructedNetwork1.getVertexByLabel(outputLabel);
         assertThat(reconstructedMasterOutput, notNullValue());
         assertThat(((DoubleTensor) reconstructedMasterOutput.getValue()).scalar(), is(16.0));
     }
@@ -755,6 +756,22 @@ public class ProtobufTest {
             .count(2)
             .withFactory(factory)
             .build();
+    }
+
+    @Test
+    public void canSaveAndLoadBayesNetWithUnparentedProxyVertex() throws IOException {
+        VertexLabel proxyLabel = new VertexLabel("proxy");
+        DoubleVertex proxyVertex = new DoubleProxyVertex(proxyLabel);
+
+        BayesianNetwork network = new BayesianNetwork(proxyVertex.getConnectedGraph());
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        ProtobufSaver saver = new ProtobufSaver(network);
+        saver.save(writer, true);
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork reconstructedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        Vertex reconstructedVertex = reconstructedNetwork.getVertexByLabel(proxyLabel);
+        assertThat(reconstructedVertex, notNullValue());
     }
 
 }
