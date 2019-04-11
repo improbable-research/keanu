@@ -1,14 +1,11 @@
 package io.improbable.keanu.util;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
@@ -18,13 +15,11 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
@@ -155,21 +150,9 @@ public class DescriptionCreator {
     }
 
     private static Optional<String> tryGetScalarValue(Vertex<?> vertex) {
-        if (vertex instanceof ConstantDoubleVertex) {
-            DoubleTensor constantValue = ((ConstantDoubleVertex) vertex).getConstantValue();
-            if (constantValue.isScalar()) {
-                return Optional.of(constantValue.scalar().toString());
-            }
-        } else if (vertex instanceof ConstantIntegerVertex) {
-            IntegerTensor constantValue = ((ConstantIntegerVertex) vertex).getConstantValue();
-            if (constantValue.isScalar()) {
-                return Optional.of(constantValue.scalar().toString());
-            }
-        } else if (vertex instanceof ConstantBooleanVertex) {
-            BooleanTensor constantValue = ((ConstantBooleanVertex) vertex).getConstantValue();
-            if (constantValue.isScalar()) {
-                return Optional.of(constantValue.scalar().toString());
-            }
+        Tensor tensor = (Tensor) vertex.getValue();
+        if (tensor.isScalar()) {
+            return Optional.of(tensor.scalar().toString());
         }
         return Optional.empty();
     }
