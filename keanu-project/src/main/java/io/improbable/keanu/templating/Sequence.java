@@ -34,11 +34,7 @@ public class Sequence implements Iterable<SequenceItem> {
     }
 
     public void add(SequenceItem p) {
-        int index = p.getIndex();
-        while (containedItems.size() <= index) {
-            containedItems.add(null);
-        }
-        containedItems.set(index, p);
+        containedItems.add(p);
     }
 
     public List<SequenceItem> asList() {

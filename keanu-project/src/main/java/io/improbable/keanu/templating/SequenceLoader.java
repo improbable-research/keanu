@@ -1,5 +1,6 @@
 package io.improbable.keanu.templating;
 
+import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -18,18 +19,22 @@ import static io.improbable.keanu.templating.SequenceItem.parseSequenceName;
 public class SequenceLoader {
 
     public static Sequence loadFromBayesNet(BayesianNetwork network) {
-        Collection<Sequence> sequences = loadMultipleSequencesFromBayesNet(network).values();
-        if (sequences.size() != 1) {
-            throw new SequenceConstructionException("The provided BayesianNetwork contains more than one Sequence");
-        }
+        Collection<Sequence> sequences = loadSequences(network, false).values();
         return sequences.stream().findFirst().get();
     }
 
     public static Map<Integer, Sequence> loadMultipleSequencesFromBayesNet(BayesianNetwork network) {
-        List<Vertex> vertices = network.getAllVertices();
+        return loadSequences(network, true);
+    }
+
+    private static Map<Integer, Sequence> loadSequences(BayesianNetwork network, boolean shouldLoadMultiple) {
+        List<Vertex> vertices = TopologicalSort.sort(network.getAllVertices());
         Map<Integer, Sequence> sequences = new HashMap<>();
         for (Vertex vertex : vertices) {
             addVertexToSequences(vertex, sequences);
+            if (!shouldLoadMultiple && sequences.size() > 1) {
+                throw new SequenceConstructionException("The provided BayesianNetwork contains more than one Sequence");
+            }
         }
         if (sequences.size() == 0) {
             throw new SequenceConstructionException("The provided BayesianNetwork contains no Sequences");
