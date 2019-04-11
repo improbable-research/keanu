@@ -239,7 +239,7 @@ def test_you_can_name_a_sequence() -> None:
 
     x_output_label = x_output.get_label()
     assert x_output_label is not None
-    assert re.match("My_Awesome_Sequence.Sequence_Item_1.\d+.x", x_output_label)
+    assert re.match("My_Awesome_Sequence.Sequence_Item_1.\d+.x", x_output_label) is not None
 
 
 def test_you_can_get_a_bayes_net_from_a_sequence() -> None:
