@@ -115,6 +115,6 @@ public class DescriptionGeneratorTest {
     public void createsNullDescription() {
         String description = descriptionCreator.createDescription(null);
 
-        assertThat(description, is("This Vertex = null"));
+        assertThat(description, is("This Vertex = Null"));
     }
 }
