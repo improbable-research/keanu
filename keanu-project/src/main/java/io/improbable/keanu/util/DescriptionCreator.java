@@ -155,24 +155,23 @@ public class DescriptionCreator {
     }
 
     private static Optional<String> tryGetScalarValue(Vertex<?> vertex) {
-        Optional<String> scalarValue = Optional.empty();
         if (vertex instanceof ConstantDoubleVertex) {
             DoubleTensor constantValue = ((ConstantDoubleVertex) vertex).getConstantValue();
             if (constantValue.isScalar()) {
-                scalarValue = Optional.of(constantValue.scalar().toString());
+                return Optional.of(constantValue.scalar().toString());
             }
         } else if (vertex instanceof ConstantIntegerVertex) {
             IntegerTensor constantValue = ((ConstantIntegerVertex) vertex).getConstantValue();
             if (constantValue.isScalar()) {
-                scalarValue = Optional.of(constantValue.scalar().toString());
+                return Optional.of(constantValue.scalar().toString());
             }
         } else if (vertex instanceof ConstantBooleanVertex) {
             BooleanTensor constantValue = ((ConstantBooleanVertex) vertex).getConstantValue();
             if (constantValue.isScalar()) {
-                scalarValue = Optional.of(constantValue.scalar().toString());
+                return Optional.of(constantValue.scalar().toString());
             }
         }
-        return scalarValue;
+        return Optional.empty();
     }
 
     private Optional<String> checkForIrregularExpressions(Vertex<?> vertex, boolean includeBrackets) {
