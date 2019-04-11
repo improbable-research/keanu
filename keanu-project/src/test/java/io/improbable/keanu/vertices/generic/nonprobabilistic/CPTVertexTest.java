@@ -17,7 +17,7 @@ public class CPTVertexTest {
 
         BooleanVertex A = new BernoulliVertex(0.2);
 
-        CPTVertex<BooleanTensor> cpt = ConditionalProbabilityTable.of(A)
+        CPTVertex<Boolean, BooleanTensor> cpt = ConditionalProbabilityTable.of(A)
             .when(true).then(TRUE)
             .orDefault(FALSE);
 
@@ -34,7 +34,7 @@ public class CPTVertexTest {
         BooleanVertex A = new BernoulliVertex(0.5);
         BooleanVertex B = new BernoulliVertex(0.5);
 
-        CPTVertex<BooleanTensor> cpt = ConditionalProbabilityTable.of(A, B)
+        CPTVertex<Boolean, BooleanTensor> cpt = ConditionalProbabilityTable.of(A, B)
             .when(true, true).then(FALSE)
             .when(false, true).then(TRUE)
             .when(true, false).then(TRUE)

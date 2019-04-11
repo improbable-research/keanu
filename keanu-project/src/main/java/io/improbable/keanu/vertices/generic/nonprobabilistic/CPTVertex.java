@@ -9,14 +9,14 @@ import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 import java.util.List;
 import java.util.Map;
 
-public class CPTVertex<OUT extends Tensor> extends GenericTensorVertex<OUT> implements NonProbabilistic<OUT>, NonSaveableVertex {
+public class CPTVertex<IN, OUT extends Tensor> extends GenericTensorVertex<OUT> implements NonProbabilistic<OUT>, NonSaveableVertex {
 
-    private final List<Vertex<? extends Tensor<Boolean>>> inputs;
-    private final Map<CPTCondition, ? extends Vertex<OUT>> conditions;
+    private final List<Vertex<? extends Tensor<IN>>> inputs;
+    private final Map<CPTCondition<IN>, ? extends Vertex<OUT>> conditions;
     private final Vertex<OUT> defaultResult;
 
-    public CPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
-                     Map<CPTCondition, ? extends Vertex<OUT>> conditions,
+    public CPTVertex(List<Vertex<? extends Tensor<IN>>> inputs,
+                     Map<CPTCondition<IN>, ? extends Vertex<OUT>> conditions,
                      Vertex<OUT> defaultResult) {
         this.conditions = conditions;
         this.inputs = inputs;

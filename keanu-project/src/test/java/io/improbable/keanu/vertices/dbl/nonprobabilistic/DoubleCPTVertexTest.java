@@ -18,7 +18,7 @@ public class DoubleCPTVertexTest {
 
     GaussianVertex A;
 
-    private DoubleCPTVertex doubleCPTNetwork(boolean left, boolean right) {
+    private DoubleCPTVertex<Boolean> doubleCPTNetwork(boolean left, boolean right) {
         A = new GaussianVertex(new long[]{2}, 0, 1);
         A.setValue(aValue);
         DoubleVertex B = new GaussianVertex(0, 1);
@@ -45,7 +45,7 @@ public class DoubleCPTVertexTest {
     }
 
     private void assertFromACondition(boolean left, boolean right, DoubleTensor expected) {
-        DoubleCPTVertex doubleCPTVertex = doubleCPTNetwork(left, right);
+        DoubleCPTVertex<Boolean> doubleCPTVertex = doubleCPTNetwork(left, right);
         DoubleTensor actual = doubleCPTVertex.getValue();
         assertEquals(expected, actual);
     }

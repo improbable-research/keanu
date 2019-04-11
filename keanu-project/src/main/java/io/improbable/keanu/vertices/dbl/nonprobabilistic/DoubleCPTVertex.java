@@ -14,14 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DoubleCPTVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class DoubleCPTVertex<IN> extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
-    private final List<Vertex<? extends Tensor<Boolean>>> inputs;
-    private final Map<CPTCondition, DoubleVertex> conditions;
+    private final List<Vertex<? extends Tensor<IN>>> inputs;
+    private final Map<CPTCondition<IN>, DoubleVertex> conditions;
     private final DoubleVertex defaultResult;
 
-    public DoubleCPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
-                           Map<CPTCondition, DoubleVertex> conditions,
+    public DoubleCPTVertex(List<Vertex<? extends Tensor<IN>>> inputs,
+                           Map<CPTCondition<IN>, DoubleVertex> conditions,
                            DoubleVertex defaultResult) {
         super(defaultResult.getShape());
         this.inputs = inputs;
@@ -34,20 +34,20 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable, Non
 
     @Override
     public DoubleTensor calculate() {
-        final CPTCondition condition = CPTCondition.from(inputs, v -> v.getValue().scalar());
+        final CPTCondition<IN> condition = CPTCondition.from(inputs, v -> v.getValue().scalar());
         DoubleVertex vertex = conditions.get(condition);
         return vertex == null ? defaultResult.getValue() : vertex.getValue();
     }
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
+        final CPTCondition<IN> condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
         DoubleVertex vertex = conditions.get(condition);
         return vertex == null ? derivativeOfParentsWithRespectToInput.get(defaultResult) : derivativeOfParentsWithRespectToInput.get(vertex);
     }
 
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
+        final CPTCondition<IN> condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
         DoubleVertex conditionVertex = conditions.get(condition);
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();

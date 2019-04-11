@@ -9,15 +9,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Value
-public class CPTCondition {
+public class CPTCondition<T> {
 
-    private final List<Boolean> conditions;
+    private final List<T> conditions;
 
-    public static CPTCondition from(List<Vertex<? extends Tensor<Boolean>>> inputs,
-                                    Function<Vertex<? extends Tensor<Boolean>>, Boolean> mapper) {
+    public static <T> CPTCondition<T> from(List<Vertex<? extends Tensor<T>>> inputs,
+                                    Function<Vertex<? extends Tensor<T>>, T> mapper) {
 
 
-        List<Boolean> condition = inputs.stream().map(mapper).collect(Collectors.toList());
-        return new CPTCondition(condition);
+        List<T> condition = inputs.stream().map(mapper).collect(Collectors.toList());
+        return new CPTCondition<>(condition);
     }
 }

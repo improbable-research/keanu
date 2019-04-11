@@ -14,7 +14,7 @@ public class IntegerCPTVertexTest {
     private IntegerTensor aValue = IntegerTensor.create(3, 4);
     private IntegerTensor bValue = IntegerTensor.create(5, 6);
 
-    private IntegerCPTVertex integerCPTNetwork(boolean left, boolean right) {
+    private IntegerCPTVertex<Boolean> integerCPTNetwork(boolean left, boolean right) {
         IntegerVertex A = new ConstantIntegerVertex(aValue);
         IntegerVertex B = new ConstantIntegerVertex(bValue);
 
@@ -31,7 +31,7 @@ public class IntegerCPTVertexTest {
     }
 
     private void assertFromACondition(boolean left, boolean right, IntegerTensor expected) {
-        IntegerCPTVertex integerCPTVertex = integerCPTNetwork(left, right);
+        IntegerCPTVertex<Boolean> integerCPTVertex = integerCPTNetwork(left, right);
         IntegerTensor actual = integerCPTVertex.getValue();
         assertEquals(expected, actual);
     }
