@@ -206,11 +206,11 @@ public class DescriptionCreator {
         if (includeBrackets) {
             builder.append("(");
         }
-        builder.append(generateDescription(predicate, true, includeBrackets));
+        builder.append(generateDescription(predicate, true, true));
         builder.append(" ? ");
-        builder.append(generateDescription(thn, true, includeBrackets));
+        builder.append(generateDescription(thn, true, true));
         builder.append(" : ");
-        builder.append(generateDescription(els, true, includeBrackets));
+        builder.append(generateDescription(els, true, true));
         if (includeBrackets) {
             builder.append(")");
         }

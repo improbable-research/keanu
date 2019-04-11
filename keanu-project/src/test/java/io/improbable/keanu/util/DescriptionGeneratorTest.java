@@ -57,7 +57,7 @@ public class DescriptionGeneratorTest {
     }
 
     @Test
-    public void testIfVertexDescriptionCreatedCorrectly() {
+    public void testDoubleIfVertexDescriptionCreatedCorrectly() {
         BooleanVertex predicate = new ConstantBooleanVertex(false);
 
         DoubleVertex three = new ConstantDoubleVertex(3.0).setLabel("Three");
@@ -67,6 +67,47 @@ public class DescriptionGeneratorTest {
         String description = descriptionCreator.createDescription(result);
 
         assertThat(description, is("This Vertex = Const(false) ? Three : Four"));
+    }
+
+    @Test
+    public void testIntegerIfVertexDescriptionCreatedCorrectly() {
+        BooleanVertex predicate = new ConstantBooleanVertex(false);
+
+        IntegerVertex three = new ConstantIntegerVertex(3).setLabel("Three");
+        IntegerVertex four = new ConstantIntegerVertex(4).setLabel("Four");
+
+        IntegerVertex result = If.isTrue(predicate).then(three).orElse(four);
+        String description = descriptionCreator.createDescription(result);
+
+        assertThat(description, is("This Vertex = Const(false) ? Three : Four"));
+    }
+
+    @Test
+    public void testBooleanIfVertexDescriptionCreatedCorrectly() {
+        BooleanVertex predicate = new ConstantBooleanVertex(false);
+
+        BooleanVertex trueVertex = new ConstantBooleanVertex(true).setLabel("True Label");
+        BooleanVertex falseVertex = new ConstantBooleanVertex(false).setLabel("False Label");
+
+        BooleanVertex result = If.isTrue(predicate).then(trueVertex).orElse(falseVertex);
+        String description = descriptionCreator.createDescription(result);
+
+        assertThat(description, is("This Vertex = Const(false) ? True Label : False Label"));
+    }
+
+    @Test
+    public void usesBracketsForNestedIfs() {
+        BooleanVertex predicate1 = new ConstantBooleanVertex(false);
+
+        BooleanVertex trueVertex = new ConstantBooleanVertex(true).setLabel("True Label");
+        BooleanVertex falseVertex = new ConstantBooleanVertex(false).setLabel("False Label");
+
+        BooleanVertex path1 = If.isTrue(predicate1).then(trueVertex).orElse(falseVertex);
+
+        BooleanVertex result = If.isTrue(predicate1).then(path1).orElse(falseVertex);
+        String description = descriptionCreator.createDescription(result);
+
+        assertThat(description, is("This Vertex = Const(false) ? (Const(false) ? True Label : False Label) : False Label"));
     }
 
     @Test
