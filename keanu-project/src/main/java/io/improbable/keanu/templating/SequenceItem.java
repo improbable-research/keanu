@@ -12,12 +12,14 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
+import static java.lang.Integer.parseInt;
 
 public class SequenceItem implements VertexDictionary {
 
@@ -199,5 +201,54 @@ public class SequenceItem implements VertexDictionary {
         T newVertex = factoryMethod.apply(shape, proxyLabel);
         this.add(newVertex);
         return newVertex;
+    }
+
+    /**
+     * Tries to retrieve a SequenceItem index from a vertex label of a vertex in a sequence
+     * @param label label of the vertex being parsed.
+     * @return empty if the vertex is not in a SequenceItem. Otherwise returns index of the vertex in the sequence item.
+     */
+    static Optional<Integer> parseSequenceItemIndex(VertexLabel label) {
+        String outerNamespace = label.getOuterNamespace().orElse(null);
+        if (outerNamespace == null) {
+            return Optional.empty();
+        }
+        if (outerNamespace.startsWith(SequenceItem.NAME_PREFIX)) {
+            return Optional.of(parseInt(outerNamespace.replaceFirst(SequenceItem.NAME_PREFIX, "")));
+        }
+        outerNamespace = label.withoutOuterNamespace().getOuterNamespace().orElse(null);
+        if (outerNamespace == null) {
+            return Optional.empty();
+        }
+        return Optional.of(parseInt(outerNamespace.replaceFirst(SequenceItem.NAME_PREFIX, "")));
+    }
+
+
+    /**
+     * Tries to get the unique sequence name from a vertex label
+     * @param label the label of a vertex in a sequence
+     * @return will return empty if the label cannot be parsed as a label of a vertex from a sequence with a name.
+     */
+    static Optional<String> parseSequenceName(VertexLabel label) {
+        Optional<String> outerNamespace = label.getOuterNamespace();
+        Optional<String> penultimateOuterNamespace = label.withoutOuterNamespace().getOuterNamespace();
+        if (penultimateOuterNamespace.isPresent() && penultimateOuterNamespace.get().startsWith(NAME_PREFIX)) {
+            return outerNamespace;
+        }
+        return Optional.empty();
+    }
+    /**
+     * Tries to get the unique sequence hash from a vertex label
+     * @param label the label of a vertex in a sequence
+     * @return will return empty if the label cannot be parsed as a label of a vertex from a sequence
+     */
+    static int parseSequenceHash(VertexLabel label, boolean sequenceHasName) {
+        VertexLabel withHashAsOuterNamespace = label.withoutOuterNamespace();
+        if (sequenceHasName) {
+            withHashAsOuterNamespace = withHashAsOuterNamespace.withoutOuterNamespace();
+        }
+        String hashLabel = withHashAsOuterNamespace.getOuterNamespace()
+            .orElseThrow(() -> new SequenceConstructionException("Could not parse the sequence hash in the vertex label"));
+        return parseInt(hashLabel);
     }
 }

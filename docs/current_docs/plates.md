@@ -95,9 +95,16 @@ List<SequenceItem> sequenceItems = sequence.asList();
 SequenceItem secondSequenceItem = sequenceItems.get(1);
 Vertex x2InSecondSequenceItem = secondSequenceItem.get(x2Label);
 
-// Finally, you may need to use the save/load interface on `network` and will need a way of accessing timesteps
-// without having access to the `sequence` object
-x1Retrieved = network.getVerticesInNamespace("Keanu-Example", "Sequence_Item_0").get(0);
+// Finally, you may want to save your sequence to disk and then load it back later.
+// Firstly you can use the standard ProtobufSaver to save `network` to disk.
+ProtobufSaver saver = new ProtobufSaver(network);
+saver.save(new FileOutputStream(new File("file_name.proto")), false);
+
+// Now you can actually use Keanu to reconstruct the Sequence object
+ProtobufLoader loader = new ProtobufLoader();
+BayesianNetwork reconstructedNetwork = loader.loadNetwork(new FileInputStream(new File("file_name.proto")));
+Sequence reconstructedSequence = SequenceLoader.loadFromBayesNet(reconstructedNetwork);
+x1Retrieved = reconstructedSequence.asList().get(0).get(x1Label);
 
 ```
 
