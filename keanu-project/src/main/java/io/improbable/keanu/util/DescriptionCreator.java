@@ -79,11 +79,7 @@ public class DescriptionCreator {
         Collection<Vertex> parents = vertex.getParents();
 
         if (parents.size() == 0) {
-            if (vertex.getLabel() == null) {
-                return "<<Unlabelled Leaf Vertex>>";
-            }
-
-            return "Vertex with no parents and label: " + vertex.getLabel().toString();
+            return getLeafDescription(vertex);
         }
 
         String thisLabel = vertex.getLabel() != null ? vertex.getLabel().toString() : "This Vertex";
@@ -148,7 +144,8 @@ public class DescriptionCreator {
             builder.append(scalarValue.get());
             builder.append(")");
         } else {
-            builder.append("Vertex with shape: ");
+            builder.append(vertex.getClass().getSimpleName());
+            builder.append(" with shape: ");
             builder.append(Arrays.toString(vertex.getShape()));
         }
         return builder

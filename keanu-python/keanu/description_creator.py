@@ -7,11 +7,8 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.util.*")
 java_import(k.jvm_view(), "io.improbable.keanu.util.DescriptionCreator")
 
+description_creator = k.jvm_view().io.improbable.keanu.util.DescriptionCreator()
 
-class DescriptionCreator(JavaObjectWrapper):
 
-    def __init__(self) -> None:
-        super(DescriptionCreator, self).__init__(k.jvm_view().io.improbable.keanu.util.DescriptionCreator())
-
-    def create_description(self, vertex: Vertex) -> str:
-        return self.unwrap().createDescription(vertex.unwrap())
+def create_description(vertex: Vertex) -> str:
+    return description_creator.createDescription(vertex.unwrap())
