@@ -36,9 +36,10 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
         setLabel(label);
     }
 
-    public IntegerProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) VertexLabel label, @LoadVertexParam(value = PARENT_NAME, isNullable = true) IntegerVertex parent) {
+    public IntegerProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) String labelString, @LoadVertexParam(value = PARENT_NAME, isNullable = true) IntegerVertex parent) {
         super(shape);
-        setLabel(label);
+        VertexLabel vertexLabel = VertexLabel.parseLabel(labelString);
+        setLabel(vertexLabel);
         if (parent != null) {
             setParent(parent);
         }

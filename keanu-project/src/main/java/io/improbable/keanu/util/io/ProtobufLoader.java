@@ -249,10 +249,6 @@ public class ProtobufLoader implements NetworkLoader {
                 throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
                     + paramAnnotation.value());
             }
-            String annotationName = methodParameter.getAnnotation(LoadVertexParam.class).value();
-            if (annotationName.equals("label")) {
-                return VertexLabel.parseLabel((String) parameter);
-            }
 
             return parameter;
         } else if (methodParameter.getAnnotation(LoadShape.class) != null) {

@@ -36,9 +36,10 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
         setLabel(label);
     }
 
-    public BooleanProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) VertexLabel label, @LoadVertexParam(value = PARENT_NAME, isNullable = true) BooleanVertex parent) {
+    public BooleanProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) String labelString, @LoadVertexParam(value = PARENT_NAME, isNullable = true) BooleanVertex parent) {
         super(shape);
-        setLabel(label);
+        VertexLabel vertexLabel = VertexLabel.parseLabel(labelString);
+        setLabel(vertexLabel);
         if (parent != null) {
             setParent(parent);
         }
