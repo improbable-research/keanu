@@ -31,6 +31,9 @@ public class SequenceLoader {
         for (Vertex vertex : vertices) {
             addVertexToSequences(vertex, sequences);
         }
+        if (sequences.size() == 0) {
+            throw new SequenceConstructionException("The provided BayesianNetwork contains no Sequences");
+        }
         return sequences.values();
     }
 
