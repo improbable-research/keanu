@@ -99,4 +99,15 @@ public class DescriptionGeneratorTest {
         assertThat(description, is("This Vertex = Const(1)"));
         assertThat(descriptionWithShape, is("This Vertex = ConstantIntegerVertex with shape: [2]"));
     }
+
+    @Test
+    public void usesVertexLabelWhenProvided() {
+        IntegerVertex two = new ConstantIntegerVertex(2).setLabel("Two");
+        IntegerVertex three = new ConstantIntegerVertex(3).setLabel("Three");
+
+        IntegerVertex result = two.multiply(three).setLabel("Result");
+        String description = descriptionCreator.createDescription(result);
+
+        assertThat(description, is("Result = Two * Three"));
+    }
 }
