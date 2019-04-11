@@ -9,5 +9,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface SaveVertexParam {
 
+    boolean isNullable() default false;
     String value();
+
+
 }
