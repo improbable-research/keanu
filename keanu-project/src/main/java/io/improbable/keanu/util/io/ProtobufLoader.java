@@ -217,13 +217,12 @@ public class ProtobufLoader implements NetworkLoader {
             arguments[i] = parameter;
 
             Class argumentClass;
-            Class parameterClass;
+            Class parameterClass = Primitives.wrap(constructorParameters[i].getType());
             if (parameter != null) {
                 argumentClass = arguments[i].getClass();
             } else {
-                argumentClass = constructorParameters[i].getType();
+                argumentClass = parameterClass;
             }
-            parameterClass = Primitives.wrap(constructorParameters[i].getType());
 
             if (!parameterClass.isAssignableFrom(argumentClass)) {
                 throw new IllegalArgumentException("Incorrect Parameter Type specified.  Got: "

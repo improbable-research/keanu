@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.mir.KeanuSavedBayesNet;
 import io.improbable.mir.SavedBayesNet;
-import kotlin.Pair;
+import org.apache.commons.math3.util.Pair;
 
 import java.io.IOException;
 import java.io.OutputStream;
