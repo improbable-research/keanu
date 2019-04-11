@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.improbable.keanu.templating.SequenceBuilder.getUnscopedLabel;
-import static io.improbable.keanu.templating.SequenceItem.getSequenceHash;
-import static io.improbable.keanu.templating.SequenceItem.getSequenceItemIndex;
-import static io.improbable.keanu.templating.SequenceItem.getSequenceName;
+import static io.improbable.keanu.templating.SequenceItem.parseSequenceHash;
+import static io.improbable.keanu.templating.SequenceItem.parseSequenceItemIndex;
+import static io.improbable.keanu.templating.SequenceItem.parseSequenceName;
 
 public class SequenceLoader {
 
@@ -37,10 +37,10 @@ public class SequenceLoader {
     private static void addVertexToSequences(Vertex<?> vertex, Map<Integer, Sequence> sequences) {
         VertexLabel label = vertex.getLabel();
         if (label != null) {
-            Optional<Integer> sequenceItemIndex = getSequenceItemIndex(label);
+            Optional<Integer> sequenceItemIndex = parseSequenceItemIndex(label);
             if (sequenceItemIndex.isPresent()) {
-                Optional<String> sequenceName = getSequenceName(label);
-                int sequenceHash = getSequenceHash(label, sequenceName.isPresent());
+                Optional<String> sequenceName = parseSequenceName(label);
+                int sequenceHash = parseSequenceHash(label, sequenceName.isPresent());
 
                 Sequence sequence = getOrCreateSequence(sequences, sequenceHash, sequenceName.orElse(null));
                 SequenceItem item = getOrCreateSequenceItem(sequence, sequenceItemIndex.get(), sequenceHash, sequenceName.orElse(null));

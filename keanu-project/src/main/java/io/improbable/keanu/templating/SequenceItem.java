@@ -208,7 +208,7 @@ public class SequenceItem implements VertexDictionary {
      * @param label label of the vertex being parsed.
      * @return empty if the vertex is not in a SequenceItem. Otherwise returns index of the vertex in the sequence item.
      */
-    static Optional<Integer> getSequenceItemIndex(VertexLabel label) {
+    static Optional<Integer> parseSequenceItemIndex(VertexLabel label) {
         String outerNamespace = label.getOuterNamespace().orElse(null);
         if (outerNamespace == null) {
             return Optional.empty();
@@ -229,7 +229,7 @@ public class SequenceItem implements VertexDictionary {
      * @param label the label of a vertex in a sequence
      * @return will return empty if the label cannot be parsed as a label of a vertex from a sequence with a name.
      */
-    static Optional<String> getSequenceName(VertexLabel label) {
+    static Optional<String> parseSequenceName(VertexLabel label) {
         Optional<String> outerNamespace = label.getOuterNamespace();
         Optional<String> penultimateOuterNamespace = label.withoutOuterNamespace().getOuterNamespace();
         if (penultimateOuterNamespace.isPresent() && penultimateOuterNamespace.get().startsWith(NAME_PREFIX)) {
@@ -242,7 +242,7 @@ public class SequenceItem implements VertexDictionary {
      * @param label the label of a vertex in a sequence
      * @return will return empty if the label cannot be parsed as a label of a vertex from a sequence
      */
-    static int getSequenceHash(VertexLabel label, boolean sequenceHasName) {
+    static int parseSequenceHash(VertexLabel label, boolean sequenceHasName) {
         VertexLabel withHashAsOuterNamespace = label.withoutOuterNamespace();
         if (sequenceHasName) {
             withHashAsOuterNamespace = withHashAsOuterNamespace.withoutOuterNamespace();
