@@ -79,7 +79,9 @@ public class DescriptionCreator {
         Collection<Vertex> parents = vertex.getParents();
 
         if (parents.size() == 0) {
-            return getLeafDescription(vertex);
+            StringBuilder builder = new StringBuilder("This Vertex = ");
+            builder.append(getLeafDescription(vertex));
+            return builder.toString();
         }
 
         String thisLabel = vertex.getLabel() != null ? vertex.getLabel().toString() : "This Vertex";
@@ -171,10 +173,6 @@ public class DescriptionCreator {
             }
         }
         return scalarValue;
-    }
-
-    private String getDescriptionDelimiter(Vertex<?> vertex) {
-        return delimiters.getOrDefault(vertex.getClass(), ", ");
     }
 
     private Optional<String> checkForIrregularExpressions(Vertex<?> vertex, boolean includeBrackets) {

@@ -87,4 +87,16 @@ public class DescriptionGeneratorTest {
         assertThat(descriptionCreator.createDescription(predicate5), is("This Vertex = Const(false) || Const(false)"));
         assertThat(descriptionCreator.createDescription(predicate6), is("This Vertex = Const(false) && Const(false)"));
     }
+
+    @Test
+    public void testSingleConstVertexDescription() {
+        IntegerVertex vertex = new ConstantIntegerVertex(1);
+        IntegerVertex vertexWithShape = new ConstantIntegerVertex(new int[]{1, 1});
+
+        String description = descriptionCreator.createDescription(vertex);
+        String descriptionWithShape = descriptionCreator.createDescription(vertexWithShape);
+
+        assertThat(description, is("This Vertex = Const(1)"));
+        assertThat(descriptionWithShape, is("This Vertex = ConstantIntegerVertex with shape: [2]"));
+    }
 }
