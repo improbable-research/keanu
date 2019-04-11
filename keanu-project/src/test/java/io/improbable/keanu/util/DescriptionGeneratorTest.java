@@ -110,4 +110,11 @@ public class DescriptionGeneratorTest {
 
         assertThat(description, is("Result = Two * Three"));
     }
+
+    @Test
+    public void createsNullDescription() {
+        String description = descriptionCreator.createDescription(null);
+
+        assertThat(description, is("This Vertex = null"));
+    }
 }

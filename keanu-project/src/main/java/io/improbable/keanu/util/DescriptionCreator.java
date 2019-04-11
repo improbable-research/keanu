@@ -36,6 +36,8 @@ import java.util.stream.Stream;
 public class DescriptionCreator {
 
     private Map<Class, String> delimiters;
+    private static final String thisVertex = "This Vertex";
+    private static final String nullString = "Null";
 
     public DescriptionCreator() {
         delimiters = new HashMap<>();
@@ -68,20 +70,27 @@ public class DescriptionCreator {
      * E.g. "This Vertex = that + (three * Const(4))"
      */
     public String createDescription(Vertex<?> vertex) {
+        if (vertex == null) {
+            return thisVertex + " = " + nullString;
+        }
         Collection<Vertex> parents = vertex.getParents();
 
         if (parents.size() == 0) {
-            StringBuilder builder = new StringBuilder("This Vertex = ");
+            StringBuilder builder = new StringBuilder(thisVertex);
+            builder.append(" = ");
             builder.append(getLeafDescription(vertex));
             return builder.toString();
         }
 
-        String thisLabel = vertex.getLabel() != null ? vertex.getLabel().toString() : "This Vertex";
+        String thisLabel = vertex.getLabel() != null ? vertex.getLabel().toString() : thisVertex;
 
         return thisLabel + " = " + generateDescription(vertex, false, false);
     }
 
     private String generateDescription(Vertex<?> vertex, boolean allowLabels, boolean includeBrackets) {
+        if (vertex == null) {
+            return nullString;
+        }
         if (allowLabels && vertex.getLabel() != null) {
             return vertex.getLabel().toString();
         }
