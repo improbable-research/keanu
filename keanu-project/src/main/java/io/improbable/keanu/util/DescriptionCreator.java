@@ -1,7 +1,6 @@
 package io.improbable.keanu.util;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -25,8 +24,6 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -213,12 +210,11 @@ public class DescriptionCreator {
     }
 
     private Optional<String> tryCreateDescriptionFromSaveLoadAnnotations(Vertex vertex, boolean includeBrackets) {
-        Optional<Constructor<?>> vertexConstructor = Arrays.stream(vertex.getClass().getConstructors())
-            .filter(constructor -> Arrays.stream(constructor.getParameterAnnotations())
-                .anyMatch(annotationsList -> annotationsList.length > 0))
-            .findFirst();
+        Method[] classSaveLoadMethods = Arrays.stream(vertex.getClass().getMethods())
+            .filter(method -> method.isAnnotationPresent(SaveVertexParam.class))
+            .toArray(Method[]::new);
 
-        if (!vertexConstructor.isPresent()) {
+        if (classSaveLoadMethods.length == 0) {
             return Optional.empty();
         }
 
@@ -227,19 +223,14 @@ public class DescriptionCreator {
         builder.append(vertexName);
         builder.append("(");
 
-        String[] loadVertexParams = Arrays.stream(vertexConstructor.get().getParameterAnnotations())
-            .map(DescriptionCreator::tryGetLoadVertexParamAnnotation)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(LoadVertexParam::value)
-            .toArray(String[]::new);
-
-        if (loadVertexParams.length == 0) {
+        try {
+            for (Method method : classSaveLoadMethods) {
+                String paramName = method.getAnnotation(SaveVertexParam.class).value();
+                Vertex paramVertex = (Vertex) method.invoke(vertex);
+                appendParamToBuilder(paramName, paramVertex, builder);
+            }
+        } catch (IllegalAccessException | InvocationTargetException e) {
             return Optional.empty();
-        }
-
-        for (String paramName : loadVertexParams) {
-            appendParamToBuilder(paramName, vertex, builder);
         }
 
         builder.delete(builder.length() - 2, builder.length());
@@ -249,38 +240,10 @@ public class DescriptionCreator {
             .toString());
     }
 
-    private void appendParamToBuilder(String paramName, Vertex<?> parentVertex, StringBuilder builder) {
-        try {
-            Optional<Vertex<?>> paramVertex = getSaveVertexParamVertex(paramName, parentVertex);
-            if (paramVertex.isPresent()) {
-                builder.append(paramName).append("=");
-                builder.append(generateDescription(paramVertex.get(), true, true));
-                builder.append(", ");
-            }
-        } catch (Exception ignored) {}
-    }
-
-    private static Optional<LoadVertexParam> tryGetLoadVertexParamAnnotation(Annotation[] annotations) {
-        return Arrays.stream(annotations)
-            .filter(annotation -> annotation.annotationType().equals(LoadVertexParam.class))
-            .map(annotation -> (LoadVertexParam) annotation)
-            .findAny();
-    }
-
-    private Optional<Vertex<?>> getSaveVertexParamVertex(String saveVertexParamName, Vertex parentVertex) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        Optional<Method> retrievedMethod = Arrays.stream(parentVertex.getClass().getMethods())
-            .filter(method ->
-                method.isAnnotationPresent(SaveVertexParam.class)
-                    && method.getAnnotation(SaveVertexParam.class).value().equals(saveVertexParamName))
-            .findFirst();
-        if (!retrievedMethod.isPresent()) {
-            throw new NullPointerException("");
-        }
-        Object retrievedVertex = retrievedMethod.get().invoke(parentVertex);
-        if (retrievedVertex instanceof Vertex) {
-            return Optional.of((Vertex<?>) retrievedVertex);
-        }
-        return Optional.empty();
+    private void appendParamToBuilder(String paramName, Vertex<?> paramVertex, StringBuilder builder) {
+        builder.append(paramName).append("=");
+        builder.append(generateDescription(paramVertex, true, true));
+        builder.append(", ");
     }
 
     private String createBooleanBinaryOpDescription(BooleanBinaryOpVertex<?, ?> opVertex, String operation, boolean includeBrackets) {
