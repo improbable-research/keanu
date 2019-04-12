@@ -2,6 +2,8 @@ from typing import Callable, Any
 
 from py4j.java_gateway import JavaObject
 
+from keanu.functional.hash_shortener import shorten_hash
+
 
 class BiConsumer:
 
@@ -15,6 +17,9 @@ class BiConsumer:
         foobar
         """
         self.lambda_function(arg1, arg2)
+
+    def hashCode(self) -> int:
+        return shorten_hash(hash(self.lambda_function))
 
     class Java:
         implements = ["java.util.function.BiConsumer"]

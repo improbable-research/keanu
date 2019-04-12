@@ -41,7 +41,7 @@ public class SequenceItemTest {
     @Before
     public void createItem() throws Exception {
         when(vertex1.getLabel()).thenReturn(VERTEX_LABEL_1);
-        item = new SequenceItem();
+        item = new SequenceItem(0, this.hashCode());
         item.add(vertex1);
         item.add(VERTEX_LABEL_2, vertex2);
     }

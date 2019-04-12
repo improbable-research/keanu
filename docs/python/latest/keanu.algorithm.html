@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>keanu.algorithm &#8212; keanu 0.0.23 documentation</title>
+    <title>keanu.algorithm &#8212; keanu 0.0.24 documentation</title>
     <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
@@ -193,12 +193,13 @@ If not set, a new one is created.</p>
 <li><strong>proposal_distribution</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The proposal distribution for Metropolis Hastings. Options are ‘gaussian’ and ‘prior’.</li>
 <li><strong>latents</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code>]) – All latent vertices.</li>
 <li><strong>proposal_listeners</strong> – Listeners for proposal creation and rejection. Options are <code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.AcceptanceRateTracker</span></code>.</li>
-<li><strong>proposal_distribution_sigma</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Parameter sigma for ‘gaussian’ proposal distribution.</li>
+<li><strong>proposal_distribution_sigma</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">floating</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool_</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">floating</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool_</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]], <code class="docutils literal notranslate"><span class="pre">None</span></code>]) – Parameter sigma (a single sigma or a list of sigmas for each latent) for ‘gaussian’ proposal distribution</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
 <li><strong>TypeError</strong> – If you pass <cite>proposal_listener</cite> without specifying <cite>proposal_distribution</cite>.</li>
+<li><strong>TypeError</strong> – If you choose ‘gaussian’ as <cite>proposal_distribution</cite> but did not specify <cite>latents</cite>.</li>
 <li><strong>TypeError</strong> – If you choose ‘gaussian’ as <cite>proposal_distribution</cite> but did not specify <cite>proposal_distribution_sigma</cite>.</li>
 <li><strong>TypeError</strong> – If you choose ‘prior’ as <cite>proposal_distribution</cite> but did not pass latent vertices.</li>
 </ul>

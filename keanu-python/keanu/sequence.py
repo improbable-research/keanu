@@ -1,4 +1,4 @@
-from typing import Callable, Generator, Dict, Optional, Any, Iterator, Iterable, Union
+from typing import Callable, Generator, Dict, Optional, Any, Iterator, Iterable, Union, Collection
 
 from py4j.java_gateway import java_import, is_instance_of
 from py4j.java_collections import ListConverter
@@ -6,18 +6,22 @@ from py4j.java_collections import ListConverter
 from functools import partial
 from collections.abc import Iterable as CollectionsIterable
 
+from keanu import BayesNet
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.functional import BiConsumer
 from keanu.functional import Consumer
 from keanu.functional import JavaIterator
-from keanu.vertex import Vertex, cast_to_double_vertex, vertex_constructor_param_types
+from keanu.vertex import Vertex, cast_to_double_vertex, vertex_constructor_param_types, DoubleProxy, shape_types, \
+    IntegerProxy, BooleanProxy
 from keanu.vertex.label import _VertexLabel
 
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.templating.SequenceBuilder")
 java_import(k.jvm_view(), "io.improbable.keanu.vertices.SimpleVertexDictionary")
+java_import(k.jvm_view(), "io.improbable.keanu.templating.SequenceItem")
+java_import(k.jvm_view(), "io.improbable.keanu.templating.SequenceLoader")
 
 
 class SequenceItem(JavaObjectWrapper):
@@ -43,6 +47,33 @@ class SequenceItem(JavaObjectWrapper):
             for k, v in self.unwrap().getContents().items()
         }
 
+    def add_double_proxy_for(self, label: str, shape: Collection[int] = None) -> Vertex:
+        """
+        Creates a proxy vertex for the given label and adds to the sequence item
+        """
+        if shape is None:
+            return Vertex._from_java_vertex(self.unwrap().addDoubleProxyFor(_VertexLabel(label).unwrap()))
+        else:
+            return Vertex._from_java_vertex(self.unwrap().addDoubleProxyFor(_VertexLabel(label).unwrap(), shape))
+
+    def add_integer_proxy_for(self, label: str, shape: Collection[int] = None) -> Vertex:
+        """
+        Creates a proxy vertex for the given label and adds to the sequence item
+        """
+        if shape is None:
+            return Vertex._from_java_vertex(self.unwrap().addIntegerProxyFor(_VertexLabel(label).unwrap()))
+        else:
+            return Vertex._from_java_vertex(self.unwrap().addIntegerProxyFor(_VertexLabel(label).unwrap(), shape))
+
+    def add_boolean_proxy_for(self, label: str, shape: Collection[int] = None) -> Vertex:
+        """
+        Creates a proxy vertex for the given label and adds to the sequence item
+        """
+        if shape is None:
+            return Vertex._from_java_vertex(self.unwrap().addBooleanProxyFor(_VertexLabel(label).unwrap()))
+        else:
+            return Vertex._from_java_vertex(self.unwrap().addBooleanProxyFor(_VertexLabel(label).unwrap(), shape))
+
 
 class Sequence(JavaObjectWrapper):
     """
@@ -60,10 +91,11 @@ class Sequence(JavaObjectWrapper):
     def __init__(self,
                  factories: Union[Callable[..., None], Iterable[Callable[..., None]]] = None,
                  count: int = None,
+                 name: str = None,
                  data_generator: Iterator[Dict[str, Any]] = None,
                  initial_state: Dict[str, vertex_constructor_param_types] = None):
 
-        builder = k.jvm_view().SequenceBuilder()
+        builder = k.jvm_view().SequenceBuilder().named(name)
 
         if initial_state is not None:
             initial_state_java = k.to_java_map(
@@ -107,12 +139,19 @@ class Sequence(JavaObjectWrapper):
     def get_last_item(self) -> SequenceItem:
         return SequenceItem(self.unwrap().getLastItem())
 
+    def to_bayes_net(self) -> BayesNet:
+        bayes_net: BayesNet = JavaObjectWrapper(self.unwrap().toBayesianNetwork())  # type: ignore
+        #  A hack that assumes BayesNet.__init__ has no unique behaviour
+        #  This is necessary because the BayesNet constructor takes a set of vertices (not a java object)
+        bayes_net.__class__ = BayesNet
+        return bayes_net
+
     @staticmethod
-    def proxy_for(label: str) -> str:
+    def proxy_label_for(label: str) -> str:
         """
-        >>> Sequence.proxy_for("foo")
+        >>> Sequence.proxy_label_for("foo")
         'proxy_for.foo'
         """
         label_java = _VertexLabel(label).unwrap()
-        proxy_label_java = k.jvm_view().SequenceBuilder.proxyFor(label_java)
+        proxy_label_java = k.jvm_view().SequenceBuilder.proxyLabelFor(label_java)
         return proxy_label_java.getQualifiedName()

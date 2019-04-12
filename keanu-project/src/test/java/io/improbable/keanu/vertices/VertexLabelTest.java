@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Optional;
 
@@ -13,6 +15,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 public class VertexLabelTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void byDefaultALabelHasNoNamespace() {
         VertexLabel foo = new VertexLabel("foo");
@@ -184,5 +190,12 @@ public class VertexLabelTest {
     public void isNotInNamespaceWithMissingOuter() {
         VertexLabel label = new VertexLabel("outer", "inner", "foo");
         assertFalse(label.isInNamespace("inner"));
+    }
+
+    @Test
+    public void throwsWhenAddingNullExtraNamespace() {
+        expectedException.expect(NullPointerException.class);
+        VertexLabel label = new VertexLabel("outer", "inner", "foo");
+        label.withExtraNamespace(null);
     }
 }
