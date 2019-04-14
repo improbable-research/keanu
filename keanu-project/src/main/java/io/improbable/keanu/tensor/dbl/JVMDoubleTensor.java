@@ -134,7 +134,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         return new JVMDoubleTensor(buffer, new long[]{buffer.length});
     }
 
-    private double[] newBuffer() {
+    private double[] newBufferOfSameLength() {
         return new double[buffer.length];
     }
 
@@ -280,7 +280,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         long[] resultShape = TensorShape.getPermutedResultShapeShape(shape, rearrange);
         long[] resultStride = TensorShape.getRowFirstStride(resultShape);
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
 
@@ -560,7 +560,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor unaryMinus() {
 
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = -buffer[i];
@@ -742,7 +742,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor pow(double exponent) {
 
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.pow(buffer[i], exponent);
@@ -753,7 +753,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor sqrt() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.sqrt(buffer[i]);
@@ -764,7 +764,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor log() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.log(buffer[i]);
@@ -781,7 +781,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor logGamma() {
 
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = Gamma.logGamma(buffer[i]);
@@ -792,7 +792,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor digamma() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = Gamma.digamma(buffer[i]);
@@ -803,7 +803,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor sin() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.sin(buffer[i]);
@@ -814,7 +814,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor cos() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.cos(buffer[i]);
@@ -825,7 +825,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor tan() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.tan(buffer[i]);
@@ -836,7 +836,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor atan() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.atan(buffer[i]);
@@ -847,7 +847,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor atan2(double y) {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.atan2(y, buffer[i]);
@@ -876,7 +876,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor asin() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.asin(buffer[i]);
@@ -887,7 +887,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor acos() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.acos(buffer[i]);
@@ -898,7 +898,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor exp() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.exp(buffer[i]);
@@ -947,7 +947,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor replaceNaN(double value) {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = Double.isNaN(buffer[i]) ? value : buffer[i];
@@ -963,7 +963,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor ceil() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.ceil(buffer[i]);
@@ -974,7 +974,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor floor() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = FastMath.floor(buffer[i]);
@@ -988,7 +988,7 @@ public class JVMDoubleTensor extends DoubleTensor {
      * Round half up as used in ND4j
      */
     public DoubleTensor round() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
             if (buffer[i] >= 0) {
@@ -1003,7 +1003,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor sigmoid() {
-        double[] newBuffer = newBuffer();
+        double[] newBuffer = newBufferOfSameLength();
 
         Sigmoid sigmoid = new Sigmoid();
         for (int i = 0; i < buffer.length; i++) {
