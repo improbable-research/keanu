@@ -244,7 +244,6 @@ public class JVMDoubleTensor extends DoubleTensor {
             } else if (that.isScalar()) {
                 return elementwiseEquals(((DoubleTensor) that).scalar());
             } else {
-
                 DoubleTensor equalsMask = broadcastableBinaryDoubleOp((l, r) -> l.equals(r) ? 1.0 : 0.0, (DoubleTensor) that);
 
                 return maskToBooleanTensor(equalsMask);
