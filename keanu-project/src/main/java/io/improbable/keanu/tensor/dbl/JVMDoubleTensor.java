@@ -266,15 +266,13 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor permute(int... rearrange) {
-
+        Preconditions.checkArgument(rearrange.length == shape.length);
         long[] resultShape = TensorShape.getPermutedResultShapeShape(shape, rearrange);
         long[] resultStride = TensorShape.getRowFirstStride(resultShape);
         double[] newBuffer = newBufferOfSameLength();
 
         for (int i = 0; i < buffer.length; i++) {
-
             long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
-
             long[] permutedIndex = new long[shapeIndices.length];
 
             for (int p = 0; p < permutedIndex.length; p++) {
@@ -287,7 +285,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         return new JVMDoubleTensor(newBuffer, resultShape);
-
     }
 
     @Override
