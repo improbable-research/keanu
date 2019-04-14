@@ -78,7 +78,11 @@ public class JVMDoubleTensor extends DoubleTensor {
     public static JVMDoubleTensor create(double value, long... shape) {
         long length = TensorShape.getLength(shape);
         double[] buffer = new double[Ints.checkedCast(length)];
-        Arrays.fill(buffer, value);
+
+        if (value != 0) {
+            Arrays.fill(buffer, value);
+        }
+
         return new JVMDoubleTensor(buffer, shape);
     }
 
