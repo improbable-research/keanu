@@ -70,5 +70,4 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex implements Differ
 
         return partials;
     }
-
 }

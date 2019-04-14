@@ -21,6 +21,7 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.templating.SequenceBuilder")
 java_import(k.jvm_view(), "io.improbable.keanu.vertices.SimpleVertexDictionary")
 java_import(k.jvm_view(), "io.improbable.keanu.templating.SequenceItem")
+java_import(k.jvm_view(), "io.improbable.keanu.templating.SequenceLoader")
 
 
 class SequenceItem(JavaObjectWrapper):

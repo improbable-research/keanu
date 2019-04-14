@@ -4,8 +4,11 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.templating.Sequence;
 import io.improbable.keanu.templating.SequenceBuilder;
 import io.improbable.keanu.templating.SequenceItem;
+import io.improbable.keanu.templating.SequenceLoader;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
+import io.improbable.keanu.util.io.ProtobufLoader;
+import io.improbable.keanu.util.io.ProtobufSaver;
 import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
@@ -15,6 +18,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -80,7 +87,7 @@ public class SequenceExample {
     }
     //%%SNIPPET_END%% Sequence
 
-    public Sequence buildSequenceTimeSeries() {
+    public Sequence buildSequenceTimeSeries() throws IOException {
         //%%SNIPPET_START%% SequenceTimeSeries
         DoubleVertex two = new ConstantDoubleVertex(2);
 
@@ -139,9 +146,16 @@ public class SequenceExample {
         SequenceItem secondSequenceItem = sequenceItems.get(1);
         Vertex x2InSecondSequenceItem = secondSequenceItem.get(x2Label);
 
-        // Finally, you may need to use the save/load interface on `network` and will need a way of accessing timesteps
-        // without having access to the `sequence` object
-        x1Retrieved = network.getVerticesInNamespace("Keanu-Example", "Sequence_Item_0").get(0);
+        // Finally, you may want to save your sequence to disk and then load it back later.
+        // Firstly you can use the standard ProtobufSaver to save `network` to disk.
+        ProtobufSaver saver = new ProtobufSaver(network);
+        saver.save(new FileOutputStream(new File("file_name.proto")), false);
+
+        // Now you can actually use Keanu to reconstruct the Sequence object
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork reconstructedNetwork = loader.loadNetwork(new FileInputStream(new File("file_name.proto")));
+        Sequence reconstructedSequence = SequenceLoader.loadFromBayesNet(reconstructedNetwork);
+        x1Retrieved = reconstructedSequence.asList().get(0).get(x1Label);
 
         //%%SNIPPET_END%% SequenceTimeSeries
 

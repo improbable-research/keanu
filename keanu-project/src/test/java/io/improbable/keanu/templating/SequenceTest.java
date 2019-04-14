@@ -17,7 +17,7 @@ public class SequenceTest {
     @Test
     public void youCanGetTheLastItem() {
         int numItems = 10;
-        Sequence sequence = new Sequence(numItems);
+        Sequence sequence = new Sequence(numItems, this.hashCode(), null);
         for (int i = 0; i < numItems-1; i++) {
             sequence.add(mock(SequenceItem.class));
         }
@@ -30,14 +30,14 @@ public class SequenceTest {
 
     @Test(expected = SequenceConstructionException.class)
     public void itThrowsIfYouAskForTheLastItemButThereIsNone() {
-        new Sequence(10).getLastItem();
+        new Sequence(10, this.hashCode(), null).getLastItem();
     }
 
     @Test
     public void bayesNetConstructionFailsWhenThereAreNoSequenceItems() {
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("Bayesian Network construction failed because the Sequence contains no SequenceItems");
-        Sequence sequence = new Sequence(0);
+        Sequence sequence = new Sequence(0, this.hashCode(), null);
         BayesianNetwork network = sequence.toBayesianNetwork();
     }
 
@@ -46,7 +46,7 @@ public class SequenceTest {
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("Bayesian Network construction failed because there are no vertices in the Sequence");
         SequenceItem emptySequenceItem = new SequenceItem(0, 0);
-        Sequence sequence = new Sequence(0);
+        Sequence sequence = new Sequence(0, this.hashCode(), null);
         sequence.add(emptySequenceItem);
         BayesianNetwork network = sequence.toBayesianNetwork();
     }
