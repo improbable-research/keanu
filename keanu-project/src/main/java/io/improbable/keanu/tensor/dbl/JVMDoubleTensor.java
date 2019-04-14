@@ -24,7 +24,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkElementwiseShapeMatch;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.ADD;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.DIV;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.GTE_MASK;
@@ -611,7 +611,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
-        checkElementwiseShapeMatch(shape, mask.getShape());
+        checkShapesMatch(shape, mask.getShape());
 
         double[] maskBuffer = getRawBufferIfJVMTensor(mask);
 
@@ -624,7 +624,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
-        checkElementwiseShapeMatch(shape, mask.getShape());
+        checkShapesMatch(shape, mask.getShape());
 
         double[] newBuffer = new double[buffer.length];
         double[] maskBuffer = getRawBufferIfJVMTensor(mask);
