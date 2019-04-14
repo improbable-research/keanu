@@ -272,6 +272,17 @@ public class TensorShapeValidation {
         return TensorShape.concat(removeAll(leftShape, dimsLeft), removeAll(rightShape, dimsRight));
     }
 
+    public static void checkElementwiseShapeMatch(long[] leftShape, long[] rightShape) {
+        if (!Arrays.equals(leftShape, rightShape)) {
+            throw new IllegalArgumentException(
+                "Broadcast not supported for shape " +
+                    Arrays.toString(leftShape) +
+                    " and " +
+                    Arrays.toString(rightShape)
+            );
+        }
+    }
+
     private static String toStringArgs(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
         return "left shape: " + Arrays.toString(leftShape) + " right shape: " + Arrays.toString(rightShape) + " on left dimensions " +
             Arrays.toString(dimsLeft) + " and right dimensions " + Arrays.toString(dimsRight);
