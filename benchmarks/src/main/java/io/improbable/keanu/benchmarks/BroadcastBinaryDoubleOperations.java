@@ -1,6 +1,6 @@
 package io.improbable.keanu.benchmarks;
 
-import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -46,17 +46,15 @@ public class BroadcastBinaryDoubleOperations {
             .toArray();
 
         DoubleTensor.setFactory(impl.getFactory());
-        left = DoubleTensor.arange(0, TensorShape.getLength(leftShape)).reshape(leftShape);
-        right = DoubleTensor.arange(2, TensorShape.getLength(rightShape) + 2).reshape(rightShape);
+        left = KeanuRandom.getDefaultRandom().nextGaussian(leftShape);
+        right = KeanuRandom.getDefaultRandom().nextGaussian(rightShape);
     }
 
     @Benchmark
     public DoubleTensor benchmark() {
 
         DoubleTensor result = null;
-        for (int i = 0; i < NUM_OPERATIONS; i++) {
-            result = operation.apply(left, right);
-        }
+        result = operation.apply(left, right);
 
         return result;
     }
