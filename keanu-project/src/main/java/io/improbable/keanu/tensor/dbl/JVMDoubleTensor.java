@@ -172,7 +172,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public long getLength() {
-        return buffer.length > 0 ? buffer.length : 1;
+        return buffer.length;
     }
 
     @Override
