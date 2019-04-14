@@ -307,7 +307,6 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor diag() {
-
         int n = buffer.length;
         double[] newBuffer = new double[Ints.checkedCast(n * n)];
         int nInt = Ints.checkedCast(n);
