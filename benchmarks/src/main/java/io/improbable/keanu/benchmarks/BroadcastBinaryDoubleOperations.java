@@ -45,7 +45,6 @@ public class BroadcastBinaryDoubleOperations {
             .mapToLong(Long::parseLong)
             .toArray();
 
-        DoubleTensor.setFactory(impl.getFactory());
         left = KeanuRandom.getDefaultRandom().nextGaussian(leftShape);
         right = KeanuRandom.getDefaultRandom().nextGaussian(rightShape);
     }
