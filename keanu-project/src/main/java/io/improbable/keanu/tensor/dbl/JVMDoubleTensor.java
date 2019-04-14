@@ -109,19 +109,21 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     public static JVMDoubleTensor arange(double start, double end, double stepSize) {
+        Preconditions.checkArgument(stepSize != 0);
         int steps = (int) Math.ceil((end - start) / stepSize);
 
         return linearBufferCreate(start, steps, stepSize);
     }
 
     public static JVMDoubleTensor linspace(double start, double end, int numberOfPoints) {
-
+        Preconditions.checkArgument(numberOfPoints > 0);
         double stepSize = (end - start) / (numberOfPoints - 1);
 
         return linearBufferCreate(start, numberOfPoints, stepSize);
     }
 
     private static JVMDoubleTensor linearBufferCreate(double start, int numberOfPoints, double stepSize) {
+        Preconditions.checkArgument(numberOfPoints > 0);
         double[] buffer = new double[numberOfPoints];
 
         double currentValue = start;
