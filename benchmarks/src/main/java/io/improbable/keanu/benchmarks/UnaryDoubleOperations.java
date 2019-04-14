@@ -16,7 +16,7 @@ public class UnaryDoubleOperations {
     @Param({"CHOLESKY", "DETERMINANT", "COS", "INVERSE", "LOG", "TRANSPOSE"})
     public UnaryOperation operation;
 
-    @Param({"10"})
+    @Param({"2", "5", "10", "50"})
     public int dimLength;
 
     @Param({"JVM", "ND4J"})

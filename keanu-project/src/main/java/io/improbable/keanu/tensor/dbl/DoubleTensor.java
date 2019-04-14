@@ -21,14 +21,6 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
         DoubleTensor.factory = factory;
     }
 
-    public final static DoubleTensor MINUS_ONE_SCALAR = scalar(-1.0);
-
-    public final static DoubleTensor ZERO_SCALAR = scalar(0.0);
-
-    public final static DoubleTensor ONE_SCALAR = scalar(1.0);
-
-    public final static DoubleTensor TWO_SCALAR = scalar(2.0);
-
     public static DoubleTensor create(double value, long[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(value);

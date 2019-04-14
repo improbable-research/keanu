@@ -277,7 +277,7 @@ public class ForwardSamplerTest {
         @Override
         public DoubleTensor sample(KeanuRandom random) {
             ids.add(this.getId());
-            return DoubleTensor.ZERO_SCALAR;
+            return DoubleTensor.scalar(0.0);
         }
 
         @Override
@@ -303,7 +303,7 @@ public class ForwardSamplerTest {
         @Override
         protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
             ids.add(this.getId());
-            return DoubleTensor.ZERO_SCALAR;
+            return DoubleTensor.scalar(0.0);
         }
     }
 

@@ -39,13 +39,13 @@ public class ExponentialVertexTest {
     public void logProbIsNegInfWhereXLessThanOne() {
         DoubleTensor matrixX = DoubleTensor.create(new double[]{1, -2}, new long[]{2, 1});
 
-        DoubleTensor maskResult = Exponential.withParameters(DoubleTensor.ONE_SCALAR).logProb(matrixX);
+        DoubleTensor maskResult = Exponential.withParameters(DoubleTensor.scalar(1.0)).logProb(matrixX);
         assertArrayEquals(new double[]{-1, Double.NEGATIVE_INFINITY}, maskResult.asFlatDoubleArray(), 0.0);
     }
 
     @Test
     public void logProbGraphIsNegInfWhereXLessThanOne() {
-        DoubleVertex rate = ConstantVertex.of(DoubleTensor.ONE_SCALAR);
+        DoubleVertex rate = ConstantVertex.of(DoubleTensor.scalar(1.0));
         ExponentialVertex tensorExponentialVertex = new ExponentialVertex(rate);
         LogProbGraph logProbGraph = tensorExponentialVertex.logProbGraph();
         LogProbGraphValueFeeder.feedValue(logProbGraph, rate, rate.getValue());
