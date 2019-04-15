@@ -211,15 +211,17 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         long newLength = 1;
         int negativeDimension = -1;
+        long newShapeCopy[] = new long[newShape.length];
+        System.arraycopy(newShape, 0, newShapeCopy, 0, newShape.length);
 
-        for (int i = 0; i < newShape.length; i++) {
+        for (int i = 0; i < newShapeCopy.length; i++) {
 
-            long dimILength = newShape[i];
+            long dimILength = newShapeCopy[i];
             if (dimILength > 0) {
                 newLength *= dimILength;
             } else if (dimILength < 0) {
                 if (negativeDimension >= 0) {
-                    throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(shape) + " to " + Arrays.toString(newShape));
+                    throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(shape) + " to " + Arrays.toString(newShapeCopy));
                 }
                 negativeDimension = i;
             }
@@ -227,13 +229,13 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         if (newLength != buffer.length || negativeDimension >= 0) {
             if (negativeDimension < 0) {
-                throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(shape) + " to " + Arrays.toString(newShape));
+                throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(shape) + " to " + Arrays.toString(newShapeCopy));
             } else {
-                newShape[negativeDimension] = buffer.length / newLength;
+                newShapeCopy[negativeDimension] = buffer.length / newLength;
             }
         }
 
-        return new JVMDoubleTensor(copyOf(buffer, buffer.length), copyOf(newShape, newShape.length));
+        return new JVMDoubleTensor(copyOf(buffer, buffer.length), newShapeCopy);
     }
 
     @Override
