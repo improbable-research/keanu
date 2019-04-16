@@ -1519,34 +1519,42 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public FlattenedView<Double> getFlattenedView() {
-        return new JVMDoubleFlattenedView();
+        if (buffer.length == 1) {
+            return new ScalarJVMFlattenedView();
+        } else {
+            return new TensorJVMDoubleFlattenedView();
+        }
     }
 
-    private class JVMDoubleFlattenedView implements FlattenedView<Double> {
-
-        @Override
+    private class JVMDoubleFlattenedView {
         public long size() {
             return buffer.length;
         }
 
-        @Override
         public Double get(long index) {
             return buffer[Ints.checkedCast(index)];
         }
 
-        @Override
-        public Double getOrScalar(long index) {
-            if (buffer.length == 1) {
-                return get(0);
-            } else {
-                return get(index);
-            }
-        }
-
-        @Override
         public void set(long index, Double value) {
             buffer[Ints.checkedCast(index)] = value;
         }
+
+    }
+
+    private class TensorJVMDoubleFlattenedView extends JVMDoubleFlattenedView implements FlattenedView<Double> {
+        @Override
+        public Double getOrScalar(long index) {
+                return get(index);
+        }
+
+    }
+
+    private class ScalarJVMFlattenedView extends JVMDoubleFlattenedView implements FlattenedView<Double> {
+        @Override
+        public Double getOrScalar(long index) {
+            return buffer[0];
+        }
+
     }
 
     @Override
