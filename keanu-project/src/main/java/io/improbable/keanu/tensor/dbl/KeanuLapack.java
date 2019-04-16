@@ -19,7 +19,7 @@ public class KeanuLapack {
 
         UPPER((byte) 'U'), LOWER((byte) 'L');
 
-        public final byte lapackChar;
+        private final byte lapackChar;
     }
 
     /**
