@@ -1040,8 +1040,6 @@ public class JVMDoubleTensor extends DoubleTensor {
      */
     @Override
     public List<DoubleTensor> split(int dimension, long... splitAtIndices) {
-
-        long[] shape = getShape();
         dimension = getAbsoluteDimension(dimension, getRank());
 
         if (dimension < 0 || dimension >= shape.length) {
@@ -1061,7 +1059,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         int rawBufferPosition = 0;
         for (long splitAtIndex : splitAtIndices) {
 
-            long[] subTensorShape = Arrays.copyOf(shape, shape.length);
+            long[] subTensorShape = shapeCopy();
             long subTensorLengthInDimension = splitAtIndex - previousSplitAtIndex;
 
             if (subTensorLengthInDimension > shape[dimension] || subTensorLengthInDimension <= 0) {
