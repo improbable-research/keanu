@@ -1286,7 +1286,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor minusInPlace(double value) {
         for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = buffer[i] - value;
+            buffer[i] -= value;
         }
         return this;
     }
@@ -1309,7 +1309,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor plusInPlace(double value) {
         for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = buffer[i] + value;
+            buffer[i] += value;
         }
         return this;
     }
@@ -1332,7 +1332,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor timesInPlace(double value) {
         for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = buffer[i] * value;
+            buffer[i] *= value;
         }
         return this;
     }
@@ -1355,7 +1355,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor divInPlace(double value) {
         for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = buffer[i] / value;
+            buffer[i] /= value;
         }
         return this;
     }
@@ -1491,7 +1491,6 @@ public class JVMDoubleTensor extends DoubleTensor {
             left.buffer = outputBuffer;
             left.shape = resultShape;
 
-            //TODO: get rid of the need to do this!
             left.stride = TensorShape.getRowFirstStride(resultShape);
 
             return left;
