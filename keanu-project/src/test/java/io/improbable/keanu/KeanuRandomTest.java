@@ -58,7 +58,7 @@ public class KeanuRandomTest {
 
     @Test
     public void canGetStandardDeviationOfGaussian() {
-        DoubleTensor A = random.nextGaussian(new long[]{1000}).times(5);
+        DoubleTensor A = random.nextGaussian(new long[]{1000}).times(5.0);
         Assert.assertEquals(5.0, A.standardDeviation(), 0.1);
     }
 }
