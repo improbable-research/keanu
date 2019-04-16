@@ -52,15 +52,6 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     /**
-     * @param shape shape to use as place holder
-     */
-    public SimpleBooleanTensor(long[] shape) {
-        this.data = null;
-        this.shape = Arrays.copyOf(shape, shape.length);
-        this.stride = TensorShape.getRowFirstStride(shape);
-    }
-
-    /**
      * @param constant constant boolean value to fill shape
      * @param shape    desired shape of tensor
      */
