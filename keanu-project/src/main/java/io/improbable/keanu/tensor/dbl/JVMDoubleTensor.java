@@ -356,11 +356,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reciprocal() {
-        double[] result = new double[buffer.length];
-        for (int i = 0; i < buffer.length; i++) {
-            result[i] = 1.0 / buffer[i];
-        }
-        return new JVMDoubleTensor(result, shapeCopy());
+        return duplicate().reciprocalInPlace();
     }
 
     @Override
@@ -698,7 +694,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor pow(DoubleTensor exponent) {
-        return broadcastableBinaryDoubleOp(FastMath::pow, exponent);
+        return duplicate().powInPlace(exponent);
     }
 
     @Override
@@ -711,25 +707,12 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor pow(double exponent) {
-
-        double[] newBuffer = newBufferOfSameLength();
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = FastMath.pow(buffer[i], exponent);
-        }
-
-        return new JVMDoubleTensor(newBuffer, shapeCopy());
+        return duplicate().powInPlace(exponent);
     }
 
     @Override
     public DoubleTensor sqrt() {
-        double[] newBuffer = newBufferOfSameLength();
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = FastMath.sqrt(buffer[i]);
-        }
-
-        return new JVMDoubleTensor(newBuffer, shapeCopy());
+        return duplicate().sqrtInPlace();
     }
 
     @Override
@@ -754,13 +737,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor sin() {
-        double[] newBuffer = newBufferOfSameLength();
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = FastMath.sin(buffer[i]);
-        }
-
-        return new JVMDoubleTensor(newBuffer, shapeCopy());
+        return duplicate().sinInPlace();
     }
 
     @Override
@@ -856,13 +833,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor replaceNaN(double value) {
-        double[] newBuffer = newBufferOfSameLength();
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = Double.isNaN(buffer[i]) ? value : buffer[i];
-        }
-
-        return new JVMDoubleTensor(newBuffer, shapeCopy());
+        return duplicate().replaceNaNInPlace(value);
     }
 
     @Override
@@ -885,17 +856,7 @@ public class JVMDoubleTensor extends DoubleTensor {
      * Round half up as used in ND4j
      */
     public DoubleTensor round() {
-        double[] newBuffer = newBufferOfSameLength();
-
-        for (int i = 0; i < buffer.length; i++) {
-            if (buffer[i] >= 0) {
-                newBuffer[i] = FastMath.floor(buffer[i] + 0.5);
-            } else {
-                newBuffer[i] = FastMath.ceil(buffer[i] - 0.5);
-            }
-        }
-
-        return new JVMDoubleTensor(newBuffer, shapeCopy());
+        return duplicate().roundInPlace();
     }
 
     @Override
@@ -1283,8 +1244,13 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor roundInPlace() {
         for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.round(buffer[i]);
+            if (buffer[i] >= 0.0) {
+                buffer[i] = FastMath.floor(buffer[i] + 0.5);
+            } else {
+                buffer[i] = FastMath.ceil(buffer[i] - 0.5);
+            }
         }
+
         return this;
     }
 
@@ -1353,11 +1319,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor plus(double value) {
-        double[] result = new double[buffer.length];
-        for (int i = 0; i < buffer.length; i++) {
-            result[i] = buffer[i] + value;
-        }
-        return new JVMDoubleTensor(result, shapeCopy());
+        return duplicate().plusInPlace(value);
     }
 
     @Override
@@ -1367,7 +1329,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor plus(DoubleTensor that) {
-        return broadcastableBinaryDoubleOp(ADD, that);
+        return duplicate().plusInPlace(that);
     }
 
     @Override
@@ -1380,11 +1342,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor times(double value) {
-        double[] result = new double[buffer.length];
-        for (int i = 0; i < buffer.length; i++) {
-            result[i] = buffer[i] * value;
-        }
-        return new JVMDoubleTensor(result, shapeCopy());
+        return duplicate().timesInPlace(value);
     }
 
     @Override
@@ -1394,7 +1352,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor times(DoubleTensor that) {
-        return broadcastableBinaryDoubleOp(MUL, that);
+        return duplicate().timesInPlace(that);
     }
 
     @Override
