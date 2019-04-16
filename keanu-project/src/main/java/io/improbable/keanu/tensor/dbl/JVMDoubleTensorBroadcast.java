@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 
@@ -100,7 +101,7 @@ public class JVMDoubleTensorBroadcast {
     static void broadcastFromRight(double[] leftBuffer, long[] leftShape, long[] leftStride,
                                    double[] rightBuffer, long[] rightShape, long[] rightStride,
                                    double[] outputBuffer, BiFunction<Double, Double, Double> op) {
-
+        Preconditions.checkArgument(leftBuffer.length >= rightBuffer.length);
         for (int i = 0; i < outputBuffer.length; i++) {
 
             long[] shapeIndices = TensorShape.getShapeIndices(leftShape, leftStride, i);
@@ -134,7 +135,7 @@ public class JVMDoubleTensorBroadcast {
     static void broadcastFromLeft(double[] leftBuffer, long[] leftShape, long[] leftStride,
                                   double[] rightBuffer, long[] rightShape, long[] rightStride,
                                   double[] outputBuffer, BiFunction<Double, Double, Double> op) {
-
+        Preconditions.checkArgument(leftBuffer.length <= rightBuffer.length);
         for (int i = 0; i < outputBuffer.length; i++) {
 
             long[] shapeIndices = TensorShape.getShapeIndices(rightShape, rightStride, i);
