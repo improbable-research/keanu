@@ -886,7 +886,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor slice(int dimension, long index) {
-
+        Preconditions.checkArgument(dimension < shape.length && index < shape[dimension]);
         long[] resultShape = ArrayUtils.remove(shape, dimension);
         long[] resultStride = TensorShape.getRowFirstStride(resultShape);
         double[] newBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
