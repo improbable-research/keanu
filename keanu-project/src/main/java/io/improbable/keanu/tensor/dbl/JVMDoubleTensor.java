@@ -235,7 +235,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             }
         }
 
-        return new JVMDoubleTensor(copyOf(buffer, buffer.length), newShapeCopy);
+        return new JVMDoubleTensor(bufferCopy(), newShapeCopy);
     }
 
     @Override
@@ -291,7 +291,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor duplicate() {
-        return new JVMDoubleTensor(copyOf(buffer, buffer.length), shapeCopy());
+        return new JVMDoubleTensor(bufferCopy(), shapeCopy());
     }
 
     @Override
@@ -1387,8 +1387,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(DoubleTensor right,
                                                             BiFunction<Double, Double, Double> op,
                                                             boolean inPlace) {
-
-
         final double[] rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
