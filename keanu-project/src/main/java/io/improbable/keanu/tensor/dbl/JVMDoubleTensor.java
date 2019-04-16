@@ -8,7 +8,6 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.special.Gamma;
@@ -307,10 +306,9 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor diag() {
         int n = buffer.length;
-        double[] newBuffer = new double[Ints.checkedCast(n * n)];
-        int nInt = Ints.checkedCast(n);
+        double[] newBuffer = new double[Ints.checkedCast((long)n * n)];
         for (int i = 0; i < n; i++) {
-            newBuffer[i * nInt + i] = buffer[i];
+            newBuffer[i * n + i] = buffer[i];
         }
 
         return new JVMDoubleTensor(newBuffer, new long[]{n, n});
@@ -462,9 +460,9 @@ public class JVMDoubleTensor extends DoubleTensor {
         final double[] B = getRawBufferIfJVMTensor(that);
         final double[] C = new double[Ints.checkedCast(this.shape[0] * thatShape[1])];
 
-        final int N = (int) thatShape[1];
-        final int M = (int) this.shape[0];
-        final int K = (int) this.shape[1];
+        final int N = Ints.checkedCast(thatShape[1]);
+        final int M = Ints.checkedCast(this.shape[0]);
+        final int K = Ints.checkedCast(this.shape[1]);
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, 1, A, K, B, N, 0, C, N);
 
@@ -508,7 +506,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         JVMDoubleTensor permuted = (JVMDoubleTensor) permute(rearrange);
         double[] permutedBuffer = permuted.buffer;
 
-        int dimLength = Ints.checkedCast(buffer.length / shape[axis]);
+        int dimLength = (int)(buffer.length / shape[axis]);
 
         double[] maxBuffer = new double[dimLength];
         int[] maxIndex = new int[dimLength];
@@ -592,7 +590,9 @@ public class JVMDoubleTensor extends DoubleTensor {
         double[] maskBuffer = getRawBufferIfJVMTensor(mask);
 
         for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = maskBuffer[i] == 1.0 ? value : buffer[i];
+            if (maskBuffer[i] == 1.0) {
+                buffer[i] = value;
+            }
         }
 
         return this;
@@ -828,7 +828,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor standardize() {
-        throw new NotImplementedException("");
+        return this.duplicate().standardizeInPlace();
     }
 
     @Override
@@ -1254,7 +1254,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor standardizeInPlace() {
-        throw new NotImplementedException("");
+        return this.minusInPlace(average()).divInPlace(standardDeviation());
     }
 
     @Override
