@@ -1267,9 +1267,8 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor setAllInPlace(double value) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = value;
-        }
+        Arrays.fill(buffer, value);
+
         return this;
     }
 
