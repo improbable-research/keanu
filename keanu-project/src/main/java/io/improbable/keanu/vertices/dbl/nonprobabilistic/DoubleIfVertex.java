@@ -88,5 +88,4 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
             .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask()));
         return partials;
     }
-
 }
