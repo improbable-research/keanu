@@ -269,7 +269,7 @@ public class TensorShape {
         }
     }
 
-    public static long[] getPermutedResultShapeShape(long[] shape, int... rearrange) {
+    public static long[] getPermutedResultShape(long[] shape, int... rearrange) {
         long[] permutedShape = new long[shape.length];
         for (int i = 0; i < shape.length; i++) {
             permutedShape[i] = shape[rearrange[i]];

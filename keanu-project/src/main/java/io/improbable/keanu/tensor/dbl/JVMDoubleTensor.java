@@ -268,7 +268,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor permute(int... rearrange) {
         Preconditions.checkArgument(rearrange.length == shape.length);
-        long[] resultShape = TensorShape.getPermutedResultShapeShape(shape, rearrange);
+        long[] resultShape = TensorShape.getPermutedResultShape(shape, rearrange);
         long[] resultStride = TensorShape.getRowFirstStride(resultShape);
         double[] newBuffer = newBufferOfSameLength();
 
@@ -928,7 +928,7 @@ public class JVMDoubleTensor extends DoubleTensor {
                 toConcatOnDimensionZero[i] = toConcat[i].permute(rearrange);
             }
 
-            long[] permutedConcatShape = TensorShape.getPermutedResultShapeShape(concatShape, rearrange);
+            long[] permutedConcatShape = TensorShape.getPermutedResultShape(concatShape, rearrange);
             JVMDoubleTensor concatOnDimZero = concatOnDimensionZero(permutedConcatShape, toConcatOnDimensionZero);
 
             return concatOnDimZero.permute(invertedPermute(rearrange));
@@ -1081,7 +1081,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             double[] buffer = new double[subTensorLength];
             System.arraycopy(rawBuffer, rawBufferPosition, buffer, 0, buffer.length);
 
-            long[] subTensorPermutedShape = TensorShape.getPermutedResultShapeShape(subTensorShape, moveDimToZero);
+            long[] subTensorPermutedShape = TensorShape.getPermutedResultShape(subTensorShape, moveDimToZero);
             DoubleTensor subTensor = DoubleTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
             splitTensor.add(subTensor);
 
