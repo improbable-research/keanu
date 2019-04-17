@@ -13,8 +13,6 @@ import java.util.Arrays;
 @State(Scope.Benchmark)
 public class BroadcastBinaryDoubleOperations {
 
-    private static final int NUM_OPERATIONS = 1000;
-
     @Param({"TIMES", "DIVIDE"})
     public BinaryOperation operation;
 
@@ -52,8 +50,7 @@ public class BroadcastBinaryDoubleOperations {
     @Benchmark
     public DoubleTensor benchmark() {
 
-        DoubleTensor result = null;
-        result = operation.apply(left, right);
+        DoubleTensor result = operation.apply(left, right);
 
         return result;
     }

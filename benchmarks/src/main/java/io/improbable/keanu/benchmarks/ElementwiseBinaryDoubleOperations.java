@@ -10,8 +10,6 @@ import org.openjdk.jmh.annotations.State;
 @State(Scope.Benchmark)
 public class ElementwiseBinaryDoubleOperations {
 
-    private static final int NUM_OPERATIONS = 100;
-
     @Param({"TIMES", "MATRIX_MULTIPLY"})
     public BinaryOperation operation;
 
@@ -34,10 +32,7 @@ public class ElementwiseBinaryDoubleOperations {
     @Benchmark
     public DoubleTensor benchmark() {
 
-        DoubleTensor result = null;
-        for (int i = 0; i < NUM_OPERATIONS; i++) {
-            result = operation.apply(left, right);
-        }
+        DoubleTensor result = operation.apply(left, right);
 
         return result;
     }
