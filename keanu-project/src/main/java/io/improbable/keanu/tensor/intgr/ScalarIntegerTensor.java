@@ -44,7 +44,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public long[] getStride() {
-        return new long[0];
+        return new long[shape.length];
     }
 
     @Override
