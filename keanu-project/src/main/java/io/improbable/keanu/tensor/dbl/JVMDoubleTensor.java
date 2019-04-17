@@ -585,7 +585,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
-        checkShapesMatch(shape, mask.getShape());
+        checkMaskLengthMatches(mask);
 
         double[] maskBuffer = getRawBufferIfJVMTensor(mask);
 
@@ -596,6 +596,15 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         return this;
+    }
+
+    private void checkMaskLengthMatches(DoubleTensor mask) {
+        if (getLength() != mask.getLength()) {
+            throw new IllegalArgumentException(
+                "The lengths of the tensor and mask must match, but got tensor length: " + getLength()
+                + ", mask length: " + mask.getLength()
+            );
+        }
     }
 
     @Override

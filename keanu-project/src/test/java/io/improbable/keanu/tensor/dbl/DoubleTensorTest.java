@@ -410,7 +410,7 @@ public class DoubleTensorTest {
         DoubleTensor mask = DoubleTensor.ones(2, 2);
 
         thrown.expect(IllegalArgumentException.class);
-//        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
 
         tensor.setWithMaskInPlace(mask, -2.0);
     }
