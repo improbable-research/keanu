@@ -50,7 +50,7 @@ public class TensorMulByMatrixMul {
         //so initializing with {1} which will then get overridden if not empty
         long[] newShapeA = {-1, n2};
         long[] oldShapeA;
-        if (listA.size() == 0) {
+        if (listA.isEmpty()) {
             oldShapeA = new long[0];
         } else {
             oldShapeA = Longs.toArray(listA);
@@ -67,7 +67,7 @@ public class TensorMulByMatrixMul {
 
         long[] newShapeB = {n3, -1};
         long[] oldShapeB;
-        if (listB.size() == 0) {
+        if (listB.isEmpty()) {
             oldShapeB = new long[0];
         } else {
             oldShapeB = Longs.toArray(listB);
