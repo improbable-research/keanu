@@ -82,7 +82,7 @@ public interface Tensor<T> {
      *
      * The stride is the distance you'd move in a flat representation of the tensor for each index within that dimension
      * EG) For a 2x2 Tensor the Tensor would be laid out (in C order):
-     * [{0, 0}, {0, 1}, {1. 0}, {1. 1}]
+     * [{0, 0}, {0, 1}, {1, 0}, {1, 1}]
      * Thus the stride array would be provided as:
      * [2, 1]
      *
