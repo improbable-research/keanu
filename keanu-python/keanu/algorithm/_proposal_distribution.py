@@ -1,7 +1,7 @@
-from typing import List, Any, Callable, Dict, Union, cast
+from typing import List, Any, Callable, Dict, Union
 
-from py4j.java_gateway import java_import, JavaObject
 from py4j.java_collections import JavaList, JavaMap
+from py4j.java_gateway import java_import, JavaObject
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
@@ -26,32 +26,43 @@ class ProposalDistribution(JavaObjectWrapper):
                  type_: str,
                  latents: List[Vertex] = None,
                  sigma: Union[tensor_arg_types, List[tensor_arg_types]] = None,
+                 default_sigma: tensor_arg_types = None,
                  listeners: List[Any] = []) -> None:
         ctor = proposal_distribution_types[type_]
-        args: List[Union[JavaMap, JavaList, JavaObject]] = []
 
         if type_ == "gaussian":
-            if latents is None or len(latents) <= 0:
-                raise TypeError("Gaussian Proposal Distribution requires values for latents")
 
-            if isinstance(sigma, runtime_tensor_arg_types):
-                sigma_as_tensor = Tensor(sigma).unwrap()
-                args.append(k.to_java_object_list(latents))
-                args.append(sigma_as_tensor)
-            elif isinstance(sigma, list) and len(sigma) == len(latents) and isinstance(
-                    sigma[0], runtime_tensor_arg_types):
-                sigma_as_tensors = [Tensor(s) for s in sigma]
-                args.append(k.to_java_map(dict(zip(latents, sigma_as_tensors))))
+            builder = ctor.builder()
+
+            if default_sigma is not None and isinstance(default_sigma, runtime_tensor_arg_types):
+                sigma_as_tensor = Tensor(default_sigma).unwrap()
+                builder.defaultSigma(sigma_as_tensor.scalar())
+
+            if sigma is not None:
+
+                if isinstance(sigma, list) and 0 < len(latents) == len(sigma) and isinstance(
+                        sigma[0], runtime_tensor_arg_types):
+                    sigma_as_tensors = [Tensor(s) for s in sigma]
+                    latent_and_sigma_pairs = zip(latents, sigma_as_tensors)
+                    for pair in latent_and_sigma_pairs:
+                        builder.sigmaFor(pair[0].unwrap(), pair[1].unwrap())
+
+                else:
+                    raise TypeError("Gaussian Proposal Distribution requires a list of sigmas. One for each latent.")
+
+            if len(listeners) > 0:
+                for listener in listeners:
+                    builder.proposalListener(listener.unwrap())
+
+            super(ProposalDistribution, self).__init__(builder.build())
+
+        elif type_ == "prior":
+
+            if sigma is not None:
+                raise TypeError('Parameter sigma is not valid unless type is "gaussian"')
+
+            if len(listeners) > 0:
+                args: List[Union[JavaMap, JavaList, JavaObject]] = [k.to_java_object_list(listeners)]
+                super(ProposalDistribution, self).__init__(ctor(*args))
             else:
-                raise TypeError("Gaussian Proposal Distribution requires a sigma or a list of sigmas for each latent")
-
-        elif sigma is not None:
-            raise TypeError('Parameter sigma is not valid unless type is "gaussian"')
-
-        if type_ == "prior":
-            if latents is None:
-                raise TypeError("Prior Proposal Distribution requires latent variables")
-
-        if len(listeners) > 0:
-            args.append(k.to_java_object_list(listeners))
-        super(ProposalDistribution, self).__init__(ctor(*args))
+                super(ProposalDistribution, self).__init__(ctor())

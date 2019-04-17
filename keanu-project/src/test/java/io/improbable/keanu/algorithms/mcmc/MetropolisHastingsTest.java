@@ -1,10 +1,8 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.mcmc.proposal.*;
 import io.improbable.keanu.algorithms.mcmc.testcases.MCMCTestCase;
 import io.improbable.keanu.algorithms.mcmc.testcases.MultiVariateDiscreteTestCase;
@@ -24,7 +22,6 @@ import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
@@ -209,8 +206,8 @@ public class MetropolisHastingsTest {
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
 
         ProposalDistribution proposalDistribution =  GaussianProposalDistribution.builder()
-            .sigma(A, DoubleTensor.scalar(1.5))
-            .sigma(B, DoubleTensor.scalar(1.5))
+            .sigmaFor(A, DoubleTensor.scalar(1.5))
+            .sigmaFor(B, DoubleTensor.scalar(1.5))
             .build();
 
         MetropolisHastings metropolisHastings = MetropolisHastings.builder()

@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.KeanuRandom;
@@ -17,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,8 +57,8 @@ public class GaussianProposalDistributionTest {
             vertex2, sigmaForVertex2
         );
         proposalDistribution = GaussianProposalDistribution.builder()
-            .sigma(vertex1, sigmaForVertex1)
-            .sigma(vertex2, sigmaForVertex2)
+            .sigmaFor(vertex1, sigmaForVertex1)
+            .sigmaFor(vertex2, sigmaForVertex2)
             .build();
     }
 
@@ -106,11 +104,11 @@ public class GaussianProposalDistributionTest {
     public void youCanAddProposalListeners() {
         ProposalListener listener1 = mock(ProposalListener.class);
         ProposalListener listener2 = mock(ProposalListener.class);
-        List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
         proposalDistribution = GaussianProposalDistribution.builder()
-            .sigma(vertex1, sigmaForVertex1)
-            .sigma(vertex2, sigmaForVertex2)
-            .proposalNotifier(new ProposalNotifier(listeners))
+            .sigmaFor(vertex1, sigmaForVertex1)
+            .sigmaFor(vertex2, sigmaForVertex2)
+            .proposalListener(listener1)
+            .proposalListener(listener2)
             .build();
         Set<Variable> variables = ImmutableSet.of(vertex1, vertex2);
         Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());

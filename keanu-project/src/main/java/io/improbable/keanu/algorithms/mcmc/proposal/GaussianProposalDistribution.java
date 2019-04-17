@@ -6,8 +6,9 @@ import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,12 +62,12 @@ public class GaussianProposalDistribution implements ProposalDistribution {
 
         private Map<Variable, DoubleTensor> sigmas = new HashMap<>();
         private double defaultSigma = 1.0;
-        private ProposalNotifier proposalNotifier = new ProposalNotifier(Collections.emptyList());
+        private List<ProposalListener> proposalListeners = new ArrayList<>();
 
         private GaussianProposalDistributionBuilder() {
         }
 
-        public GaussianProposalDistributionBuilder sigma(Variable sigmaKey, DoubleTensor sigmaValue) {
+        public GaussianProposalDistributionBuilder sigmaFor(Variable sigmaKey, DoubleTensor sigmaValue) {
             sigmas.put(sigmaKey, sigmaValue);
             return this;
         }
@@ -76,13 +77,13 @@ public class GaussianProposalDistribution implements ProposalDistribution {
             return this;
         }
 
-        public GaussianProposalDistributionBuilder proposalNotifier(ProposalNotifier proposalNotifier) {
-            this.proposalNotifier = proposalNotifier;
+        public GaussianProposalDistributionBuilder proposalListener(ProposalListener listener) {
+            this.proposalListeners.add(listener);
             return this;
         }
 
         public GaussianProposalDistribution build() {
-            return new GaussianProposalDistribution(sigmas, defaultSigma, proposalNotifier);
+            return new GaussianProposalDistribution(sigmas, defaultSigma, new ProposalNotifier(proposalListeners));
         }
     }
 }

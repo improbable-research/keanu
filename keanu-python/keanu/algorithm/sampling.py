@@ -10,7 +10,7 @@ from keanu.context import KeanuContext
 from keanu.net import BayesNet, ProbabilisticModel, ProbabilisticModelWithGradient
 from keanu.plots import traceplot
 from keanu.tensor import Tensor
-from keanu.vartypes import sample_types, sample_generator_types, numpy_types, sample_generator_dict_type, tensor_arg_types
+from keanu.vartypes import sample_types, sample_generator_types, sample_generator_dict_type, tensor_arg_types
 from keanu.vertex.base import Vertex
 
 COLUMN_HEADER_FOR_SCALAR = (0,)
@@ -54,9 +54,9 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
     def __init__(self,
                  proposal_distribution: str,
                  latents: Iterable[Vertex],
-                 proposal_listeners=[],
+                 proposal_listeners: List[Any] = [],
                  proposal_distribution_sigma: Union[tensor_arg_types, List[tensor_arg_types]] = None):
-        if (proposal_distribution is None and len(proposal_listeners) > 0):
+        if proposal_distribution is None and len(proposal_listeners) > 0:
             raise TypeError("If you pass in proposal_listeners you must also specify proposal_distribution")
 
         builder: JavaObject = k.jvm_view().MetropolisHastings.builder()
