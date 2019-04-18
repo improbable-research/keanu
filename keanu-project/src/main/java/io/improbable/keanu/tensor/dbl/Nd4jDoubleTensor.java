@@ -45,7 +45,7 @@ import static java.util.Arrays.copyOf;
  * Class for representing n-dimensional arrays of doubles. This is
  * backed by Nd4j.
  */
-public class Nd4jDoubleTensor implements DoubleTensor {
+public class Nd4jDoubleTensor extends DoubleTensor {
 
     static {
         INDArrayShim.startNewThreadForNd4j();
@@ -66,12 +66,20 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.scalar(scalarValue, BUFFER_TYPE));
     }
 
-    public static Nd4jDoubleTensor create(double[] values, long[] shape) {
+    public static Nd4jDoubleTensor create(double[] values, long... shape) {
+        long length = TensorShape.getLength(shape);
+        if (values.length != length) {
+            throw new IllegalArgumentException("Shape " + Arrays.toString(shape) + " does not match buffer size " + values.length);
+        }
         return new Nd4jDoubleTensor(values, shape);
     }
 
-    public static Nd4jDoubleTensor create(double value, long[] shape) {
+    public static Nd4jDoubleTensor create(double value, long... shape) {
         return new Nd4jDoubleTensor(valueArrayOf(shape, value, BUFFER_TYPE));
+    }
+
+    public static Nd4jDoubleTensor create(double[] values) {
+        return create(values, values.length);
     }
 
     public static Nd4jDoubleTensor ones(long... shape) {
@@ -104,7 +112,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (that.isLengthOne()) {
             return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
         }
-        return ((Nd4jDoubleTensor) that).tensor;
+
+        if (that instanceof Nd4jDoubleTensor) {
+            return ((Nd4jDoubleTensor) that).tensor;
+        } else {
+            return TypedINDArrayFactory.create(that.asFlatDoubleArray(), that.getShape(), BUFFER_TYPE);
+        }
     }
 
     @Override
@@ -118,20 +131,25 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public long[] getStride() {
+        return tensor.stride();
+    }
+
+    @Override
     public long getLength() {
         return tensor.lengthLong();
     }
 
-    @Override
-    public boolean isShapePlaceholder() {
-        return tensor == null;
-    }
-
     public Double getValue(long... index) {
-        return tensor.getDouble(index);
+        if (index.length == 1) {
+            return tensor.getDouble(index[0]);
+        } else {
+            return tensor.getDouble(index);
+        }
     }
 
     public DoubleTensor setValue(Double value, long... index) {
+
         tensor.putScalar(index, value);
         return this;
     }
@@ -153,6 +171,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor transpose() {
+        if (this.getRank() != 2) {
+            throw new IllegalArgumentException("Cannot transpose rank " + this.getRank() + " tensor. Try permute instead.");
+        }
         return new Nd4jDoubleTensor(tensor.transpose());
     }
 
@@ -273,7 +294,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor choleskyDecomposition() {
         INDArray dup = tensor.dup();
-        Nd4j.getBlasWrapper().lapack().potrf(dup, false);
+        Nd4j.getBlasWrapper().lapack().potrf(dup, true);
         return new Nd4jDoubleTensor(dup);
     }
 
@@ -313,8 +334,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
-        INDArray tensorMmulResult = Nd4j.tensorMmul(tensor, unsafeGetNd4J(value), new int[][]{dimsLeft, dimsRight});
-        return new Nd4jDoubleTensor(tensorMmulResult);
+        return TensorMulByMatrixMul.tensorMmul(this, value, new int[][]{dimsLeft, dimsRight});
     }
 
     @Override

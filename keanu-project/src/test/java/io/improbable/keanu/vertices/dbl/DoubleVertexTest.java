@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -45,7 +44,7 @@ public class DoubleVertexTest {
     @Test
     public void canObserveTensor() {
         DoubleVertex gaussianVertex = new GaussianVertex(0, 1);
-        DoubleTensor observation = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor observation = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
         gaussianVertex.observe(observation);
         assertArrayEquals(observation.asFlatDoubleArray(), gaussianVertex.getValue().asFlatDoubleArray(), 0.0);
         assertArrayEquals(observation.getShape(), gaussianVertex.getShape());

@@ -139,9 +139,9 @@ public class ForwardSamplerTest {
 
         ProbabilisticModel model = new KeanuProbabilisticModel(Arrays.asList(A, B));
 
-        Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 100);
+        Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 20);
 
-        verify(B, times(100)).setValue(DoubleTensor.scalar(0.));
+        verify(B, times(20)).setValue(DoubleTensor.scalar(0.));
     }
 
     @Test
@@ -277,7 +277,7 @@ public class ForwardSamplerTest {
         @Override
         public DoubleTensor sample(KeanuRandom random) {
             ids.add(this.getId());
-            return DoubleTensor.ZERO_SCALAR;
+            return DoubleTensor.scalar(0.0);
         }
 
         @Override
@@ -303,7 +303,7 @@ public class ForwardSamplerTest {
         @Override
         protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
             ids.add(this.getId());
-            return DoubleTensor.ZERO_SCALAR;
+            return DoubleTensor.scalar(0.0);
         }
     }
 

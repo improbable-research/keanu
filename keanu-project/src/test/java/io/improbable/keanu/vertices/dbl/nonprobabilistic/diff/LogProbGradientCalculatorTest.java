@@ -15,10 +15,10 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 public class LogProbGradientCalculatorTest {
 
@@ -32,7 +32,7 @@ public class LogProbGradientCalculatorTest {
         Map<VertexId, DoubleTensor> gradient = calculator.getJointLogProbGradientWrtLatents();
         DoubleTensor dALogProbWrtAValue = gradient.get(A.getId());
 
-        ContinuousDistribution distribution = Gaussian.withParameters(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
+        ContinuousDistribution distribution = Gaussian.withParameters(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));
         DoubleTensor expected = distribution.dLogProb(DoubleTensor.scalar(0.5)).get(Diffs.X).getValue();
 
         assertThat(dALogProbWrtAValue, equalTo(expected));
@@ -158,8 +158,8 @@ public class LogProbGradientCalculatorTest {
         DoubleTensor expectedDJLogProbWrtAValue = dJLogProbWrtH.times(dHdA);
         DoubleTensor expectedDJLogProbWrtBValue = dJLogProbWrtH.times(dHdB);
 
-        assertEquals(expectedDJLogProbWrtAValue, dJLogProbWrtAValue);
-        assertEquals(expectedDJLogProbWrtBValue, dJLogProbWrtBValue);
+        assertThat(expectedDJLogProbWrtAValue, valuesWithinEpsilonAndShapesMatch(dJLogProbWrtAValue, 1e-8));
+        assertThat(expectedDJLogProbWrtBValue, valuesWithinEpsilonAndShapesMatch(dJLogProbWrtBValue, 1e-8));
     }
 
 }

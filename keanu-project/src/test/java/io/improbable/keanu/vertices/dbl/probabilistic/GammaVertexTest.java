@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -91,13 +90,13 @@ public class GammaVertexTest {
         Gamma.Diff gammaLogDiff = Gamma.dlnPdf(2, 5.5, 1.5);
 
         UniformVertex thetaTensor = new UniformVertex(0.5, 1.0);
-        thetaTensor.setValue(Nd4jDoubleTensor.scalar(2));
+        thetaTensor.setValue(DoubleTensor.scalar(2));
 
         UniformVertex kTensor = new UniformVertex(1.0, 5.0);
-        kTensor.setValue(Nd4jDoubleTensor.scalar(5.5));
+        kTensor.setValue(DoubleTensor.scalar(5.5));
 
         GammaVertex tensorGamma = new GammaVertex(thetaTensor, kTensor);
-        Map<Vertex, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(Nd4jDoubleTensor.scalar(1.5), thetaTensor, kTensor, tensorGamma);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(DoubleTensor.scalar(1.5), thetaTensor, kTensor, tensorGamma);
 
         assertEquals(gammaLogDiff.dPdtheta, actualDerivatives.get(thetaTensor).scalar(), 1e-5);
         assertEquals(gammaLogDiff.dPdk, actualDerivatives.get(kTensor).scalar(), 1e-5);
@@ -110,10 +109,10 @@ public class GammaVertexTest {
         double[] vector = new double[]{1.5, 2, 2.5, 3, 3.5};
 
         UniformVertex thetaTensor = new UniformVertex(0.5, 1.0);
-        thetaTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
+        thetaTensor.setValue(DoubleTensor.scalar(0.75));
 
         UniformVertex kTensor = new UniformVertex(1.0, 5.0);
-        kTensor.setValue(Nd4jDoubleTensor.scalar(2.5));
+        kTensor.setValue(DoubleTensor.scalar(2.5));
 
         Supplier<GammaVertex> vertexSupplier = () -> new GammaVertex(thetaTensor, kTensor);
 
@@ -123,7 +122,7 @@ public class GammaVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         GammaVertex vertexUnderTest = new GammaVertex(1.5, 5.0);
-        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
+        vertexUnderTest.setAndCascade(DoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
@@ -134,13 +133,13 @@ public class GammaVertexTest {
         UniformVertex uniformA = new UniformVertex(1.0, 3.0);
         GammaVertex gamma = new GammaVertex(uniformA, 3.0);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(3.);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(3.5);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(2.5),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(2.5),
             0.1,
             uniformA,
             gamma,
@@ -156,13 +155,13 @@ public class GammaVertexTest {
         UniformVertex uniformA = new UniformVertex(2.0, 5.0);
         GammaVertex gamma = new GammaVertex(2.0, uniformA);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(3.);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(3.5);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(2.0),
-            Nd4jDoubleTensor.scalar(4.5),
+            DoubleTensor.scalar(2.0),
+            DoubleTensor.scalar(4.5),
             0.1,
             uniformA,
             gamma,
@@ -207,9 +206,9 @@ public class GammaVertexTest {
 
         List<DoubleVertex> latentThetaK = new ArrayList<>();
         UniformVertex latentTheta = new UniformVertex(0.01, 10.0);
-        latentTheta.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
+        latentTheta.setAndCascade(DoubleTensor.scalar(9.9));
         UniformVertex latentK = new UniformVertex(0.01, 10.0);
-        latentK.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
+        latentK.setAndCascade(DoubleTensor.scalar(0.1));
 
         latentThetaK.add(latentTheta);
         latentThetaK.add(latentK);

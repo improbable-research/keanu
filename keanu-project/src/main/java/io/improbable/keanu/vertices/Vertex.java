@@ -102,7 +102,9 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
     /**
      * @return True if the vertex is differentiable, false otherwise.
      */
-    public final boolean isDifferentiable() {return this instanceof Differentiable; }
+    public final boolean isDifferentiable() {
+        return this instanceof Differentiable;
+    }
 
     /**
      * Sets the value if the vertex isn't already observed.
@@ -130,12 +132,7 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
     }
 
     public boolean hasValue() {
-        T value = state.getValue();
-        if (value instanceof Tensor) {
-            return !((Tensor) value).isShapePlaceholder();
-        } else {
-            return value != null;
-        }
+        return state.getValue() != null;
     }
 
     @Override

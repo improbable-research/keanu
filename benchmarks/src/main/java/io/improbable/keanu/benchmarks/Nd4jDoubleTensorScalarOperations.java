@@ -20,7 +20,7 @@ public class Nd4jDoubleTensorScalarOperations {
 
 
     @Param({"PLUS", "MINUS", "TIMES", "DIVIDE"})
-    public Operation operation;
+    public BinaryOperation operation;
 
     @Param({"100", "10000", "1000000"})
     public double tensorLength;

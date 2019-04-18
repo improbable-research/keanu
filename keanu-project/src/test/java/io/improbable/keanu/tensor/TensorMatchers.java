@@ -95,6 +95,10 @@ public class TensorMatchers {
         return both(TensorMatchers.valuesMatch(tensor)).and(hasShape(tensor.getShape()));
     }
 
+    public static Matcher<Tensor<Double>> valuesWithinEpsilonAndShapesMatch(Tensor<Double> tensor, double epsilon) {
+        return both(TensorMatchers.allCloseTo(epsilon, tensor)).and(hasShape(tensor.getShape()));
+    }
+
     public static <T> Matcher<Tensor<T>> allValues(Matcher<T> valueMatcher) {
         return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
             @Override

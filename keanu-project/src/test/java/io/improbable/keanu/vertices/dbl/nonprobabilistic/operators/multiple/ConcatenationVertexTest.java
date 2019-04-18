@@ -219,7 +219,7 @@ public class ConcatenationVertexTest {
     @Test
     public void canConcatenateSimpleAutoDiffForwardNoSharedParentsDimensionOne() {
         UniformVertex a = new UniformVertex(0, 10);
-        a.setValue(DoubleTensor.create(new double[]{5}, 2, 2));
+        a.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
         UniformVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
@@ -278,13 +278,13 @@ public class ConcatenationVertexTest {
     @Test
     public void canConcatenateSimpleAutoDiffForwardSharedParentsAndDifferentSize() {
         UniformVertex a = new UniformVertex(0, 10);
-        a.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 3));
+        a.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25, 30, 35}, 2, 3));
 
         UniformVertex b = new UniformVertex(0, 10);
-        b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 3));
+        b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25, 30, 35}, 2, 3));
 
         UniformVertex d = new UniformVertex(0, 10);
-        d.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 3, 2));
+        d.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25, 30, 35}, 3, 2));
 
         DoubleVertex e = a.times(b);
         DoubleVertex f = b.matrixMultiply(d);
