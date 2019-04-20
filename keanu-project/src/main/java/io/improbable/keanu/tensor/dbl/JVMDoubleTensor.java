@@ -32,8 +32,7 @@ import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.Broadcasta
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.LT_MASK;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.MUL;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.SUB;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastFromLeft;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastFromRight;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.doBroadcast;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarLeft;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarRight;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
@@ -1487,14 +1486,10 @@ public class JVMDoubleTensor extends DoubleTensor {
             outputBuffer = inPlace ? leftBuffer : new double[leftBuffer.length];
         }
 
-        //Allow broadcasting from left and right
-        if (paddedLeftShape.length > paddedRightShape.length || leftBuffer.length > rightBuffer.length) {
-            //e.g. [2, 2] * [1, 2]
-            broadcastFromRight(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
-        } else {
-            //e.g. [2] / [2, 2]
-            broadcastFromLeft(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
-        }
+        doBroadcast(
+            leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer,
+            paddedRightShape, paddedRightStride, outputBuffer, op
+        );
 
         if (inPlace) {
             left.buffer = outputBuffer;

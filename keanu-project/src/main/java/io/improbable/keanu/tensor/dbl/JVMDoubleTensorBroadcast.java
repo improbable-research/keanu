@@ -85,6 +85,20 @@ public class JVMDoubleTensorBroadcast {
 
     }
 
+    static void doBroadcast(double[] leftBuffer, long[] leftShape, long[] leftStride,
+                            double[] rightBuffer, long[] rightShape, long[] rightStride,
+                            double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+        if (leftShape.length > rightShape.length || leftBuffer.length > rightBuffer.length) {
+            broadcastFromRight(
+                leftBuffer, leftShape, leftStride, rightBuffer, rightShape, rightStride, outputBuffer, op
+            );
+        } else {
+            broadcastFromLeft(
+                leftBuffer, leftShape, leftStride, rightBuffer, rightShape, rightStride, outputBuffer, op
+            );
+        }
+    }
+
     /**
      * Right buffer is shorter than left
      *
