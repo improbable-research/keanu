@@ -53,5 +53,4 @@ public class IntegerIfVertex extends IntegerVertex implements NonProbabilistic<I
     private IntegerTensor op(BooleanTensor predicate, IntegerTensor thn, IntegerTensor els) {
         return predicate.integerWhere(thn, els);
     }
-
 }

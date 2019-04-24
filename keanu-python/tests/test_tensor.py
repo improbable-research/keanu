@@ -35,8 +35,6 @@ def test_dataframe_passed_to_Tensor_creates_tensor(data: List[List[primitive_typ
     dataframe = pd.DataFrame(columns=['A', 'B'], data=data)
     t = Tensor(dataframe)
 
-    assert_java_class(t, expected_java_class)
-
     tensor_value = Tensor._to_ndarray(t.unwrap())
     dataframe_value = dataframe.values
 
@@ -50,8 +48,6 @@ def test_dataframe_passed_to_Tensor_creates_tensor(data: List[List[primitive_typ
 def test_series_passed_to_Tensor_creates_tensor(data: List[primitive_types], expected_java_class: str) -> None:
     series = pd.Series(data)
     t = Tensor(series)
-
-    assert_java_class(t, expected_java_class)
 
     tensor_value = Tensor._to_ndarray(t.unwrap())
     series_value = series.values
@@ -75,7 +71,7 @@ def test_cannot_pass_generic_to_Tensor(generic) -> None:
 def test_ndarray_passed_to_Tensor_creates_nonscalar_tensor(arr: primitive_types, expected_java_class: str) -> None:
     ndarray = np.array(arr)
     t = Tensor(ndarray)
-    assert_java_class(t, expected_java_class)
+
     assert not t.is_scalar()
 
 

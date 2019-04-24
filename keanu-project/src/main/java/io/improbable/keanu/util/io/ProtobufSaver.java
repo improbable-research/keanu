@@ -15,6 +15,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.mir.KeanuSavedBayesNet;
 import io.improbable.mir.SavedBayesNet;
+import org.apache.commons.math3.util.Pair;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -107,32 +108,37 @@ public class ProtobufSaver implements NetworkSaver {
 
     private void saveParams(SavedBayesNet.Vertex.Builder vertexBuilder,
                             Vertex vertex) {
-        Map<String, Method> parentRetrievalMethodMap = getParentRetrievalMethodMap(vertex);
+        Map<String, Pair<Method, Boolean>> parentRetrievalMethodMap = getParentRetrievalMethodMap(vertex);
 
         String[] parentNames = parentRetrievalMethodMap.keySet().toArray(new String[0]);
         Arrays.sort(parentNames);
         for (String parentName : parentNames) {
-            vertexBuilder.addParameters(getEncodedParam(vertex, parentName, parentRetrievalMethodMap.get(parentName)));
+            Method getParentMethod = parentRetrievalMethodMap.get(parentName).getFirst();
+            boolean isParentNullable = parentRetrievalMethodMap.get(parentName).getSecond();
+            SavedBayesNet.NamedParam encodedParam = getEncodedParam(vertex, parentName, getParentMethod, isParentNullable);
+            if (encodedParam != null) {
+                vertexBuilder.addParameters(encodedParam);
+            }
         }
     }
 
-    private Map<String, Method> getParentRetrievalMethodMap(Vertex vertex) {
+    private Map<String, Pair<Method, Boolean>> getParentRetrievalMethodMap(Vertex vertex) {
         Class vertexClass = vertex.getClass();
         Method[] methods = vertexClass.getMethods();
-        Map<String, Method> parentRetrievalMethodMap = new HashMap<>();
+        Map<String, Pair<Method, Boolean>> parentRetrievalMethodMap = new HashMap<>();
 
         for (Method method : methods) {
             SaveVertexParam vertexAnnotation = method.getAnnotation(SaveVertexParam.class);
             if (vertexAnnotation != null) {
                 String parentName = vertexAnnotation.value();
-                parentRetrievalMethodMap.put(parentName, method);
+                parentRetrievalMethodMap.put(parentName, new Pair<>(method, vertexAnnotation.isNullable()));
             }
         }
 
         return parentRetrievalMethodMap;
     }
 
-    private SavedBayesNet.NamedParam getEncodedParam(Vertex vertex, String paramName, Method getParamMethod) {
+    private SavedBayesNet.NamedParam getEncodedParam(Vertex vertex, String paramName, Method getParamMethod, boolean isNullable) {
         Object param;
 
         try {
@@ -142,7 +148,11 @@ public class ProtobufSaver implements NetworkSaver {
         }
 
         if (param == null) {
-            throw new IllegalArgumentException("No value returned from Save Function");
+            if (!isNullable) {
+                throw new IllegalArgumentException("No value returned from Save Function");
+            } else {
+                return null;
+            }
         }
 
         return getTypedParam(paramName, param);

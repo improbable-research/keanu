@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -125,12 +124,12 @@ public class GaussianVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex mu = new UniformVertex(0.0, 1.0);
-        mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
+        mu.setAndCascade(DoubleTensor.scalar(0.5));
         GaussianVertex vertexUnderTest = new GaussianVertex(
             mu,
             3.0
         );
-        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
+        vertexUnderTest.setAndCascade(DoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
@@ -140,13 +139,13 @@ public class GaussianVertexTest {
         UniformVertex uniformA = new UniformVertex(1.5, 3.0);
         GaussianVertex gaussian = new GaussianVertex(uniformA, 3.0);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.0);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(5.0);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(1.5),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(1.5),
             0.1,
             uniformA,
             gaussian,
@@ -161,13 +160,13 @@ public class GaussianVertexTest {
         UniformVertex uniformA = new UniformVertex(1.5, 3.0);
         GaussianVertex gaussian = new GaussianVertex(3.0, uniformA);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.0);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(0.5);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(3.0),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(3.0),
             0.1,
             uniformA,
             gaussian,

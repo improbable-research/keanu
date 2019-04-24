@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Logistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -107,12 +106,12 @@ public class LogisticVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex mu = new UniformVertex(0.0, 1.0);
-        mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
+        mu.setAndCascade(DoubleTensor.scalar(0.5));
         LogisticVertex vertexUnderTest = new LogisticVertex(
             mu,
             3.
         );
-        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
+        vertexUnderTest.setAndCascade(DoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
@@ -122,13 +121,13 @@ public class LogisticVertexTest {
         UniformVertex uniformA = new UniformVertex(0.0, 1.0);
         LogisticVertex logistic = new LogisticVertex(uniformA, 1.0);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.0);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(1.0);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(5.0);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(0.0),
-            Nd4jDoubleTensor.scalar(0.9),
+            DoubleTensor.scalar(0.0),
+            DoubleTensor.scalar(0.9),
             0.1,
             uniformA,
             logistic,
@@ -143,13 +142,13 @@ public class LogisticVertexTest {
         UniformVertex uniformA = new UniformVertex(0., 1.);
         LogisticVertex logistic = new LogisticVertex(0.0, uniformA);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(1.0);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.0);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(1.0);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(0.5),
-            Nd4jDoubleTensor.scalar(3.5),
+            DoubleTensor.scalar(0.5),
+            DoubleTensor.scalar(3.5),
             0.1,
             uniformA,
             logistic,

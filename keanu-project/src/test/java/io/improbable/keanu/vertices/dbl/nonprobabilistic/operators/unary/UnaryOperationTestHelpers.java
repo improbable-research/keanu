@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
@@ -33,7 +32,7 @@ public class UnaryOperationTestHelpers {
                                                                                               Function<DoubleVertex, T> op) {
 
         UniformVertex A = new UniformVertex(0.0, 1.0);
-        A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
+        A.setAndCascade(DoubleTensor.scalar(aValue));
         T output = op.apply(A);
 
         DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output);
@@ -59,7 +58,7 @@ public class UnaryOperationTestHelpers {
 
         DoubleTensor result = op.apply(A).getValue();
 
-        DoubleTensor expectedTensor = Nd4jDoubleTensor.create(expected, new long[]{2, 2});
+        DoubleTensor expectedTensor = DoubleTensor.create(expected, new long[]{2, 2});
 
         assertEquals(expectedTensor.getValue(0, 0), result.getValue(0, 0), 1e-5);
         assertEquals(expectedTensor.getValue(0, 1), result.getValue(0, 1), 1e-5);
@@ -74,7 +73,7 @@ public class UnaryOperationTestHelpers {
         long[] matrixShape = new long[]{2, 2};
         long[] expectedShape = TensorShape.concat(matrixShape, matrixShape);
         UniformVertex A = new UniformVertex(matrixShape, 0.0, 1.0);
-        A.setAndCascade(Nd4jDoubleTensor.create(aValues, matrixShape));
+        A.setAndCascade(DoubleTensor.create(aValues, matrixShape));
 
         T output = op.apply(A);
 

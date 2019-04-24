@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>keanu.algorithm.sampling &#8212; keanu 0.0.23 documentation</title>
+    <title>keanu.algorithm.sampling &#8212; keanu 0.0.25 documentation</title>
     <link rel="stylesheet" href="../../../static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
@@ -81,7 +81,7 @@
             
   <h1>Source code for keanu.algorithm.sampling</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">ndenumerate</span><span class="p">,</span> <span class="n">ndarray</span>
 <span class="kn">from</span> <span class="nn">py4j.java_collections</span> <span class="k">import</span> <span class="n">JavaList</span>
@@ -92,7 +92,7 @@
 <span class="kn">from</span> <span class="nn">keanu.net</span> <span class="k">import</span> <span class="n">BayesNet</span><span class="p">,</span> <span class="n">ProbabilisticModel</span><span class="p">,</span> <span class="n">ProbabilisticModelWithGradient</span>
 <span class="kn">from</span> <span class="nn">keanu.plots</span> <span class="k">import</span> <span class="n">traceplot</span>
 <span class="kn">from</span> <span class="nn">keanu.tensor</span> <span class="k">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">keanu.vartypes</span> <span class="k">import</span> <span class="n">sample_types</span><span class="p">,</span> <span class="n">sample_generator_types</span><span class="p">,</span> <span class="n">numpy_types</span><span class="p">,</span> <span class="n">sample_generator_dict_type</span>
+<span class="kn">from</span> <span class="nn">keanu.vartypes</span> <span class="k">import</span> <span class="n">sample_types</span><span class="p">,</span> <span class="n">sample_generator_types</span><span class="p">,</span> <span class="n">numpy_types</span><span class="p">,</span> <span class="n">sample_generator_dict_type</span><span class="p">,</span> <span class="n">tensor_arg_types</span>
 <span class="kn">from</span> <span class="nn">keanu.vertex.base</span> <span class="k">import</span> <span class="n">Vertex</span>
 
 <span class="n">COLUMN_HEADER_FOR_SCALAR</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span>
@@ -125,9 +125,10 @@
 <span class="sd">    :param proposal_distribution: The proposal distribution for Metropolis Hastings. Options are &#39;gaussian&#39; and &#39;prior&#39;.</span>
 <span class="sd">    :param latents: All latent vertices.</span>
 <span class="sd">    :param proposal_listeners: Listeners for proposal creation and rejection. Options are :class:`keanu.algorithm.AcceptanceRateTracker`.</span>
-<span class="sd">    :param proposal_distribution_sigma: Parameter sigma for &#39;gaussian&#39; proposal distribution.</span>
+<span class="sd">    :param proposal_distribution_sigma: Parameter sigma (a single sigma or a list of sigmas for each latent) for &#39;gaussian&#39; proposal distribution</span>
 
 <span class="sd">    :raises TypeError: If you pass `proposal_listener` without specifying `proposal_distribution`.</span>
+<span class="sd">    :raises TypeError: If you choose &#39;gaussian&#39; as `proposal_distribution` but did not specify `latents`.</span>
 <span class="sd">    :raises TypeError: If you choose &#39;gaussian&#39; as `proposal_distribution` but did not specify `proposal_distribution_sigma`.</span>
 <span class="sd">    :raises TypeError: If you choose &#39;prior&#39; as `proposal_distribution` but did not pass latent vertices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -136,7 +137,7 @@
                  <span class="n">proposal_distribution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                  <span class="n">latents</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Vertex</span><span class="p">],</span>
                  <span class="n">proposal_listeners</span><span class="o">=</span><span class="p">[],</span>
-                 <span class="n">proposal_distribution_sigma</span><span class="p">:</span> <span class="n">numpy_types</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+                 <span class="n">proposal_distribution_sigma</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">tensor_arg_types</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">tensor_arg_types</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">proposal_distribution</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">proposal_listeners</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;If you pass in proposal_listeners you must also specify proposal_distribution&quot;</span><span class="p">)</span>
 
@@ -241,6 +242,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">sample_from</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
+    <span class="n">id_to_label</span> <span class="o">=</span> <span class="n">__check_if_vertices_are_labelled</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">sampling_algorithm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">sampling_algorithm</span> <span class="o">=</span> <span class="n">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">proposal_distribution</span><span class="o">=</span><span class="s2">&quot;prior&quot;</span><span class="p">,</span> <span class="n">latents</span><span class="o">=</span><span class="n">sample_from</span><span class="p">)</span>
@@ -254,7 +256,6 @@
     <span class="n">network_samples</span><span class="p">:</span> <span class="n">JavaObject</span> <span class="o">=</span> <span class="n">sampling_algorithm</span><span class="o">.</span><span class="n">get_sampler</span><span class="p">()</span><span class="o">.</span><span class="n">getPosteriorSamples</span><span class="p">(</span>
         <span class="n">probabilistic_model</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(),</span> <span class="n">vertices_unwrapped</span><span class="p">,</span> <span class="n">draws</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span><span class="o">.</span><span class="n">downSample</span><span class="p">(</span><span class="n">down_sample_interval</span><span class="p">)</span>
 
-    <span class="n">id_to_label</span> <span class="o">=</span> <span class="n">__check_if_vertices_are_labelled</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">__all_scalar</span><span class="p">(</span><span class="n">sample_from</span><span class="p">):</span>
         <span class="n">vertex_samples</span> <span class="o">=</span> <span class="n">__create_single_indexed_samples</span><span class="p">(</span><span class="n">network_samples</span><span class="p">,</span> <span class="n">vertices_unwrapped</span><span class="p">,</span> <span class="n">id_to_label</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>

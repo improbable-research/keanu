@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -24,9 +23,9 @@ public class BinaryOperationTestHelpers {
                                                        BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
         UniformVertex A = new UniformVertex(0.0, 1.0);
-        A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
+        A.setAndCascade(DoubleTensor.scalar(aValue));
         UniformVertex B = new UniformVertex(0.0, 1.0);
-        B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
+        B.setAndCascade(DoubleTensor.scalar(bValue));
 
         assertEquals(expected, op.apply(A, B).getValue().scalar(), 1e-5);
     }
@@ -39,9 +38,9 @@ public class BinaryOperationTestHelpers {
                                           BiFunction<DoubleVertex, DoubleVertex, T> op) {
 
         UniformVertex A = new UniformVertex(0.0, 1.0);
-        A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
+        A.setAndCascade(DoubleTensor.scalar(aValue));
         UniformVertex B = new UniformVertex(0.0, 1.0);
-        B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
+        B.setAndCascade(DoubleTensor.scalar(bValue));
         T output = op.apply(A, B);
 
         assertEquals(expectedGradientWrtA, Differentiator.forwardModeAutoDiff(A, output).of(output).scalar(), 1e-5);
@@ -58,13 +57,13 @@ public class BinaryOperationTestHelpers {
                                                           BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
         UniformVertex A = new UniformVertex(new long[]{2, 2}, 0.0, 1.0);
-        A.setAndCascade(Nd4jDoubleTensor.create(aValues, new long[]{2, 2}));
+        A.setAndCascade(DoubleTensor.create(aValues, new long[]{2, 2}));
         UniformVertex B = new UniformVertex(new long[]{2, 2}, 0.0, 1.0);
-        B.setAndCascade(Nd4jDoubleTensor.create(bValues, new long[]{2, 2}));
+        B.setAndCascade(DoubleTensor.create(bValues, new long[]{2, 2}));
 
         DoubleTensor result = op.apply(A, B).getValue();
 
-        DoubleTensor expectedTensor = Nd4jDoubleTensor.create(expected, new long[]{2, 2});
+        DoubleTensor expectedTensor = DoubleTensor.create(expected, new long[]{2, 2});
 
         assertEquals(expectedTensor.getValue(0, 0), result.getValue(0, 0), 1e-5);
         assertEquals(expectedTensor.getValue(0, 1), result.getValue(0, 1), 1e-5);

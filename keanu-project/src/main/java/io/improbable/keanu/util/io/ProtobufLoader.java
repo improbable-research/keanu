@@ -13,6 +13,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -196,8 +197,9 @@ public class ProtobufLoader implements NetworkLoader {
         Map<String, Object> parameterMap = getParameterMap(vertex, existingVertices);
         Vertex newVertex = instantiateVertex(vertexClass, parameterMap, vertex);
 
-        if (!vertex.getLabel().isEmpty()) {
-            newVertex.setLabel(vertex.getLabel());
+        if (!vertex.getLabel().isEmpty() && !(newVertex instanceof ProxyVertex)) {
+            VertexLabel newLabel = VertexLabel.parseLabel(vertex.getLabel());
+            newVertex.setLabel(newLabel);
         }
 
         return newVertex;
@@ -211,10 +213,16 @@ public class ProtobufLoader implements NetworkLoader {
         Object[] arguments = new Object[constructorParameters.length];
 
         for (int i = 0; i < constructorParameters.length; i++) {
-            arguments[i] = getParameter(constructorParameters[i], paramMap, vertex);
+            Object parameter = getParameter(constructorParameters[i], paramMap, vertex);
+            arguments[i] = parameter;
 
-            Class argumentClass = arguments[i].getClass();
+            Class argumentClass;
             Class parameterClass = Primitives.wrap(constructorParameters[i].getType());
+            if (parameter != null) {
+                argumentClass = arguments[i].getClass();
+            } else {
+                argumentClass = parameterClass;
+            }
 
             if (!parameterClass.isAssignableFrom(argumentClass)) {
                 throw new IllegalArgumentException("Incorrect Parameter Type specified.  Got: "
@@ -236,12 +244,12 @@ public class ProtobufLoader implements NetworkLoader {
 
         if ((paramAnnotation = methodParameter.getAnnotation(LoadVertexParam.class)) != null) {
             Object parameter = paramMap.get(paramAnnotation.value());
-            if (parameter == null) {
-                throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
+            if (parameter == null && !paramAnnotation.isNullable()) {
+                throw new IllegalArgumentException("Failed to create vertex due to missing parameter: "
                     + paramAnnotation.value());
-            } else {
-                return parameter;
             }
+
+            return parameter;
         } else if (methodParameter.getAnnotation(LoadShape.class) != null) {
             if (vertex.getShapeCount() == 0) {
                 return Tensor.SCALAR_SHAPE;

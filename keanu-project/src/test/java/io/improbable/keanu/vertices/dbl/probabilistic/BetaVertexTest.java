@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -149,12 +148,12 @@ public class BetaVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex alpha = new UniformVertex(0.0, 1.0);
-        alpha.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
+        alpha.setAndCascade(DoubleTensor.scalar(0.5));
         BetaVertex vertexUnderTest = new BetaVertex(
             alpha,
             3.0
         );
-        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
+        vertexUnderTest.setAndCascade(DoubleTensor.scalar(0.5));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
@@ -164,13 +163,13 @@ public class BetaVertexTest {
         UniformVertex uniformA = new UniformVertex(1.5, 3.0);
         BetaVertex beta = new BetaVertex(uniformA, 3.0);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.9);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.1);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(0.9);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.6),
-            Nd4jDoubleTensor.scalar(2.9),
+            DoubleTensor.scalar(1.6),
+            DoubleTensor.scalar(2.9),
             0.1,
             uniformA,
             beta,
@@ -185,13 +184,13 @@ public class BetaVertexTest {
         UniformVertex uniformA = new UniformVertex(1.5, 3.0);
         BetaVertex beta = new BetaVertex(3.0, uniformA);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.1);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(0.5);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(3.0),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(3.0),
             0.1,
             uniformA,
             beta,

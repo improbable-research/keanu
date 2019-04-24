@@ -44,4 +44,14 @@ public class Nd4jTensorTestHelpers {
         assertEquals(expected, left);
     }
 
+    public static void assertPowOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        DoubleTensor actual = left.pow(right);
+        assertEquals(expected, actual);
+    }
+
+    public static void assertPowInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        left = left.powInPlace(right);
+        assertEquals(expected, left);
+    }
+
 }

@@ -2,6 +2,7 @@ package io.improbable.keanu;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.random.MersenneTwister;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,5 +54,11 @@ public class KeanuRandomTest {
         KeanuRandom keanuRandom = new KeanuRandom(1);
         assertEquals(keanuRandom.nextDouble(), new MersenneTwister(1L).nextDouble());
         assertEquals(keanuRandom.nextDouble(), 0.41782887182714457, 1e-16);
+    }
+
+    @Test
+    public void canGetStandardDeviationOfGaussian() {
+        DoubleTensor A = random.nextGaussian(new long[]{1000}).times(5.0);
+        Assert.assertEquals(5.0, A.standardDeviation(), 0.1);
     }
 }

@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -121,12 +120,12 @@ public class InverseGammaVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex a = new UniformVertex(0.0, 1.0);
-        a.setAndCascade(Nd4jDoubleTensor.scalar(2.5));
+        a.setAndCascade(DoubleTensor.scalar(2.5));
         InverseGammaVertex vertexUnderTest = new InverseGammaVertex(
             a,
             3.0
         );
-        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
+        vertexUnderTest.setAndCascade(DoubleTensor.scalar(0.5));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
@@ -136,13 +135,13 @@ public class InverseGammaVertexTest {
         UniformVertex uniformA = new UniformVertex(1.0, 3.0);
         InverseGammaVertex inverseGamma = new InverseGammaVertex(uniformA, 3.0);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.9);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.1);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(0.9);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.5),
-            Nd4jDoubleTensor.scalar(2.5),
+            DoubleTensor.scalar(1.5),
+            DoubleTensor.scalar(2.5),
             0.1,
             uniformA,
             inverseGamma,
@@ -157,13 +156,13 @@ public class InverseGammaVertexTest {
         UniformVertex uniformA = new UniformVertex(1.0, 3.0);
         InverseGammaVertex inverseGamma = new InverseGammaVertex(3.0, uniformA);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.9);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.1);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(0.9);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.5),
-            Nd4jDoubleTensor.scalar(3.0),
+            DoubleTensor.scalar(1.5),
+            DoubleTensor.scalar(3.0),
             0.1,
             uniformA,
             inverseGamma,
@@ -203,9 +202,9 @@ public class InverseGammaVertexTest {
 
         List<DoubleVertex> latentAB = new ArrayList<>();
         UniformVertex latentA = new UniformVertex(0.01, 10.0);
-        latentA.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
+        latentA.setAndCascade(DoubleTensor.scalar(9.9));
         UniformVertex latentB = new UniformVertex(0.01, 10.0);
-        latentB.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
+        latentB.setAndCascade(DoubleTensor.scalar(0.1));
         latentAB.add(latentA);
         latentAB.add(latentB);
 

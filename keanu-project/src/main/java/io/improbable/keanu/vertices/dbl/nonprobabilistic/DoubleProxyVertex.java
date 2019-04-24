@@ -23,6 +23,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 public class DoubleProxyVertex extends DoubleVertex implements Differentiable, ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
 
     private static final String LABEL_PARAM_NAME = "label";
+    private static final String PARENT_NAME = "parent";
 
     /**
      * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
@@ -34,13 +35,30 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
         this(Tensor.SCALAR_SHAPE, label);
     }
 
+    @ExportVertexToPythonBindings
     public DoubleProxyVertex(long[] shape, VertexLabel label) {
         super(shape);
-        this.setLabel(label);
+        setLabel(label);
     }
 
-    @ExportVertexToPythonBindings
-    public DoubleProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_PARAM_NAME) String label) {
+    public DoubleProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_PARAM_NAME) String labelString, @LoadVertexParam(value = PARENT_NAME, isNullable = true) DoubleVertex parent) {
+        super(shape);
+        VertexLabel vertexLabel = VertexLabel.parseLabel(labelString);
+        setLabel(vertexLabel);
+        if (parent != null) {
+            setParent(parent);
+        }
+    }
+
+    @Override
+    public <V extends Vertex<DoubleTensor>> V setLabel(VertexLabel label) {
+        if (this.getLabel() != null && !this.getLabel().getUnqualifiedName().equals(label.getUnqualifiedName())) {
+            throw new RuntimeException("You should not change the label on a Proxy Vertex");
+        }
+        return super.setLabel(label);
+    }
+
+    public DoubleProxyVertex(long[] shape, String label) {
         this(shape, new VertexLabel(label));
     }
 
@@ -55,6 +73,7 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
         setParents(newParent);
     }
 
+    @SaveVertexParam(value = PARENT_NAME, isNullable = true)
     public DoubleVertex getParent() {
         return (DoubleVertex) Iterables.getOnlyElement(getParents(), null);
     }

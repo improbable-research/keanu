@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -121,6 +122,8 @@ class JavaVertexToPythonConverter {
             return "Collection[int]";
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "Collection[Vertex]";
+        } else if (VertexLabel.class.isAssignableFrom(parameterType)) {
+            return "str";
         } else {
             throw new NotImplementedException(String.format("Mapping from Java type %s is not defined.", parameterType.getName()));
         }
@@ -171,6 +174,8 @@ class JavaVertexToPythonConverter {
             return "cast_to_int_array(" + pythonParameter + ")";
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex_array(" + pythonParameter + ")";
+        } else if (VertexLabel.class.isAssignableFrom(parameterType)) {
+            return "_VertexLabel(" + pythonParameter + ")";
         } else {
             throw new IllegalArgumentException("Failed to Encode " + pythonParameter + " of type: " + parameterType);
         }

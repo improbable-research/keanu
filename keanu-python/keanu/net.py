@@ -1,9 +1,10 @@
 from py4j.java_gateway import java_import
+
 from .base import JavaObjectWrapper
 from .context import KeanuContext
 from .vertex.base import Vertex
 from .keanu_random import KeanuRandom
-from typing import Any, Iterator, Iterable, Optional
+from typing import Any, Iterator, Iterable, Optional, Union
 from .vertex.label import _VertexLabel
 
 k = KeanuContext()
@@ -17,7 +18,6 @@ class BayesNet(JavaObjectWrapper):
 
     def __init__(self, vertices: Iterable[Any]) -> None:
         java_vertices = k.to_java_object_list(vertices)
-
         super(BayesNet, self).__init__(k.jvm_view().BayesianNetwork(java_vertices))
 
     def iter_latent_or_observed_vertices(self) -> Iterator[Vertex]:

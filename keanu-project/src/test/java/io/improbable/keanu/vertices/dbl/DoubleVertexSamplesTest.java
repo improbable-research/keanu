@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 
 public class DoubleVertexSamplesTest {
+
     List<DoubleTensor> values = ImmutableList.of(
         DoubleTensor.create(new double[]{0, 16, 4}, 1, 3),
         DoubleTensor.create(new double[]{-4, -8, 4}, 1, 3),
@@ -34,7 +35,7 @@ public class DoubleVertexSamplesTest {
     public void calculateSummaryStatistics() {
         for (DoubleTensor tensor : values) {
             for (int i = 0; i < tensor.getLength(); i++) {
-                stats.get(i).addValue(tensor.getValue(i));
+                stats.get(i).addValue(tensor.getValue(0, i));
             }
         }
     }

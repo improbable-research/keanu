@@ -12,8 +12,10 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class MatrixInverseVertexTest {
 
@@ -51,7 +53,7 @@ public class MatrixInverseVertexTest {
 
         DoubleTensor expected = DoubleTensor.create(new double[]{-2, 1, 1.5, -0.5}, 2, 2);
 
-        assertEquals(expected, inverseVertex.getValue());
+        assertThat(expected, valuesWithinEpsilonAndShapesMatch(inverseVertex.getValue(), 1e-10));
     }
 
     @Test
@@ -77,8 +79,8 @@ public class MatrixInverseVertexTest {
             new long[]{2, 2, 2, 2}
         );
 
-        assertEquals(expectedInverseWrtMatrix, inverseWrtMatrix);
-        assertEquals(expectedInverseWrtMatrix, reverseInverseWrtMatrix);
+        assertThat(expectedInverseWrtMatrix, valuesWithinEpsilonAndShapesMatch(inverseWrtMatrix, 1e-10));
+        assertThat(expectedInverseWrtMatrix, valuesWithinEpsilonAndShapesMatch(reverseInverseWrtMatrix, 1e-10));
     }
 
     @Test
@@ -91,7 +93,7 @@ public class MatrixInverseVertexTest {
             inputVertex.setValue(inputVertex.sample());
             DoubleTensor result = multiplied.eval();
 
-            assertEquals(result, DoubleTensor.eye(4));
+            assertThat(DoubleTensor.eye(4), valuesWithinEpsilonAndShapesMatch(result, 1e-10));
 
             DoubleTensor changeInMultipliedWrtInput = Differentiator.forwardModeAutoDiff(inputVertex, multiplied).of(multiplied);
             DoubleTensor reverseOutputWrtInput = Differentiator.reverseModeAutoDiff(multiplied, inputVertex).withRespectTo(inputVertex);

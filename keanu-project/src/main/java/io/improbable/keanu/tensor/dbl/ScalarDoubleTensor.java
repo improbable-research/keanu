@@ -20,7 +20,7 @@ import static io.improbable.keanu.tensor.TensorShape.calculateShapeForLengthOneB
 import static io.improbable.keanu.tensor.TensorShapeValidation.getTensorMultiplyResultShape;
 import static org.apache.commons.lang3.ArrayUtils.removeAll;
 
-public class ScalarDoubleTensor implements DoubleTensor {
+public class ScalarDoubleTensor extends DoubleTensor {
 
     private Double value;
     private long[] shape;
@@ -49,13 +49,13 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public long getLength() {
-        return isShapePlaceholder() ? 0L : 1L;
+    public long[] getStride() {
+        return new long[shape.length];
     }
 
     @Override
-    public boolean isShapePlaceholder() {
-        return value == null;
+    public long getLength() {
+        return 1;
     }
 
     @Override
@@ -585,7 +585,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             value = Math.atan2(y.scalar(), value);
             shape = calculateShapeForLengthOneBroadcast(shape, y.getShape());
         } else {
-            return Nd4jDoubleTensor.create(value, y.getShape()).atan2InPlace(y);
+            return DoubleTensor.create(value, y.getShape()).atan2InPlace(y);
         }
         return this;
     }

@@ -569,13 +569,13 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public long getLength() {
-        return tensor.lengthLong();
+    public long[] getStride() {
+        return tensor.stride();
     }
 
     @Override
-    public boolean isShapePlaceholder() {
-        return tensor == null;
+    public long getLength() {
+        return tensor.lengthLong();
     }
 
     @Override

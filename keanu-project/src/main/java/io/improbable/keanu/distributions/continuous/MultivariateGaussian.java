@@ -27,10 +27,11 @@ public class MultivariateGaussian implements ContinuousDistribution {
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
         TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, mu.getShape());
         final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
-        final DoubleTensor variateSamples = random.nextGaussian(mu.getShape());
+        final DoubleTensor variateSamples = random.nextGaussian(mu.getShape())
+            .reshape(mu.getLength(), 1);
         final DoubleTensor covTimesVariates = isUnivariate() ?
             choleskyCov.times(variateSamples) : choleskyCov.matrixMultiply(variateSamples);
-        return covTimesVariates.plus(mu);
+        return covTimesVariates.reshape(mu.getShape()).plus(mu);
     }
 
     @Override

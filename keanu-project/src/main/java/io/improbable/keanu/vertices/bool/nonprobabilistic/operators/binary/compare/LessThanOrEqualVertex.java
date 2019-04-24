@@ -18,5 +18,4 @@ public class LessThanOrEqualVertex<A extends NumberTensor, B extends NumberTenso
     protected BooleanTensor op(A l, B r) {
         return l.lessThanOrEqual(r);
     }
-
 }

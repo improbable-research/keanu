@@ -23,6 +23,7 @@ public class SequenceBuilder<T> {
     private static final String PROXY_LABEL_MARKER = "proxy_for";
     private VertexDictionary initialState;
     private Map<VertexLabel, VertexLabel> transitionMapping = Collections.emptyMap();
+    private String sequenceName;
 
     private interface ItemCount {
         int getCount();
@@ -42,13 +43,17 @@ public class SequenceBuilder<T> {
         Sequence build();
     }
 
-    public static VertexLabel proxyFor(VertexLabel label) {
+    public static VertexLabel proxyLabelFor(VertexLabel label) {
         return label.withExtraNamespace(PROXY_LABEL_MARKER);
     }
 
-
     public SequenceBuilder<T> withInitialState(Vertex<?> vertex) {
         return withInitialState(VertexDictionary.of(vertex));
+    }
+
+    public SequenceBuilder<T> named(String sequenceName) {
+        this.sequenceName = sequenceName;
+        return this;
     }
 
     public SequenceBuilder<T> withInitialState(VertexLabel label, Vertex<?> vertex) {
@@ -193,15 +198,18 @@ public class SequenceBuilder<T> {
         }
 
         public Sequence build() throws SequenceConstructionException {
-            Sequence sequence = new Sequence(this.size);
+            int uniqueSequenceIdentifier = this.factories.hashCode();
+            Sequence sequence = new Sequence(this.size, uniqueSequenceIdentifier, sequenceName);
             Iterator<T> iter = data.getIterator();
             VertexDictionary previousVertices = initialState;
+            int i = 0;
             while (iter.hasNext()) {
-                SequenceItem item = new SequenceItem();
+                SequenceItem item = new SequenceItem(i, uniqueSequenceIdentifier, sequenceName);
                 factories.forEach(factory -> factory.accept(item, iter.next()));
                 connectTransitionVariables(previousVertices, item, transitionMapping);
                 sequence.add(item);
                 previousVertices = item;
+                i++;
             }
             return sequence;
         }
@@ -211,7 +219,7 @@ public class SequenceBuilder<T> {
         Collection<Vertex<?>> proxyVertices = item.getProxyVertices();
 
         for (Vertex<?> proxy : proxyVertices) {
-            VertexLabel proxyLabel = proxy.getLabel().withoutOuterNamespace();
+            VertexLabel proxyLabel = getUnscopedLabel(proxy.getLabel(), this.sequenceName != null);
             VertexLabel defaultParentLabel = getDefaultParentLabel(proxyLabel);
             VertexLabel parentLabel = transitionMapping.getOrDefault(proxyLabel, defaultParentLabel);
 
@@ -231,6 +239,10 @@ public class SequenceBuilder<T> {
         }
     }
 
+    /**
+     * @param proxyLabel The label to remove the proxy_for namespace from
+     * @return This method will remove the outer namespace from a proxy namespace or return null if not possible
+     */
     private VertexLabel getDefaultParentLabel(VertexLabel proxyLabel) {
         String outerNamespace = proxyLabel.getOuterNamespace().orElse(null);
         if (PROXY_LABEL_MARKER.equals(outerNamespace)) {
@@ -238,6 +250,23 @@ public class SequenceBuilder<T> {
         } else {
             return null;
         }
+    }
+
+    /**
+     * This function is best described by how it operates on labels passed to it:
+     *  1. `Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` becomes `proxy_for.LABEL`
+     *  2. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` becomes  `proxy_for.LABEL`
+     *  3. `Sequence_Item_INDEX.HASHCODE.LABEL` becomes `LABEL`
+     *  4. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.LABEL` becomes  `LABEL`
+     * @param proxyLabel Label to be unscoped
+     * @param hasSequenceName Whether the sequence has a name
+     * @return unscoped label
+     */
+    public static VertexLabel getUnscopedLabel(VertexLabel proxyLabel, boolean hasSequenceName) {
+        if (hasSequenceName) {
+            proxyLabel = proxyLabel.withoutOuterNamespace();
+        }
+        return proxyLabel.withoutOuterNamespace().withoutOuterNamespace();
     }
 
     /**
@@ -254,10 +283,11 @@ public class SequenceBuilder<T> {
 
 
         public Sequence build() throws SequenceConstructionException {
-            Sequence sequence = new Sequence(count.getCount());
+            int uniqueSequenceIdentifier = this.factories.hashCode();
+            Sequence sequence = new Sequence(count.getCount(), uniqueSequenceIdentifier, sequenceName);
             VertexDictionary previousItem = initialState;
             for (int i = 0; i < count.getCount(); i++) {
-                SequenceItem item = new SequenceItem();
+                SequenceItem item = new SequenceItem(i, uniqueSequenceIdentifier, sequenceName);
                 factories.forEach(factory -> factory.accept(item));
                 connectTransitionVariables(previousItem, item, transitionMapping);
                 sequence.add(item);

@@ -30,7 +30,7 @@ public class Bernoulli implements Distribution<BooleanTensor> {
 
     @Override
     public DoubleTensor logProb(BooleanTensor x) {
-        DoubleTensor probTrueClamped = probTrue.clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
+        DoubleTensor probTrueClamped = probTrue.clamp(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));
 
         DoubleTensor probability = x.doubleWhere(
             probTrueClamped,
@@ -54,10 +54,10 @@ public class Bernoulli implements Distribution<BooleanTensor> {
 
     public DoubleTensor dLogProb(BooleanTensor x) {
         DoubleTensor greaterThanMask = probTrue
-            .getGreaterThanMask(DoubleTensor.ONE_SCALAR);
+            .getGreaterThanMask(DoubleTensor.scalar(1.0));
 
         DoubleTensor lessThanOrEqualToMask = probTrue
-            .getLessThanOrEqualToMask(DoubleTensor.ZERO_SCALAR);
+            .getLessThanOrEqualToMask(DoubleTensor.scalar(0.0));
 
         DoubleTensor greaterThanOneOrLessThanZero = greaterThanMask.plusInPlace(lessThanOrEqualToMask);
 

@@ -132,12 +132,7 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
     }
 
     public boolean hasValue() {
-        T value = state.getValue();
-        if (value instanceof Tensor) {
-            return !((Tensor) value).isShapePlaceholder();
-        } else {
-            return value != null;
-        }
+        return state.getValue() != null;
     }
 
     @Override

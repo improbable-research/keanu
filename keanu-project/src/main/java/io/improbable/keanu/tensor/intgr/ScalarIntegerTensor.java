@@ -43,13 +43,13 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public long getLength() {
-        return isShapePlaceholder() ? 0L : 1L;
+    public long[] getStride() {
+        return new long[shape.length];
     }
 
     @Override
-    public boolean isShapePlaceholder() {
-        return value == null;
+    public long getLength() {
+        return 1;
     }
 
     @Override

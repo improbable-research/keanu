@@ -5,8 +5,6 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,62 +13,60 @@ import java.util.List;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 
-public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
+public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
-    DoubleTensor MINUS_ONE_SCALAR = scalar(-1.0);
+    private static DoubleTensorFactory factory = new JVMDoubleTensorFactory();
 
-    DoubleTensor ZERO_SCALAR = scalar(0.0);
+    public static void setFactory(DoubleTensorFactory factory) {
+        DoubleTensor.factory = factory;
+    }
 
-    DoubleTensor ONE_SCALAR = scalar(1.0);
-
-    DoubleTensor TWO_SCALAR = scalar(2.0);
-
-    static DoubleTensor create(double value, long[] shape) {
+    public static DoubleTensor create(double value, long[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(value);
         } else {
-            return Nd4jDoubleTensor.create(value, shape);
+            return factory.create(value, shape);
         }
     }
 
-    static DoubleTensor create(double[] values, long... shape) {
+    public static DoubleTensor create(double[] values, long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
             return new ScalarDoubleTensor(values[0]);
         } else {
-            return Nd4jDoubleTensor.create(values, shape);
+            return factory.create(values, shape);
         }
     }
 
-    static DoubleTensor create(double... values) {
+    public static DoubleTensor create(double... values) {
         return create(values, values.length);
     }
 
-    static DoubleTensor ones(long... shape) {
+    public static DoubleTensor ones(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(1.0);
         } else {
-            return Nd4jDoubleTensor.ones(shape);
+            return factory.ones(shape);
         }
     }
 
-    static DoubleTensor eye(long n) {
+    public static DoubleTensor eye(long n) {
         if (n == 1) {
             return new ScalarDoubleTensor(1.0);
         } else {
-            return Nd4jDoubleTensor.eye(n);
+            return factory.eye(n);
         }
     }
 
-    static DoubleTensor zeros(long... shape) {
+    public static DoubleTensor zeros(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(0.0);
         } else {
-            return Nd4jDoubleTensor.zeros(shape);
+            return factory.zeros(shape);
         }
     }
 
-    static DoubleTensor linspace(double start, double end, int numberOfPoints) {
-        return Nd4jDoubleTensor.linspace(start, end, numberOfPoints);
+    public static DoubleTensor linspace(double start, double end, int numberOfPoints) {
+        return factory.linspace(start, end, numberOfPoints);
     }
 
     /**
@@ -78,8 +74,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
      * @param end   end of range (exclusive)
      * @return a vector of numbers from start incrementing by one to end (exclusively)
      */
-    static DoubleTensor arange(double start, double end) {
-        return Nd4jDoubleTensor.arange(start, end);
+    public static DoubleTensor arange(double start, double end) {
+        return factory.arange(start, end);
     }
 
     /**
@@ -88,15 +84,15 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
      * @param stepSize size of step from start to end
      * @return a vector of numbers starting at start and stepping to end (exclusively)
      */
-    static DoubleTensor arange(double start, double end, double stepSize) {
-        return Nd4jDoubleTensor.arange(start, end, stepSize);
+    public static DoubleTensor arange(double start, double end, double stepSize) {
+        return factory.arange(start, end, stepSize);
     }
 
-    static DoubleTensor scalar(double scalarValue) {
+    public static DoubleTensor scalar(double scalarValue) {
         return new ScalarDoubleTensor(scalarValue);
     }
 
-    static DoubleTensor vector(double... values) {
+    public static DoubleTensor vector(double... values) {
         return DoubleTensor.create(values, values.length);
     }
 
@@ -115,7 +111,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
      * <p>
      * DoubleTensor.stack(-1, A, B, C) gives DoubleTensor.ones(4, 2, 3)
      */
-    static DoubleTensor stack(int dimension, DoubleTensor... toStack) {
+    public static DoubleTensor stack(int dimension, DoubleTensor... toStack) {
         long[] shape = toStack[0].getShape();
         int stackedRank = toStack[0].getRank() + 1;
         int absoluteDimension = getAbsoluteDimension(dimension, stackedRank);
@@ -129,7 +125,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return concat(absoluteDimension, reshaped);
     }
 
-    static DoubleTensor concat(DoubleTensor... toConcat) {
+    public static DoubleTensor concat(DoubleTensor... toConcat) {
         return concat(0, toConcat);
     }
 
@@ -142,140 +138,137 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
      * <p>
      * DoubleTensor.concat(0, A, B, C) gives DoubleTensor.ones(12, 2)
      */
-    static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
-        INDArray[] concatAsINDArray = new INDArray[toConcat.length];
-        for (int i = 0; i < toConcat.length; i++) {
-            concatAsINDArray[i] = Nd4jDoubleTensor.unsafeGetNd4J(toConcat[i]).dup();
-            if (concatAsINDArray[i].shape().length == 0) {
-                concatAsINDArray[i] = concatAsINDArray[i].reshape(1);
-            }
-        }
-        INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
-        return new Nd4jDoubleTensor(concat);
+    public static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
+        return factory.concat(dimension, toConcat);
     }
 
-    static DoubleTensor min(DoubleTensor a, DoubleTensor b) {
+    public static DoubleTensor min(DoubleTensor a, DoubleTensor b) {
         return a.duplicate().minInPlace(b);
     }
 
-    static DoubleTensor max(DoubleTensor a, DoubleTensor b) {
+    public static DoubleTensor max(DoubleTensor a, DoubleTensor b) {
         return a.duplicate().maxInPlace(b);
     }
 
     @Override
-    DoubleTensor setValue(Double value, long... index);
+    public abstract DoubleTensor setValue(Double value, long... index);
 
     @Override
-    DoubleTensor reshape(long... newShape);
+    public abstract DoubleTensor reshape(long... newShape);
 
-    DoubleTensor permute(int... rearrange);
+    public abstract DoubleTensor permute(int... rearrange);
 
     @Override
-    DoubleTensor duplicate();
+    public abstract DoubleTensor duplicate();
 
-    DoubleTensor diag();
+    public abstract DoubleTensor diag();
 
-    DoubleTensor transpose();
+    public abstract DoubleTensor transpose();
 
-    DoubleTensor sum(int... overDimensions);
+    public abstract DoubleTensor sum(int... overDimensions);
 
     //New tensor Ops and transforms
 
-    DoubleTensor reciprocal();
+    public abstract DoubleTensor reciprocal();
 
-    DoubleTensor minus(double value);
+    public abstract DoubleTensor minus(double value);
 
-    default DoubleTensor reverseMinus(double value) {
+    public DoubleTensor reverseMinus(double value) {
         return DoubleTensor.scalar(value).minus(this);
     }
 
-    DoubleTensor plus(double value);
+    public abstract DoubleTensor plus(double value);
 
-    DoubleTensor times(double value);
+    public abstract DoubleTensor times(double value);
 
-    DoubleTensor div(double value);
+    public abstract DoubleTensor div(double value);
 
-    default DoubleTensor reverseDiv(double value) {
+    public DoubleTensor reverseDiv(double value) {
         return DoubleTensor.scalar(value).div(this);
     }
 
-    DoubleTensor matrixMultiply(DoubleTensor value);
+    public abstract DoubleTensor matrixMultiply(DoubleTensor value);
 
-    DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight);
+    public abstract DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight);
 
-    DoubleTensor pow(DoubleTensor exponent);
+    public abstract DoubleTensor pow(DoubleTensor exponent);
 
-    DoubleTensor pow(double exponent);
+    public abstract DoubleTensor pow(double exponent);
 
-    DoubleTensor sqrt();
+    public abstract DoubleTensor sqrt();
 
-    DoubleTensor log();
+    public abstract DoubleTensor log();
 
-    DoubleTensor safeLogTimes(DoubleTensor y);
+    public abstract DoubleTensor safeLogTimes(DoubleTensor y);
 
-    DoubleTensor logGamma();
+    public abstract DoubleTensor logGamma();
 
-    DoubleTensor digamma();
+    public abstract DoubleTensor digamma();
 
-    DoubleTensor sin();
+    public abstract DoubleTensor sin();
 
-    DoubleTensor cos();
+    public abstract DoubleTensor cos();
 
-    DoubleTensor tan();
+    public abstract DoubleTensor tan();
 
-    DoubleTensor atan();
+    public abstract DoubleTensor atan();
 
-    DoubleTensor atan2(double y);
+    public abstract DoubleTensor atan2(double y);
 
-    DoubleTensor atan2(DoubleTensor y);
+    public abstract DoubleTensor atan2(DoubleTensor y);
 
-    DoubleTensor asin();
+    public abstract DoubleTensor asin();
 
-    DoubleTensor acos();
+    public abstract DoubleTensor acos();
 
-    DoubleTensor exp();
+    public abstract DoubleTensor exp();
 
-    DoubleTensor matrixInverse();
+    public abstract DoubleTensor matrixInverse();
 
-    double max();
+    public abstract double max();
 
-    double min();
+    public abstract double min();
 
-    double average();
+    public abstract double average();
 
-    double standardDeviation();
+    public abstract double standardDeviation();
 
-    boolean equalsWithinEpsilon(DoubleTensor other, double epsilon);
+    public abstract boolean equalsWithinEpsilon(DoubleTensor other, double epsilon);
 
-    DoubleTensor standardize();
+    public abstract DoubleTensor standardize();
 
-    DoubleTensor replaceNaN(double value);
+    public abstract DoubleTensor replaceNaN(double value);
 
-    DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
+    public abstract DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
 
-    DoubleTensor ceil();
+    public abstract DoubleTensor ceil();
 
-    DoubleTensor floor();
+    public abstract DoubleTensor floor();
 
-    DoubleTensor round();
+    /**
+     * @return The tensor with the elements rounded half up
+     * e.g. 1.5 is 2
+     * e.g. -2.5 is -3
+     */
+    public abstract DoubleTensor round();
 
-    DoubleTensor sigmoid();
+    public abstract DoubleTensor sigmoid();
 
-    DoubleTensor choleskyDecomposition();
+    public abstract DoubleTensor choleskyDecomposition();
 
-    double determinant();
+    public abstract double determinant();
 
-    double product();
+    public abstract double product();
 
     @Override
-    DoubleTensor slice(int dimension, long index);
+    public abstract DoubleTensor slice(int dimension, long index);
 
     @Override
-    DoubleTensor take(long... index);
+    public abstract DoubleTensor take(long... index);
 
-    List<DoubleTensor> split(int dimension, long... splitAtIndices);
+    public abstract List<DoubleTensor> split(int dimension, long... splitAtIndices);
 
-    default List<DoubleTensor> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {
+    public List<DoubleTensor> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {
         List<DoubleTensor> slicedTensors = new ArrayList<>();
 
         for (long i = indexStart; i < indexEnd; i++) {
@@ -287,78 +280,78 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
-    DoubleTensor reciprocalInPlace();
+    public abstract DoubleTensor reciprocalInPlace();
 
-    DoubleTensor minusInPlace(double value);
+    public abstract DoubleTensor minusInPlace(double value);
 
-    DoubleTensor plusInPlace(double value);
+    public abstract DoubleTensor plusInPlace(double value);
 
-    DoubleTensor timesInPlace(double value);
+    public abstract DoubleTensor timesInPlace(double value);
 
-    DoubleTensor divInPlace(double value);
+    public abstract DoubleTensor divInPlace(double value);
 
-    DoubleTensor powInPlace(double exponent);
+    public abstract DoubleTensor powInPlace(double exponent);
 
-    DoubleTensor sqrtInPlace();
+    public abstract DoubleTensor sqrtInPlace();
 
-    DoubleTensor logInPlace();
+    public abstract DoubleTensor logInPlace();
 
-    DoubleTensor safeLogTimesInPlace(DoubleTensor y);
+    public abstract DoubleTensor safeLogTimesInPlace(DoubleTensor y);
 
-    DoubleTensor logGammaInPlace();
+    public abstract DoubleTensor logGammaInPlace();
 
-    DoubleTensor digammaInPlace();
+    public abstract DoubleTensor digammaInPlace();
 
-    DoubleTensor sinInPlace();
+    public abstract DoubleTensor sinInPlace();
 
-    DoubleTensor cosInPlace();
+    public abstract DoubleTensor cosInPlace();
 
-    DoubleTensor tanInPlace();
+    public abstract DoubleTensor tanInPlace();
 
-    DoubleTensor atanInPlace();
+    public abstract DoubleTensor atanInPlace();
 
-    DoubleTensor atan2InPlace(double y);
+    public abstract DoubleTensor atan2InPlace(double y);
 
-    DoubleTensor atan2InPlace(DoubleTensor y);
+    public abstract DoubleTensor atan2InPlace(DoubleTensor y);
 
-    DoubleTensor asinInPlace();
+    public abstract DoubleTensor asinInPlace();
 
-    DoubleTensor acosInPlace();
+    public abstract DoubleTensor acosInPlace();
 
-    DoubleTensor expInPlace();
+    public abstract DoubleTensor expInPlace();
 
-    DoubleTensor minInPlace(DoubleTensor min);
+    public abstract DoubleTensor minInPlace(DoubleTensor min);
 
-    DoubleTensor maxInPlace(DoubleTensor max);
+    public abstract DoubleTensor maxInPlace(DoubleTensor max);
 
-    DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
+    public abstract DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
 
-    DoubleTensor ceilInPlace();
+    public abstract DoubleTensor ceilInPlace();
 
-    DoubleTensor floorInPlace();
+    public abstract DoubleTensor floorInPlace();
 
-    DoubleTensor roundInPlace();
+    public abstract DoubleTensor roundInPlace();
 
-    DoubleTensor sigmoidInPlace();
+    public abstract DoubleTensor sigmoidInPlace();
 
-    DoubleTensor standardizeInPlace();
+    public abstract DoubleTensor standardizeInPlace();
 
-    DoubleTensor replaceNaNInPlace(double value);
+    public abstract DoubleTensor replaceNaNInPlace(double value);
 
-    DoubleTensor setAllInPlace(double value);
+    public abstract DoubleTensor setAllInPlace(double value);
 
     // Comparisons
-    BooleanTensor lessThan(double value);
+    public abstract BooleanTensor lessThan(double value);
 
-    BooleanTensor lessThanOrEqual(double value);
+    public abstract BooleanTensor lessThanOrEqual(double value);
 
-    BooleanTensor greaterThan(double value);
+    public abstract BooleanTensor greaterThan(double value);
 
-    BooleanTensor greaterThanOrEqual(double value);
+    public abstract BooleanTensor greaterThanOrEqual(double value);
 
-    BooleanTensor notNaN();
+    public abstract BooleanTensor notNaN();
 
-    default BooleanTensor isNaN() {
+    public BooleanTensor isNaN() {
         return notNaN().not();
     }
 
