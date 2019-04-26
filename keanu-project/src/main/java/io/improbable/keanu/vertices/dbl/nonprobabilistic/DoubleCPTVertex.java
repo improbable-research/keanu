@@ -16,11 +16,11 @@ import java.util.Map;
 
 public class DoubleCPTVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
-    private final List<Vertex<? extends Tensor<Boolean>>> inputs;
+    private final List<Vertex<? extends Tensor<?>>> inputs;
     private final Map<CPTCondition, DoubleVertex> conditions;
     private final DoubleVertex defaultResult;
 
-    public DoubleCPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
+    public DoubleCPTVertex(List<Vertex<? extends Tensor<?>>> inputs,
                            Map<CPTCondition, DoubleVertex> conditions,
                            DoubleVertex defaultResult) {
         super(defaultResult.getShape());
