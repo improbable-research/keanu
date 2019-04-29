@@ -13,6 +13,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleCPTVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -41,94 +42,28 @@ public class WeaponMaterialsTest {
 
     @Test
     public void testBooleanConditions() {
-        CategoricalVertex<Weapon, GenericTensor<Weapon>> murderWeapon = getWeaponPrior();
-        CategoricalVertex<Material, GenericTensor<Material>> weaponMaterial = getWeaponMaterialPrior();
+        CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon = getWeaponPrior();
+        CategoricalVertex<Material, GenericTensor<Material>> material = getWeaponMaterialPrior();
+        DoubleCPTVertex cpt = createCPTWithBooleans(weapon, material);
 
-        BooleanVertex isPoison = new EqualsVertex<>(murderWeapon, ConstantVertex.of(Weapon.POISON));
-        BooleanVertex isSpanner = new EqualsVertex<>(murderWeapon, ConstantVertex.of(Weapon.SPANNER));
-        BooleanVertex isClub = new EqualsVertex<>(murderWeapon, ConstantVertex.of(Weapon.CLUB));
-        BooleanVertex isKnife = new EqualsVertex<>(murderWeapon, ConstantVertex.of(Weapon.KNIFE));
-        BooleanVertex isIron = new EqualsVertex<>(weaponMaterial, ConstantVertex.of(Material.IRON));
-        BooleanVertex isWood = new EqualsVertex<>(weaponMaterial, ConstantVertex.of(Material.WOOD));
-        BooleanVertex isSteal = new EqualsVertex<>(weaponMaterial, ConstantVertex.of(Material.STEAL));
-        BooleanVertex isRubber = new EqualsVertex<>(weaponMaterial, ConstantVertex.of(Material.RUBBER));
-        BooleanVertex isFunnySmell = new EqualsVertex<>(weaponMaterial, ConstantVertex.of(Material.FUNNY_SMELL));
+        material.observe(GenericTensor.scalar(Material.WOOD));
+        NetworkSamples samples = takeSamples(cpt, weapon, material);
 
-        DoubleCPTVertex cpt = ConditionalProbabilityTable.of(isPoison, isSpanner, isClub, isKnife, isIron, isWood, isSteal, isRubber, isFunnySmell)
-            .when(true, false, false, false, false, false, false, false, true).then(1.0)
-            .when(false, true, false, false, true, false, false, false, false).then(0.5)
-            .when(false, true, false, false, false, false, true, false, false).then(0.5)
-            .when(false, false, true, false, true, false, false, false, false).then(0.25)
-            .when(false, false, true, false, false, true, false, false, false).then(0.25)
-            .when(false, false, true, false, false, false, true, false, false).then(0.25)
-            .when(false, false, true, false, false, false, false, true, false).then(0.25)
-            .when(false, false, false, true, true, false, false, false, false).then(0.3333333333333333)
-            .when(false, false, false, true, false, false, true, false, false).then(0.3333333333333333)
-            .when(false, false, false, true, false, false, false, true, false).then(0.3333333333333333)
-            .orDefault(0.0);
-
-        new BernoulliVertex(cpt).observe(true);
-
-        murderWeapon.observe(GenericTensor.scalar(Weapon.CLUB));
-
-        BayesianNetwork bnet = new BayesianNetwork(cpt.getConnectedGraph());
-        bnet.probeForNonZeroProbability(10000);
-        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bnet);
-
-        NetworkSamples samples = Keanu.Sampling.MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
-            model,
-            Arrays.asList(murderWeapon, weaponMaterial)
-        ).generate(11000).drop(1000).downSample(2);
-
-        printWeaponSamples(samples, murderWeapon);
-        printMaterialSamples(samples, weaponMaterial);
+        Map<Weapon, Double> weaponSampleProportion = calculateSampleProportions(samples, weapon);
+        Assert.assertEquals(1.0, weaponSampleProportion.get(Weapon.CLUB), 0);
     }
 
     @Test
     public void testEnumConditions() {
-        Map<Weapon, DoubleVertex> murderWeaponPrior = new HashMap<>();
-        murderWeaponPrior.put(Weapon.POISON, ConstantVertex.of(0.25));
-        murderWeaponPrior.put(Weapon.SPANNER, ConstantVertex.of(0.25));
-        murderWeaponPrior.put(Weapon.CLUB, ConstantVertex.of(0.25));
-        murderWeaponPrior.put(Weapon.KNIFE, ConstantVertex.of(0.25));
-        CategoricalVertex<Weapon, GenericTensor<Weapon>> murderWeapon = new CategoricalVertex<>(murderWeaponPrior);
+        CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon = getWeaponPrior();
+        CategoricalVertex<Material, GenericTensor<Material>> material = getWeaponMaterialPrior();
+        DoubleCPTVertex cpt = createCPTWithEnums(weapon, material);
 
-        Map<Material, DoubleVertex> weaponMaterialPrior = new HashMap<>();
-        weaponMaterialPrior.put(Material.IRON, ConstantVertex.of(0.2));
-        weaponMaterialPrior.put(Material.WOOD, ConstantVertex.of(0.2));
-        weaponMaterialPrior.put(Material.STEAL, ConstantVertex.of(0.2));
-        weaponMaterialPrior.put(Material.RUBBER, ConstantVertex.of(0.2));
-        weaponMaterialPrior.put(Material.FUNNY_SMELL, ConstantVertex.of(0.2));
-        CategoricalVertex<Material, GenericTensor<Material>> weaponMaterial = new CategoricalVertex<>(weaponMaterialPrior);
+        material.observe(GenericTensor.scalar(Material.WOOD));
+        NetworkSamples samples = takeSamples(cpt, weapon, material);
 
-        DoubleCPTVertex cpt = ConditionalProbabilityTable.of(murderWeapon, weaponMaterial)
-            .when(Weapon.POISON, Material.FUNNY_SMELL).then(1.0)
-            .when(Weapon.SPANNER, Material.IRON).then(0.5)
-            .when(Weapon.SPANNER, Material.STEAL).then(0.5)
-            .when(Weapon.CLUB, Material.IRON).then(0.25)
-            .when(Weapon.CLUB, Material.WOOD).then(0.25)
-            .when(Weapon.CLUB, Material.STEAL).then(0.25)
-            .when(Weapon.CLUB, Material.RUBBER).then(0.25)
-            .when(Weapon.KNIFE, Material.IRON).then(0.3333333333333333)
-            .when(Weapon.KNIFE, Material.STEAL).then(0.3333333333333333)
-            .when(Weapon.KNIFE, Material.RUBBER).then(0.3333333333333333)
-            .orDefault(0.0);
-
-        new BernoulliVertex(cpt).observe(true);
-
-        murderWeapon.observe(GenericTensor.scalar(Weapon.POISON));
-
-        BayesianNetwork bnet = new BayesianNetwork(cpt.getConnectedGraph());
-        bnet.probeForNonZeroProbability(10000);
-        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bnet);
-
-        NetworkSamples samples = Keanu.Sampling.MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
-            model,
-            Arrays.asList(murderWeapon, weaponMaterial)
-        ).generate(11000).drop(1000).downSample(2);
-
-        printWeaponSamples(samples, murderWeapon);
-        printMaterialSamples(samples, weaponMaterial);
+        Map<Weapon, Double> weaponSampleProportion = calculateSampleProportions(samples, weapon);
+        Assert.assertEquals(1.0, weaponSampleProportion.get(Weapon.CLUB), 0);
     }
 
     private CategoricalVertex<Weapon, GenericTensor<Weapon>> getWeaponPrior() {
@@ -150,30 +85,85 @@ public class WeaponMaterialsTest {
         return new CategoricalVertex<>(weaponMaterialPrior);
     }
 
-    private void printWeaponSamples(NetworkSamples samples,
-                                    CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon) {
+    private DoubleCPTVertex createCPTWithBooleans(CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon,
+                                                  CategoricalVertex<Material, GenericTensor<Material>> material) {
 
-        List<Weapon> weaponSamples = samples.get(weapon).asList().stream()
-            .map(s -> s.scalar()).collect(Collectors.toList());
+        BooleanVertex isPoison = new EqualsVertex<>(weapon, ConstantVertex.of(Weapon.POISON));
+        BooleanVertex isSpanner = new EqualsVertex<>(weapon, ConstantVertex.of(Weapon.SPANNER));
+        BooleanVertex isClub = new EqualsVertex<>(weapon, ConstantVertex.of(Weapon.CLUB));
+        BooleanVertex isKnife = new EqualsVertex<>(weapon, ConstantVertex.of(Weapon.KNIFE));
+        BooleanVertex isIron = new EqualsVertex<>(material, ConstantVertex.of(Material.IRON));
+        BooleanVertex isWood = new EqualsVertex<>(material, ConstantVertex.of(Material.WOOD));
+        BooleanVertex isSteal = new EqualsVertex<>(material, ConstantVertex.of(Material.STEAL));
+        BooleanVertex isRubber = new EqualsVertex<>(material, ConstantVertex.of(Material.RUBBER));
+        BooleanVertex isFunnySmell = new EqualsVertex<>(material, ConstantVertex.of(Material.FUNNY_SMELL));
 
-        Map<Weapon, Long> materialSampleCounts = weaponSamples.stream()
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        DoubleCPTVertex cpt = ConditionalProbabilityTable.of(isPoison, isSpanner, isClub, isKnife, isIron, isWood, isSteal, isRubber, isFunnySmell)
+            .when(true, false, false, false, false, false, false, false, true).then(1.0)
+            .when(false, true, false, false, true, false, false, false, false).then(0.5)
+            .when(false, true, false, false, false, false, true, false, false).then(0.5)
+            .when(false, false, true, false, true, false, false, false, false).then(0.25)
+            .when(false, false, true, false, false, true, false, false, false).then(0.25)
+            .when(false, false, true, false, false, false, true, false, false).then(0.25)
+            .when(false, false, true, false, false, false, false, true, false).then(0.25)
+            .when(false, false, false, true, true, false, false, false, false).then(0.3333333333333333)
+            .when(false, false, false, true, false, false, true, false, false).then(0.3333333333333333)
+            .when(false, false, false, true, false, false, false, true, false).then(0.3333333333333333)
+            .orDefault(0.0);
 
-        for (Map.Entry<Weapon, Long> entry : materialSampleCounts.entrySet()) {
-            System.out.println(entry.getKey().toString() + ": " + entry.getValue());
-        }
+        new BernoulliVertex(cpt).observe(true);
+
+        return cpt;
     }
 
-    private void printMaterialSamples(NetworkSamples samples,
-                                      CategoricalVertex<Material, GenericTensor<Material>> material) {
+    private DoubleCPTVertex createCPTWithEnums(CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon,
+                                               CategoricalVertex<Material, GenericTensor<Material>> material) {
 
-        List<Material> materialSamples = samples.get(material).asList().stream()
+        DoubleCPTVertex cpt = ConditionalProbabilityTable.of(weapon, material)
+            .when(Weapon.POISON, Material.FUNNY_SMELL).then(1.0)
+            .when(Weapon.SPANNER, Material.IRON).then(0.5)
+            .when(Weapon.SPANNER, Material.STEAL).then(0.5)
+            .when(Weapon.CLUB, Material.IRON).then(0.25)
+            .when(Weapon.CLUB, Material.WOOD).then(0.25)
+            .when(Weapon.CLUB, Material.STEAL).then(0.25)
+            .when(Weapon.CLUB, Material.RUBBER).then(0.25)
+            .when(Weapon.KNIFE, Material.IRON).then(0.3333333333333333)
+            .when(Weapon.KNIFE, Material.STEAL).then(0.3333333333333333)
+            .when(Weapon.KNIFE, Material.RUBBER).then(0.3333333333333333)
+            .orDefault(0.0);
+
+        new BernoulliVertex(cpt).observe(true);
+        return cpt;
+    }
+
+    private NetworkSamples takeSamples(DoubleCPTVertex cpt, CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon,
+                             CategoricalVertex<Material, GenericTensor<Material>> material) {
+
+        BayesianNetwork bnet = new BayesianNetwork(cpt.getConnectedGraph());
+        bnet.probeForNonZeroProbability(10000);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bnet);
+
+        return Keanu.Sampling.MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
+            model,
+            Arrays.asList(weapon, material)
+        ).generate(11000).drop(1000).downSample(2);
+    }
+
+    private <T> Map<T, Double> calculateSampleProportions(NetworkSamples samples,
+                                                        CategoricalVertex<T, GenericTensor<T>> inputCategorical) {
+
+        List<T> inputSamples = samples.get(inputCategorical).asList().stream()
             .map(s -> s.scalar()).collect(Collectors.toList());
 
-        Map<Material, Long> materialSampleCounts = materialSamples.stream()
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        return inputSamples.stream().collect(Collectors.groupingBy(Function.identity(),
+                Collectors.collectingAndThen(Collectors.counting(), count -> ((double)count) / inputSamples.size())));
+    }
 
-        for (Map.Entry<Material, Long> entry : materialSampleCounts.entrySet()) {
+    private <T> void printSampleProportions(NetworkSamples samples, CategoricalVertex<T, GenericTensor<T>> inputCategorical) {
+
+        Map<T, Double> sampleCounts = calculateSampleProportions(samples, inputCategorical);
+
+        for (Map.Entry<T, Double> entry : sampleCounts.entrySet()) {
             System.out.println(entry.getKey().toString() + ": " + entry.getValue());
         }
     }
