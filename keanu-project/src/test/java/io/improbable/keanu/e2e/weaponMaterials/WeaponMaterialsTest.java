@@ -193,13 +193,4 @@ public class WeaponMaterialsTest {
         return inputSamples.stream().collect(Collectors.groupingBy(Function.identity(),
                 Collectors.collectingAndThen(Collectors.counting(), count -> ((double)count) / inputSamples.size())));
     }
-
-    private <T> void printSampleProportions(NetworkSamples samples, CategoricalVertex<T, GenericTensor<T>> inputCategorical) {
-
-        Map<T, Double> sampleCounts = calculateSampleProportions(samples, inputCategorical);
-
-        for (Map.Entry<T, Double> entry : sampleCounts.entrySet()) {
-            System.out.println(entry.getKey().toString() + ": " + entry.getValue());
-        }
-    }
 }
