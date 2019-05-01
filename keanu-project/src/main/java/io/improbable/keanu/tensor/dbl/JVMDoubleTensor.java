@@ -470,7 +470,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor that, int[] dimsLeft, int[] dimsRight) {
-        return TensorMulByMatrixMul.tensorMmul(this, that, new int[][]{dimsLeft, dimsRight});
+        return TensorMulByMatrixMul.tensorMmul(this, that, dimsLeft, dimsRight);
     }
 
     @Override

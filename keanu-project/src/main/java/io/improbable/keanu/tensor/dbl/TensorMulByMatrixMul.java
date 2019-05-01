@@ -6,81 +6,90 @@ import com.google.common.primitives.Longs;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TensorMulByMatrixMul {
+class TensorMulByMatrixMul {
 
-    public static DoubleTensor tensorMmul(DoubleTensor a, DoubleTensor b, int[][] axes) {
+    static DoubleTensor tensorMmul(DoubleTensor left, DoubleTensor right, int[] dimsLeft, int[] dimsRight) {
 
-        long[] aShape = a.getShape();
-        long[] bShape = b.getShape();
+        long[] leftShape = left.getShape();
+        long[] rightShape = right.getShape();
 
-        int validationLength = Math.min(axes[0].length, axes[1].length);
-        for (int i = 0; i < validationLength; i++) {
-            if (aShape[axes[0][i]] != bShape[axes[1][i]])
-                throw new IllegalArgumentException("Size of the given axes at each dimension must be the same size.");
-            if (axes[0][i] < 0)
-                axes[0][i] += aShape.length;
-            if (axes[1][i] < 0)
-                axes[1][i] += bShape.length;
+        validateTensorMmul(leftShape, rightShape, dimsLeft, dimsRight);
 
-        }
+        List<Integer> leftDimsKept = getKeptDimensions(leftShape.length, dimsLeft);
+        List<Integer> rightDimsKept = getKeptDimensions(rightShape.length, dimsRight);
 
-        List<Integer> listA = new ArrayList<>();
-        for (int i = 0; i < aShape.length; i++) {
-            if (!Ints.contains(axes[0], i))
-                listA.add(i);
-        }
+        int[] leftDimsPermuted = Ints.concat(Ints.toArray(leftDimsKept), dimsLeft);
+        int[] rightDimsPermuted = Ints.concat(dimsRight, Ints.toArray(rightDimsKept));
 
-        int[] newAxesA = Ints.concat(Ints.toArray(listA), axes[0]);
+        long dimsLength = calculateDimensionsLength(leftShape, dimsLeft);
+        long[] leftTensorAsMatrixShape = {-1, dimsLength};
+        long[] rightTensorAsMatrixShape = {dimsLength, -1};
 
-        List<Integer> listB = new ArrayList<>();
-        for (int i = 0; i < bShape.length; i++) {
-            if (!Ints.contains(axes[1], i))
-                listB.add(i);
-        }
+        DoubleTensor leftTensorAsMatrix = left.permute(leftDimsPermuted).reshape(leftTensorAsMatrixShape);
+        DoubleTensor rightTensorAsMatrix = right.permute(rightDimsPermuted).reshape(rightTensorAsMatrixShape);
+        DoubleTensor resultAsMatrix = leftTensorAsMatrix.matrixMultiply(rightTensorAsMatrix);
 
-        int[] newAxesB = Ints.concat(axes[1], Ints.toArray(listB));
+        long[] leftKeptShape = getKeptShape(leftShape, leftDimsKept);
+        long[] rightKeptShape = getKeptShape(rightShape, rightDimsKept);
 
-        int n2 = 1;
-        int aLength = Math.min(aShape.length, axes[0].length);
-        for (int i = 0; i < aLength; i++) {
-            n2 *= aShape[axes[0][i]];
-        }
-
-        //if listA and listB are empty these do not initialize.
-        //so initializing with {1} which will then get overridden if not empty
-        long[] newShapeA = {-1, n2};
-        long[] oldShapeA;
-        if (listA.isEmpty()) {
-            oldShapeA = new long[0];
-        } else {
-            oldShapeA = Longs.toArray(listA);
-            for (int i = 0; i < oldShapeA.length; i++) {
-                oldShapeA[i] = aShape[Ints.checkedCast(oldShapeA[i])];
-            }
-        }
-
-        int n3 = 1;
-        int bNax = Math.min(bShape.length, axes[1].length);
-        for (int i = 0; i < bNax; i++) {
-            n3 *= bShape[axes[1][i]];
-        }
-
-        long[] newShapeB = {n3, -1};
-        long[] oldShapeB;
-        if (listB.isEmpty()) {
-            oldShapeB = new long[0];
-        } else {
-            oldShapeB = Longs.toArray(listB);
-            for (int i = 0; i < oldShapeB.length; i++) {
-                oldShapeB[i] = bShape[Ints.checkedCast(oldShapeB[i])];
-            }
-        }
-
-        DoubleTensor at = a.permute(newAxesA).reshape(newShapeA);
-        DoubleTensor bt = b.permute(newAxesB).reshape(newShapeB);
-        DoubleTensor ret = at.matrixMultiply(bt);
-
-        long[] aPlusB = Longs.concat(oldShapeA, oldShapeB);
-        return ret.reshape(aPlusB);
+        long[] resultShape = Longs.concat(leftKeptShape, rightKeptShape);
+        return resultAsMatrix.reshape(resultShape);
     }
+
+    /**
+     * Validates that the multiply dimensions match for the left shape and the right shape. Also, corrects for the
+     * use of a negative dimension to represent dimensions from the right.
+     *
+     * @param leftShape  the shape of the left tensor being mmul
+     * @param rightShape the shape of the right tensor being mmul
+     * @param dimsLeft   dimensions along the left to multiply
+     * @param dimsRight  dimensions along the right to multiply
+     */
+    private static void validateTensorMmul(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
+
+        int validationLength = Math.min(dimsLeft.length, dimsRight.length);
+        for (int i = 0; i < validationLength; i++) {
+
+            if (leftShape[dimsLeft[i]] != rightShape[dimsRight[i]]) {
+                throw new IllegalArgumentException("Size of the given axes at each dimension must be the same size.");
+            }
+
+            if (dimsLeft[i] < 0) {
+                dimsLeft[i] += leftShape.length;
+            }
+
+            if (dimsRight[i] < 0) {
+                dimsRight[i] += rightShape.length;
+            }
+
+        }
+    }
+
+    private static List<Integer> getKeptDimensions(int shapeLength, int[] dims) {
+        List<Integer> result = new ArrayList<>();
+        for (int i = 0; i < shapeLength; i++) {
+            if (!Ints.contains(dims, i)) {
+                result.add(i);
+            }
+        }
+        return result;
+    }
+
+    private static long[] getKeptShape(long[] shape, List<Integer> keptDimensions) {
+        long[] keptShape = Longs.toArray(keptDimensions);
+        for (int i = 0; i < keptShape.length; i++) {
+            keptShape[i] = shape[Ints.checkedCast(keptShape[i])];
+        }
+        return keptShape;
+    }
+
+    private static long calculateDimensionsLength(long[] shape, int[] dims) {
+        long length = 1;
+        int aLength = Math.min(shape.length, dims.length);
+        for (int i = 0; i < aLength; i++) {
+            length *= shape[dims[i]];
+        }
+        return length;
+    }
+
 }
