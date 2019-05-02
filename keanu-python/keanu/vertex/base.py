@@ -4,7 +4,7 @@ from typing import cast as typing_cast
 
 import numpy as np
 from py4j.java_collections import JavaList, JavaArray
-from py4j.java_gateway import JavaObject, JavaMember
+from py4j.java_gateway import JavaObject, JavaMember, is_instance_of
 
 import keanu as kn
 from keanu.base import JavaObjectWrapper
@@ -223,7 +223,16 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
     @staticmethod
     def _from_java_vertex(java_vertex: JavaObject) -> 'Vertex':
-        return Vertex(java_vertex, None)
+        ctor = Vertex
+
+        if is_instance_of(k._gateway, java_vertex, "io.improbable.keanu.vertices.dbl.DoubleVertex"):
+            ctor = Double
+        elif is_instance_of(k._gateway, java_vertex, "io.improbable.keanu.vertices.intgr.IntegerVertex"):
+            ctor = Integer
+        elif is_instance_of(k._gateway, java_vertex, "io.improbable.keanu.vertices.bool.BooleanVertex"):
+            ctor = Boolean
+
+        return ctor(java_vertex, None)
 
     @staticmethod
     def _to_generator(java_vertices: Union[JavaList, JavaArray]) -> Iterator['Vertex']:
