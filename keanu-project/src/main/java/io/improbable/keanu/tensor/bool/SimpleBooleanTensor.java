@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -50,15 +49,6 @@ public class SimpleBooleanTensor implements BooleanTensor {
         this.data = new boolean[]{constant};
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
-    }
-
-    /**
-     * @param shape shape to use as place holder
-     */
-    public SimpleBooleanTensor(long[] shape) {
-        this.data = null;
-        this.shape = Arrays.copyOf(shape, shape.length);
-        this.stride = TensorShape.getRowFirstStride(shape);
     }
 
     /**
@@ -239,7 +229,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor slice(int dimension, long index) {
-        DoubleTensor tadDoubles = Nd4jDoubleTensor.create(asFlatDoubleArray(), shape).slice(dimension, index);
+        DoubleTensor tadDoubles = DoubleTensor.create(asFlatDoubleArray(), shape).slice(dimension, index);
         double[] tadFlat = tadDoubles.asFlatDoubleArray();
         boolean[] tadToBooleans = new boolean[tadFlat.length];
         for (int i = 0; i < tadFlat.length; i++) {
@@ -259,13 +249,13 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public long getLength() {
-        return data.length;
+    public long[] getStride() {
+        return stride;
     }
 
     @Override
-    public boolean isShapePlaceholder() {
-        return data == null;
+    public long getLength() {
+        return data.length;
     }
 
     @Override

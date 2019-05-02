@@ -5,8 +5,8 @@ import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
@@ -61,7 +61,7 @@ public class KeanuRandom {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(nextDouble());
         } else {
-            return new Nd4jDoubleTensor(doubleNextDouble(shape));
+            return DoubleTensor.create(doubleNextDouble(shape), shape);
         }
     }
 
@@ -85,7 +85,7 @@ public class KeanuRandom {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(nextGaussian());
         } else {
-            return new Nd4jDoubleTensor(doubleNextGaussian(shape));
+            return DoubleTensor.create(doubleNextGaussian(shape), shape);
         }
     }
 
@@ -131,14 +131,25 @@ public class KeanuRandom {
         return nd4jRandom.nextInt(shape);
     }
 
-    private INDArray doubleNextDouble(long[] shape) {
-        Nd4j.setDataType(bufferType);
-        return nd4jRandom.nextDouble(shape);
+    private double[] doubleNextDouble(long[] shape) {
+        int length = TensorShape.getLengthAsInt(shape);
+        double[] buffer = new double[length];
+        for (int i = 0; i < length; i++) {
+            buffer[i] = nextDouble();
+        }
+
+        return buffer;
     }
 
-    private INDArray doubleNextGaussian(long[] shape) {
-        Nd4j.setDataType(bufferType);
-        return nd4jRandom.nextGaussian(shape);
+    private double[] doubleNextGaussian(long[] shape) {
+
+        int length = TensorShape.getLengthAsInt(shape);
+        double[] buffer = new double[length];
+        for (int i = 0; i < length; i++) {
+            buffer[i] = nextGaussian();
+        }
+
+        return buffer;
     }
 
 }

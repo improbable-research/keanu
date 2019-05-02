@@ -21,7 +21,9 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.testGradientAcrossMultipleHyperParameterValues;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -198,12 +200,12 @@ public class BernoulliVertexTest {
         );
 
         expectedWrtA = expectedWrtA.setWithMaskInPlace(
-            AValue.times(BValue).getGreaterThanMask(DoubleTensor.ONE_SCALAR),
+            AValue.times(BValue).getGreaterThanMask(DoubleTensor.scalar(1.0)),
             0.0
         );
 
         expectedWrtA = expectedWrtA.setWithMaskInPlace(
-            AValue.times(BValue).getLessThanOrEqualToMask(DoubleTensor.ZERO_SCALAR),
+            AValue.times(BValue).getLessThanOrEqualToMask(DoubleTensor.scalar(0.0)),
             0.0
         );
 
@@ -213,17 +215,17 @@ public class BernoulliVertexTest {
         );
 
         expectedWrtB = expectedWrtB.setWithMaskInPlace(
-            AValue.times(BValue).getGreaterThanMask(DoubleTensor.ONE_SCALAR),
+            AValue.times(BValue).getGreaterThanMask(DoubleTensor.scalar(1.0)),
             0.0
         );
 
         expectedWrtB = expectedWrtB.setWithMaskInPlace(
-            AValue.times(BValue).getLessThanOrEqualToMask(DoubleTensor.ZERO_SCALAR),
+            AValue.times(BValue).getLessThanOrEqualToMask(DoubleTensor.scalar(0.0)),
             0.0
         );
 
-        assertEquals(expectedWrtA, dLogPmf.get(A.getId()));
-        assertEquals(expectedWrtB, dLogPmf.get(B.getId()));
+        assertThat(expectedWrtA, valuesWithinEpsilonAndShapesMatch(dLogPmf.get(A.getId()), 1e-8));
+        assertThat(expectedWrtB, valuesWithinEpsilonAndShapesMatch(dLogPmf.get(B.getId()), 1e-8));
     }
 
     @Test

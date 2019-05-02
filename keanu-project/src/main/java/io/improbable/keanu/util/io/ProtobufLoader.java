@@ -245,7 +245,7 @@ public class ProtobufLoader implements NetworkLoader {
         if ((paramAnnotation = methodParameter.getAnnotation(LoadVertexParam.class)) != null) {
             Object parameter = paramMap.get(paramAnnotation.value());
             if (parameter == null && !paramAnnotation.isNullable()) {
-                throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
+                throw new IllegalArgumentException("Failed to create vertex due to missing parameter: "
                     + paramAnnotation.value());
             }
 

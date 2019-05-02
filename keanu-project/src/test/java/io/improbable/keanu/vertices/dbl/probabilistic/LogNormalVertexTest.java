@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.LogNormal;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -141,8 +140,8 @@ public class LogNormalVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(1.5),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(1.5),
             0.1,
             uniformA,
             logNormal,
@@ -162,8 +161,8 @@ public class LogNormalVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(3.0),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(3.0),
             0.1,
             uniformA,
             logNormal,

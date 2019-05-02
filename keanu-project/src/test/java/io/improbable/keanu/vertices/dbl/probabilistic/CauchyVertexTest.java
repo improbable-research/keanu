@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -137,12 +136,12 @@ public class CauchyVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex location = new UniformVertex(0.0, 1.0);
-        location.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
+        location.setAndCascade(DoubleTensor.scalar(0.5));
         CauchyVertex vertexUnderTest = new CauchyVertex(
             location,
             3.0
         );
-        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
+        vertexUnderTest.setAndCascade(DoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
@@ -152,13 +151,13 @@ public class CauchyVertexTest {
         UniformVertex uniformA = new UniformVertex(1.5, 3.0);
         CauchyVertex cauchy = new CauchyVertex(uniformA, 3.0);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.0);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(5.0);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(3.0),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(3.0),
             0.1,
             uniformA,
             cauchy,
@@ -173,13 +172,13 @@ public class CauchyVertexTest {
         UniformVertex uniformA = new UniformVertex(1.5, 3.0);
         CauchyVertex cauchy = new CauchyVertex(3.0, uniformA);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.0);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(0.5);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(3.0),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(3.0),
             0.1,
             uniformA,
             cauchy,

@@ -8,7 +8,6 @@ import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogProbF
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -31,17 +30,17 @@ public class FitnessFunctionGradientTest {
         GaussianVertex A = new GaussianVertex(1.0, 1.0);
         GaussianVertex B = new GaussianVertex(2.0, 1.0);
 
-        A.setAndCascade(Nd4jDoubleTensor.scalar(1.5));
-        B.setAndCascade(Nd4jDoubleTensor.scalar(2.5));
+        A.setAndCascade(DoubleTensor.scalar(1.5));
+        B.setAndCascade(DoubleTensor.scalar(2.5));
 
         DoubleVertex C = A.multiply(B);
         DoubleVertex D = A.minus(B);
 
         GaussianVertex cObservation = new GaussianVertex(C, 1.0);
-        cObservation.observe(Nd4jDoubleTensor.scalar(3.0));
+        cObservation.observe(DoubleTensor.scalar(3.0));
 
         GaussianVertex dObservation = new GaussianVertex(D, 1.0);
-        dObservation.observe(Nd4jDoubleTensor.scalar(3.0));
+        dObservation.observe(DoubleTensor.scalar(3.0));
 
         KeanuProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
 
@@ -71,17 +70,17 @@ public class FitnessFunctionGradientTest {
         GaussianVertex A = new GaussianVertex(7.0, 3.0);
         GaussianVertex B = new GaussianVertex(3.0, 3.0);
 
-        A.setAndCascade(Nd4jDoubleTensor.scalar(6.0));
-        B.setAndCascade(Nd4jDoubleTensor.scalar(3.0));
+        A.setAndCascade(DoubleTensor.scalar(6.0));
+        B.setAndCascade(DoubleTensor.scalar(3.0));
 
         DoubleVertex C = A.divideBy(B);
         DoubleVertex D = A.multiply(B);
 
         GaussianVertex cObservation = new GaussianVertex(C, 5.0);
-        cObservation.observe(Nd4jDoubleTensor.scalar(2.1));
+        cObservation.observe(DoubleTensor.scalar(2.1));
 
         GaussianVertex dObservation = new GaussianVertex(D, 5.0);
-        dObservation.observe(Nd4jDoubleTensor.scalar(18.0));
+        dObservation.observe(DoubleTensor.scalar(18.0));
 
         KeanuProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
 
@@ -111,8 +110,8 @@ public class FitnessFunctionGradientTest {
         GaussianVertex A = new GaussianVertex(2.0, 3.0);
         GaussianVertex B = new GaussianVertex(3.0, 3.0);
 
-        A.setAndCascade(Nd4jDoubleTensor.scalar(2.2));
-        B.setAndCascade(Nd4jDoubleTensor.scalar(3.2));
+        A.setAndCascade(DoubleTensor.scalar(2.2));
+        B.setAndCascade(DoubleTensor.scalar(3.2));
 
         DoubleVertex C = A.plus(B);
         DoubleVertex D = A.multiply(B);
@@ -121,10 +120,10 @@ public class FitnessFunctionGradientTest {
         DoubleVertex F = C.divideBy(D);
 
         GaussianVertex eObservation = new GaussianVertex(E, 5.0);
-        eObservation.observe(Nd4jDoubleTensor.scalar(1.2));
+        eObservation.observe(DoubleTensor.scalar(1.2));
 
         GaussianVertex fObservation = new GaussianVertex(F, C);
-        fObservation.observe(Nd4jDoubleTensor.scalar(1.0));
+        fObservation.observe(DoubleTensor.scalar(1.0));
 
         KeanuProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
         FitnessFunction fitness = new LogProbFitnessFunction(graph);

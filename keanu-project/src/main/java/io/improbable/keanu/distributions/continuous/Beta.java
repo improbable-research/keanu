@@ -35,8 +35,8 @@ public class Beta implements ContinuousDistribution {
         Preconditions.checkArgument(alpha.greaterThan(0.).allTrue() && beta.greaterThan(0.).allTrue(),
             "alpha and beta must be positive. alpha: " + alpha + " beta: " + beta);
 
-        final DoubleTensor y1 = random.nextGamma(shape, DoubleTensor.ONE_SCALAR, alpha);
-        final DoubleTensor y2 = random.nextGamma(shape, DoubleTensor.ONE_SCALAR, beta);
+        final DoubleTensor y1 = random.nextGamma(shape, DoubleTensor.scalar(1.0), alpha);
+        final DoubleTensor y2 = random.nextGamma(shape, DoubleTensor.scalar(1.0), beta);
 
         final DoubleTensor range = xMax.minus(xMin);
         final DoubleTensor y1PlusY2 = y1.plus(y2);

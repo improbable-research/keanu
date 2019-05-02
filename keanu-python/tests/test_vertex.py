@@ -8,7 +8,7 @@ from py4j.java_gateway import JVMView
 from keanu import set_deterministic_state
 from keanu.context import KeanuContext
 from keanu.vartypes import tensor_arg_types, primitive_types, numpy_types, pandas_types
-from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli, IntegerProxy
+from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli, IntegerProxy, Double
 from keanu.vertex.base import Vertex
 
 
@@ -182,7 +182,7 @@ def test_java_collections_to_generator() -> None:
     java_vertex_ids = [Vertex._get_python_id(java_vertex) for java_vertex in java_collections]
 
     assert java_collections.size() == len(python_list)
-    assert all(type(element) == Vertex and element.get_id() in java_vertex_ids for element in python_list)
+    assert all(type(element) == Double and element.get_id() in java_vertex_ids for element in python_list)
 
 
 def test_get_vertex_id() -> None:

@@ -180,7 +180,7 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfParentsAreMissing() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex due to missing parent: sigma");
+        expectedException.expectMessage("Failed to create vertex due to missing parameter: sigma");
 
         SavedBayesNet.Vertex muVertex = SavedBayesNet.Vertex.newBuilder()
             .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
@@ -246,7 +246,7 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfNoConstantSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex due to missing parent: constant");
+        expectedException.expectMessage("Failed to create vertex due to missing parameter: constant");
 
         SavedBayesNet.Vertex constantVertex = SavedBayesNet.Vertex.newBuilder()
             .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
@@ -271,7 +271,7 @@ public class ProtobufTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Incorrect Parameter Type specified.  " +
             "Got: class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, " +
-            "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
+            "Expected: class io.improbable.keanu.tensor.dbl.DoubleTensor");
 
         SavedBayesNet.Vertex constantVertex = SavedBayesNet.Vertex.newBuilder()
             .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))

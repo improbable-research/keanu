@@ -51,7 +51,7 @@ public class PrintVertexTest {
 
     @Before
     public void setup() {
-        when(parent.getValue()).thenReturn(DoubleTensor.ONE_SCALAR);
+        when(parent.getValue()).thenReturn(DoubleTensor.scalar(1.0));
         PrintVertex.setPrintStream(printStream);
     }
 
