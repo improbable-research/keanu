@@ -57,6 +57,9 @@ class Tensor(JavaObjectWrapper):
 
     @staticmethod
     def __get_java_array_from_ndarray(ndarray: numpy_types) -> Union[JavaObject, bytes]:
+        if ndarray.size == 0:
+            raise ValueError("Cannot infer type because array is empty")
+
         if np.issubdtype(ndarray.dtype, np.bool_):
             return k.to_java_array(ndarray.flatten().tolist())
         elif np.issubdtype(ndarray.dtype, np.integer):
