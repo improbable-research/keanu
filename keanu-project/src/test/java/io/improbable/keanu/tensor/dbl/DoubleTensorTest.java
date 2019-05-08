@@ -2,7 +2,6 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.tensor.ByteArrayConverter;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorTestHelper;
@@ -1347,7 +1346,7 @@ public class DoubleTensorTest {
     }
 
     @Test
-    public void canCreateFromByteArray() {
+    public void canConstructFromByteArray() {
         byte byte1 = Byte.parseByte("01000000", 2);
         byte byte2 = Byte.parseByte("00011000", 2);
         byte byte3 = Byte.parseByte("00001000", 2);
@@ -1357,11 +1356,10 @@ public class DoubleTensorTest {
             byte1, byte3, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,
         };
 
-        double[] doubles = ByteArrayConverter.toDoubleArray(bytes);
+        DoubleTensor tensor = DoubleTensor.create(bytes);
 
-        assertThat(doubles.length, is(2));
-        assertThat(doubles[0], is(6.0));
-        assertThat(doubles[1], is(3.0));
+        assertThat(tensor.getShape(), is(new long[] { 2 }));
+        assertThat(tensor.getValue(0), is(6.0));
+        assertThat(tensor.getValue(1), is(3.0));
     }
-
 }

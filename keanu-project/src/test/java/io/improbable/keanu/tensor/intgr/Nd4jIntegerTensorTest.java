@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.intgr;
 
-import io.improbable.keanu.tensor.ByteArrayConverter;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorTestHelper;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -768,7 +767,7 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
-    public void canCreateFromByteArray() {
+    public void canConstructFromByteArray() {
         byte byte1 = Byte.parseByte("00000110", 2);
         byte byte2 = Byte.parseByte("00000011", 2);
         byte zeroByte = Byte.parseByte("00000000", 2);
@@ -777,11 +776,12 @@ public class Nd4jIntegerTensorTest {
             zeroByte, zeroByte, zeroByte, byte2
         };
 
-        int[] ints = ByteArrayConverter.toIntegerArray(bytes);
+        IntegerTensor tensor = IntegerTensor.create(bytes);
 
-        assertThat(ints.length, is(2));
-        assertThat(ints[0], is(6));
-        assertThat(ints[1], is(3));
+        assertThat(tensor.getShape(), is(new long[] { 2 }));
+        assertThat(tensor.getValue(0), is(6));
+        assertThat(tensor.getValue(1), is(3));
     }
+
 
 }
