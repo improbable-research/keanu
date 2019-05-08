@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.ByteArrayConverter;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorTestHelper;
@@ -34,6 +35,7 @@ import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndSh
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -1344,5 +1346,22 @@ public class DoubleTensorTest {
         A.setValue(0.5, 1, 0);
     }
 
+    @Test
+    public void canCreateFromByteArray() {
+        byte byte1 = Byte.parseByte("01000000", 2);
+        byte byte2 = Byte.parseByte("00011000", 2);
+        byte byte3 = Byte.parseByte("00001000", 2);
+        byte zeroByte = Byte.parseByte("00000000", 2);
+        byte[] bytes = new byte[] {
+            byte1, byte2, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,
+            byte1, byte3, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,
+        };
+
+        double[] doubles = ByteArrayConverter.toDoubleArray(bytes);
+
+        assertThat(doubles.length, is(2));
+        assertThat(doubles[0], is(6.0));
+        assertThat(doubles[1], is(3.0));
+    }
 
 }

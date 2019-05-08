@@ -11,6 +11,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import java.util.Arrays;
 import java.util.function.Function;
 
+import static io.improbable.keanu.tensor.ByteArrayConverter.toIntegerArray;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
@@ -40,6 +41,16 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     static IntegerTensor create(int... values) {
         return create(values, values.length);
     }
+
+
+    static IntegerTensor create(byte[] bytes, long... shape) {
+        return create(toIntegerArray(bytes), shape);
+    }
+
+    static IntegerTensor create(byte[] bytes) {
+        return create(toIntegerArray(bytes));
+    }
+
 
     static IntegerTensor ones(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
