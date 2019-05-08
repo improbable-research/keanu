@@ -1,14 +1,13 @@
 import numpy as np
 from numpy import ndarray
 from py4j.java_gateway import java_import, JavaObject, JavaMember, is_instance_of
-from typing import Any
+from typing import Any, Union
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.functional import Function
-from .vartypes import (numpy_types, tensor_arg_types, primitive_types, runtime_int_types, runtime_float_types,
-                       runtime_bool_types, runtime_numpy_types, runtime_pandas_types, runtime_primitive_types,
-                       primitive_types)
+from .vartypes import (numpy_types, tensor_arg_types, runtime_int_types, runtime_float_types, runtime_bool_types,
+                       runtime_numpy_types, runtime_pandas_types, runtime_primitive_types, primitive_types)
 
 k = KeanuContext()
 
@@ -51,10 +50,22 @@ class Tensor(JavaObjectWrapper):
     def __get_tensor_from_ndarray(ndarray: numpy_types) -> JavaObject:
 
         ctor = Tensor.__infer_tensor_ctor_from_ndarray(ndarray)
-        values = k.to_java_array(ndarray.flatten().tolist())
+        values = Tensor.__get_java_array_from_ndarray(ndarray)
         shape = k.to_java_long_array(ndarray.shape)
 
         return ctor(values, shape)
+
+    @staticmethod
+    def __get_java_array_from_ndarray(ndarray: numpy_types) -> Union[JavaObject, bytes]:
+        if np.issubdtype(ndarray.dtype, np.bool_):
+            return k.to_java_array(ndarray.flatten().tolist())
+        elif np.issubdtype(ndarray.dtype, np.integer):
+            return k.jvm_view().Py4jByteArrayConverter.toIntegerArray(ndarray.flatten().tobytes(), ndarray.itemsize)
+        elif np.issubdtype(ndarray.dtype, np.floating):
+            return k.jvm_view().Py4jByteArrayConverter.toDoubleArray(ndarray.flatten().tobytes(), ndarray.itemsize)
+        else:
+            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(
+                ndarray.dtype))
 
     @staticmethod
     def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> JavaMember:

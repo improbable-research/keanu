@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.improbable.keanu.tensor.ByteArrayConverter.toDoubleArray;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 
@@ -42,13 +41,6 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
         return create(values, values.length);
     }
 
-    public static DoubleTensor create(byte[] bytes, long... shape) {
-        return create(toDoubleArray(bytes), shape);
-    }
-
-    public static DoubleTensor create(byte[] bytes) {
-        return create(toDoubleArray(bytes));
-    }
 
     public static DoubleTensor ones(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {

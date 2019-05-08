@@ -40,4 +40,20 @@ public class Py4jByteArrayConverter {
         byte[] byteArray = booleanBuffer.array();
         return byteArray;
     }
+
+    public static double[] toDoubleArray(byte[] byteArray, int itemSizeBytes){
+        double[] doubles = new double[byteArray.length / itemSizeBytes];
+        for(int i=0;i<doubles.length;i++){
+            doubles[i] = ByteBuffer.wrap(byteArray, i*itemSizeBytes, itemSizeBytes).order(ByteOrder.LITTLE_ENDIAN).getDouble();
+        }
+        return doubles;
+    }
+
+    public static int[] toIntegerArray(byte[] byteArray, int itemSizeBytes){
+        int[] ints = new int[byteArray.length / itemSizeBytes];
+        for(int i=0;i<ints.length;i++){
+            ints[i] = ByteBuffer.wrap(byteArray, i*itemSizeBytes, itemSizeBytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
+        }
+        return ints;
+    }
 }

@@ -17,7 +17,6 @@ import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -764,23 +763,6 @@ public class Nd4jIntegerTensorTest {
 
         IntegerTensor concat = IntegerTensor.concat(0, x, y);
         assertEquals(IntegerTensor.create(2, 3, 4, 5, 6), concat);
-    }
-
-    @Test
-    public void canConstructFromByteArray() {
-        byte byte1 = Byte.parseByte("00000110", 2);
-        byte byte2 = Byte.parseByte("00000011", 2);
-        byte zeroByte = Byte.parseByte("00000000", 2);
-        byte[] bytes = new byte[] {
-            zeroByte, zeroByte, zeroByte, byte1,
-            zeroByte, zeroByte, zeroByte, byte2
-        };
-
-        IntegerTensor tensor = IntegerTensor.create(bytes);
-
-        assertThat(tensor.getShape(), is(new long[] { 2 }));
-        assertThat(tensor.getValue(0), is(6));
-        assertThat(tensor.getValue(1), is(3));
     }
 
 

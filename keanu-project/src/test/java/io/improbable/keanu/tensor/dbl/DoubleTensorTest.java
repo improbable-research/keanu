@@ -34,7 +34,6 @@ import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndSh
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -1345,21 +1344,5 @@ public class DoubleTensorTest {
         A.setValue(0.5, 1, 0);
     }
 
-    @Test
-    public void canConstructFromByteArray() {
-        byte byte1 = Byte.parseByte("01000000", 2);
-        byte byte2 = Byte.parseByte("00011000", 2);
-        byte byte3 = Byte.parseByte("00001000", 2);
-        byte zeroByte = Byte.parseByte("00000000", 2);
-        byte[] bytes = new byte[] {
-            byte1, byte2, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,
-            byte1, byte3, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,
-        };
 
-        DoubleTensor tensor = DoubleTensor.create(bytes);
-
-        assertThat(tensor.getShape(), is(new long[] { 2 }));
-        assertThat(tensor.getValue(0), is(6.0));
-        assertThat(tensor.getValue(1), is(3.0));
-    }
 }
