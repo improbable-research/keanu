@@ -5,7 +5,7 @@ import re
 
 from keanu.sequence import Sequence, SequenceItem
 from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, ConstantDouble, \
-    vertex_constructor_param_types
+    vertex_constructor_param_types, Vertex, Integer, Double, Boolean
 from keanu.vertex.label import _VertexLabel
 
 
@@ -261,3 +261,46 @@ def test_you_can_get_a_bayes_net_from_a_sequence() -> None:
         full_label = vertex.get_label()
         assert full_label is not None
         assert net.get_vertex_by_label(full_label) is not None
+
+
+def test_proxy_vertices_are_correctly_typed() -> None:
+
+    initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {
+        "double_vertex": Const(1.0),
+        "int_vertex": Const(1),
+        "bool_vertex": Const(True)
+    }
+
+    def factory(sequence_item: SequenceItem):
+
+        previous_double_vertex = sequence_item.add_double_proxy_for("double_vertex")
+        assert previous_double_vertex._class == "DoubleProxyVertex"
+        assert type(previous_double_vertex) == Double
+
+        previous_int_vertex = sequence_item.add_integer_proxy_for("int_vertex")
+        assert previous_int_vertex._class == "IntegerProxyVertex"
+        assert type(previous_int_vertex) == Integer
+
+        previous_bool_vertex = sequence_item.add_boolean_proxy_for("bool_vertex")
+        assert previous_bool_vertex._class == "BooleanProxyVertex"
+        assert type(previous_bool_vertex) == Boolean
+
+        double_vertex = previous_int_vertex + 1.0
+        double_vertex.set_label("double_vertex")
+        sequence_item.add(double_vertex)
+        assert double_vertex._class == "AdditionVertex"
+        assert type(double_vertex) == Double
+
+        int_vertex = previous_int_vertex + 1
+        int_vertex.set_label("int_vertex")
+        sequence_item.add(int_vertex)
+        assert int_vertex._class == "IntegerAdditionVertex"
+        assert type(int_vertex) == Integer
+
+        bool_vertex = previous_bool_vertex == True
+        bool_vertex.set_label("bool_vertex")
+        sequence_item.add(bool_vertex)
+        assert bool_vertex._class == "EqualsVertex"
+        assert type(bool_vertex) == Boolean
+
+    sequence = Sequence(count=5, factories=factory, initial_state=initial_state)
