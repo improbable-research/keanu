@@ -56,12 +56,13 @@ class Tensor(JavaObjectWrapper):
         return ctor(values, shape)
 
     @staticmethod
-    def __get_java_array_from_ndarray(ndarray: numpy_types) -> Union[JavaObject, bytes]:
+    def __get_java_array_from_ndarray(ndarray: numpy_types) -> JavaObject:
         if ndarray.size == 0:
             raise ValueError("Cannot infer type because array is empty")
 
         if np.issubdtype(ndarray.dtype, np.bool_):
-            return k.to_java_array(ndarray.flatten().tolist())
+            return k.jvm_view().Py4jByteArrayConverter.toBooleanArray(
+                np.packbits(ndarray.flatten()).tobytes(), ndarray.size)
         elif np.issubdtype(ndarray.dtype, np.integer):
             return k.jvm_view().Py4jByteArrayConverter.toIntegerArray(ndarray.flatten().tobytes(), ndarray.itemsize)
         elif np.issubdtype(ndarray.dtype, np.floating):

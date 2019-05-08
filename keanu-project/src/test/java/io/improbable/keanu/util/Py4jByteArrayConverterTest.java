@@ -41,4 +41,20 @@ public class Py4jByteArrayConverterTest {
         assertThat(doubles[0], is(6.0));
         assertThat(doubles[1], is(3.0));
     }
+
+    @Test
+    public void canCreateBooleanArrayFromByteArray() {
+        byte byte1 = (byte) Integer.parseInt("10101010", 2);
+        byte byte2 = (byte) Integer.parseInt("10000000", 2);
+        byte[] bytes = new byte[] { byte1, byte2 };
+
+        boolean[] bools = Py4jByteArrayConverter.toBooleanArray(bytes, bytes.length * 8);
+        boolean[] desiredBools = new boolean[] {
+            true, false, true, false, true, false, true, false,
+            true, false, false, false, false, false, false, false
+        };
+
+        assertThat(bools.length, is(16));
+        assertThat(bools, is(desiredBools));
+    }
 }

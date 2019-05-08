@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.BitSet;
 
 @UtilityClass
 public class Py4jByteArrayConverter {
@@ -55,5 +56,24 @@ public class Py4jByteArrayConverter {
             ints[i] = ByteBuffer.wrap(byteArray, i*itemSizeBytes, itemSizeBytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
         }
         return ints;
+    }
+
+    public static boolean[] toBooleanArray(byte[] byteArray, int numberOfBooleansInArray) {
+        BitSet bits = BitSet.valueOf(byteArray);
+        boolean[] bools = new boolean[numberOfBooleansInArray];
+        int numberOfBitsToIterateThrough = ((int) Math.ceil((numberOfBooleansInArray - 1.0) / 8.0) + 1) * 8;
+        for (int i = bits.nextSetBit(0); i != -1 && i < numberOfBitsToIterateThrough; i = bits.nextSetBit(i+1)) {
+            int position = getBigEndianPosition(i);
+            if (position < numberOfBooleansInArray) {
+                bools[position] = true;
+            }
+        }
+        return bools;
+    }
+
+    private int getBigEndianPosition(int index){
+        int byteNumber = index / 8;
+        int bitNumber = index % 8;
+        return byteNumber * 8 + (7 - bitNumber);
     }
 }
