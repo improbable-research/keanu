@@ -41,7 +41,6 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
         return create(values, values.length);
     }
 
-
     public static DoubleTensor ones(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(1.0);
