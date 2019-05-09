@@ -44,7 +44,7 @@ public class Py4jByteArrayConverter {
 
     public static double[] toDoubleArray(byte[] byteArray, int itemSizeBytes){
         double[] doubles = new double[byteArray.length / itemSizeBytes];
-        for(int i=0;i<doubles.length;i++){
+        for (int i = 0; i < doubles.length; i++) {
             doubles[i] = ByteBuffer.wrap(byteArray, i*itemSizeBytes, itemSizeBytes).order(ByteOrder.LITTLE_ENDIAN).getDouble();
         }
         return doubles;
