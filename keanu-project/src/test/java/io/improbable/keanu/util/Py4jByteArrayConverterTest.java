@@ -2,8 +2,7 @@ package io.improbable.keanu.util;
 
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertArrayEquals;
 
 public class Py4jByteArrayConverterTest {
 
@@ -18,10 +17,9 @@ public class Py4jByteArrayConverterTest {
         };
 
         int[] ints = Py4jByteArrayConverter.toIntegerArray(bytes, 4);
+        int[] desiredInts = new int[] { 6, 3 };
 
-        assertThat(ints.length, is(2));
-        assertThat(ints[0], is(6));
-        assertThat(ints[1], is(3));
+        assertArrayEquals(ints, desiredInts);
     }
 
     @Test
@@ -36,10 +34,9 @@ public class Py4jByteArrayConverterTest {
         };
 
         double[] doubles = Py4jByteArrayConverter.toDoubleArray(bytes, 8);
+        double[] desiredDoubles = new double[] { 6.0, 3.0 };
 
-        assertThat(doubles.length, is(2));
-        assertThat(doubles[0], is(6.0));
-        assertThat(doubles[1], is(3.0));
+        assertArrayEquals(doubles, desiredDoubles, 0.0);
     }
 
     @Test
@@ -54,7 +51,6 @@ public class Py4jByteArrayConverterTest {
             true, false, false, false, false, false, false, false
         };
 
-        assertThat(bools.length, is(16));
-        assertThat(bools, is(desiredBools));
+        assertArrayEquals(bools, desiredBools);
     }
 }
