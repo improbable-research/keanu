@@ -52,7 +52,7 @@ public class Py4jByteArrayConverter {
 
     public static int[] toIntegerArray(byte[] byteArray, int itemSizeBytes){
         int[] ints = new int[byteArray.length / itemSizeBytes];
-        for(int i=0;i<ints.length;i++){
+        for(int i = 0; i < ints.length; i++) {
             ints[i] = ByteBuffer.wrap(byteArray, i*itemSizeBytes, itemSizeBytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
         }
         return ints;
