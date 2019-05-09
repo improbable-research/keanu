@@ -42,7 +42,11 @@ public class Py4jByteArrayConverter {
         return byteArray;
     }
 
-    public static double[] toDoubleArray(byte[] byteArray, int itemSizeBytes){
+    public static double[] toDoubleArray(byte[] byteArray, int itemSizeBytes) throws ArrayConversionException {
+        if (itemSizeBytes == 0) {
+            throw new ArrayConversionException("itemSizeBytes cannot be zero");
+        }
+
         double[] doubles = new double[byteArray.length / itemSizeBytes];
         for (int i = 0; i < doubles.length; i++) {
             doubles[i] = ByteBuffer.wrap(byteArray, i*itemSizeBytes, itemSizeBytes).order(ByteOrder.LITTLE_ENDIAN).getDouble();
@@ -50,7 +54,11 @@ public class Py4jByteArrayConverter {
         return doubles;
     }
 
-    public static int[] toIntegerArray(byte[] byteArray, int itemSizeBytes){
+    public static int[] toIntegerArray(byte[] byteArray, int itemSizeBytes) throws ArrayConversionException {
+        if (itemSizeBytes == 0) {
+            throw new ArrayConversionException("itemSizeBytes cannot be zero");
+        }
+
         int[] ints = new int[byteArray.length / itemSizeBytes];
         for(int i = 0; i < ints.length; i++) {
             ints[i] = ByteBuffer.wrap(byteArray, i*itemSizeBytes, itemSizeBytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
@@ -75,5 +83,11 @@ public class Py4jByteArrayConverter {
         int byteNumber = index / 8;
         int bitNumber = index % 8;
         return byteNumber * 8 + (7 - bitNumber);
+    }
+}
+
+class ArrayConversionException extends Exception {
+    ArrayConversionException(String message) {
+        super(message);
     }
 }

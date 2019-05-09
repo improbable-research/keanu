@@ -7,7 +7,7 @@ import static org.junit.Assert.assertArrayEquals;
 public class Py4jByteArrayConverterTest {
 
     @Test
-    public void canCreateIntegerArrayFromByteArray() {
+    public void canCreateIntegerArrayFromByteArray() throws ArrayConversionException {
         byte byte1 = Byte.parseByte("00000110", 2);
         byte byte2 = Byte.parseByte("00000011", 2);
         byte zeroByte = Byte.parseByte("00000000", 2);
@@ -23,7 +23,7 @@ public class Py4jByteArrayConverterTest {
     }
 
     @Test
-    public void canCreateDoubleArrayFromByteArray() {
+    public void canCreateDoubleArrayFromByteArray() throws ArrayConversionException{
         byte byte1 = Byte.parseByte("01000000", 2);
         byte byte2 = Byte.parseByte("00011000", 2);
         byte byte3 = Byte.parseByte("00001000", 2);
