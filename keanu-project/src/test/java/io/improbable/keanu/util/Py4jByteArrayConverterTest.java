@@ -69,4 +69,19 @@ public class Py4jByteArrayConverterTest {
 
         assertArrayEquals(bools, desiredBools);
     }
+
+    @Test
+    public void doesntCreateTooManyBooleansFromPadding() {
+        byte byte1 = (byte) Integer.parseInt("10101010", 2);
+        byte byte2 = (byte) Integer.parseInt("10000000", 2);
+        byte[] bytes = new byte[] { byte1, byte2 };
+
+        boolean[] bools = Py4jByteArrayConverter.toBooleanArray(bytes, bytes.length * 8 - 4);
+        boolean[] desiredBools = new boolean[] {
+            true, false, true, false, true, false, true, false,
+            true, false, false, false
+        };
+
+        assertArrayEquals(bools, desiredBools);
+    }
 }

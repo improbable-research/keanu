@@ -84,8 +84,8 @@ public class Py4jByteArrayConverter {
     public static boolean[] toBooleanArray(byte[] byteArray, int numberOfBooleansInArray) {
         BitSet bits = BitSet.valueOf(byteArray);
         boolean[] bools = new boolean[numberOfBooleansInArray];
-        int numberOfBitsToIterateThrough = ((int) Math.ceil((numberOfBooleansInArray - 1.0) / 8.0) + 1) * 8;
-        for (int i = bits.nextSetBit(0); i != -1 && i < numberOfBitsToIterateThrough; i = bits.nextSetBit(i+1)) {
+        int totalNumberOfBits = byteArray.length * 8;
+        for (int i = bits.nextSetBit(0); i != -1 && i < totalNumberOfBits; i = bits.nextSetBit(i+1)) {
             int position = getBigEndianPosition(i);
             if (position < numberOfBooleansInArray) {
                 bools[position] = true;
