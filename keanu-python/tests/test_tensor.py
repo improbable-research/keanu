@@ -119,6 +119,15 @@ def test_you_can_create_tensors(dtype):
     assert (ones == ndarray).all()
 
 
+@pytest.mark.parametrize("value", [[True, True], [True, False], [True, True, True, True, False, False, False, False],
+                                   [False, True, False, True, False, True, False, True]])
+def test_you_can_create_boolean_tensor(value):
+    bools = np.array(value)
+    t = Tensor(bools)
+    ndarray = Tensor._to_ndarray(t.unwrap())
+    assert (bools == ndarray).all()
+
+
 def test_fails_when_long_is_too_long() -> None:
     ones = np.ones((1, 1), np.int64)
     ones[0, 0] = sys.maxsize

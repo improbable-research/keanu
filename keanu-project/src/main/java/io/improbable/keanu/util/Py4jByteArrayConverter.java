@@ -81,11 +81,12 @@ public class Py4jByteArrayConverter {
     public static boolean[] toBooleanArray(byte[] byteArray, int numberOfBooleansInArray) {
         BitSet bits = BitSet.valueOf(byteArray);
         boolean[] bools = new boolean[numberOfBooleansInArray];
-        for (int i = bits.nextSetBit(0); i != -1; i = bits.nextSetBit(i+1)) {
+        for (int i = bits.nextSetBit(0); i != -1; i = bits.nextSetBit(i + 1)) {
             int position = getBigEndianPosition(i);
-            if (position < numberOfBooleansInArray) {
-                bools[position] = true;
+            if (position >= numberOfBooleansInArray) {
+                throw new Py4jByteArrayConversionException("There are more encoded booleans than the number of booleans specified");
             }
+            bools[position] = true;
         }
         return bools;
     }

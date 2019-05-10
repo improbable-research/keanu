@@ -1,10 +1,15 @@
 package io.improbable.keanu.util;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertArrayEquals;
 
 public class Py4jByteArrayConverterTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void canCreateIntegerArrayFromByteArray() {
@@ -83,5 +88,18 @@ public class Py4jByteArrayConverterTest {
         };
 
         assertArrayEquals(bools, desiredBools);
+    }
+
+
+    @Test
+    public void throwsIfTooManyBooleansAreEncoded() {
+        byte byte1 = (byte) Integer.parseInt("10101010", 2);
+        byte byte2 = (byte) Integer.parseInt("10000001", 2);
+        byte[] bytes = new byte[] { byte1, byte2 };
+
+        expectedException.expect(Py4jByteArrayConversionException.class);
+        expectedException.expectMessage("There are more encoded booleans than the number of booleans specified");
+
+        Py4jByteArrayConverter.toBooleanArray(bytes, bytes.length * 8 - 4);
     }
 }
