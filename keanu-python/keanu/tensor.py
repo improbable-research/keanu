@@ -63,10 +63,12 @@ class Tensor(JavaObjectWrapper):
         if np.issubdtype(ndarray.dtype, np.bool_):
             return k.jvm_view().Py4jByteArrayConverter.toBooleanArray(
                 np.packbits(ndarray.flatten()).tobytes(), ndarray.size)
-        elif np.issubdtype(ndarray.dtype, np.integer):
-            return k.jvm_view().Py4jByteArrayConverter.toIntegerArray(ndarray.flatten().tobytes(), ndarray.itemsize)
+        elif np.issubdtype(ndarray.dtype, np.int32):
+            return k.jvm_view().Py4jByteArrayConverter.toIntegerArray(ndarray.flatten().tobytes())
+        elif np.issubdtype(ndarray.dtype, np.int64):
+            return k.jvm_view().Py4jByteArrayConverter.toLongArray(ndarray.flatten().tobytes())
         elif np.issubdtype(ndarray.dtype, np.floating):
-            return k.jvm_view().Py4jByteArrayConverter.toDoubleArray(ndarray.flatten().tobytes(), ndarray.itemsize)
+            return k.jvm_view().Py4jByteArrayConverter.toDoubleArray(ndarray.flatten().tobytes())
         else:
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(
                 ndarray.dtype))

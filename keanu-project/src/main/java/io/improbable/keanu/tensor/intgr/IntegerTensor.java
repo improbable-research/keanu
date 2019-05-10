@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -39,6 +40,17 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     static IntegerTensor create(int... values) {
         return create(values, values.length);
+    }
+
+    /**
+     * Creates an IntegerTensor from a long[]. Will throw an exception is any value in the long[] cannot be represented as an integer
+     * @param values long[] of values
+     * @param shape shape of the tensor
+     * @return a new IntegerTensor
+     */
+    static IntegerTensor create(long[] values, long[] shape) {
+        int[] ints = Arrays.stream(values).mapToInt(Ints::checkedCast).toArray();
+        return IntegerTensor.create(ints, shape);
     }
 
     static IntegerTensor ones(long... shape) {

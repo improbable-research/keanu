@@ -1,8 +1,10 @@
+import sys
 from typing import Union, List
 
 import numpy as np
 import pandas as pd
 import pytest
+from py4j.protocol import Py4JJavaError
 
 from keanu.tensor import Tensor
 from keanu.vartypes import primitive_types, numpy_types
@@ -107,3 +109,18 @@ def test_you_can_apply_a_function_to_a_tensor(value, expected_result):
     result = t.apply(lambda x: x + 10)
     ndarray = Tensor._to_ndarray(result)
     assert (ndarray == expected_result).all()
+
+
+@pytest.mark.parametrize("dtype", [np.int32, np.int64, np.float])
+def test_you_can_create_tensors(dtype):
+    ones = np.ones((1, 1), dtype)
+    t = Tensor(ones)
+    ndarray = Tensor._to_ndarray(t.unwrap())
+    assert (ones == ndarray).all()
+
+
+def test_fails_when_long_is_too_long() -> None:
+    ones = np.ones((1, 1), np.int64)
+    ones[0, 0] = sys.maxsize
+    with pytest.raises(Py4JJavaError):
+        Tensor(ones)

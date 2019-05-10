@@ -7,7 +7,7 @@ import static org.junit.Assert.assertArrayEquals;
 public class Py4jByteArrayConverterTest {
 
     @Test
-    public void canCreateIntegerArrayFromByteArray() throws ArrayConversionException {
+    public void canCreateIntegerArrayFromByteArray() {
         byte byte1 = Byte.parseByte("00000110", 2);
         byte byte2 = Byte.parseByte("00000011", 2);
         byte zeroByte = Byte.parseByte("00000000", 2);
@@ -16,14 +16,30 @@ public class Py4jByteArrayConverterTest {
             byte2, zeroByte, zeroByte, zeroByte
         };
 
-        int[] ints = Py4jByteArrayConverter.toIntegerArray(bytes, 4);
+        int[] ints = Py4jByteArrayConverter.toIntegerArray(bytes);
         int[] desiredInts = new int[] { 6, 3 };
 
         assertArrayEquals(ints, desiredInts);
     }
 
     @Test
-    public void canCreateDoubleArrayFromByteArray() throws ArrayConversionException{
+    public void canCreateLongArrayFromByteArray() {
+        byte byte1 = Byte.parseByte("00000110", 2);
+        byte byte2 = Byte.parseByte("00000011", 2);
+        byte zeroByte = Byte.parseByte("00000000", 2);
+        byte[] bytes = new byte[] {
+            byte1, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,
+            byte2, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte
+        };
+
+        long[] longs = Py4jByteArrayConverter.toLongArray(bytes);
+        long[] desiredInts = new long[] { 6, 3 };
+
+        assertArrayEquals(longs, desiredInts);
+    }
+
+    @Test
+    public void canCreateDoubleArrayFromByteArray(){
         byte byte1 = Byte.parseByte("01000000", 2);
         byte byte2 = Byte.parseByte("00011000", 2);
         byte byte3 = Byte.parseByte("00001000", 2);
@@ -33,7 +49,7 @@ public class Py4jByteArrayConverterTest {
             zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, byte3, byte1
         };
 
-        double[] doubles = Py4jByteArrayConverter.toDoubleArray(bytes, 8);
+        double[] doubles = Py4jByteArrayConverter.toDoubleArray(bytes);
         double[] desiredDoubles = new double[] { 6.0, 3.0 };
 
         assertArrayEquals(doubles, desiredDoubles, 0.0);
