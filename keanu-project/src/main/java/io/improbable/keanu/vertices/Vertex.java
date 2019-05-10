@@ -16,15 +16,17 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexState<T>> {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
 
-    private Set<Vertex> children = Collections.emptySet();
+    private Set<Vertex> children = new TreeSet<>(Comparator.comparing(Vertex::getId));
     private Set<Vertex> parents = Collections.emptySet();
     private VertexState<T> state;
     private VertexLabel label = null;
@@ -231,11 +233,11 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
     }
 
     public Set<Vertex> getChildren() {
-        return children;
+        return Collections.unmodifiableSet(children);
     }
 
     public void addChild(Vertex<?> v) {
-        children = ImmutableSet.<Vertex>builder().addAll(children).add(v).build();
+        children.add(v);
     }
 
     public void setParents(Collection<? extends Vertex> parents) {

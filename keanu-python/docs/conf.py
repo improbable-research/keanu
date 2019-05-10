@@ -23,9 +23,9 @@ copyright = u'2018, Improbable'
 author = u'Improbable'
 
 # The short X.Y version
-version = u'0.0.25'
+version = u'0.0.26'
 # The full version, including alpha/beta/rc tags
-release = u'0.0.25'
+release = u'0.0.26'
 
 # -- General configuration ---------------------------------------------------
 
