@@ -54,7 +54,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     /**
-     * Creates an IntegerTensor from a long[]. Will throw an exception is any value in the long[] cannot be represented as an integer
+     * Creates an IntegerTensor from a long[]. Will throw an exception if any value in the long[] cannot be represented as an integer
      * @param values long[] of values
      * @return a new IntegerTensor
      */
