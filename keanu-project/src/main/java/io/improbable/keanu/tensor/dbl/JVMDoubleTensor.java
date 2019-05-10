@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.dbl;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorMulByMatrixMul;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;

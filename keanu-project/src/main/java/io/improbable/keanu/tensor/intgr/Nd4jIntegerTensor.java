@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.intgr;
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorMulByMatrixMul;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.TypedINDArrayFactory;
@@ -66,6 +67,10 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     public static Nd4jIntegerTensor create(int[] values, long[] shape) {
+        long length = TensorShape.getLength(shape);
+        if (values.length != length) {
+            throw new IllegalArgumentException("Shape " + Arrays.toString(shape) + " does not match buffer size " + values.length);
+        }
         return new Nd4jIntegerTensor(values, shape);
     }
 
@@ -98,12 +103,20 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor permute(int... rearrange) {
+        return new Nd4jIntegerTensor(tensor.permute(rearrange));
+    }
+
+    @Override
     public IntegerTensor diag() {
         return new Nd4jIntegerTensor(Nd4j.diag(tensor));
     }
 
     @Override
     public IntegerTensor transpose() {
+        if (this.getRank() != 2) {
+            throw new IllegalArgumentException("Cannot transpose rank " + this.getRank() + " tensor. Try permute instead.");
+        }
         return new Nd4jIntegerTensor(tensor.transpose());
     }
 
@@ -135,8 +148,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight) {
-        INDArray tensorMmulResult = Nd4j.tensorMmul(tensor, unsafeGetNd4J(value), new int[][]{dimLeft, dimsRight});
-        return new Nd4jIntegerTensor(tensorMmulResult);
+        return TensorMulByMatrixMul.tensorMmul(this, value, dimLeft, dimsRight);
     }
 
     @Override
@@ -575,7 +587,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public Integer getValue(long... index) {
-        return (int) tensor.getDouble(index);
+        if (index.length == 1) {
+            return (int) tensor.getDouble(index[0]);
+        } else {
+            return (int) tensor.getDouble(index);
+        }
     }
 
     @Override
