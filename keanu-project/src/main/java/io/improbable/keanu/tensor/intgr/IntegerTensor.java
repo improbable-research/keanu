@@ -48,7 +48,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
      * @param shape shape of the tensor
      * @return a new IntegerTensor
      */
-    static IntegerTensor create(long[] values, long[] shape) {
+    static IntegerTensor create(long[] values, long... shape) {
         int[] ints = Arrays.stream(values).mapToInt(Ints::checkedCast).toArray();
         return IntegerTensor.create(ints, shape);
     }
@@ -58,9 +58,8 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
      * @param values long[] of values
      * @return a new IntegerTensor
      */
-    static IntegerTensor create(long[] values) {
-        int[] ints = Arrays.stream(values).mapToInt(Ints::checkedCast).toArray();
-        return IntegerTensor.create(ints);
+    static IntegerTensor create(long... values) {
+        return IntegerTensor.create(values, values.length);
     }
 
     static IntegerTensor ones(long... shape) {
