@@ -275,6 +275,15 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
+    public void cannotCreateTensorWithLongsThatAreTooLong() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Out of range: " + Long.MAX_VALUE);
+
+
+        IntegerTensor.create(new long[]{Long.MAX_VALUE});
+    }
+
+    @Test
     public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
         IntegerTensor tensor = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor mask = Nd4jIntegerTensor.scalar(1);

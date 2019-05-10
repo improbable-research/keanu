@@ -53,6 +53,16 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return IntegerTensor.create(ints, shape);
     }
 
+    /**
+     * Creates an IntegerTensor from a long[]. Will throw an exception is any value in the long[] cannot be represented as an integer
+     * @param values long[] of values
+     * @return a new IntegerTensor
+     */
+    static IntegerTensor create(long[] values) {
+        int[] ints = Arrays.stream(values).mapToInt(Ints::checkedCast).toArray();
+        return IntegerTensor.create(ints);
+    }
+
     static IntegerTensor ones(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarIntegerTensor(1);
