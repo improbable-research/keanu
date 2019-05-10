@@ -8,6 +8,9 @@ import java.util.BitSet;
 
 @UtilityClass
 public class Py4jByteArrayConverter {
+    private final int LONG_SIZE_BYTES = Long.SIZE / Byte.SIZE;
+    private final int INT_SIZE_BYTES = Integer.SIZE / Byte.SIZE;
+    private final int DOUBLE_SIZE_BYTES = Double.SIZE / Byte.SIZE;
 
     public byte[] toByteArray(double[] doubleArray) {
         ByteBuffer doubleBuffer = ByteBuffer.allocate(Double.SIZE / Byte.SIZE * doubleArray.length);
@@ -43,31 +46,25 @@ public class Py4jByteArrayConverter {
     }
 
     public static double[] toDoubleArray(byte[] byteArray) {
-        int doubleSizeBytes = Double.SIZE / Byte.SIZE;
-
-        double[] doubles = new double[byteArray.length / doubleSizeBytes];
+        double[] doubles = new double[byteArray.length / DOUBLE_SIZE_BYTES];
         for (int i = 0; i < doubles.length; i++) {
-            doubles[i] = ByteBuffer.wrap(byteArray, i * doubleSizeBytes, doubleSizeBytes).order(ByteOrder.LITTLE_ENDIAN).getDouble();
+            doubles[i] = ByteBuffer.wrap(byteArray, i * DOUBLE_SIZE_BYTES, DOUBLE_SIZE_BYTES).order(ByteOrder.LITTLE_ENDIAN).getDouble();
         }
         return doubles;
     }
 
     public static int[] toIntegerArray(byte[] byteArray) {
-        int intSizeBytes = Integer.SIZE / Byte.SIZE;
-
-        int[] ints = new int[byteArray.length / intSizeBytes];
+        int[] ints = new int[byteArray.length / INT_SIZE_BYTES];
         for(int i = 0; i < ints.length; i++) {
-            ints[i] = ByteBuffer.wrap(byteArray, i * intSizeBytes, intSizeBytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            ints[i] = ByteBuffer.wrap(byteArray, i * INT_SIZE_BYTES, INT_SIZE_BYTES).order(ByteOrder.LITTLE_ENDIAN).getInt();
         }
         return ints;
     }
 
     public static long[] toLongArray(byte[] byteArray) {
-        int longSizeBytes = Long.SIZE / Byte.SIZE;
-
-        long[] longs = new long[byteArray.length / longSizeBytes];
+        long[] longs = new long[byteArray.length / LONG_SIZE_BYTES];
         for(int i = 0; i < longs.length; i++) {
-            longs[i] = ByteBuffer.wrap(byteArray, i * longSizeBytes, longSizeBytes).order(ByteOrder.LITTLE_ENDIAN).getLong();
+            longs[i] = ByteBuffer.wrap(byteArray, i * LONG_SIZE_BYTES, LONG_SIZE_BYTES).order(ByteOrder.LITTLE_ENDIAN).getLong();
         }
         return longs;
     }
@@ -84,8 +81,7 @@ public class Py4jByteArrayConverter {
     public static boolean[] toBooleanArray(byte[] byteArray, int numberOfBooleansInArray) {
         BitSet bits = BitSet.valueOf(byteArray);
         boolean[] bools = new boolean[numberOfBooleansInArray];
-        int totalNumberOfBits = byteArray.length * 8;
-        for (int i = bits.nextSetBit(0); i != -1 && i < totalNumberOfBits; i = bits.nextSetBit(i+1)) {
+        for (int i = bits.nextSetBit(0); i != -1; i = bits.nextSetBit(i+1)) {
             int position = getBigEndianPosition(i);
             if (position < numberOfBooleansInArray) {
                 bools[position] = true;
