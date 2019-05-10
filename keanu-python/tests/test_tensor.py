@@ -111,7 +111,7 @@ def test_you_can_apply_a_function_to_a_tensor(value, expected_result):
     assert (ndarray == expected_result).all()
 
 
-@pytest.mark.parametrize("dtype", [np.int32, np.int64, np.float])
+@pytest.mark.parametrize("dtype", [np.int32, np.int64, np.float_])
 def test_you_can_create_tensors(dtype):
     ones = np.ones((1, 1), dtype)
     t = Tensor(ones)
