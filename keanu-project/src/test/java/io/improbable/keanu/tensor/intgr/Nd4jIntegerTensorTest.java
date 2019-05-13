@@ -279,7 +279,6 @@ public class Nd4jIntegerTensorTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Out of range: " + Long.MAX_VALUE);
 
-
         IntegerTensor.create(new long[]{Long.MAX_VALUE});
     }
 
