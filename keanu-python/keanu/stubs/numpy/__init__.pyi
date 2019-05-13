@@ -13,6 +13,8 @@ _dtype = dtype
 class ufunc:
     __name__: str
 
+def packbits(array: ndarray) -> ndarray:...
+
 class flagsobj:
     """numpy.flagsobj"""
     aligned = None       # type: bool
