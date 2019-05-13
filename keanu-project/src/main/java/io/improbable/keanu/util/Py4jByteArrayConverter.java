@@ -8,9 +8,6 @@ import java.util.BitSet;
 
 @UtilityClass
 public class Py4jByteArrayConverter {
-    private final int LONG_SIZE_BYTES = Long.SIZE / Byte.SIZE;
-    private final int INT_SIZE_BYTES = Integer.SIZE / Byte.SIZE;
-    private final int DOUBLE_SIZE_BYTES = Double.SIZE / Byte.SIZE;
 
     public byte[] toByteArray(double[] doubleArray) {
         ByteBuffer doubleBuffer = ByteBuffer.allocate(Double.SIZE / Byte.SIZE * doubleArray.length);
@@ -46,25 +43,25 @@ public class Py4jByteArrayConverter {
     }
 
     public static double[] toDoubleArray(byte[] byteArray) {
-        double[] doubles = new double[byteArray.length / DOUBLE_SIZE_BYTES];
+        double[] doubles = new double[byteArray.length / Double.BYTES];
         for (int i = 0; i < doubles.length; i++) {
-            doubles[i] = ByteBuffer.wrap(byteArray, i * DOUBLE_SIZE_BYTES, DOUBLE_SIZE_BYTES).order(ByteOrder.LITTLE_ENDIAN).getDouble();
+            doubles[i] = ByteBuffer.wrap(byteArray, i * Double.BYTES, Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).getDouble();
         }
         return doubles;
     }
 
     public static int[] toIntegerArray(byte[] byteArray) {
-        int[] ints = new int[byteArray.length / INT_SIZE_BYTES];
+        int[] ints = new int[byteArray.length / Integer.BYTES];
         for(int i = 0; i < ints.length; i++) {
-            ints[i] = ByteBuffer.wrap(byteArray, i * INT_SIZE_BYTES, INT_SIZE_BYTES).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            ints[i] = ByteBuffer.wrap(byteArray, i * Integer.BYTES, Integer.BYTES).order(ByteOrder.LITTLE_ENDIAN).getInt();
         }
         return ints;
     }
 
     public static long[] toLongArray(byte[] byteArray) {
-        long[] longs = new long[byteArray.length / LONG_SIZE_BYTES];
+        long[] longs = new long[byteArray.length / Long.BYTES];
         for(int i = 0; i < longs.length; i++) {
-            longs[i] = ByteBuffer.wrap(byteArray, i * LONG_SIZE_BYTES, LONG_SIZE_BYTES).order(ByteOrder.LITTLE_ENDIAN).getLong();
+            longs[i] = ByteBuffer.wrap(byteArray, i * Long.BYTES, Long.BYTES).order(ByteOrder.LITTLE_ENDIAN).getLong();
         }
         return longs;
     }
