@@ -1,5 +1,18 @@
 ## Version 0.0.26
 
+### Common
+
+* Made constructing the children set of a vertex more efficient by not constantly reconstructing the set.
+
+### Java
+
+* Fixed an error where a space was present in one of the dependencies, which broke some build systems fetching dependencies.
+
+### Python
+
+* Faster tensor creation in Python
+
+
 ## Version 0.0.25
 
 ## Version 0.0.24
