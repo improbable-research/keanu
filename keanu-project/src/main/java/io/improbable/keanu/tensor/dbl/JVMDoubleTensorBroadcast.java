@@ -104,15 +104,21 @@ public class JVMDoubleTensorBroadcast {
         Preconditions.checkArgument(leftBuffer.length >= rightBuffer.length);
         for (int i = 0; i < outputBuffer.length; i++) {
 
-            int j = mapBroadcastedIndex(leftShape, leftStride, rightShape, rightStride, i);
+            int j = mapBroadcastedIndex(leftStride, rightShape, rightStride, i);
 
             outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[j]);
         }
 
     }
 
-    static int mapBroadcastedIndex(long[] fromShape, long[] fromStride, long[] toShape, long[] toStride, int i) {
-        long[] shapeIndices = TensorShape.getShapeIndices(fromShape, fromStride, i);
+    private static int mapBroadcastedIndex(long[] fromStride, long[] toShape, long[] toStride, int flatIndex) {
+
+        long[] shapeIndices = new long[fromStride.length];
+        long remainder = flatIndex;
+        for (int i = 0; i < fromStride.length; i++) {
+            shapeIndices[i] = remainder / fromStride[i];
+            remainder -= shapeIndices[i] * fromStride[i];
+        }
 
         long[] mappedShapeIndices = new long[shapeIndices.length];
 
@@ -142,7 +148,7 @@ public class JVMDoubleTensorBroadcast {
         Preconditions.checkArgument(leftBuffer.length <= rightBuffer.length);
         for (int i = 0; i < outputBuffer.length; i++) {
 
-            int j = mapBroadcastedIndex(rightShape, rightStride, leftShape, leftStride,  i);
+            int j = mapBroadcastedIndex(rightStride, leftShape, leftStride, i);
 
             outputBuffer[i] = op.apply(leftBuffer[j], rightBuffer[i]);
         }
