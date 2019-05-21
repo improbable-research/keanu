@@ -113,7 +113,7 @@ public class JVMDoubleTensorBroadcast {
 
         long[] fromShapeIndex = new long[fromStride.length];
         long[] toShapeIndex = new long[fromShapeIndex.length];
-        long remainder = fromFlatIndex;
+        int remainder = fromFlatIndex;
         int toFlatIndex = 0;
 
         for (int i = 0; i < fromStride.length; i++) {
