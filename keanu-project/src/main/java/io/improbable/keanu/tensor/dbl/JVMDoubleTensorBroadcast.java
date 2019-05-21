@@ -1,9 +1,8 @@
 package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.TensorShape;
 
+import java.util.Arrays;
 import java.util.function.BiFunction;
 
 public class JVMDoubleTensorBroadcast {
@@ -111,10 +110,10 @@ public class JVMDoubleTensorBroadcast {
 
     }
 
-    private static int mapBroadcastedIndex(long[] fromStride, long[] toShape, long[] toStride, int flatIndex) {
+    private static int mapBroadcastedIndex(long[] fromStride, long[] toShape, long[] toStride, int fromFlatIndex) {
 
         long[] shapeIndices = new long[fromStride.length];
-        long remainder = flatIndex;
+        long remainder = fromFlatIndex;
         for (int i = 0; i < fromStride.length; i++) {
             shapeIndices[i] = remainder / fromStride[i];
             remainder -= shapeIndices[i] * fromStride[i];
@@ -126,7 +125,19 @@ public class JVMDoubleTensorBroadcast {
             mappedShapeIndices[s] = shapeIndices[s] % toShape[s];
         }
 
-        return Ints.checkedCast(TensorShape.getFlatIndex(toShape, toStride, mappedShapeIndices));
+        int flatIndex = 0;
+        for (int i = 0; i < mappedShapeIndices.length; i++) {
+
+            if (mappedShapeIndices[i] >= toShape[i]) {
+                throw new IllegalArgumentException(
+                    "Invalid index " + Arrays.toString(mappedShapeIndices) + " for shape " + Arrays.toString(toShape)
+                );
+            }
+
+            flatIndex += toStride[i] * mappedShapeIndices[i];
+        }
+
+        return flatIndex;
     }
 
     /**
