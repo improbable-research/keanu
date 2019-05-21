@@ -104,19 +104,23 @@ public class JVMDoubleTensorBroadcast {
         Preconditions.checkArgument(leftBuffer.length >= rightBuffer.length);
         for (int i = 0; i < outputBuffer.length; i++) {
 
-            long[] shapeIndices = TensorShape.getShapeIndices(leftShape, leftStride, i);
-
-            long[] mappedShapeIndices = new long[shapeIndices.length];
-
-            for (int s = 0; s < shapeIndices.length; s++) {
-                mappedShapeIndices[s] = shapeIndices[s] % rightShape[s];
-            }
-
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(rightShape, rightStride, mappedShapeIndices));
+            int j = mapBroadcastedIndex(leftShape, leftStride, rightShape, rightStride, i);
 
             outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[j]);
         }
 
+    }
+
+    static int mapBroadcastedIndex(long[] fromShape, long[] fromStride, long[] toShape, long[] toStride, int i) {
+        long[] shapeIndices = TensorShape.getShapeIndices(fromShape, fromStride, i);
+
+        long[] mappedShapeIndices = new long[shapeIndices.length];
+
+        for (int s = 0; s < shapeIndices.length; s++) {
+            mappedShapeIndices[s] = shapeIndices[s] % toShape[s];
+        }
+
+        return Ints.checkedCast(TensorShape.getFlatIndex(toShape, toStride, mappedShapeIndices));
     }
 
     /**
@@ -138,15 +142,7 @@ public class JVMDoubleTensorBroadcast {
         Preconditions.checkArgument(leftBuffer.length <= rightBuffer.length);
         for (int i = 0; i < outputBuffer.length; i++) {
 
-            long[] shapeIndices = TensorShape.getShapeIndices(rightShape, rightStride, i);
-
-            long[] mappedShapeIndices = new long[shapeIndices.length];
-
-            for (int s = 0; s < shapeIndices.length; s++) {
-                mappedShapeIndices[s] = shapeIndices[s] % leftShape[s];
-            }
-
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(leftShape, leftStride, mappedShapeIndices));
+            int j = mapBroadcastedIndex(rightShape, rightStride, leftShape, leftStride,  i);
 
             outputBuffer[i] = op.apply(leftBuffer[j], rightBuffer[i]);
         }
