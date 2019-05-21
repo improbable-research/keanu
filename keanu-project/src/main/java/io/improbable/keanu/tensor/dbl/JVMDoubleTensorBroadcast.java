@@ -2,7 +2,6 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
 
-import java.util.Arrays;
 import java.util.function.BiFunction;
 
 public class JVMDoubleTensorBroadcast {
@@ -112,32 +111,19 @@ public class JVMDoubleTensorBroadcast {
 
     private static int mapBroadcastedIndex(long[] fromStride, long[] toShape, long[] toStride, int fromFlatIndex) {
 
-        long[] shapeIndices = new long[fromStride.length];
+        long[] fromShapeIndex = new long[fromStride.length];
+        long[] toShapeIndex = new long[fromShapeIndex.length];
         long remainder = fromFlatIndex;
+        int toFlatIndex = 0;
+
         for (int i = 0; i < fromStride.length; i++) {
-            shapeIndices[i] = remainder / fromStride[i];
-            remainder -= shapeIndices[i] * fromStride[i];
+            fromShapeIndex[i] = remainder / fromStride[i];
+            remainder -= fromShapeIndex[i] * fromStride[i];
+            toShapeIndex[i] = fromShapeIndex[i] % toShape[i];
+            toFlatIndex += toStride[i] * toShapeIndex[i];
         }
 
-        long[] mappedShapeIndices = new long[shapeIndices.length];
-
-        for (int s = 0; s < shapeIndices.length; s++) {
-            mappedShapeIndices[s] = shapeIndices[s] % toShape[s];
-        }
-
-        int flatIndex = 0;
-        for (int i = 0; i < mappedShapeIndices.length; i++) {
-
-            if (mappedShapeIndices[i] >= toShape[i]) {
-                throw new IllegalArgumentException(
-                    "Invalid index " + Arrays.toString(mappedShapeIndices) + " for shape " + Arrays.toString(toShape)
-                );
-            }
-
-            flatIndex += toStride[i] * mappedShapeIndices[i];
-        }
-
-        return flatIndex;
+        return toFlatIndex;
     }
 
     /**
