@@ -41,11 +41,11 @@ public class MetropolisHastingsStepTest {
     public void setup() {
         alwaysAccept = mock(KeanuRandom.class);
         when(alwaysAccept.nextDouble()).thenReturn(0.0);
-        when(alwaysAccept.nextGaussian(any())).thenReturn(DoubleTensor.ZERO_SCALAR);
+        when(alwaysAccept.nextGaussian(any())).thenReturn(DoubleTensor.scalar(0.0));
 
         alwaysReject = mock(KeanuRandom.class);
         when(alwaysReject.nextDouble()).thenReturn(1.0);
-        when(alwaysReject.nextGaussian(any())).thenReturn(DoubleTensor.ZERO_SCALAR);
+        when(alwaysReject.nextGaussian(any())).thenReturn(DoubleTensor.scalar(0.0));
     }
 
     @Test

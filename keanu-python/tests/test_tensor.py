@@ -1,8 +1,10 @@
+import sys
 from typing import Union, List
 
 import numpy as np
 import pandas as pd
 import pytest
+from py4j.protocol import Py4JJavaError
 
 from keanu.tensor import Tensor
 from keanu.vartypes import primitive_types, numpy_types
@@ -35,8 +37,6 @@ def test_dataframe_passed_to_Tensor_creates_tensor(data: List[List[primitive_typ
     dataframe = pd.DataFrame(columns=['A', 'B'], data=data)
     t = Tensor(dataframe)
 
-    assert_java_class(t, expected_java_class)
-
     tensor_value = Tensor._to_ndarray(t.unwrap())
     dataframe_value = dataframe.values
 
@@ -50,8 +50,6 @@ def test_dataframe_passed_to_Tensor_creates_tensor(data: List[List[primitive_typ
 def test_series_passed_to_Tensor_creates_tensor(data: List[primitive_types], expected_java_class: str) -> None:
     series = pd.Series(data)
     t = Tensor(series)
-
-    assert_java_class(t, expected_java_class)
 
     tensor_value = Tensor._to_ndarray(t.unwrap())
     series_value = series.values
@@ -75,7 +73,7 @@ def test_cannot_pass_generic_to_Tensor(generic) -> None:
 def test_ndarray_passed_to_Tensor_creates_nonscalar_tensor(arr: primitive_types, expected_java_class: str) -> None:
     ndarray = np.array(arr)
     t = Tensor(ndarray)
-    assert_java_class(t, expected_java_class)
+
     assert not t.is_scalar()
 
 
@@ -111,3 +109,27 @@ def test_you_can_apply_a_function_to_a_tensor(value, expected_result):
     result = t.apply(lambda x: x + 10)
     ndarray = Tensor._to_ndarray(result)
     assert (ndarray == expected_result).all()
+
+
+@pytest.mark.parametrize("dtype", [np.int32, np.int64, np.float_])
+def test_you_can_create_tensors(dtype):
+    ones = np.ones((1, 1), dtype)
+    t = Tensor(ones)
+    ndarray = Tensor._to_ndarray(t.unwrap())
+    assert (ones == ndarray).all()
+
+
+@pytest.mark.parametrize("value", [[True, True], [True, False], [True, True, True, True, False, False, False, False],
+                                   [False, True, False, True, False, True, False, True]])
+def test_you_can_create_boolean_tensor(value):
+    bools = np.array(value)
+    t = Tensor(bools)
+    ndarray = Tensor._to_ndarray(t.unwrap())
+    assert (bools == ndarray).all()
+
+
+def test_fails_when_long_is_too_long() -> None:
+    ones = np.ones((1, 1), np.int64)
+    ones[0, 0] = sys.maxsize
+    with pytest.raises(Py4JJavaError):
+        Tensor(ones)

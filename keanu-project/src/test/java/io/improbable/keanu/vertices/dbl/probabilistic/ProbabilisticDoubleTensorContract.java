@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -71,7 +70,7 @@ public class ProbabilisticDoubleTensorContract {
             double percentage = (double) sampleBucket.getValue() / samples.length;
             double bucketCenter = sampleBucket.getKey();
 
-            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
+            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(DoubleTensor.scalar(bucketCenter)));
             double actual = percentage / bucketSize;
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
         }
@@ -108,7 +107,7 @@ public class ProbabilisticDoubleTensorContract {
             double percentage = (double) sampleBucket.getValue() / samples.length;
             double bucketCenter = sampleBucket.getKey();
 
-            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
+            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(DoubleTensor.scalar(bucketCenter)));
             double actual = percentage / bucketSize;
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
         }
@@ -333,7 +332,7 @@ public class ProbabilisticDoubleTensorContract {
             double percentage = (double) entry.getValue() / sampleCount;
             if (percentage != 0) {
                 double[] bucketCenter = new double[]{entry.getKey().getFirst(), entry.getKey().getSecond()};
-                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(bucketCenter, shape);
+                DoubleTensor bucket = DoubleTensor.create(bucketCenter, shape);
                 double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucket)) * bucketVolume;
                 double actual = percentage;
                 assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));

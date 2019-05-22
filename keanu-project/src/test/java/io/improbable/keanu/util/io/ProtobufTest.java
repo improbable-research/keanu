@@ -18,6 +18,7 @@ import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
@@ -54,6 +55,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 
 public class ProtobufTest {
@@ -178,7 +180,7 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfParentsAreMissing() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex due to missing parent: sigma");
+        expectedException.expectMessage("Failed to create vertex due to missing parameter: sigma");
 
         SavedBayesNet.Vertex muVertex = SavedBayesNet.Vertex.newBuilder()
             .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
@@ -244,7 +246,7 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfNoConstantSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex due to missing parent: constant");
+        expectedException.expectMessage("Failed to create vertex due to missing parameter: constant");
 
         SavedBayesNet.Vertex constantVertex = SavedBayesNet.Vertex.newBuilder()
             .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
@@ -269,7 +271,7 @@ public class ProtobufTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Incorrect Parameter Type specified.  " +
             "Got: class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, " +
-            "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
+            "Expected: class io.improbable.keanu.tensor.dbl.DoubleTensor");
 
         SavedBayesNet.Vertex constantVertex = SavedBayesNet.Vertex.newBuilder()
             .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
@@ -491,9 +493,16 @@ public class ProtobufTest {
         for (Map.Entry<String, Class> param : requiredParams.entrySet()) {
             assertThat("Class must save all required params: " + vertexClass,
                 storedParams, hasKey(param.getKey()));
-            assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
-                    + storedParams.get(param.getKey()) + ", " + param.getValue(),
-                param.getValue().isAssignableFrom(storedParams.get(param.getKey())));
+            if (param.getKey().equals("label")) {
+                //Labels are stored as strings and are parsed into VertexLabels at load time
+                assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
+                        + storedParams.get(param.getKey()) + ", " + param.getValue(),
+                    String.class.isAssignableFrom(storedParams.get(param.getKey())));
+            } else {
+                assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
+                        + storedParams.get(param.getKey()) + ", " + param.getValue(),
+                    param.getValue().isAssignableFrom(storedParams.get(param.getKey())));
+            }
         }
     }
 
@@ -548,4 +557,19 @@ public class ProtobufTest {
         return requiredParameters;
     }
 
+    @Test
+    public void canSaveAndLoadBayesNetWithUnparentedProxyVertex() throws IOException {
+        VertexLabel proxyLabel = new VertexLabel("proxy");
+        DoubleVertex proxyVertex = new DoubleProxyVertex(proxyLabel);
+
+        BayesianNetwork network = new BayesianNetwork(proxyVertex.getConnectedGraph());
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        ProtobufSaver saver = new ProtobufSaver(network);
+        saver.save(writer, true);
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork reconstructedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        Vertex reconstructedVertex = reconstructedNetwork.getVertexByLabel(proxyLabel);
+        assertThat(reconstructedVertex, notNullValue());
+    }
 }

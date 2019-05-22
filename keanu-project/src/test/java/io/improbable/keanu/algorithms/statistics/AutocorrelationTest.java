@@ -26,7 +26,7 @@ public class AutocorrelationTest {
     }
 
     private double[] generateUniformRandomArray(int length) {
-        ContinuousDistribution uniform = Uniform.withParameters(DoubleTensor.ZERO_SCALAR, DoubleTensor.scalar(1000));
+        ContinuousDistribution uniform = Uniform.withParameters(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1000));
         return uniform.sample(new long[]{length}, KeanuRandom.getDefaultRandom()).asFlatDoubleArray();
     }
 

@@ -14,7 +14,9 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Test;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class DifferentiatorTest {
@@ -93,8 +95,8 @@ public class DifferentiatorTest {
         DoubleTensor dHdAForward = Differentiator.forwardModeAutoDiff(A, H).of(H);
         DoubleTensor dHdBForward = Differentiator.forwardModeAutoDiff(B, H).of(H);
 
-        assertEquals(dHdAReverse, dHdAForward);
-        assertEquals(dHdBReverse, dHdBForward);
+        assertThat(dHdAReverse, valuesWithinEpsilonAndShapesMatch(dHdAForward, 1e-8));
+        assertThat(dHdBReverse, valuesWithinEpsilonAndShapesMatch(dHdBForward, 1e-8));
     }
 
     @Test

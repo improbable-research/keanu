@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -163,13 +162,13 @@ public class DirichletVertexTest {
     public void canSplitManyStringsOfVaryingSizeWithKnownMean() {
         DirichletVertex dirichlet = new DirichletVertex(10, 5, 3);
         int numSamples = 30000;
-        DoubleTensor samples = Nd4jDoubleTensor.zeros(new long[]{numSamples, 3});
+        DoubleTensor samples = DoubleTensor.zeros(new long[]{numSamples, 3});
 
         for (int i = 0; i < numSamples; i++) {
             DoubleTensor sample = dirichlet.sample(random);
-            samples.setValue(sample.getValue( 0), i, 0);
-            samples.setValue(sample.getValue( 1), i, 1);
-            samples.setValue(sample.getValue( 2), i, 2);
+            samples.setValue(sample.getValue(0), i, 0);
+            samples.setValue(sample.getValue(1), i, 1);
+            samples.setValue(sample.getValue(2), i, 2);
         }
 
         DoubleTensor stringOne = samples.slice(1, 0);
@@ -236,7 +235,7 @@ public class DirichletVertexTest {
         concentrationHyperParam.setValue(hyperParamValue);
 
         DirichletVertex dirichlet = new DirichletVertex(concentrationHyperParam);
-        DoubleTensor startingValue = Nd4jDoubleTensor.create(new double[]{0.1, 0.9}, new long[]{1, 2});
+        DoubleTensor startingValue = DoubleTensor.create(new double[]{0.1, 0.9}, new long[]{1, 2});
 
         double start = 0.1;
         double end = 0.9;
@@ -263,7 +262,7 @@ public class DirichletVertexTest {
 
             assertEquals(diffLnDensityApproxExpected, actualDiff, 0.001);
 
-            startingValue = Nd4jDoubleTensor.create(new double[]{dirchletValue[0] + step, dirchletValue[1] - step}, new long[]{1, 2});
+            startingValue = DoubleTensor.create(new double[]{dirchletValue[0] + step, dirchletValue[1] - step}, new long[]{1, 2});
         }
     }
 
@@ -323,7 +322,7 @@ public class DirichletVertexTest {
                     break;
                 }
                 double x3 = 1 - x1 - x2;
-                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(new double[]{x1, x2, x3}, new long[]{1, 3});
+                DoubleTensor bucket = DoubleTensor.create(new double[]{x1, x2, x3}, new long[]{1, 3});
                 double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucket)) * bucketVolume;
                 double actual = percentage;
                 assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));

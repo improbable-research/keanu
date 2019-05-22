@@ -161,12 +161,21 @@ public class INDArrayShim {
     }
 
     private static INDArray performOperationWithScalarTensorPreservingShape(INDArray left, INDArray right, BiFunction<INDArray, INDArray, INDArray> operation) {
-        if (left.length() == 1 || right.length() == 1) {
+        if (!Arrays.equals(left.shape(), right.shape())) {
+
             long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
-            INDArray result = (left.length() == 1) ?
-                operation.apply(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right) :
-                operation.apply(left, Nd4j.valueArrayOf(left.shape(), right.getDouble(0)));
-            return result.reshape(resultShape);
+
+            INDArray leftBroadcasted = left;
+            INDArray rightBroadcasted = right;
+            if (!Arrays.equals(left.shape(), resultShape)) {
+                leftBroadcasted = addi(Nd4j.valueArrayOf(resultShape, 0), left);
+            }
+
+            if (!Arrays.equals(right.shape(), resultShape)) {
+                rightBroadcasted = addi(Nd4j.valueArrayOf(resultShape, 0), right);
+            }
+
+            return operation.apply(leftBroadcasted, rightBroadcasted);
         } else {
             return operation.apply(left, right);
         }

@@ -71,13 +71,13 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public long getLength() {
-        return TensorShape.getLength(shape);
+    public long[] getStride() {
+        return stride;
     }
 
     @Override
-    public boolean isShapePlaceholder() {
-        return data == null;
+    public long getLength() {
+        return TensorShape.getLength(shape);
     }
 
     @Override

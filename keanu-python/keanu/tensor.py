@@ -1,14 +1,13 @@
 import numpy as np
 from numpy import ndarray
 from py4j.java_gateway import java_import, JavaObject, JavaMember, is_instance_of
-from typing import Any
+from typing import Any, Union
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.functional import Function
-from .vartypes import (numpy_types, tensor_arg_types, primitive_types, runtime_int_types, runtime_float_types,
-                       runtime_bool_types, runtime_numpy_types, runtime_pandas_types, runtime_primitive_types,
-                       primitive_types)
+from .vartypes import (numpy_types, tensor_arg_types, runtime_int_types, runtime_float_types, runtime_bool_types,
+                       runtime_numpy_types, runtime_pandas_types, runtime_primitive_types, primitive_types)
 
 k = KeanuContext()
 
@@ -51,10 +50,28 @@ class Tensor(JavaObjectWrapper):
     def __get_tensor_from_ndarray(ndarray: numpy_types) -> JavaObject:
 
         ctor = Tensor.__infer_tensor_ctor_from_ndarray(ndarray)
-        values = k.to_java_array(ndarray.flatten().tolist())
+        values = Tensor.__get_java_array_from_ndarray(ndarray)
         shape = k.to_java_long_array(ndarray.shape)
 
         return ctor(values, shape)
+
+    @staticmethod
+    def __get_java_array_from_ndarray(ndarray: numpy_types) -> JavaObject:
+        if ndarray.size == 0:
+            raise ValueError("Cannot infer type because array is empty")
+
+        if np.issubdtype(ndarray.dtype, np.bool_):
+            return k.jvm_view().Py4jByteArrayConverter.toBooleanArray(
+                np.packbits(ndarray.flatten()).tobytes(), ndarray.size)
+        elif np.issubdtype(ndarray.dtype, np.int32):
+            return k.jvm_view().Py4jByteArrayConverter.toIntegerArray(ndarray.flatten().tobytes())
+        elif np.issubdtype(ndarray.dtype, np.int64):
+            return k.jvm_view().Py4jByteArrayConverter.toLongArray(ndarray.flatten().tobytes())
+        elif np.issubdtype(ndarray.dtype, np.floating):
+            return k.jvm_view().Py4jByteArrayConverter.toDoubleArray(ndarray.flatten().tobytes())
+        else:
+            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(
+                ndarray.dtype))
 
     @staticmethod
     def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> JavaMember:

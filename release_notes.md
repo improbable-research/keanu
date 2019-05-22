@@ -1,3 +1,26 @@
+## Version 0.0.26
+
+### Common
+
+* Made constructing the children set of a vertex more efficient by not constantly reconstructing the set.
+
+### Java
+
+* Fixed an error where a space was present in one of the dependencies, which broke some build systems fetching dependencies.
+
+### Python
+
+* Faster tensor creation in Python
+
+
+## Version 0.0.25
+
+## Version 0.0.24
+
+### Common
+
+* Sequences save / load
+
 ## Version 0.0.23
 
 ### Common
@@ -10,6 +33,9 @@
 
 ### Common
 
+* Generalised `GaussianProposalDistribution` to take different sigmas for each latent.
+  * Example in Python:
+    * `MetropolisHastingsSampler(proposal_distribution='gaussian', latents=[v1, v2], proposal_distribution_sigma=[1., np.array([[1., 2.], [3., 4.]]))`
 * `DoubleVertex#matrixMultiply` now performs dot product when given two vectors, and matrix-vector product when given a matrix and a vector.
 * Autodiff for Slice Vertices has now been fixed (caused issues with NUTs when run on a graph containing Slices)
 * `MultivariateGaussianVertex` now requires that mu is a vector instead of a matrix.
