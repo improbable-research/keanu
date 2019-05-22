@@ -87,7 +87,6 @@ public class JVMDoubleTensorBroadcast {
      * Right buffer is shorter than left
      *
      * @param leftBuffer
-     * @param leftShape
      * @param leftStride
      * @param rightBuffer
      * @param rightShape
@@ -96,23 +95,48 @@ public class JVMDoubleTensorBroadcast {
      * @param op
      * @return
      */
-    static void broadcastFromRight(double[] leftBuffer, long[] leftShape, long[] leftStride,
+    static void broadcastFromRight(double[] leftBuffer, long[] leftStride,
                                    double[] rightBuffer, long[] rightShape, long[] rightStride,
                                    double[] outputBuffer, BiFunction<Double, Double, Double> op) {
         Preconditions.checkArgument(leftBuffer.length >= rightBuffer.length);
         for (int i = 0; i < outputBuffer.length; i++) {
 
-            int j = mapBroadcastedIndex(leftStride, rightShape, rightStride, i);
+            int j = mapBroadcastIndex(i, leftStride, rightShape, rightStride);
 
             outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[j]);
         }
 
     }
 
-    private static int mapBroadcastedIndex(long[] fromStride, long[] toShape, long[] toStride, int fromFlatIndex) {
+    /**
+     * Left buffer is shorter than right
+     *
+     * @param leftBuffer
+     * @param leftShape
+     * @param leftStride
+     * @param rightBuffer
+     * @param rightStride
+     * @param outputBuffer
+     * @param op
+     * @return
+     */
+    static void broadcastFromLeft(double[] leftBuffer, long[] leftShape, long[] leftStride,
+                                  double[] rightBuffer, long[] rightStride,
+                                  double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+        Preconditions.checkArgument(leftBuffer.length <= rightBuffer.length);
+        for (int i = 0; i < outputBuffer.length; i++) {
 
-        long[] fromShapeIndex = new long[fromStride.length];
-        long[] toShapeIndex = new long[fromShapeIndex.length];
+            int j = mapBroadcastIndex(i, rightStride, leftShape, leftStride);
+
+            outputBuffer[i] = op.apply(leftBuffer[j], rightBuffer[i]);
+        }
+
+    }
+
+    private static int mapBroadcastIndex(int fromFlatIndex, long[] fromStride, long[] toShape, long[] toStride) {
+
+        final long[] fromShapeIndex = new long[fromStride.length];
+        final long[] toShapeIndex = new long[fromShapeIndex.length];
         int remainder = fromFlatIndex;
         int toFlatIndex = 0;
 
@@ -124,32 +148,6 @@ public class JVMDoubleTensorBroadcast {
         }
 
         return toFlatIndex;
-    }
-
-    /**
-     * Left buffer is shorter than right
-     *
-     * @param leftBuffer
-     * @param leftShape
-     * @param leftStride
-     * @param rightBuffer
-     * @param rightShape
-     * @param rightStride
-     * @param outputBuffer
-     * @param op
-     * @return
-     */
-    static void broadcastFromLeft(double[] leftBuffer, long[] leftShape, long[] leftStride,
-                                  double[] rightBuffer, long[] rightShape, long[] rightStride,
-                                  double[] outputBuffer, BiFunction<Double, Double, Double> op) {
-        Preconditions.checkArgument(leftBuffer.length <= rightBuffer.length);
-        for (int i = 0; i < outputBuffer.length; i++) {
-
-            int j = mapBroadcastedIndex(rightStride, leftShape, leftStride, i);
-
-            outputBuffer[i] = op.apply(leftBuffer[j], rightBuffer[i]);
-        }
-
     }
 
 

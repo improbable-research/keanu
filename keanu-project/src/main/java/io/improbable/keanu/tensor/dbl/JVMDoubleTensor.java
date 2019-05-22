@@ -306,7 +306,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor diag() {
         int n = buffer.length;
-        double[] newBuffer = new double[Ints.checkedCast((long)n * n)];
+        double[] newBuffer = new double[Ints.checkedCast((long) n * n)];
         for (int i = 0; i < n; i++) {
             newBuffer[i * n + i] = buffer[i];
         }
@@ -506,7 +506,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         JVMDoubleTensor permuted = (JVMDoubleTensor) permute(rearrange);
         double[] permutedBuffer = permuted.buffer;
 
-        int dimLength = (int)(buffer.length / shape[axis]);
+        int dimLength = (int) (buffer.length / shape[axis]);
 
         double[] maxBuffer = new double[dimLength];
         int[] maxIndex = new int[dimLength];
@@ -602,7 +602,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         if (getLength() != mask.getLength()) {
             throw new IllegalArgumentException(
                 "The lengths of the tensor and mask must match, but got tensor length: " + getLength()
-                + ", mask length: " + mask.getLength()
+                    + ", mask length: " + mask.getLength()
             );
         }
     }
@@ -1490,10 +1490,10 @@ public class JVMDoubleTensor extends DoubleTensor {
         //Allow broadcasting from left and right
         if (paddedLeftShape.length > paddedRightShape.length || leftBuffer.length > rightBuffer.length) {
             //e.g. [2, 2] * [1, 2]
-            broadcastFromRight(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
+            broadcastFromRight(leftBuffer, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
         } else {
             //e.g. [2] / [2, 2]
-            broadcastFromLeft(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
+            broadcastFromLeft(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightStride, outputBuffer, op);
         }
 
         if (inPlace) {
@@ -1553,7 +1553,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     private class TensorJVMDoubleFlattenedView extends JVMDoubleFlattenedView implements FlattenedView<Double> {
         @Override
         public Double getOrScalar(long index) {
-                return get(index);
+            return get(index);
         }
 
     }
