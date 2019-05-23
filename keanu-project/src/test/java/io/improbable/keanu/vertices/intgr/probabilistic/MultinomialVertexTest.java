@@ -9,6 +9,7 @@ import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.distributions.discrete.Multinomial;
 import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensorFactory;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
@@ -135,6 +136,17 @@ public class MultinomialVertexTest {
         MultinomialVertex multinomial = new MultinomialVertex(n, ConstantVertex.of(p));
         IntegerTensor samples = multinomial.sample(KeanuRandom.getDefaultRandom());
         assertThat(samples, hasShape(3, 1));
+        assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
+    }
+
+    @Test
+    public void itWorksWithAlmostOneProbability() {
+        int n = 100;
+//        DoubleTensor.setFactory(new Nd4jDoubleTensorFactory());
+        DoubleTensor p = DoubleTensor.create(0.1, new long[]{10}).reshape(10, 1);
+        MultinomialVertex multinomial = new MultinomialVertex(n, ConstantVertex.of(p));
+        IntegerTensor samples = multinomial.sample(KeanuRandom.getDefaultRandom());
+        assertThat(samples, hasShape(10, 1));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
     }
 
