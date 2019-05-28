@@ -1,27 +1,19 @@
 package io.improbable.keanu.distributions.discrete;
 
-import com.google.common.base.Preconditions;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.validate.DebugTensorValidator;
-import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 
 public class Multinomial implements DiscreteDistribution {
 
-    public static final DebugTensorValidator CATEGORY_PROBABILITIES_CANNOT_BE_ZERO = new DebugTensorValidator<>(TensorValidator.ZERO_CATCHER);
     private final IntegerTensor n;
     private final DoubleTensor p;
     private final long numCategories;
@@ -38,13 +30,6 @@ public class Multinomial implements DiscreteDistribution {
      * Generalisation of the Binomial distribution to variables with more than 2 possible values
      */
     private Multinomial(IntegerTensor n, DoubleTensor p) {
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(n.getShape(), TensorShape.removeDimension(0, p.getShape()));
-        Preconditions.checkArgument(
-            p.sum(0).elementwiseEquals(DoubleTensor.ones(n.getShape())).allTrue(),
-            "Probabilities must sum to one"
-        );
-        CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.validate(p);
-
         numCategories = p.getShape()[0];
         this.n = n;
         this.p = p;
@@ -53,7 +38,6 @@ public class Multinomial implements DiscreteDistribution {
 
     @Override
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
-        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, n.getShape());
 
         Tensor.FlattenedView<Integer> nFlattened = n.getFlattenedView();
         List<DoubleTensor> sliced = p.sliceAlongDimension(0, 0, numCategories);
@@ -124,22 +108,6 @@ public class Multinomial implements DiscreteDistribution {
 
     @Override
     public DoubleTensor logProb(IntegerTensor k) {
-        long[] expectedShape = p.getShape();
-        TensorShapeValidation.checkAllShapesMatch(
-            String.format("Shape mismatch. k: %s, p: %s",
-                Arrays.toString(k.getShape()),
-                Arrays.toString(expectedShape)),
-            k.getShape(), expectedShape
-        );
-        Preconditions.checkArgument(
-            k.sum(0).elementwiseEquals(this.n).allTrue(),
-            String.format("Inputs %s must sum to n = %s", k, this.n)
-        );
-        Preconditions.checkArgument(
-            k.greaterThanOrEqual(0).allTrue(),
-            String.format("Inputs %s cannot be negative", k)
-        );
-
         DoubleTensor gammaN = n.plus(1).toDouble().logGammaInPlace();
         DoubleTensor gammaKs = k.plus(1).toDouble().logGammaInPlace().sum(0);
         DoubleTensor kLogP = p.log().timesInPlace(k.toDouble()).sum(0);

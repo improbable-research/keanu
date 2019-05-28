@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import com.google.common.base.Preconditions;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Multinomial;
@@ -45,16 +44,11 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
     @ExportVertexToPythonBindings
     public MultinomialVertex(IntegerVertex n, DoubleVertex p) {
-        this(checkRankOfNIsStrictlyPositive(n), n, p);
-    }
-
-    private static long[] checkRankOfNIsStrictlyPositive(IntegerVertex n) {
-        Preconditions.checkArgument(n.getRank() > 0, "Rank of n must be greater than 0.");
-        return n.getShape();
+        this(n.getShape(), n, p);
     }
 
     public MultinomialVertex(int n, DoubleVertex p) {
-        this(ConstantVertex.of(IntegerTensor.create(n, new long[]{1, 1})), p);
+        this(ConstantVertex.of(IntegerTensor.scalar(n)), p);
     }
 
     @Override
