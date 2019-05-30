@@ -199,6 +199,28 @@ public class TensorShape {
         return (shape1.length >= shape2.length) ? shape1 : shape2;
     }
 
+    public static long[] getBroadcastResultShape(long[] left, long[] right) {
+
+        final long[] highestRank = left.length > right.length ? left : right;
+        long[] resultShape = Arrays.copyOf(highestRank, highestRank.length);
+
+        int lowestRank = Math.min(left.length, right.length);
+        for (int i = 1; i <= lowestRank; i++) {
+            final long lDim = left[left.length - i];
+            final long rDim = right[right.length - i];
+
+            if (lDim != rDim && lDim != 1 && rDim != 1) {
+                throw new IllegalArgumentException(
+                    "Shape " + Arrays.toString(left) + " is not broadcastable with shape " + Arrays.toString(right)
+                );
+            }
+
+            resultShape[resultShape.length - i] = Math.max(lDim, rDim);
+        }
+
+        return resultShape;
+    }
+
     private static long[] increaseRankByPaddingValue(long[] lowRankTensorShape, int desiredRank, boolean append) {
         long[] paddedShape = new long[desiredRank];
         if (lowRankTensorShape.length > desiredRank) {

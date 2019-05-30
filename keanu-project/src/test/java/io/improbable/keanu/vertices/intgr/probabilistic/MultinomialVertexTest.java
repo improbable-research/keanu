@@ -1,28 +1,23 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.distributions.discrete.Multinomial;
-import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensorFactory;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
+import umontreal.ssj.probdistmulti.MultinomialDist;
 
 import java.util.Map;
 
@@ -130,117 +125,111 @@ public class MultinomialVertexTest {
 //    }
 
     @Test
-    public void itWorksWithScalars() {
-        int n = 100;
-        DoubleTensor p = DoubleTensor.create(new double[]{0.01, 0.09, 0.9}, 3, 1);
-        MultinomialVertex multinomial = new MultinomialVertex(n, ConstantVertex.of(p));
-        IntegerTensor samples = multinomial.sample(KeanuRandom.getDefaultRandom());
-        assertThat(samples, hasShape(3, 1));
-        assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
+    public void itWorksWithScalarTrialCountN() {
+        int n = 4;
+        DoubleTensor p = DoubleTensor.create(new double[]{0.2, 0.3, 0.5}, 3);
+
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        IntegerTensor sample = multinomial.sample();
+
+        assertThat(sample, hasShape(3));
+        assertThat(sample, allValues(both(greaterThan(-1)).and(lessThan(n))));
+        assertThat(sample.sum(), equalTo(n));
     }
 
     @Test
     public void itWorksWithAlmostOneProbability() {
         int n = 100;
-        DoubleTensor p = DoubleTensor.create(0.1, new long[]{10}).reshape(10, 1);
-        MultinomialVertex multinomial = new MultinomialVertex(n, ConstantVertex.of(p));
-        IntegerTensor samples = multinomial.sample(KeanuRandom.getDefaultRandom());
-        assertThat(samples, hasShape(10, 1));
+        DoubleTensor p = DoubleTensor.create(0.1, new long[]{10});
+
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        IntegerTensor samples = multinomial.sample();
+
+        assertThat(samples, hasShape(10));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
     }
 
     @Test
-    public void itWorksWithTensors() {
-        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(new int[]{
-                1, 5, 8, 10,
-                100, 200, 500, 1000},
-            2, 4));
+    public void itWorksWithVectorOfNandMatrixOfProbabilities() {
 
-        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(new double[]{
-                .1, .2, .3, .8,
-                .25, .25, .4, .45,
+        IntegerTensor n = IntegerTensor.create(new int[]{
+            4, 5
+        }, 2);
 
-                .1, .2, .3, .1,
-                .50, .25, .4, .45,
+        DoubleTensor p = DoubleTensor.create(new double[]{
+            0.1, 0.2, 0.7,
+            0.3, 0.3, 0.4
+        }, 2, 3);
 
-                .8, .6, .4, .1,
-                .25, .5, .2, .1
-            },
-            3, 2, 4));
-        //
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
+
+        IntegerTensor sample = multinomial.sample();
+        assertThat(sample, hasShape(2, 3));
+
+        double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
+            1, 1, 2,
+            3, 1, 1,
+        }, 2, 3));
+
+        MultinomialDist dist1 = new MultinomialDist(4, new double[]{0.1, 0.2, 0.7});
+        MultinomialDist dist2 = new MultinomialDist(5, new double[]{0.3, 0.3, 0.4});
+
+        double expected1 = dist1.prob(new int[]{1, 1, 2});
+        double expected2 = dist2.prob(new int[]{3, 1, 1});
+
+        double lopSumExpected = Math.log(expected1) + Math.log(expected2);
+
+        assertThat(logProb, closeTo(lopSumExpected, 1e-8));
+    }
+
+    @Test
+    public void itWorksWithMatrixOfNAndRank3Probabilities() {
+        IntegerTensor n = IntegerTensor.create(new int[]{
+            1, 10,
+            100, 1000
+        }, 2, 2);
+
+        DoubleTensor p = DoubleTensor.create(new double[]{
+            .1, .1, .8,
+            .8, .1, .1,
+            .25, .5, .25,
+            .2, .3, .5
+        }, 2, 2, 3);
+
         MultinomialVertex multinomial = new MultinomialVertex(n, p);
         IntegerTensor sample = multinomial.sample(KeanuRandom.getDefaultRandom());
-        assertThat(sample, hasShape(3, 2, 4));
+        assertThat(sample, hasShape(2, 2, 3));
 
         double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
-                0, 1, 2, 10,
-                25, 50, 200, 450,
+            0, 0, 1,
+            10, 0, 0,
+            25, 50, 25,
+            200, 300, 500
+        }, 2, 2, 3));
 
-                0, 0, 2, 0,
-                50, 50, 200, 450,
+        MultinomialDist dist1 = new MultinomialDist(1, new double[]{.1, .1, .8});
+        MultinomialDist dist2 = new MultinomialDist(10, new double[]{.8, .1, .1});
+        MultinomialDist dist3 = new MultinomialDist(100, new double[]{.25, .5, .25});
+        MultinomialDist dist4 = new MultinomialDist(1000, new double[]{.2, .3, .5});
 
-                1, 4, 4, 0,
-                25, 100, 100, 100,
-            },
-            3, 2, 4));
+        double expected1 = dist1.prob(new int[]{0, 0, 1});
+        double expected2 = dist2.prob(new int[]{10, 0, 0});
+        double expected3 = dist3.prob(new int[]{25, 50, 25});
+        double expected4 = dist4.prob(new int[]{200, 300, 500});
 
-        assertThat(logProb, closeTo(-30.193364297395277, 1e-8));
-    }
+        double expectedLogProb = Math.log(expected1) + Math.log(expected2) + Math.log(expected3) + Math.log(expected4);
 
-    @Test
-    public void youCanUseAConcatAndReshapeVertexToPipeInTheProbabilities() {
-        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(new int[]{
-                1, 10,
-                100, 1000},
-            2, 2));
-
-        DoubleVertex p1 = ConstantVertex.of(DoubleTensor.create(new double[]{
-                .1, .8,
-                .25, .2,
-            },
-            2, 2));
-
-        DoubleVertex p2 = ConstantVertex.of(DoubleTensor.create(new double[]{
-                .1, .1,
-                .50, .3,
-            },
-            2, 2));
-
-        DoubleVertex p3 = ConstantVertex.of(DoubleTensor.create(new double[]{
-
-                .8, .1,
-                .25, .5
-            },
-            2, 2));
-
-        ConcatenationVertex pConcatenated = new ConcatenationVertex(0, p1, p2, p3);
-        ReshapeVertex pReshaped = new ReshapeVertex(pConcatenated, 3, 2, 2);
-        MultinomialVertex multinomial = new MultinomialVertex(n, pReshaped);
-        IntegerTensor sample = multinomial.sample(KeanuRandom.getDefaultRandom());
-        assertThat(sample, hasShape(3, 2, 2));
-        double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
-                0, 10,
-                25, 200,
-
-                0, 0,
-                50, 300,
-
-                1, 0,
-                25, 500,
-            },
-            3, 2, 2));
-
-        assertThat(logProb, equalTo(-14.165389164658901));
+        assertThat(logProb, closeTo(expectedLogProb, 1e-8));
     }
 
 
     @Test
-    public void youCanSampleWithATensorIfNIsScalarAndPIsAColumnVector() {
+    public void youCanSampleWithATensorIfNIsScalarAndPIsARowVector() {
         int n = 100;
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(4, 1);
-        Multinomial multinomial = Multinomial.withParameters(IntegerTensor.scalar(n).reshape(1, 1), p);
-        IntegerTensor samples = multinomial.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
-        assertThat(samples, hasShape(4, 2, 2));
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(1, 4);
+        Multinomial multinomial = Multinomial.withParameters(IntegerTensor.scalar(n), p);
+        IntegerTensor samples = multinomial.sample(new long[]{1, 4}, KeanuRandom.getDefaultRandom());
+        assertThat(samples, hasShape(1, 4));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
     }
 
@@ -248,10 +237,10 @@ public class MultinomialVertexTest {
     public void ifYourRandomReturnsZeroItSamplesFromTheFirstCategory() {
         KeanuRandom mockRandomAlwaysZero = mock(KeanuRandom.class);
         when(mockRandomAlwaysZero.nextDouble()).thenReturn(0.);
-        IntegerTensor n = IntegerTensor.scalar(100).reshape(1, 1);
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(4, 1);
+        IntegerTensor n = IntegerTensor.scalar(100);
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(1, 4);
         Multinomial multinomial = Multinomial.withParameters(n, p);
-        IntegerTensor samples = multinomial.sample(new long[]{1, 1}, mockRandomAlwaysZero);
+        IntegerTensor samples = multinomial.sample(new long[]{4, 1}, mockRandomAlwaysZero);
         assertThat(samples, hasValue(100, 0, 0, 0));
     }
 
@@ -259,22 +248,23 @@ public class MultinomialVertexTest {
     public void ifYourRandomReturnsOneItSamplesFromTheLastCategory() {
         KeanuRandom mockRandomAlwaysZero = mock(KeanuRandom.class);
         when(mockRandomAlwaysZero.nextDouble()).thenReturn(1.);
-        IntegerTensor n = IntegerTensor.scalar(100).reshape(1, 1);
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(4, 1);
+        IntegerTensor n = IntegerTensor.scalar(100);
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(1, 4);
         Multinomial multinomial = Multinomial.withParameters(n, p);
-        IntegerTensor samples = multinomial.sample(new long[]{1, 1}, mockRandomAlwaysZero);
+        IntegerTensor samples = multinomial.sample(new long[]{1, 4}, mockRandomAlwaysZero);
         assertThat(samples, hasValue(0, 0, 0, 100));
     }
 
     @Test
     public void whenKEqualsTwoItsBinomial() {
-        IntegerTensor n = IntegerTensor.scalar(10).reshape(1, 1);
-        DoubleTensor p = DoubleTensor.create(0.2, 0.8).reshape(2, 1);
+        IntegerTensor n = IntegerTensor.scalar(10);
+        DoubleTensor p = DoubleTensor.create(0.2, 0.8).reshape(1, 2);
         DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
         DiscreteDistribution binomial = Binomial.withParameters(DoubleTensor.scalar(0.2), n);
-        for (int value : ImmutableList.of(1, 2, 9, 10)) {
+
+        for (int value : new int[]{1, 2, 9, 10}) {
             DoubleTensor binomialLogProbs = binomial.logProb(IntegerTensor.scalar(value));
-            DoubleTensor multinomialLogProbs = multinomial.logProb(IntegerTensor.create(value, 10 - value).reshape(2, 1)).transpose();
+            DoubleTensor multinomialLogProbs = multinomial.logProb(IntegerTensor.create(value, 10 - value));
             assertThat(multinomialLogProbs, allCloseTo(1e-6, binomialLogProbs));
         }
     }
@@ -285,8 +275,8 @@ public class MultinomialVertexTest {
 
     @Test
     public void whenKNEqualsOneItsCategorical() {
-        IntegerTensor n = IntegerTensor.scalar(1).reshape(1, 1);
-        DoubleTensor p = DoubleTensor.create(0.2, .3, 0.5).reshape(3, 1);
+        IntegerTensor n = IntegerTensor.scalar(1);
+        DoubleTensor p = DoubleTensor.create(0.2, .3, 0.5);
         DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
 
         Map<Color, DoubleVertex> selectableValues = ImmutableMap.of(
@@ -296,50 +286,39 @@ public class MultinomialVertexTest {
         CategoricalVertex<Color, GenericTensor<Color>> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
         double pRed = categoricalVertex.logProb(GenericTensor.scalar(Color.RED));
-        assertThat(multinomial.logProb(IntegerTensor.create(1, 0, 0).reshape(3, 1)).scalar(), closeTo(pRed, 1e-7));
+        assertThat(multinomial.logProb(IntegerTensor.create(1, 0, 0)).scalar(), closeTo(pRed, 1e-7));
         double pGreen = categoricalVertex.logProb(GenericTensor.scalar(Color.GREEN));
-        assertThat(multinomial.logProb(IntegerTensor.create(0, 1, 0).reshape(3, 1)).scalar(), closeTo(pGreen, 1e-7));
+        assertThat(multinomial.logProb(IntegerTensor.create(0, 1, 0)).scalar(), closeTo(pGreen, 1e-7));
         double pBlue = categoricalVertex.logProb(GenericTensor.scalar(Color.BLUE));
-        assertThat(multinomial.logProb(IntegerTensor.create(0, 0, 1).reshape(3, 1)).scalar(), closeTo(pBlue, 1e-7));
+        assertThat(multinomial.logProb(IntegerTensor.create(0, 0, 1)).scalar(), closeTo(pBlue, 1e-7));
     }
 
     @Category(Slow.class)
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
-        int N = 10000;
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4).reshape(4, 1);
-        IntegerTensor n = IntegerTensor.scalar(500).reshape(1, 1);
+        int sampleCount = 10000;
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4).plus(DoubleTensor.zeros(sampleCount, 4));
+        int n = 500;
 
-        MultinomialVertex vertex = new MultinomialVertex(
-            new long[]{1, N},
-            ConstantVertex.of(n),
-            ConstantVertex.of(p)
-        );
+        MultinomialVertex vertex = new MultinomialVertex(n, p);
 
         IntegerTensor samples = vertex.sample();
-        assertThat(samples, hasShape(4, N));
+        assertThat(samples, hasShape(sampleCount, 4));
 
-        for (int i = 0; i < samples.getShape()[0]; i++) {
-            IntegerTensor sample = samples.slice(0, i);
-            Double probability = p.slice(0, i).scalar();
-            double mean = sample.toDouble().average();
-            double std = sample.toDouble().standardDeviation();
+        for (int i = 0; i < samples.getShape()[1]; i++) {
+
+            IntegerTensor sampleForIndexI = samples.slice(1, i);
+
+            Double probability = p.getValue(0, i);
+            double mean = sampleForIndexI.toDouble().average();
+            double std = sampleForIndexI.toDouble().standardDeviation();
 
             double epsilonForMean = 0.5;
             double epsilonForVariance = 5.;
-            assertEquals(n.scalar() * probability, mean, epsilonForMean);
-            assertEquals(n.scalar() * probability * (1 - probability), std * std, epsilonForVariance);
+
+            assertEquals(n * probability, mean, epsilonForMean);
+            assertEquals(n * probability * (1 - probability), std * std, epsilonForVariance);
         }
     }
 
-    @Test
-    public void throwsIfRankOfNIsZero() {
-        IntegerVertex nWithRankZero = ConstantVertex.of(10);
-        assertThat(nWithRankZero.getRank(), equalTo(0));
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Rank of n must be greater than 0.");
-
-        MultinomialVertex vertex = new MultinomialVertex(ConstantVertex.of(10), ConstantVertex.of(0.1, 0.2, 0.7));
-    }
 }
