@@ -11,8 +11,11 @@ import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
+import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -43,13 +46,16 @@ public class MultinomialVertexTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-//    @Test(expected = IllegalArgumentException.class)
-//    public void itThrowsIfTheProbabilitiesDontSumToOne() {
-//        IntegerTensor n = IntegerTensor.scalar(100).reshape(1, 1);
-//        DoubleTensor p = DoubleTensor.create(0.1, 0.1, 0.1, 0.1).reshape(4, 1);
-//        Multinomial.withParameters(n, p);
-//    }
-//
+    @Test(expected = GraphAssertionException.class)
+    public void itThrowsIfTheProbabilitiesDontSumToOne() {
+        int n = 100;
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.1, 0.1, 0.1, 0.1));
+        BooleanVertex equalsOne = new EqualsVertex<>(p.sum(), ConstantVertex.of(1.0));
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+        equalsOne.assertTrue().getValue();
+    }
+
+    //
 //    @Test(expected = TensorValueException.class)
 //    public void inDebugModeItThrowsIfAnyOfTheProbabilitiesIsZero() {
 //        try {
@@ -62,33 +68,57 @@ public class MultinomialVertexTest {
 //        }
 //    }
 //
-//    @Test(expected = IllegalArgumentException.class)
-//    public void itThrowsIfTheParametersAreDifferentHighRankShapes() {
-//        IntegerTensor n = IntegerTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4);
-//        DoubleTensor p = DoubleTensor.linspace(0, 1, 18).reshape(3, 2, 3);
-//        Multinomial.withParameters(n, p);
-//    }
-//
-//    @Test(expected = IllegalArgumentException.class)
-//    public void itThrowsIfTheParametersAreDifferentShapes() {
-//        IntegerTensor n = IntegerTensor.create(1, 2).reshape(1, 2);
-//        DoubleTensor p = DoubleTensor.linspace(0, 1, 9).reshape(3, 3);
-//        Multinomial.withParameters(n, p);
-//    }
-//
-//    @Test(expected = IllegalArgumentException.class)
-//    public void itThrowsIfTheSampleShapeDoesntMatchTheShapeOfN() {
-//        IntegerTensor n = IntegerTensor.create(100, 200).reshape(1, 2);
-//        DoubleTensor p = DoubleTensor.create(new double[]{
-//                0.1, 0.25,
-//                0.2, 0.25,
-//                0.3, 0.25,
-//                0.4, 0.25
-//            },
-//            4, 2);
-//        Multinomial multinomial = Multinomial.withParameters(n, p);
-//        multinomial.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
-//    }
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheParametersAreDifferentHighRankShapes() {
+        IntegerTensor n = IntegerTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4);
+        DoubleTensor p = DoubleTensor.linspace(0, 1, 18).reshape(3, 2, 3);
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheParametersAreDifferentShapes() {
+        IntegerTensor n = IntegerTensor.create(1, 2);
+        DoubleTensor p = DoubleTensor.linspace(0, 1, 9).reshape(3, 3);
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+    }
+
+    @Test
+    public void doesNotThrowIfNIsBroadcastableToP() {
+        IntegerTensor n = IntegerTensor.create(1, 2, 3);
+        DoubleTensor p = DoubleTensor.linspace(0, 1, 9).reshape(3, 3);
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheSampleShapeDoesntMatchTheShapeOfN() {
+        IntegerTensor n = IntegerTensor.create(100, 200, 300, 400);
+        DoubleTensor p = DoubleTensor.create(new double[]{
+            0.1, 0.25,
+            0.2, 0.25,
+            0.3, 0.25,
+            0.4, 0.25
+        }, 4, 2);
+
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+        multinomialVertex.sampleWithShape(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
+    }
+
+    @Test
+    public void doesAllowSampleWithShapeThatIsBroadcastableWithVertexShape() {
+        IntegerTensor n = IntegerTensor.create(100, 200, 300, 400);
+        DoubleTensor p = DoubleTensor.create(new double[]{
+            0.1, 0.25,
+            0.2, 0.25,
+            0.3, 0.25,
+            0.4, 0.25
+        }, 4, 2);
+
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+        IntegerTensor sample = multinomialVertex.sampleWithShape(new long[]{2, 4, 2}, KeanuRandom.getDefaultRandom());
+
+        assertThat(sample, hasShape(2, 4, 2));
+    }
 //
 //    @Test(expected = IllegalArgumentException.class)
 //    public void itThrowsIfTheLogProbShapeDoesntMatchTheNumberOfCategories() {
@@ -169,15 +199,23 @@ public class MultinomialVertexTest {
         double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
             1, 1, 2,
             3, 1, 1,
-        }, 2, 3));
+            4, 0, 0,
+            0, 1, 4,
+        }, 2, 2, 3));
 
         MultinomialDist dist1 = new MultinomialDist(4, new double[]{0.1, 0.2, 0.7});
-        MultinomialDist dist2 = new MultinomialDist(5, new double[]{0.3, 0.3, 0.4});
-
         double expected1 = dist1.prob(new int[]{1, 1, 2});
+
+        MultinomialDist dist2 = new MultinomialDist(5, new double[]{0.3, 0.3, 0.4});
         double expected2 = dist2.prob(new int[]{3, 1, 1});
 
-        double lopSumExpected = Math.log(expected1) + Math.log(expected2);
+        MultinomialDist dist3 = new MultinomialDist(4, new double[]{0.1, 0.2, 0.7});
+        double expected3 = dist3.prob(new int[]{4, 0, 0});
+
+        MultinomialDist dist4 = new MultinomialDist(5, new double[]{0.3, 0.3, 0.4});
+        double expected4 = dist4.prob(new int[]{0, 1, 4});
+
+        double lopSumExpected = Math.log(expected1) + Math.log(expected2) + Math.log(expected3) + Math.log(expected4);
 
         assertThat(logProb, closeTo(lopSumExpected, 1e-8));
     }

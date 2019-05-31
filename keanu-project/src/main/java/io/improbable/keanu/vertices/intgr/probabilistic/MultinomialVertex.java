@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkIsBroadcastable;
+import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
 
 public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
@@ -49,6 +50,16 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
         Preconditions.checkArgument(k >= 2, "K value of " + k + " must be greater than 1");
 
         long[] pBatchShape = TensorShape.selectDimensions(0, pRank - 1, pShape);
+
+        if (!isBroadcastable(nShape, pBatchShape)) {
+            throw new IllegalArgumentException(
+                "The shape of n " +
+                    Arrays.toString(nShape) +
+                    " must be broadcastable with the shape of p excluding the k dimension " +
+                    Arrays.toString(pBatchShape)
+            );
+        }
+
         return TensorShape.concat(checkIsBroadcastable(nShape, pBatchShape), new long[]{k});
     }
 

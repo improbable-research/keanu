@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.discrete;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
@@ -9,6 +10,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 import java.util.List;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
 
 
 public class Multinomial implements DiscreteDistribution {
@@ -34,14 +37,17 @@ public class Multinomial implements DiscreteDistribution {
         this.p = p;
     }
 
-
     @Override
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
 
-        long[] pBatchShape = TensorShape.selectDimensions(0, p.getRank() - 1, p.getShape());
+        long[] sampleBatchShape = TensorShape.selectDimensions(0, shape.length - 1, shape);
 
-        IntegerTensor broadcastedN = n.plus(IntegerTensor.zeros(pBatchShape));
+        Preconditions.checkArgument(isBroadcastable(sampleBatchShape, n.getShape()));
+
+        IntegerTensor broadcastedN = n.plus(IntegerTensor.zeros(sampleBatchShape));
         long[] broadcastResultShape = TensorShape.getBroadcastResultShape(TensorShape.concat(broadcastedN.getShape(), new long[]{1}), p.getShape());
+
+        Preconditions.checkArgument(isBroadcastable(p.getShape(), broadcastResultShape));
 
         DoubleTensor pBroadcasted = p.plus(DoubleTensor.zeros(broadcastResultShape));
 
@@ -59,7 +65,6 @@ public class Multinomial implements DiscreteDistribution {
             System.arraycopy(sample, 0, samples, numCategories * i, sample.length);
         }
 
-        //TODO make sure to use passed in shape
         return IntegerTensor.create(samples, shape);
     }
 
