@@ -10,7 +10,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
 
@@ -60,40 +59,37 @@ public class Multinomial implements DiscreteDistribution {
             TensorShape.concat(broadcastedN.getShape(), new long[]{1}), p.getShape()
         );
 
-        DoubleTensor pBroadcasted = p.plus(DoubleTensor.zeros(broadcastResultShape));
+        DoubleTensor broadcastedP = p.plus(DoubleTensor.zeros(broadcastResultShape));
+        DoubleTensor reshapedP = broadcastedP.reshape(-1, numCategories);
 
-        Tensor.FlattenedView<Integer> nFlattened = broadcastedN.getFlattenedView();
-        DoubleTensor reshapedP = pBroadcasted.reshape(-1, numCategories);
+        double[] flatP = reshapedP.asFlatDoubleArray();
+        int[] flatN = broadcastedN.asFlatIntegerArray();
 
-        List<DoubleTensor> sliced = reshapedP.sliceAlongDimension(0, 0, reshapedP.getShape()[0]);
+        int sampleCount = TensorShape.getLengthAsInt(broadcastedN.getShape());
+        int[] samples = new int[numCategories * sampleCount];
 
-        int length = TensorShape.getLengthAsInt(broadcastedN.getShape());
-        int[] samples = new int[numCategories * length];
+        for (int i = 0; i < sampleCount; i++) {
 
-        for (int i = 0; i < length; i++) {
-            double[] categoryProbabilities = sliced.get(i).asFlatDoubleArray();
-            int[] sample = drawNTimes(nFlattened.getOrScalar(i), random, categoryProbabilities);
-            System.arraycopy(sample, 0, samples, numCategories * i, sample.length);
+            int pIndex = i * numCategories;
+            drawNTimes(flatN[i], random, samples, pIndex, flatP, pIndex, numCategories);
         }
 
         return IntegerTensor.create(samples, shape);
     }
 
-    private static int[] drawNTimes(int n, KeanuRandom random, double... categoryProbabilities) {
-        int[] categoryDrawCounts = new int[categoryProbabilities.length];
+    private static void drawNTimes(int n, KeanuRandom random, int[] sample, int sampleIndex, double[] p, int pIndex, int pCount) {
         for (int i = 0; i < n; i++) {
-            int index = draw(random, categoryProbabilities);
-            categoryDrawCounts[index] += 1;
+            int index = draw(random, p, pIndex, pCount);
+            sample[sampleIndex + index] += 1;
         }
-        return categoryDrawCounts;
     }
 
-    private static int draw(KeanuRandom random, double... categoryProbabilities) {
+    private static int draw(KeanuRandom random, double[] p, int pIndex, int pCount) {
         double value = random.nextDouble();
         int index = 0;
         Double pCumulative = 0.;
-        while (index < categoryProbabilities.length) {
-            Double currentP = categoryProbabilities[index++];
+        while (index < pCount) {
+            Double currentP = p[pIndex + index++];
             if (currentP == 0.) {
                 continue;
             }
