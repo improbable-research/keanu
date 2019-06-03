@@ -11,11 +11,9 @@ import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
-import io.improbable.keanu.vertices.utility.GraphAssertionException;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -46,28 +44,24 @@ public class MultinomialVertexTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    @Test(expected = GraphAssertionException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheProbabilitiesDontSumToOne() {
         int n = 100;
         DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.1, 0.1, 0.1, 0.1));
-        BooleanVertex equalsOne = new EqualsVertex<>(p.sum(), ConstantVertex.of(1.0));
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
-        equalsOne.assertTrue().getValue();
+        multinomialVertex.setValidationEnabled(true);
+        multinomialVertex.sample();
     }
 
-    //
-//    @Test(expected = TensorValueException.class)
-//    public void inDebugModeItThrowsIfAnyOfTheProbabilitiesIsZero() {
-//        try {
-//            Multinomial.CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.enable();
-//            IntegerTensor n = IntegerTensor.scalar(100).reshape(1, 1);
-//            DoubleTensor p = DoubleTensor.create(0., 0., 1., 0.).reshape(4, 1);
-//            Multinomial.withParameters(n, p);
-//        } finally {
-//            Multinomial.CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.disable();
-//        }
-//    }
-//
+    @Test(expected = IllegalArgumentException.class)
+    public void inDebugModeItThrowsIfAnyOfTheProbabilitiesIsZero() {
+        int n = 100;
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0, 0, 1, 0));
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+        multinomialVertex.setValidationEnabled(true);
+        multinomialVertex.sample();
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheParametersAreDifferentHighRankShapes() {
         IntegerTensor n = IntegerTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4);
@@ -91,7 +85,7 @@ public class MultinomialVertexTest {
 
 
     @Test(expected = IllegalArgumentException.class)
-    public void itThrowsIfTheSampleShapeDoesntMatchTheShapeOfN() {
+    public void itThrowsIfTheSampleShapeIsNotBroadcastableToTheVertexShape() {
         IntegerTensor n = IntegerTensor.create(100, 200, 300, 400);
         DoubleTensor p = DoubleTensor.create(new double[]{
             0.1, 0.25,
@@ -119,40 +113,52 @@ public class MultinomialVertexTest {
 
         assertThat(sample, hasShape(2, 4, 2));
     }
-//
-//    @Test(expected = IllegalArgumentException.class)
-//    public void itThrowsIfTheLogProbShapeDoesntMatchTheNumberOfCategories() {
-//        IntegerTensor n = IntegerTensor.create(100).reshape(1, 1);
-//        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(4, 1);
-//        Multinomial multinomial = Multinomial.withParameters(n, p);
-//        multinomial.logProb(IntegerTensor.scalar(1));
-//    }
-//
-//    @Test(expected = IllegalArgumentException.class)
-//    public void itThrowsIfTheLogProbStateDoesntSumToN() {
-//        IntegerTensor n = IntegerTensor.scalar(10).reshape(1, 1);
-//        DoubleTensor p = DoubleTensor.create(0.2, 0.8).reshape(2, 1);
-//        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
-//        multinomial.logProb(IntegerTensor.create(5, 6).transpose());
-//    }
-//
-//    @Test(expected = IllegalArgumentException.class)
-//    public void itThrowsIfTheLogProbStateContainsNegativeNumbers() {
-//        IntegerTensor n = IntegerTensor.scalar(10).reshape(1, 1);
-//        DoubleTensor p = DoubleTensor.create(0.2, 0.8).reshape(2, 1);
-//        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
-//        multinomial.logProb(IntegerTensor.create(-1, 11).transpose());
-//    }
-//
-//    @Test(expected = IllegalArgumentException.class)
-//    public void itThrowsIfTheLogProbStateContainsNumbersGreaterThanN() {
-//        IntegerTensor n = IntegerTensor.scalar(10).reshape(1, 1);
-//        DoubleTensor p = DoubleTensor.create(0.2, 0.3, 0.5).reshape(3, 1);
-//        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
-//        int[] state = new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE, 12};
-//        assertThat(state[0] + state[1] + state[2], equalTo(10));
-//        multinomial.logProb(IntegerTensor.create(state).transpose());
-//    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheLogProbShapeDoesntMatchTheNumberOfCategories() {
+        IntegerTensor n = IntegerTensor.create(100);
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4);
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        multinomial.logProb(IntegerTensor.scalar(1));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheLogProbStateDoesntSumToN() {
+        IntegerVertex n = ConstantVertex.of(10);
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.2, 0.8));
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        multinomial.setValidationEnabled(true);
+        multinomial.logProb(IntegerTensor.create(5, 7));
+    }
+
+    @Test
+    public void itAllowsTheLogProbStateToSumToN() {
+        IntegerVertex n = ConstantVertex.of(10);
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.2, 0.8));
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        multinomial.setValidationEnabled(true);
+        multinomial.logProb(IntegerTensor.create(5, 5, 3, 7).reshape(2, 2));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheLogProbStateContainsNegativeNumbers() {
+        IntegerTensor n = IntegerTensor.scalar(10);
+        DoubleTensor p = DoubleTensor.create(0.2, 0.8);
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        multinomial.setValidationEnabled(true);
+        multinomial.logProb(IntegerTensor.create(-1, 11).transpose());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheLogProbStateContainsNumbersGreaterThanN() {
+        IntegerTensor n = IntegerTensor.scalar(10);
+        DoubleTensor p = DoubleTensor.create(0.2, 0.3, 0.5);
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        multinomial.setValidationEnabled(true);
+        int[] state = new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE, 12};
+        assertThat(state[0] + state[1] + state[2], equalTo(10));
+        multinomial.logProb(IntegerTensor.create(state).transpose());
+    }
 
     @Test
     public void itWorksWithScalarTrialCountN() {
@@ -260,6 +266,43 @@ public class MultinomialVertexTest {
         assertThat(logProb, closeTo(expectedLogProb, 1e-8));
     }
 
+    @Test
+    public void itWorksWithVectorOfNAndMatrixOfProbabilitiesWithRank3x() {
+        IntegerTensor n = IntegerTensor.create(new int[]{
+            1, 10
+        }, 2);
+
+        DoubleTensor p = DoubleTensor.create(new double[]{
+            .1, .1, .8,
+            .8, .1, .1,
+        }, 2, 3);
+
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        IntegerTensor sample = multinomial.sample(KeanuRandom.getDefaultRandom());
+        assertThat(sample, hasShape(2, 3));
+
+        double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
+            0, 0, 1,
+            10, 0, 0,
+            1, 0, 0,
+            5, 2, 3
+        }, 2, 2, 3));
+
+        MultinomialDist dist1 = new MultinomialDist(1, new double[]{.1, .1, .8});
+        MultinomialDist dist2 = new MultinomialDist(10, new double[]{.8, .1, .1});
+        MultinomialDist dist3 = new MultinomialDist(1, new double[]{.1, .1, .8});
+        MultinomialDist dist4 = new MultinomialDist(10, new double[]{.8, .1, .1});
+
+        double expected1 = dist1.prob(new int[]{0, 0, 1});
+        double expected2 = dist2.prob(new int[]{10, 0, 0});
+        double expected3 = dist3.prob(new int[]{1, 0, 0});
+        double expected4 = dist4.prob(new int[]{5, 2, 3});
+
+        double expectedLogProb = Math.log(expected1) + Math.log(expected2) + Math.log(expected3) + Math.log(expected4);
+
+        assertThat(logProb, closeTo(expectedLogProb, 1e-8));
+    }
+
 
     @Test
     public void youCanSampleWithATensorIfNIsScalarAndPIsARowVector() {
@@ -335,19 +378,19 @@ public class MultinomialVertexTest {
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
         int sampleCount = 10000;
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4).plus(DoubleTensor.zeros(sampleCount, 4));
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4);
         int n = 500;
 
         MultinomialVertex vertex = new MultinomialVertex(n, p);
 
-        IntegerTensor samples = vertex.sample();
+        IntegerTensor samples = vertex.sampleWithShape(new long[]{sampleCount, 4});
         assertThat(samples, hasShape(sampleCount, 4));
 
         for (int i = 0; i < samples.getShape()[1]; i++) {
 
             IntegerTensor sampleForIndexI = samples.slice(1, i);
 
-            Double probability = p.getValue(0, i);
+            Double probability = p.getValue(i);
             double mean = sampleForIndexI.toDouble().average();
             double std = sampleForIndexI.toDouble().standardDeviation();
 

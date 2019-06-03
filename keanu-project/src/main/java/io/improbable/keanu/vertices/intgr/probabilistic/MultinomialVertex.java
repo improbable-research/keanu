@@ -15,6 +15,8 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -27,6 +29,11 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
     private final DoubleVertex p;
     private final IntegerVertex n;
+
+    @Getter
+    @Setter
+    private boolean validationEnabled;
+
     private static final String P_NAME = "p";
     private static final String N_NAME = "n";
 
@@ -40,6 +47,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
         this.p = p;
         this.n = n;
+        this.validationEnabled = false;
 
         setParents(p, n);
     }
@@ -86,7 +94,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
     @Override
     public double logProb(IntegerTensor xTensor) {
-        return Multinomial.withParameters(n.getValue(), p.getValue()).logProb(xTensor).sum();
+        return Multinomial.withParameters(n.getValue(), p.getValue(), validationEnabled).logProb(xTensor).sum();
     }
 
     @Override
@@ -96,7 +104,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
     @Override
     public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
-        return Multinomial.withParameters(n.getValue(), p.getValue()).sample(shape, random);
+        return Multinomial.withParameters(n.getValue(), p.getValue(), validationEnabled).sample(shape, random);
     }
 
     @SaveVertexParam(P_NAME)
@@ -108,4 +116,5 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     public IntegerVertex getN() {
         return n;
     }
+
 }

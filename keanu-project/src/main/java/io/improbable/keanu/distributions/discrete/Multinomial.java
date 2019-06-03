@@ -19,9 +19,14 @@ public class Multinomial implements DiscreteDistribution {
     private final IntegerTensor n;
     private final DoubleTensor p;
     private final int numCategories;
+    private boolean validationEnabled;
 
     public static Multinomial withParameters(IntegerTensor n, DoubleTensor p) {
-        return new Multinomial(n, p);
+        return new Multinomial(n, p, false);
+    }
+
+    public static Multinomial withParameters(IntegerTensor n, DoubleTensor p, boolean validationEnabled) {
+        return new Multinomial(n, p, validationEnabled);
     }
 
     /**
@@ -31,14 +36,20 @@ public class Multinomial implements DiscreteDistribution {
      * @see <a href="https://en.wikipedia.org/wiki/Multinomial_distribution">Multinomial Distribution</a>
      * Generalisation of the Binomial distribution to variables with more than 2 possible values
      */
-    private Multinomial(IntegerTensor n, DoubleTensor p) {
+    private Multinomial(IntegerTensor n, DoubleTensor p, boolean validationEnabled) {
         numCategories = Ints.checkedCast(p.getShape()[p.getRank() - 1]);
         this.n = n;
         this.p = p;
+        this.validationEnabled = validationEnabled;
     }
 
     @Override
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
+
+        if (validationEnabled) {
+            validateProbabilities(p);
+            validateN(n);
+        }
 
         long[] sampleBatchShape = TensorShape.selectDimensions(0, shape.length - 1, shape);
 
@@ -96,9 +107,58 @@ public class Multinomial implements DiscreteDistribution {
 
     @Override
     public DoubleTensor logProb(IntegerTensor x) {
+        if (validationEnabled) {
+            validateProbabilities(p);
+            validateN(n);
+            validateX(x, n, p);
+        }
+
         DoubleTensor gammaN = n.plus(1).toDouble().logGammaInPlace();
         DoubleTensor xLogP = p.log().timesInPlace(x.toDouble()).sum(-1);
         DoubleTensor gammaXs = x.plus(1).toDouble().logGammaInPlace().sum(-1);
         return xLogP.plusInPlace(gammaN).minusInPlace(gammaXs);
+    }
+
+    private static void validateProbabilities(DoubleTensor p) {
+        if (p.isScalar()) {
+            throw new IllegalArgumentException("Probabilities must be a vector or a tensor with rank >= 1");
+        }
+
+        final boolean pRangeValidated = p.greaterThan(0.0).allTrue() && p.lessThan(1.0).allTrue();
+        if (!pRangeValidated) {
+            throw new IllegalArgumentException("Probabilities must be > 0 < 1 but were " + p);
+        }
+
+        final DoubleTensor pSum = p.sum(-1);
+        final boolean pSumValidated = pSum.equalsWithinEpsilon(DoubleTensor.create(1.0, pSum.getShape()), 1e-8);
+        if (!pSumValidated) {
+            throw new IllegalArgumentException("Probabilities must sum to 1 but summed to " + pSum);
+        }
+    }
+
+    private static void validateN(IntegerTensor n) {
+        final boolean nRangeValidated = n.greaterThanOrEqual(0).allTrue();
+        if (!nRangeValidated) {
+            throw new IllegalArgumentException("Number of trials (n) must be non-negative.");
+        }
+    }
+
+    private static void validateX(IntegerTensor x, IntegerTensor n, DoubleTensor p) {
+        final boolean xRangeValidated = x.greaterThanOrEqual(0).allTrue() && x.lessThanOrEqual(n).allTrue();
+        if (!xRangeValidated) {
+            throw new IllegalArgumentException("x must be >= 0 and <= n");
+        }
+
+        final IntegerTensor xSum = x.sum(-1);
+        final boolean xSumValidated = xSum.elementwiseEquals(n).allTrue();
+        if (!xSumValidated) {
+            throw new IllegalArgumentException("The sum of x " + xSum + " must equal n " + n);
+        }
+
+        long kAccordingToP = p.getShape()[p.getRank() - 1];
+        Preconditions.checkArgument(
+            !x.isScalar() && x.getShape()[x.getRank() - 1] == kAccordingToP,
+            "x shape must have far right dimension matching number of categories k " + kAccordingToP
+        );
     }
 }
