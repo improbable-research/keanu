@@ -9,6 +9,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
@@ -47,18 +48,17 @@ public class Multinomial implements DiscreteDistribution {
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
 
         if (validationEnabled) {
+            validateBroadcastShapes(shape, n.getShape(), p.getShape());
             validateProbabilities(p);
             validateN(n);
         }
 
         long[] sampleBatchShape = TensorShape.selectDimensions(0, shape.length - 1, shape);
 
-        Preconditions.checkArgument(isBroadcastable(sampleBatchShape, n.getShape()));
-
         IntegerTensor broadcastedN = n.plus(IntegerTensor.zeros(sampleBatchShape));
-        long[] broadcastResultShape = TensorShape.getBroadcastResultShape(TensorShape.concat(broadcastedN.getShape(), new long[]{1}), p.getShape());
-
-        Preconditions.checkArgument(isBroadcastable(p.getShape(), broadcastResultShape));
+        long[] broadcastResultShape = TensorShape.getBroadcastResultShape(
+            TensorShape.concat(broadcastedN.getShape(), new long[]{1}), p.getShape()
+        );
 
         DoubleTensor pBroadcasted = p.plus(DoubleTensor.zeros(broadcastResultShape));
 
@@ -108,6 +108,7 @@ public class Multinomial implements DiscreteDistribution {
     @Override
     public DoubleTensor logProb(IntegerTensor x) {
         if (validationEnabled) {
+            validateBroadcastShapes(x.getShape(), n.getShape(), p.getShape());
             validateProbabilities(p);
             validateN(n);
             validateX(x, n, p);
@@ -126,13 +127,19 @@ public class Multinomial implements DiscreteDistribution {
 
         final boolean pRangeValidated = p.greaterThan(0.0).allTrue() && p.lessThan(1.0).allTrue();
         if (!pRangeValidated) {
-            throw new IllegalArgumentException("Probabilities must be > 0 < 1 but were " + p);
+            throw new IllegalArgumentException(
+                "Probabilities must be > 0 < 1 but were " + Arrays.toString(p.asFlatDoubleArray())
+            );
         }
 
         final DoubleTensor pSum = p.sum(-1);
-        final boolean pSumValidated = pSum.equalsWithinEpsilon(DoubleTensor.create(1.0, pSum.getShape()), 1e-8);
+        final boolean pSumValidated = pSum.equalsWithinEpsilon(
+            DoubleTensor.create(1.0, pSum.getShape()), 1e-8
+        );
         if (!pSumValidated) {
-            throw new IllegalArgumentException("Probabilities must sum to 1 but summed to " + pSum);
+            throw new IllegalArgumentException(
+                "Probabilities must sum to 1 but summed to " + Arrays.toString(pSum.asFlatDoubleArray())
+            );
         }
     }
 
@@ -149,16 +156,45 @@ public class Multinomial implements DiscreteDistribution {
             throw new IllegalArgumentException("x must be >= 0 and <= n");
         }
 
+        long kAccordingToP = p.getShape()[p.getRank() - 1];
+        long kAccordingToX = x.isScalar() ? 0 : x.getShape()[x.getRank() - 1];
+        Preconditions.checkArgument(
+            kAccordingToX == kAccordingToP,
+            "x shape must have far right dimension matching number of categories k " + kAccordingToP +
+                " but had " + kAccordingToX + " categories."
+        );
+
         final IntegerTensor xSum = x.sum(-1);
         final boolean xSumValidated = xSum.elementwiseEquals(n).allTrue();
         if (!xSumValidated) {
-            throw new IllegalArgumentException("The sum of x " + xSum + " must equal n " + n);
+            throw new IllegalArgumentException(
+                "The sum of x " + Arrays.toString(xSum.asFlatArray()) +
+                    " must equal n " + Arrays.toString(n.asFlatDoubleArray())
+            );
+        }
+    }
+
+    private static void validateBroadcastShapes(long[] xShape, long[] nShape, long[] pShape) {
+
+        long[] broadcastResultShape;
+        try {
+            broadcastResultShape = TensorShape.getBroadcastResultShape(
+                pShape, TensorShape.concat(nShape, new long[]{1})
+            );
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                "p shape " + Arrays.toString(pShape) + " incompatible with n shape " +
+                    Arrays.toString(nShape)
+            );
         }
 
-        long kAccordingToP = p.getShape()[p.getRank() - 1];
-        Preconditions.checkArgument(
-            !x.isScalar() && x.getShape()[x.getRank() - 1] == kAccordingToP,
-            "x shape must have far right dimension matching number of categories k " + kAccordingToP
-        );
+        if (!isBroadcastable(broadcastResultShape, xShape)) {
+            throw new IllegalArgumentException("Shape " +
+                Arrays.toString(xShape) + " is incompatible with n shape " +
+                Arrays.toString(nShape) + " and p shape " + Arrays.toString(pShape) +
+                ". It must be broadcastable with " + Arrays.toString(broadcastResultShape)
+            );
+        }
+
     }
 }

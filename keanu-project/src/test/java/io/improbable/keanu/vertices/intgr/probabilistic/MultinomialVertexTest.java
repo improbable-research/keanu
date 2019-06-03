@@ -44,8 +44,11 @@ public class MultinomialVertexTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheProbabilitiesDontSumToOne() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Probabilities must sum to 1 but summed to [0.4]");
+
         int n = 100;
         DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.1, 0.1, 0.1, 0.1));
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
@@ -53,8 +56,11 @@ public class MultinomialVertexTest {
         multinomialVertex.sample();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void inDebugModeItThrowsIfAnyOfTheProbabilitiesIsZero() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Probabilities must be > 0 < 1 but were [0.0, 0.0, 1.0, 0.0]");
+
         int n = 100;
         DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0, 0, 1, 0));
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
@@ -62,15 +68,21 @@ public class MultinomialVertexTest {
         multinomialVertex.sample();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheParametersAreDifferentHighRankShapes() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The shape of n [2, 4] must be broadcastable with the shape of p excluding the k dimension [3, 2]");
+
         IntegerTensor n = IntegerTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4);
         DoubleTensor p = DoubleTensor.linspace(0, 1, 18).reshape(3, 2, 3);
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheParametersAreDifferentShapes() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The shape of n [2] must be broadcastable with the shape of p excluding the k dimension [3]");
+
         IntegerTensor n = IntegerTensor.create(1, 2);
         DoubleTensor p = DoubleTensor.linspace(0, 1, 9).reshape(3, 3);
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
@@ -83,9 +95,14 @@ public class MultinomialVertexTest {
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
     }
 
-
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheSampleShapeIsNotBroadcastableToTheVertexShape() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(
+            "Shape [2, 2] is incompatible with n shape [4] and p shape [4, 2]." +
+                " It must be broadcastable with [4, 2]"
+        );
+
         IntegerTensor n = IntegerTensor.create(100, 200, 300, 400);
         DoubleTensor p = DoubleTensor.create(new double[]{
             0.1, 0.25,
@@ -95,7 +112,8 @@ public class MultinomialVertexTest {
         }, 4, 2);
 
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
-        multinomialVertex.sampleWithShape(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
+        multinomialVertex.setValidationEnabled(true);
+        multinomialVertex.sampleWithShape(new long[]{2, 2});
     }
 
     @Test
@@ -114,16 +132,23 @@ public class MultinomialVertexTest {
         assertThat(sample, hasShape(2, 4, 2));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheLogProbShapeDoesntMatchTheNumberOfCategories() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("x shape must have far right dimension matching number of categories k 4");
+
         IntegerTensor n = IntegerTensor.create(100);
         DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4);
         MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        multinomial.setValidationEnabled(true);
         multinomial.logProb(IntegerTensor.scalar(1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheLogProbStateDoesntSumToN() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The sum of x [12] must equal n [10.0]");
+
         IntegerVertex n = ConstantVertex.of(10);
         DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.2, 0.8));
         MultinomialVertex multinomial = new MultinomialVertex(n, p);
@@ -140,8 +165,11 @@ public class MultinomialVertexTest {
         multinomial.logProb(IntegerTensor.create(5, 5, 3, 7).reshape(2, 2));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheLogProbStateContainsNegativeNumbers() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("x must be >= 0 and <= n");
+
         IntegerTensor n = IntegerTensor.scalar(10);
         DoubleTensor p = DoubleTensor.create(0.2, 0.8);
         MultinomialVertex multinomial = new MultinomialVertex(n, p);
@@ -149,8 +177,11 @@ public class MultinomialVertexTest {
         multinomial.logProb(IntegerTensor.create(-1, 11).transpose());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheLogProbStateContainsNumbersGreaterThanN() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("x must be >= 0 and <= n");
+
         IntegerTensor n = IntegerTensor.scalar(10);
         DoubleTensor p = DoubleTensor.create(0.2, 0.3, 0.5);
         MultinomialVertex multinomial = new MultinomialVertex(n, p);
