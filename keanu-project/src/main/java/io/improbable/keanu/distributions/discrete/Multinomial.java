@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -60,16 +59,14 @@ public class Multinomial implements DiscreteDistribution {
         );
 
         DoubleTensor broadcastedP = p.plus(DoubleTensor.zeros(broadcastResultShape));
-        DoubleTensor reshapedP = broadcastedP.reshape(-1, numCategories);
 
-        double[] flatP = reshapedP.asFlatDoubleArray();
+        double[] flatP = broadcastedP.asFlatDoubleArray();
         int[] flatN = broadcastedN.asFlatIntegerArray();
 
-        int sampleCount = TensorShape.getLengthAsInt(broadcastedN.getShape());
+        int sampleCount = flatN.length;
         int[] samples = new int[numCategories * sampleCount];
 
         for (int i = 0; i < sampleCount; i++) {
-
             int pIndex = i * numCategories;
             drawNTimes(flatN[i], random, samples, pIndex, flatP, pIndex, numCategories);
         }
