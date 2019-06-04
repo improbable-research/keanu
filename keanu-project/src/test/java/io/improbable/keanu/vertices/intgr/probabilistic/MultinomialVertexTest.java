@@ -107,10 +107,10 @@ public class MultinomialVertexTest {
 
         IntegerTensor n = IntegerTensor.create(100, 200, 300, 400);
         DoubleTensor p = DoubleTensor.create(new double[]{
-            0.1, 0.25,
-            0.2, 0.25,
-            0.3, 0.25,
-            0.4, 0.25
+            0.5, 0.5,
+            0.25, 0.75,
+            0.3, 0.7,
+            0.4, 0.6
         }, 4, 2);
 
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);

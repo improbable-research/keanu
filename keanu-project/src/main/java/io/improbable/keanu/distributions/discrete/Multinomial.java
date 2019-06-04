@@ -17,7 +17,7 @@ public class Multinomial implements DiscreteDistribution {
 
     private final IntegerTensor n;
     private final DoubleTensor p;
-    private final int numCategories;
+    private final int k;
     private boolean validationEnabled;
 
     public static Multinomial withParameters(IntegerTensor n, DoubleTensor p) {
@@ -36,10 +36,15 @@ public class Multinomial implements DiscreteDistribution {
      * Generalisation of the Binomial distribution to variables with more than 2 possible values
      */
     private Multinomial(IntegerTensor n, DoubleTensor p, boolean validationEnabled) {
-        numCategories = Ints.checkedCast(p.getShape()[p.getRank() - 1]);
+        k = Ints.checkedCast(p.getShape()[p.getRank() - 1]);
         this.n = n;
         this.p = p;
         this.validationEnabled = validationEnabled;
+
+        if (validationEnabled) {
+            validateProbabilities(p);
+            validateN(n);
+        }
     }
 
     @Override
@@ -47,8 +52,6 @@ public class Multinomial implements DiscreteDistribution {
 
         if (validationEnabled) {
             validateBroadcastShapes(shape, n.getShape(), p.getShape());
-            validateProbabilities(p);
-            validateN(n);
         }
 
         long[] sampleBatchShape = TensorShape.selectDimensions(0, shape.length - 1, shape);
@@ -64,11 +67,11 @@ public class Multinomial implements DiscreteDistribution {
         int[] flatN = broadcastedN.asFlatIntegerArray();
 
         int sampleCount = flatN.length;
-        int[] samples = new int[numCategories * sampleCount];
+        int[] samples = new int[k * sampleCount];
 
         for (int i = 0; i < sampleCount; i++) {
-            int pIndex = i * numCategories;
-            drawNTimes(flatN[i], random, samples, pIndex, flatP, pIndex, numCategories);
+            int pIndex = i * k;
+            drawNTimes(flatN[i], random, samples, pIndex, flatP, pIndex, k);
         }
 
         return IntegerTensor.create(samples, shape);
@@ -102,8 +105,6 @@ public class Multinomial implements DiscreteDistribution {
     public DoubleTensor logProb(IntegerTensor x) {
         if (validationEnabled) {
             validateBroadcastShapes(x.getShape(), n.getShape(), p.getShape());
-            validateProbabilities(p);
-            validateN(n);
             validateX(x, n, p);
         }
 
