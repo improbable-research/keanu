@@ -201,8 +201,8 @@ public class TensorShape {
 
     public static long[] getBroadcastResultShape(long[] left, long[] right) {
 
-        final long[] highestRank = left.length > right.length ? left : right;
-        long[] resultShape = Arrays.copyOf(highestRank, highestRank.length);
+        final long[] shapeOfHighestRank = left.length > right.length ? left : right;
+        long[] resultShape = Arrays.copyOf(shapeOfHighestRank, shapeOfHighestRank.length);
 
         int lowestRank = Math.min(left.length, right.length);
         for (int i = 1; i <= lowestRank; i++) {
