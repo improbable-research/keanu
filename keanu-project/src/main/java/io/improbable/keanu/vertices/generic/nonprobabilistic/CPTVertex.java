@@ -11,11 +11,11 @@ import java.util.Map;
 
 public class CPTVertex<OUT extends Tensor> extends GenericTensorVertex<OUT> implements NonProbabilistic<OUT>, NonSaveableVertex {
 
-    private final List<Vertex<? extends Tensor<Boolean>>> inputs;
+    private final List<Vertex<? extends Tensor<?>>> inputs;
     private final Map<CPTCondition, ? extends Vertex<OUT>> conditions;
     private final Vertex<OUT> defaultResult;
 
-    public CPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
+    public CPTVertex(List<Vertex<? extends Tensor<?>>> inputs,
                      Map<CPTCondition, ? extends Vertex<OUT>> conditions,
                      Vertex<OUT> defaultResult) {
         this.conditions = conditions;
