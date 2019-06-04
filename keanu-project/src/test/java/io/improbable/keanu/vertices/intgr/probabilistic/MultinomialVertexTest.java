@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
@@ -217,123 +219,220 @@ public class MultinomialVertexTest {
     }
 
     @Test
-    public void itWorksWithVectorOfNandMatrixOfProbabilities() {
+    public void itWorksWithMatrixOfNAndRank3OfProbabilities() {
+
+        int n1 = 1;
+        int n2 = 10;
+        int n3 = 100;
+        int n4 = 1000;
 
         IntegerTensor n = IntegerTensor.create(new int[]{
-            4, 5
-        }, 2);
+            n1, n2,
+            n3, n4
+        }, 2, 2);
 
-        DoubleTensor p = DoubleTensor.create(new double[]{
-            0.1, 0.2, 0.7,
-            0.3, 0.3, 0.4
-        }, 2, 3);
+        double[] p1 = new double[]{.3, .2, .5};
+        double[] p2 = new double[]{.5, .3, .2};
+        double[] p3 = new double[]{.2, .2, .6};
+        double[] p4 = new double[]{.6, .2, .2};
+
+        DoubleTensor p = DoubleTensor.create(Doubles.concat(
+            p1, p2, p3, p4
+        ), 2, 2, 3);
 
         MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        IntegerTensor sample = multinomial.sample();
+        assertThat(sample, hasShape(2, 2, 3));
 
+        int[] x1 = new int[]{0, 0, 1};
+        int[] x2 = new int[]{10, 0, 0};
+        int[] x3 = new int[]{25, 50, 25};
+        int[] x4 = new int[]{200, 300, 500};
+
+        double logProb = multinomial.logProb(IntegerTensor.create(Ints.concat(
+            x1, x2, x3, x4
+        ), 2, 2, 3));
+
+        MultinomialDist dist1 = new MultinomialDist(n1, p1);
+        double expected1 = dist1.prob(x1);
+
+        MultinomialDist dist2 = new MultinomialDist(n2, p2);
+        double expected2 = dist2.prob(x2);
+
+        MultinomialDist dist3 = new MultinomialDist(n3, p3);
+        double expected3 = dist3.prob(x3);
+
+        MultinomialDist dist4 = new MultinomialDist(n4, p4);
+        double expected4 = dist4.prob(x4);
+
+        double expectedLogProb = Math.log(expected1) + Math.log(expected2) + Math.log(expected3) + Math.log(expected4);
+        assertThat(logProb, closeTo(expectedLogProb, 1e-8));
+
+        int[] x5 = new int[]{0, 1, 0};
+        int[] x6 = new int[]{0, 10, 0};
+        int[] x7 = new int[]{50, 25, 25};
+        int[] x8 = new int[]{500, 200, 300};
+
+        double logProb2x = multinomial.logProb(IntegerTensor.create(Ints.concat(
+            x1, x2, x3, x4,
+            x5, x6, x7, x8
+        ), 2, 2, 2, 3));
+
+        MultinomialDist dist5 = new MultinomialDist(n1, p1);
+        double expected5 = dist5.prob(x5);
+
+        MultinomialDist dist6 = new MultinomialDist(n2, p2);
+        double expected6 = dist6.prob(x6);
+
+        MultinomialDist dist7 = new MultinomialDist(n3, p3);
+        double expected7 = dist7.prob(x7);
+
+        MultinomialDist dist8 = new MultinomialDist(n4, p4);
+        double expected8 = dist8.prob(x8);
+
+        double expectedLogProb2x = expectedLogProb + Math.log(expected5) +
+            Math.log(expected6) + Math.log(expected7) + Math.log(expected8);
+
+        assertThat(logProb2x, closeTo(expectedLogProb2x, 1e-8));
+    }
+
+    @Test
+    public void itWorksWithVectorOfNAndMatrixOfProbabilities() {
+
+        int n1 = 1;
+        int n2 = 10;
+
+        IntegerTensor n = IntegerTensor.create(new int[]{
+            n1, n2
+        }, 2);
+
+        double[] p1 = new double[]{.3, .2, .5};
+        double[] p2 = new double[]{.5, .3, .2};
+
+        DoubleTensor p = DoubleTensor.create(Doubles.concat(
+            p1,
+            p2
+        ), 2, 3);
+
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
         IntegerTensor sample = multinomial.sample();
         assertThat(sample, hasShape(2, 3));
 
-        double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
-            1, 1, 2,
-            3, 1, 1,
-            4, 0, 0,
-            0, 1, 4,
-        }, 2, 2, 3));
+        int[] x1 = new int[]{0, 0, 1};
+        int[] x2 = new int[]{10, 0, 0};
 
-        MultinomialDist dist1 = new MultinomialDist(4, new double[]{0.1, 0.2, 0.7});
-        double expected1 = dist1.prob(new int[]{1, 1, 2});
+        double logProb = multinomial.logProb(IntegerTensor.create(Ints.concat(
+            x1,
+            x2
+        ), 2, 3));
 
-        MultinomialDist dist2 = new MultinomialDist(5, new double[]{0.3, 0.3, 0.4});
-        double expected2 = dist2.prob(new int[]{3, 1, 1});
+        MultinomialDist dist1 = new MultinomialDist(n1, p1);
+        double expected1 = dist1.prob(x1);
 
-        MultinomialDist dist3 = new MultinomialDist(4, new double[]{0.1, 0.2, 0.7});
-        double expected3 = dist3.prob(new int[]{4, 0, 0});
+        MultinomialDist dist2 = new MultinomialDist(n2, p2);
+        double expected2 = dist2.prob(x2);
 
-        MultinomialDist dist4 = new MultinomialDist(5, new double[]{0.3, 0.3, 0.4});
-        double expected4 = dist4.prob(new int[]{0, 1, 4});
+        double expectedLogProb = Math.log(expected1) + Math.log(expected2);
+        assertThat(logProb, closeTo(expectedLogProb, 1e-8));
 
-        double lopSumExpected = Math.log(expected1) + Math.log(expected2) + Math.log(expected3) + Math.log(expected4);
+        int[] x3 = new int[]{0, 1, 0};
+        int[] x4 = new int[]{0, 10, 0};
 
-        assertThat(logProb, closeTo(lopSumExpected, 1e-8));
+        double logProb2x = multinomial.logProb(IntegerTensor.create(Ints.concat(
+            x1, x2,
+            x3, x4
+        ), 2, 2, 3));
+
+        MultinomialDist dist3 = new MultinomialDist(n1, p1);
+        double expected3 = dist3.prob(x3);
+
+        MultinomialDist dist4 = new MultinomialDist(n2, p2);
+        double expected4 = dist4.prob(x4);
+
+        double expectedLogProb2x = expectedLogProb + Math.log(expected3) + Math.log(expected4);
+
+        assertThat(logProb2x, closeTo(expectedLogProb2x, 1e-8));
     }
 
     @Test
-    public void itWorksWithMatrixOfNAndRank3Probabilities() {
+    public void itWorksWithMatrixOfNAndMatrixOfProbabilities() {
+
+        int n1 = 1;
+        int n2 = 10;
+        int n3 = 100;
+        int n4 = 1000;
+
         IntegerTensor n = IntegerTensor.create(new int[]{
-            1, 10,
-            100, 1000
+            n1, n2,
+            n3, n4
         }, 2, 2);
 
-        DoubleTensor p = DoubleTensor.create(new double[]{
-            .1, .1, .8,
-            .8, .1, .1,
-            .25, .5, .25,
-            .2, .3, .5
-        }, 2, 2, 3);
+        double[] p1 = new double[]{.3, .2, .5};
+        double[] p2 = new double[]{.5, .3, .2};
+
+        DoubleTensor p = DoubleTensor.create(Doubles.concat(
+            p1,
+            p2
+        ), 2, 3);
 
         MultinomialVertex multinomial = new MultinomialVertex(n, p);
-        IntegerTensor sample = multinomial.sample(KeanuRandom.getDefaultRandom());
+        IntegerTensor sample = multinomial.sample();
         assertThat(sample, hasShape(2, 2, 3));
 
-        double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
-            0, 0, 1,
-            10, 0, 0,
-            25, 50, 25,
-            200, 300, 500
-        }, 2, 2, 3));
+        int[] x1 = new int[]{0, 0, 1};
+        int[] x2 = new int[]{10, 0, 0};
+        int[] x3 = new int[]{25, 50, 25};
+        int[] x4 = new int[]{200, 300, 500};
 
-        MultinomialDist dist1 = new MultinomialDist(1, new double[]{.1, .1, .8});
-        MultinomialDist dist2 = new MultinomialDist(10, new double[]{.8, .1, .1});
-        MultinomialDist dist3 = new MultinomialDist(100, new double[]{.25, .5, .25});
-        MultinomialDist dist4 = new MultinomialDist(1000, new double[]{.2, .3, .5});
+        double logProb = multinomial.logProb(IntegerTensor.create(Ints.concat(
+            x1,
+            x2,
+            x3,
+            x4
+        ), 2, 2, 3));
 
-        double expected1 = dist1.prob(new int[]{0, 0, 1});
-        double expected2 = dist2.prob(new int[]{10, 0, 0});
-        double expected3 = dist3.prob(new int[]{25, 50, 25});
-        double expected4 = dist4.prob(new int[]{200, 300, 500});
+        MultinomialDist dist1 = new MultinomialDist(n1, p1);
+        double expected1 = dist1.prob(x1);
 
-        double expectedLogProb = Math.log(expected1) + Math.log(expected2) + Math.log(expected3) + Math.log(expected4);
+        MultinomialDist dist2 = new MultinomialDist(n2, p2);
+        double expected2 = dist2.prob(x2);
 
-        assertThat(logProb, closeTo(expectedLogProb, 1e-8));
-    }
+        MultinomialDist dist3 = new MultinomialDist(n3, p1);
+        double expected3 = dist3.prob(x3);
 
-    @Test
-    public void itWorksWithVectorOfNAndMatrixOfProbabilitiesWithRank3x() {
-        IntegerTensor n = IntegerTensor.create(new int[]{
-            1, 10
-        }, 2);
-
-        DoubleTensor p = DoubleTensor.create(new double[]{
-            .1, .1, .8,
-            .8, .1, .1,
-        }, 2, 3);
-
-        MultinomialVertex multinomial = new MultinomialVertex(n, p);
-        IntegerTensor sample = multinomial.sample(KeanuRandom.getDefaultRandom());
-        assertThat(sample, hasShape(2, 3));
-
-        double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
-            0, 0, 1,
-            10, 0, 0,
-            1, 0, 0,
-            5, 2, 3
-        }, 2, 2, 3));
-
-        MultinomialDist dist1 = new MultinomialDist(1, new double[]{.1, .1, .8});
-        MultinomialDist dist2 = new MultinomialDist(10, new double[]{.8, .1, .1});
-        MultinomialDist dist3 = new MultinomialDist(1, new double[]{.1, .1, .8});
-        MultinomialDist dist4 = new MultinomialDist(10, new double[]{.8, .1, .1});
-
-        double expected1 = dist1.prob(new int[]{0, 0, 1});
-        double expected2 = dist2.prob(new int[]{10, 0, 0});
-        double expected3 = dist3.prob(new int[]{1, 0, 0});
-        double expected4 = dist4.prob(new int[]{5, 2, 3});
+        MultinomialDist dist4 = new MultinomialDist(n4, p2);
+        double expected4 = dist4.prob(x4);
 
         double expectedLogProb = Math.log(expected1) + Math.log(expected2) + Math.log(expected3) + Math.log(expected4);
-
         assertThat(logProb, closeTo(expectedLogProb, 1e-8));
-    }
 
+        int[] x5 = new int[]{0, 1, 0};
+        int[] x6 = new int[]{0, 10, 0};
+        int[] x7 = new int[]{50, 25, 25};
+        int[] x8 = new int[]{500, 200, 300};
+
+        double logProb2x = multinomial.logProb(IntegerTensor.create(Ints.concat(
+            x1, x2, x3, x4,
+            x5, x6, x7, x8
+        ), 2, 2, 2, 3));
+
+        MultinomialDist dist5 = new MultinomialDist(n1, p1);
+        double expected5 = dist5.prob(x5);
+
+        MultinomialDist dist6 = new MultinomialDist(n2, p2);
+        double expected6 = dist6.prob(x6);
+
+        MultinomialDist dist7 = new MultinomialDist(n3, p1);
+        double expected7 = dist7.prob(x7);
+
+        MultinomialDist dist8 = new MultinomialDist(n4, p2);
+        double expected8 = dist8.prob(x8);
+
+        double expectedLogProb2x = expectedLogProb + Math.log(expected5) +
+            Math.log(expected6) + Math.log(expected7) + Math.log(expected8);
+
+        assertThat(logProb2x, closeTo(expectedLogProb2x, 1e-8));
+    }
 
     @Test
     public void youCanSampleWithATensorIfNIsScalarAndPIsARowVector() {

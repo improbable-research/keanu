@@ -127,7 +127,7 @@ public class Multinomial implements DiscreteDistribution {
 
         final DoubleTensor pSum = p.sum(-1);
         final boolean pSumValidated = pSum.equalsWithinEpsilon(
-            DoubleTensor.create(1.0, pSum.getShape()), 1e-8
+            DoubleTensor.create(1.0, pSum.getShape()), 1e-3
         );
         if (!pSumValidated) {
             throw new IllegalArgumentException(

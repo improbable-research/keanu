@@ -25,6 +25,29 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkIsBroadcastable;
 import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
 
+/**
+ * The multinomial vertex is a multivariate distribution with a shape determined by p (probabilities) and n (trials).
+ * It does support batch sampling and batch logProb.
+ *
+ * The most common use case is a single scalar value for n (trials) and a vector of p (probabilities):
+ * e.g.
+ * n = 5
+ * p = [0.2, 0.2, 0.6]
+ * a sample could return x = [1, 3, 1]
+ * and logProb([1, 3, 1]) would be valid
+ *
+ * More complex cases are also acceptable and use broadcasting semantics.
+ *
+ * If the number of categories is defined by k, then the shape of p is (a...b, k) where a..b represents any shape of
+ * any rank. For the p as a vector case, a...b is rank 0 and would be just a shape (k). Given that p has a shape of
+ * (a...b, k) then n can have any shape that is broadcastable with a...b. The resulting shape would be the broadcasted
+ * n shape with a...b and end in k.
+ * e.g.
+ * n = [[1, 2],[3, 4]] with shape (2, 2)
+ * p = [[0.2, 0.2, 0.6], [0.5, 0.25, 0.25]] with shape 2, 3
+ * therefore k = 3
+ * and the result shape is (2, 2, 3), which is (2, 2) broadcasted with (2) and k appended.
+ */
 public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
     private final DoubleVertex p;
