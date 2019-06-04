@@ -79,17 +79,18 @@ public class Multinomial implements DiscreteDistribution {
 
     private static void drawNTimes(int n, KeanuRandom random, int[] sample, int sampleIndex, double[] p, int pIndex, int pCount) {
         for (int i = 0; i < n; i++) {
-            int index = draw(random, p, pIndex, pCount);
-            sample[sampleIndex + index] += 1;
+            int drawnIndex = draw(random, p, pIndex, pCount);
+            sample[sampleIndex + drawnIndex] += 1;
         }
     }
 
     private static int draw(KeanuRandom random, double[] p, int pIndex, int pCount) {
         double value = random.nextDouble();
         int index = 0;
-        Double pCumulative = 0.;
+        double pCumulative = 0.;
         while (index < pCount) {
-            Double currentP = p[pIndex + index++];
+            double currentP = p[pIndex + index];
+            index++;
             if (currentP == 0.) {
                 continue;
             }
