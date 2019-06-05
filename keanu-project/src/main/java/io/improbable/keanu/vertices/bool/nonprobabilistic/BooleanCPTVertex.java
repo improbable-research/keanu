@@ -13,11 +13,11 @@ import java.util.Map;
 
 public class BooleanCPTVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor>, NonSaveableVertex {
 
-    private final List<Vertex<? extends Tensor<Boolean>>> inputs;
+    private final List<Vertex<? extends Tensor<?>>> inputs;
     private final Map<CPTCondition, BooleanVertex> conditions;
     private final BooleanVertex defaultResult;
 
-    public BooleanCPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
+    public BooleanCPTVertex(List<Vertex<? extends Tensor<?>>> inputs,
                             Map<CPTCondition, BooleanVertex> conditions,
                             BooleanVertex defaultResult) {
         super(defaultResult.getShape());
