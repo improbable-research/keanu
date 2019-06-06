@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class CompiledBackEnds {
 
     public enum Backend {
-        KEANU_GRAPH, KEANU_COMPILED, PRECOMPILED_KEANU
+        KEANU_GRAPH, KEANU_COMPILED
     }
 
     @Param({"KEANU_COMPILED", "KEANU_GRAPH"})
@@ -60,9 +60,6 @@ public class CompiledBackEnds {
         output = outputNode.getReference();
 
         switch (backend) {
-            case PRECOMPILED_KEANU:
-                computableGraph = precompiledKeaunuGraph(outputNode);
-                break;
             case KEANU_GRAPH:
                 computableGraph = keaunuGraph(outputNode);
                 break;
@@ -103,10 +100,6 @@ public class CompiledBackEnds {
             .collect(Collectors.toList());
 
         return new KeanuComputableGraph(toposortedGraph, ImmutableSet.of(output));
-    }
-
-    public ComputableGraph precompiledKeaunuGraph(DoubleVertex output) {
-        return new PreCompiledKeanuGraph(output.getReference());
     }
 
     @Benchmark
