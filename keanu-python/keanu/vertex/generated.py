@@ -59,7 +59,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilis
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanReshapeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanSliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanTakeVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastToDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
@@ -135,6 +135,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabili
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPermuteVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerReshapeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex")
@@ -228,8 +229,8 @@ def BooleanTake(input_vertex: vertex_constructor_param_types, index: Collection[
     return Boolean(context.jvm_view().BooleanTakeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(index))
 
 
-def Not(a: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Boolean(context.jvm_view().NotVertex, label, cast_to_vertex(a))
+def NotBinary(a: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().NotBinaryVertex, label, cast_to_vertex(a))
 
 
 def Bernoulli(prob_true: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -794,6 +795,10 @@ def IntegerAbs(input_vertex: vertex_constructor_param_types, label: Optional[str
     return Integer(context.jvm_view().IntegerAbsVertex, label, cast_to_integer_vertex(input_vertex))
 
 
+def IntegerPermute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerPermuteVertex, label, cast_to_integer_vertex(input_vertex), cast_to_int_array(rearrange))
+
+
 def IntegerReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], label: Optional[str]=None) -> Vertex:
     return Integer(context.jvm_view().IntegerReshapeVertex, label, cast_to_integer_vertex(input_vertex), cast_to_long_array(proposed_shape))
 
@@ -809,13 +814,14 @@ def IntegerSlice(input_vertex: vertex_constructor_param_types, dimension: int, i
     return Integer(context.jvm_view().IntegerSliceVertex, label, cast_to_integer_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
 
 
-def IntegerSum(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+def IntegerSum(input_vertex: vertex_constructor_param_types, over_dimensions: Collection[int], label: Optional[str]=None) -> Vertex:
     """
-    Performs a sum across all dimensions
+    Performs a sum across each value stored in a vertex
     
     :param input_vertex: the vertex to have its values summed
+    :param over_dimensions: the dimensions to sum over
     """
-    return Integer(context.jvm_view().IntegerSumVertex, label, cast_to_integer_vertex(input_vertex))
+    return Integer(context.jvm_view().IntegerSumVertex, label, cast_to_integer_vertex(input_vertex), cast_to_int_array(over_dimensions))
 
 
 def IntegerTake(input_vertex: vertex_constructor_param_types, index: Collection[int], label: Optional[str]=None) -> Vertex:

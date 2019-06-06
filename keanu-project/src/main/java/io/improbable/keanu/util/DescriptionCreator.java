@@ -262,9 +262,9 @@ public class DescriptionCreator {
             builder.append("(");
         }
 
-        builder.append(generateDescription(opVertex.getA(), true, includeBrackets));
+        builder.append(generateDescription(opVertex.getLeft(), true, includeBrackets));
         builder.append(operation);
-        builder.append(generateDescription(opVertex.getB(), true, includeBrackets));
+        builder.append(generateDescription(opVertex.getRight(), true, includeBrackets));
 
         if (includeBrackets) {
             builder.append(")");

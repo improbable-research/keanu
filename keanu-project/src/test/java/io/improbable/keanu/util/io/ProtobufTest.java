@@ -42,6 +42,7 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -389,8 +390,8 @@ public class ProtobufTest {
     }
 
     private KeanuSavedBayesNet.ProtoModel createBasicNetworkProtobufWithValue(String labelForValue,
-                                                                         String idForValue,
-                                                                         Double valueToStore) {
+                                                                              String idForValue,
+                                                                              Double valueToStore) {
 
         SavedBayesNet.Vertex muVertex = SavedBayesNet.Vertex.newBuilder()
             .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
@@ -487,23 +488,31 @@ public class ProtobufTest {
          * For each vertex we need to check that we have a single constructor we can use for loading and that we save
          * all the necessary Params for that constructor
          */
-        Map<String, Class> storedParams = getSavedParams(vertexClass);
+        Map<String, Set<Class>> storedParams = getSavedParams(vertexClass);
         Map<String, Class> requiredParams = checkConstructorParamValidityAndGetRequiredSaves(vertexClass);
 
         for (Map.Entry<String, Class> param : requiredParams.entrySet()) {
+
             assertThat("Class must save all required params: " + vertexClass,
                 storedParams, hasKey(param.getKey()));
             if (param.getKey().equals("label")) {
                 //Labels are stored as strings and are parsed into VertexLabels at load time
                 assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
                         + storedParams.get(param.getKey()) + ", " + param.getValue(),
-                    String.class.isAssignableFrom(storedParams.get(param.getKey())));
+                    String.class.isAssignableFrom(storedParams.get(param.getKey()).iterator().next()));
             } else {
                 assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
                         + storedParams.get(param.getKey()) + ", " + param.getValue(),
-                    param.getValue().isAssignableFrom(storedParams.get(param.getKey())));
+                    containsAssignableFrom(storedParams.get(param.getKey()), param.getValue()));
             }
         }
+    }
+
+    private boolean containsAssignableFrom(Set<Class> paramTypes, Class toAssign) {
+        return paramTypes.stream()
+            .map(toAssign::isAssignableFrom)
+            .collect(Collectors.toSet())
+            .contains(true);
     }
 
     private <A extends AnnotatedElement> List<A> filterAnnotatedObjects(A[] items, Class annotation) {
@@ -516,31 +525,32 @@ public class ProtobufTest {
         return filteredList;
     }
 
-    private List<Constructor> getConstructorsWithAnnotatedParameters(Class parentClass, Class annotation) {
+    private Set<Constructor> getConstructorsWithAnnotatedParameters(Class parentClass, Class annotation) {
         return Arrays.stream(parentClass.getConstructors())
             .filter(constructor -> !filterAnnotatedObjects(constructor.getParameters(), annotation).isEmpty())
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
     }
 
-    private Map<String, Class> getSavedParams(Class<? extends Vertex> vertexClass) {
-        Map<String, Class> savedParams = new HashMap<>();
+    private Map<String, Set<Class>> getSavedParams(Class<? extends Vertex> vertexClass) {
+        Map<String, Set<Class>> savedParams = new HashMap<>();
 
         for (Method method : filterAnnotatedObjects(vertexClass.getMethods(), SaveVertexParam.class)) {
             String paramName = method.getAnnotation(SaveVertexParam.class).value();
             Class paramType = method.getReturnType();
-            savedParams.put(paramName, paramType);
+            savedParams.computeIfAbsent(paramName, (name) -> new HashSet<>()).add(paramType);
         }
 
         return savedParams;
     }
 
     private Map<String, Class> checkConstructorParamValidityAndGetRequiredSaves(Class<? extends Vertex> vertexClass) {
-        List<Constructor> parentConstructor = getConstructorsWithAnnotatedParameters(vertexClass,
-            LoadVertexParam.class);
-        assertThat("Need Constructor for Class: " + vertexClass, parentConstructor.size(), is(1));
+        Set<Constructor> loadConstructors = getConstructorsWithAnnotatedParameters(vertexClass, LoadVertexParam.class);
+        loadConstructors.addAll(getConstructorsWithAnnotatedParameters(vertexClass, LoadShape.class));
+
+        assertThat("Need Constructor for Class: " + vertexClass, loadConstructors.size(), is(1));
         Map<String, Class> requiredParameters = new HashMap<>();
 
-        for (Parameter parameter : parentConstructor.get(0).getParameters()) {
+        for (Parameter parameter : loadConstructors.iterator().next().getParameters()) {
             LoadVertexParam parameterAnnotation = parameter.getAnnotation(LoadVertexParam.class);
             LoadShape shapeAnnotation = parameter.getAnnotation(LoadShape.class);
             assertThat("Annotation has to be present on all Constructor params for class: " + vertexClass,

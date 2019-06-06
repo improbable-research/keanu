@@ -98,6 +98,14 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor permute(int... rearrange) {
+        if (rearrange.length > shape.length) {
+            throw new IllegalArgumentException("Cannot permute " + Arrays.toString(rearrange) + " on shape " + Arrays.toString(shape));
+        }
+        return new ScalarIntegerTensor(value, shape);
+    }
+
+    @Override
     public IntegerTensor diag() {
         return duplicate();
     }
@@ -265,6 +273,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
         } else {
             throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
         }
+    }
+
+    @Override
+    public IntegerTensor take(long... index) {
+        return new ScalarIntegerTensor(getValue(index));
     }
 
     @Override

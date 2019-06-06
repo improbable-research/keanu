@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.bool;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -70,6 +71,31 @@ public class SimpleBooleanTensor implements BooleanTensor {
                 + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
         }
         return new SimpleBooleanTensor(data, newShape);
+    }
+
+    @Override
+    public BooleanTensor permute(int... rearrange) {
+
+        long[] resultShape = TensorShape.getPermutedResultShape(shape, rearrange);
+        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        boolean[] newBuffer = new boolean[data.length];
+
+        for (int i = 0; i < data.length; i++) {
+
+            long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
+
+            long[] permutedIndex = new long[shapeIndices.length];
+
+            for (int p = 0; p < permutedIndex.length; p++) {
+                permutedIndex[p] = shapeIndices[rearrange[p]];
+            }
+
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, permutedIndex));
+
+            newBuffer[j] = data[i];
+        }
+
+        return new SimpleBooleanTensor(newBuffer, resultShape);
     }
 
     @Override
@@ -236,6 +262,11 @@ public class SimpleBooleanTensor implements BooleanTensor {
             tadToBooleans[i] = tadFlat[i] == 1;
         }
         return new SimpleBooleanTensor(tadToBooleans, tadDoubles.getShape());
+    }
+
+    @Override
+    public BooleanTensor take(long... index) {
+        return scalar(getValue(index));
     }
 
     @Override

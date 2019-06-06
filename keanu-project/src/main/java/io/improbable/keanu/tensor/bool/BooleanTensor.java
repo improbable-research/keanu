@@ -67,7 +67,7 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
         return concat(absoluteDimension, reshaped);
     }
 
-    static BooleanTensor concat(int dimension, BooleanTensor[] toConcat) {
+    static BooleanTensor concat(int dimension, BooleanTensor... toConcat) {
         DoubleTensor[] toDoubles = new DoubleTensor[toConcat.length];
 
         for (int i = 0; i < toConcat.length; i++) {
@@ -87,6 +87,9 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
 
     @Override
     BooleanTensor reshape(long... newShape);
+
+    @Override
+    BooleanTensor permute(int... rearrange);
 
     @Override
     BooleanTensor duplicate();
@@ -133,6 +136,9 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
 
     @Override
     BooleanTensor slice(int dimension, long index);
+
+    @Override
+    BooleanTensor take(long... index);
 
     boolean[] asFlatBooleanArray();
 

@@ -74,10 +74,6 @@ public class BayesianNetwork {
         return labelMap;
     }
 
-    List<? extends Vertex> getVertices() {
-        return vertices;
-    }
-
     public int getVertexCount() {
         return getVertices().size();
     }
@@ -99,6 +95,10 @@ public class BayesianNetwork {
      */
     public List<Vertex> getAllVertices() {
         return Collections.unmodifiableList(vertices);
+    }
+
+    public List<? extends Vertex> getVertices() {
+        return vertices;
     }
 
     private interface VertexFilter {

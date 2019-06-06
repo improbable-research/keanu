@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 
-public class IfVertex<T> extends GenericTensorVertex<Tensor<T>> implements NonProbabilistic<Tensor<T>> {
+public class IfVertex<T> extends GenericTensorVertex<T> implements NonProbabilistic<Tensor<T>> {
 
     private final static String PREDICATE_NAME = "predicate";
     private final static String THEN_NAME = "then";

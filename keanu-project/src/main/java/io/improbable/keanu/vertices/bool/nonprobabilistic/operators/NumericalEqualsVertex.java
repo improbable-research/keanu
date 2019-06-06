@@ -20,12 +20,12 @@ public class NumericalEqualsVertex extends BooleanVertex implements NonProbabili
     private Vertex<? extends NumberTensor> epsilon;
     private final static String A_NAME = "a";
     private final static String B_NAME = "b";
-    private final static String EPISILON_NAME = "episilon";
+    private final static String EPSILON_NAME = "epsilon";
 
     @ExportVertexToPythonBindings
     public NumericalEqualsVertex(@LoadVertexParam(A_NAME) Vertex<? extends NumberTensor> a,
                                  @LoadVertexParam(B_NAME) Vertex<? extends NumberTensor> b,
-                                 @LoadVertexParam(EPISILON_NAME) Vertex<? extends NumberTensor> epsilon) {
+                                 @LoadVertexParam(EPSILON_NAME) Vertex<? extends NumberTensor> epsilon) {
         super(a.getShape());
         this.a = a;
         this.b = b;
@@ -39,7 +39,7 @@ public class NumericalEqualsVertex extends BooleanVertex implements NonProbabili
     }
 
     private BooleanTensor op(NumberTensor a, NumberTensor b, NumberTensor epsilon) {
-        DoubleTensor absoluteDifference = a.toDouble().minus(b.toDouble()).absInPlace();
+        final DoubleTensor absoluteDifference = a.toDouble().minus(b.toDouble()).absInPlace();
         return absoluteDifference.lessThanOrEqual(epsilon.toDouble());
     }
 
@@ -53,7 +53,7 @@ public class NumericalEqualsVertex extends BooleanVertex implements NonProbabili
         return b;
     }
 
-    @SaveVertexParam(EPISILON_NAME)
+    @SaveVertexParam(EPSILON_NAME)
     public Vertex<? extends NumberTensor> getEpsilon() {
         return epsilon;
     }

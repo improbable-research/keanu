@@ -14,7 +14,7 @@ public class IntegerSliceVertex extends IntegerUnaryOpVertex {
     private final static String INDEX_NAME = "index";
 
     private final int dimension;
-    private final int index;
+    private final long index;
 
     /**
      * Takes the slice along a given dimension and index of a vertex
@@ -26,7 +26,7 @@ public class IntegerSliceVertex extends IntegerUnaryOpVertex {
     @ExportVertexToPythonBindings
     public IntegerSliceVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
                               @LoadVertexParam(DIMENSION_NAME) int dimension,
-                              @LoadVertexParam(INDEX_NAME) int index) {
+                              @LoadVertexParam(INDEX_NAME) long index) {
         super(removeDimension(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
@@ -43,7 +43,7 @@ public class IntegerSliceVertex extends IntegerUnaryOpVertex {
     }
 
     @SaveVertexParam(INDEX_NAME)
-    public int getIndex() {
+    public long getIndex() {
         return index;
     }
 }

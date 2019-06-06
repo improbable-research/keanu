@@ -1,45 +1,47 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
+import static io.improbable.keanu.tensor.TensorShape.getSummationResultShape;
+
 public class IntegerSumVertex extends IntegerUnaryOpVertex {
 
-    private static final String DIMENSION_NAME = "overDimensions";
+    private static final String DIMENSIONS_NAME = "overDimensions";
+
     private final int[] overDimensions;
 
     /**
-    * Performs a sum across specified dimensions. Negative dimension indexing is not supported.
-    *
-    * @param inputVertex    the vertex to have its values summed
-    * @param overDimensions dimensions to sum over
-    */
+     * Performs a sum across each value stored in a vertex
+     *
+     * @param inputVertex    the vertex to have its values summed
+     * @param overDimensions the dimensions to sum over
+     */
+    @ExportVertexToPythonBindings
     public IntegerSumVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
-                            @LoadVertexParam(DIMENSION_NAME) int[] overDimensions) {
-        super(inputVertex.getShape(), inputVertex);
+                            @LoadVertexParam(DIMENSIONS_NAME) int[] overDimensions) {
+        super(getSummationResultShape(inputVertex.getShape(), overDimensions), inputVertex);
         this.overDimensions = overDimensions;
     }
 
-    /**
-    * Performs a sum across all dimensions
-    *
-    * @param inputVertex the vertex to have its values summed
-    */
-    @ExportVertexToPythonBindings
     public IntegerSumVertex(IntegerVertex inputVertex) {
-        this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getRank()));
+        super(new long[0], inputVertex);
+        this.overDimensions = null;
     }
 
     @Override
     protected IntegerTensor op(IntegerTensor value) {
-        return value.sum(overDimensions);
+        if (overDimensions == null) {
+            return IntegerTensor.scalar(value.sum());
+        } else {
+            return value.sum(overDimensions);
+        }
     }
 
-    @SaveVertexParam(DIMENSION_NAME)
+    @SaveVertexParam(DIMENSIONS_NAME)
     public int[] getOverDimensions() {
         return overDimensions;
     }

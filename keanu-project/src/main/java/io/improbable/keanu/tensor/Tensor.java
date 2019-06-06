@@ -106,6 +106,8 @@ public interface Tensor<T> {
 
     Tensor<T> slice(int dimension, long index);
 
+    Tensor<T> take(long... index);
+
     double[] asFlatDoubleArray();
 
     int[] asFlatIntegerArray();
@@ -113,6 +115,8 @@ public interface Tensor<T> {
     T[] asFlatArray();
 
     Tensor<T> reshape(long... newShape);
+
+    Tensor<T> permute(int... rearrange);
 
     FlattenedView<T> getFlattenedView();
 
@@ -131,7 +135,7 @@ public interface Tensor<T> {
         return Arrays.asList(asFlatArray());
     }
 
-    default boolean isLengthOne(){
+    default boolean isLengthOne() {
         return getLength() == 1;
     }
 

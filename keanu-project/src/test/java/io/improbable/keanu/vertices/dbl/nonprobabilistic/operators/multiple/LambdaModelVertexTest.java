@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import com.google.common.collect.ImmutableMap;
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.Keanu;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
@@ -19,6 +19,7 @@ import io.improbable.keanu.vertices.model.LambdaModelVertex;
 import io.improbable.keanu.vertices.model.ModelVertex;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -39,13 +40,14 @@ public class LambdaModelVertexTest {
     are also written to file.
      */
 
-    private KeanuRandom random;
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
+
     private DoubleVertex inputToModel;
     private SimpleWeatherModel weatherModel;
 
     @Before
     public void mockFilesToReadModelOutput() throws IOException {
-        random = new KeanuRandom(1);
         weatherModel = new SimpleWeatherModel(inputToModel);
         inputToModel = new ConstantDoubleVertex(25.);
     }
@@ -167,10 +169,10 @@ public class LambdaModelVertexTest {
 
         KeanuProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(chanceOfRainObservation.getConnectedGraph());
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             probabilisticModel,
             inputToModel,
-            200
+            1000
         );
 
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();

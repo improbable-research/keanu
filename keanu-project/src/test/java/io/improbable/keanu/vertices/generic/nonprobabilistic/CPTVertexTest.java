@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import org.junit.Test;
@@ -17,7 +16,7 @@ public class CPTVertexTest {
 
         BooleanVertex A = new BernoulliVertex(0.2);
 
-        CPTVertex<BooleanTensor> cpt = ConditionalProbabilityTable.of(A)
+        BooleanVertex cpt = ConditionalProbabilityTable.of(A)
             .when(true).then(TRUE)
             .orDefault(FALSE);
 
@@ -34,7 +33,7 @@ public class CPTVertexTest {
         BooleanVertex A = new BernoulliVertex(0.5);
         BooleanVertex B = new BernoulliVertex(0.5);
 
-        CPTVertex<BooleanTensor> cpt = ConditionalProbabilityTable.of(A, B)
+        BooleanVertex cpt = ConditionalProbabilityTable.of(A, B)
             .when(true, true).then(FALSE)
             .when(false, true).then(TRUE)
             .when(true, false).then(TRUE)

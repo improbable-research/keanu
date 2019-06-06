@@ -17,27 +17,27 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeC
 public class IntegerConcatenationVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     private final static String DIMENSION_NAME = "dimension";
-    private final static String INPUT_ARRAY_NAME = "inputArray";
+    private final static String OPERANDS_NAME = "operands";
 
     private final int dimension;
-    private final IntegerVertex[] input;
+    private final IntegerVertex[] operands;
 
     /**
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
      * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param input     the input vertices to concatenate
+     * @param operands     the input vertices to concatenate
      */
-    public IntegerConcatenationVertex(int dimension, IntegerVertex... input) {
-        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, input)));
+    public IntegerConcatenationVertex(int dimension, IntegerVertex... operands) {
+        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, operands)));
         this.dimension = dimension;
-        this.input = input;
-        setParents(input);
+        this.operands = operands;
+        setParents(operands);
     }
 
     @ExportVertexToPythonBindings
     public IntegerConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
-                                      @LoadVertexParam(INPUT_ARRAY_NAME) Vertex[] input) {
+                                      @LoadVertexParam(OPERANDS_NAME) Vertex[] input) {
         this(dimension, convertVertexArrayToIntegerVertex(input));
     }
 
@@ -47,7 +47,7 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
 
     @Override
     public IntegerTensor calculate() {
-        return op(extractFromInputs(IntegerTensor.class, Vertex::getValue, input));
+        return op(extractFromInputs(IntegerTensor.class, Vertex::getValue, operands));
     }
 
     private IntegerTensor op(IntegerTensor... inputs) {
@@ -67,8 +67,8 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
         return dimension;
     }
 
-    @SaveVertexParam(INPUT_ARRAY_NAME)
-    public IntegerVertex[] getInputArray() {
-        return input;
+    @SaveVertexParam(OPERANDS_NAME)
+    public IntegerVertex[] getOperands() {
+        return operands;
     }
 }

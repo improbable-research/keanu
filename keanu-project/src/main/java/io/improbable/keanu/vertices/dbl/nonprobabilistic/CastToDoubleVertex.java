@@ -7,22 +7,23 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-public class CastToDoubleVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
+public class CastToDoubleVertex<T extends NumberTensor> extends DoubleVertex implements NonProbabilistic<DoubleTensor>, VertexUnaryOp<Vertex<T>> {
 
-    private final Vertex<? extends NumberTensor> inputVertex;
+    private final Vertex<T> inputVertex;
     private static final String INPUT_VERTEX_NAME = "inputVertex";
 
     @ExportVertexToPythonBindings
-    public CastToDoubleVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<? extends NumberTensor> inputVertex) {
+    public CastToDoubleVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<T> inputVertex) {
         super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
 
     @SaveVertexParam(INPUT_VERTEX_NAME)
-    public Vertex<? extends NumberTensor> getInputVertex() {
+    public Vertex<T> getInputVertex() {
         return inputVertex;
     }
 
