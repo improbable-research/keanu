@@ -14,13 +14,13 @@ import java.util.Map;
 import static io.improbable.keanu.tensor.TensorShapeValidation.getMatrixMultiplicationResultingShape;
 
 public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements Differentiable {
+
     /**
      * Matrix multiplies one vertex by another. C = AB
      *
      * @param left  vertex A
      * @param right vertex B
      */
-
     @ExportVertexToPythonBindings
     public MatrixMultiplicationVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
                                       @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {

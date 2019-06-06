@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.Vertex;
 
 import static io.improbable.keanu.tensor.TensorShape.removeDimension;
 
-public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
+public class GenericSliceVertex<T> extends GenericTensorUnaryOpVertex<T, T> {
 
     private static final String DIMENSION_NAME = "dimension";
     private static final String INDEX_NAME = "index";

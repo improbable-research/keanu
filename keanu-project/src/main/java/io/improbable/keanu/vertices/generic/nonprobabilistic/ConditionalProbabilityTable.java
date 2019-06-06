@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanCPTVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleCPTVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -22,19 +24,19 @@ public class ConditionalProbabilityTable {
     private static final String WHEN_CONDITION_SIZE_MISMATCH = "The 'when' condition size does not match input count";
 
     @SafeVarargs
-    public static CPTRawBuilder of(Vertex<? extends Tensor<Boolean>>... inputs) {
+    public static CPTRawBuilder of(Vertex<? extends Tensor<?>>... inputs) {
         return new CPTRawBuilder(Arrays.asList(inputs));
     }
 
     public static class CPTRawBuilder {
 
-        private final List<Vertex<? extends Tensor<Boolean>>> inputs;
+        private final List<Vertex<? extends Tensor<?>>> inputs;
 
-        public CPTRawBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs) {
+        public CPTRawBuilder(List<Vertex<? extends Tensor<?>>> inputs) {
             this.inputs = inputs;
         }
 
-        public CPTWhenRawBuilder when(Boolean... condition) {
+        public CPTWhenRawBuilder when(Object... condition) {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
@@ -45,15 +47,15 @@ public class ConditionalProbabilityTable {
     public static class CPTWhenRawBuilder {
 
         private final CPTCondition condition;
-        private final List<Vertex<? extends Tensor<Boolean>>> inputs;
+        private final List<Vertex<? extends Tensor<?>>> inputs;
 
-        public CPTWhenRawBuilder(List<Boolean> condition, List<Vertex<? extends Tensor<Boolean>>> inputs) {
+        public CPTWhenRawBuilder(List<?> condition, List<Vertex<? extends Tensor<?>>> inputs) {
             this.condition = new CPTCondition(condition);
             this.inputs = inputs;
         }
 
-        public <T, OUT extends Tensor<T>> CPTBuilder<T, OUT> then(Vertex<OUT> thn) {
-            Map<CPTCondition, Vertex<OUT>> conditions = new HashMap<>();
+        public <T> CPTBuilder<T> then(Vertex<Tensor<T>> thn) {
+            Map<CPTCondition, Vertex<Tensor<T>>> conditions = new HashMap<>();
             conditions.put(condition, thn);
             return new CPTBuilder<>(inputs, conditions);
         }
@@ -77,18 +79,28 @@ public class ConditionalProbabilityTable {
         public IntegerCPTBuilder then(int thn) {
             return then(ConstantVertex.of(thn));
         }
+
+        public BooleanCPTBuilder then(BooleanVertex thn) {
+            Map<CPTCondition, BooleanVertex> conditions = new HashMap<>();
+            conditions.put(condition, thn);
+            return new BooleanCPTBuilder(inputs, conditions);
+        }
+
+        public BooleanCPTBuilder then(boolean thn) {
+            return then(ConstantVertex.of(thn));
+        }
     }
 
     public static class DoubleCPTBuilder {
-        private final List<Vertex<? extends Tensor<Boolean>>> inputs;
+        private final List<Vertex<? extends Tensor<?>>> inputs;
         private final Map<CPTCondition, DoubleVertex> conditions;
 
-        public DoubleCPTBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs, Map<CPTCondition, DoubleVertex> conditions) {
+        public DoubleCPTBuilder(List<Vertex<? extends Tensor<?>>> inputs, Map<CPTCondition, DoubleVertex> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
 
-        public DoubleCPTWhenBuilder when(Boolean... condition) {
+        public DoubleCPTWhenBuilder when(Object... condition) {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
@@ -124,16 +136,61 @@ public class ConditionalProbabilityTable {
         }
     }
 
-    public static class IntegerCPTBuilder {
-        private final List<Vertex<? extends Tensor<Boolean>>> inputs;
-        private final Map<CPTCondition, IntegerVertex> conditions;
+    public static class BooleanCPTBuilder {
+        private final List<Vertex<? extends Tensor<?>>> inputs;
+        private final Map<CPTCondition, BooleanVertex> conditions;
 
-        public IntegerCPTBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs, Map<CPTCondition, IntegerVertex> conditions) {
+        public BooleanCPTBuilder(List<Vertex<? extends Tensor<?>>> inputs, Map<CPTCondition, BooleanVertex> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
 
-        public IntegerCPTWhenBuilder when(Boolean... condition) {
+        public BooleanCPTWhenBuilder when(Object... condition) {
+            if (condition.length != inputs.size()) {
+                throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
+            }
+            return new BooleanCPTWhenBuilder(new CPTCondition(ImmutableList.copyOf(condition)), this);
+        }
+
+        public BooleanCPTVertex orDefault(BooleanVertex defaultResult) {
+            return new BooleanCPTVertex(inputs, conditions, defaultResult);
+        }
+
+        public BooleanCPTVertex orDefault(boolean defaultResult) {
+            return orDefault(ConstantVertex.of(defaultResult));
+        }
+
+        public static class BooleanCPTWhenBuilder {
+
+            private final CPTCondition condition;
+            private final BooleanCPTBuilder builder;
+
+            private BooleanCPTWhenBuilder(CPTCondition condition, BooleanCPTBuilder builder) {
+                this.condition = condition;
+                this.builder = builder;
+            }
+
+            public BooleanCPTBuilder then(BooleanVertex thn) {
+                builder.conditions.put(condition, thn);
+                return builder;
+            }
+
+            public BooleanCPTBuilder then(boolean thn) {
+                return then(ConstantVertex.of(thn));
+            }
+        }
+    }
+
+    public static class IntegerCPTBuilder {
+        private final List<Vertex<? extends Tensor<?>>> inputs;
+        private final Map<CPTCondition, IntegerVertex> conditions;
+
+        public IntegerCPTBuilder(List<Vertex<? extends Tensor<?>>> inputs, Map<CPTCondition, IntegerVertex> conditions) {
+            this.inputs = inputs;
+            this.conditions = conditions;
+        }
+
+        public IntegerCPTWhenBuilder when(Object... condition) {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
@@ -169,37 +226,37 @@ public class ConditionalProbabilityTable {
         }
     }
 
-    public static class CPTBuilder<T, OUT extends Tensor<T>> {
-        private final List<Vertex<? extends Tensor<Boolean>>> inputs;
-        private final Map<CPTCondition, Vertex<OUT>> conditions;
+    public static class CPTBuilder<T> {
+        private final List<Vertex<? extends Tensor<?>>> inputs;
+        private final Map<CPTCondition, Vertex<Tensor<T>>> conditions;
 
-        public CPTBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs, Map<CPTCondition, Vertex<OUT>> conditions) {
+        public CPTBuilder(List<Vertex<? extends Tensor<?>>> inputs, Map<CPTCondition, Vertex<Tensor<T>>> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
 
-        public CPTWhenBuilder<T, OUT> when(Boolean... condition) {
+        public CPTWhenBuilder<T> when(Object... condition) {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
             return new CPTWhenBuilder<>(new CPTCondition(ImmutableList.copyOf(condition)), this);
         }
 
-        public CPTVertex<OUT> orDefault(Vertex<OUT> defaultResult) {
+        public CPTVertex<T> orDefault(Vertex<Tensor<T>> defaultResult) {
             return new CPTVertex<>(inputs, conditions, defaultResult);
         }
 
-        public static class CPTWhenBuilder<T, OUT extends Tensor<T>> {
+        public static class CPTWhenBuilder<T> {
 
             private final CPTCondition condition;
-            private final CPTBuilder<T, OUT> builder;
+            private final CPTBuilder<T> builder;
 
-            private CPTWhenBuilder(CPTCondition condition, CPTBuilder<T, OUT> builder) {
+            private CPTWhenBuilder(CPTCondition condition, CPTBuilder<T> builder) {
                 this.condition = condition;
                 this.builder = builder;
             }
 
-            public CPTBuilder<T, OUT> then(Vertex<OUT> thn) {
+            public CPTBuilder<T> then(Vertex<Tensor<T>> thn) {
                 builder.conditions.put(condition, thn);
                 return builder;
             }

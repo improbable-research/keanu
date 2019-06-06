@@ -98,6 +98,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor permute(int... rearrange) {
+        return new Nd4jIntegerTensor(tensor.permute(rearrange));
+    }
+
+    @Override
     public IntegerTensor diag() {
         return new Nd4jIntegerTensor(Nd4j.diag(tensor));
     }
@@ -586,7 +591,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public Integer scalar() {
-        if(this.getLength() > 1){
+        if (this.getLength() > 1) {
             throw new IllegalArgumentException("Not a scalar");
         }
         return (int) tensor.getDouble(0);
@@ -627,6 +632,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public IntegerTensor slice(int dimension, long index) {
         INDArray dup = tensor.dup();
         return new Nd4jIntegerTensor(INDArrayShim.slice(dup, dimension, index));
+    }
+
+    @Override
+    public IntegerTensor take(long... index) {
+        return scalar(getValue(index));
     }
 
     @Override

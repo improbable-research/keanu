@@ -263,6 +263,9 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
     @Override
     public abstract DoubleTensor slice(int dimension, long index);
 
+    @Override
+    public abstract DoubleTensor take(long... index);
+
     public abstract List<DoubleTensor> split(int dimension, long... splitAtIndices);
 
     public List<DoubleTensor> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {

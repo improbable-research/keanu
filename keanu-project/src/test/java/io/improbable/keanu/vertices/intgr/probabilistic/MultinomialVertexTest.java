@@ -280,7 +280,7 @@ public class MultinomialVertexTest {
             Color.RED, ConstantVertex.of(p.getValue(0)),
             Color.GREEN, ConstantVertex.of(p.getValue(1)),
             Color.BLUE, ConstantVertex.of(p.getValue(2)));
-        CategoricalVertex<Color, GenericTensor<Color>> categoricalVertex = new CategoricalVertex<>(selectableValues);
+        CategoricalVertex<Color> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
         double pRed = categoricalVertex.logProb(GenericTensor.scalar(Color.RED));
         assertThat(multinomial.logProb(IntegerTensor.create(1, 0, 0).reshape(3, 1)).scalar(), closeTo(pRed, 1e-7));

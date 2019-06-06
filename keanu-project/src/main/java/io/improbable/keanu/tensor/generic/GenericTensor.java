@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.generic;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -212,6 +213,31 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
+    public Tensor<T> permute(int... rearrange) {
+
+        long[] resultShape = TensorShape.getPermutedResultShape(shape, rearrange);
+        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        T[] newBuffer = Arrays.copyOf(data, data.length);
+
+        for (int i = 0; i < data.length; i++) {
+
+            long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
+
+            long[] permutedIndex = new long[shapeIndices.length];
+
+            for (int p = 0; p < permutedIndex.length; p++) {
+                permutedIndex[p] = shapeIndices[rearrange[p]];
+            }
+
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, permutedIndex));
+
+            newBuffer[j] = data[i];
+        }
+
+        return new GenericTensor<>(newBuffer, resultShape);
+    }
+
+    @Override
     public Tensor<T> slice(int dimension, long index) {
         T[] flat = asFlatArray();
         List<T> tadded = new ArrayList<>();
@@ -224,6 +250,11 @@ public class GenericTensor<T> implements Tensor<T> {
         long[] taddedShape = Arrays.copyOf(shape, shape.length);
         taddedShape[dimension] = 1;
         return new GenericTensor(tadded.toArray(), taddedShape);
+    }
+
+    @Override
+    public Tensor<T> take(long... index) {
+        return scalar(getValue(index));
     }
 
     private void assertIsNumber() {

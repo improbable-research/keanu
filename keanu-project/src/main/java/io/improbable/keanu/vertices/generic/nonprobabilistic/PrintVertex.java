@@ -47,9 +47,13 @@ public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic
 
     @Override
     public T calculate() {
-        final String dataOutput = printData ? parent.getValue().toString() + "\n" : "";
+        return print(parent.getValue(), message, printData);
+    }
+
+    public static <T> T print(T parentValue, String message, boolean printData) {
+        final String dataOutput = printData ? parentValue.toString() + "\n" : "";
         printStream.print(message + dataOutput);
-        return parent.getValue();
+        return parentValue;
     }
 
     @SaveVertexParam(PARENT)

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -37,6 +38,10 @@ public class MultiplexerVertex<T> extends GenericVertex<T> implements NonProbabi
     public T calculate() {
         Vertex<T> selector = getSelector();
         return selector.getValue();
+    }
+
+    public static <T> T mux(IntegerTensor select, T... outputs) {
+        return outputs[select.scalar()];
     }
 
     @SaveVertexParam(SELECTOR_CONTROL_NAME)

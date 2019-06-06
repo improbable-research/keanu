@@ -1,13 +1,12 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericTensorVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 public interface ConstantVertex {
@@ -72,15 +71,11 @@ public interface ConstantVertex {
         return new ConstantDoubleVertex(value);
     }
 
-    static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC value) {
-        return new ConstantGenericVertex<>(new GenericTensor<>(value));
+    static <GENERIC> ConstantGenericTensorVertex<GENERIC> of(GENERIC value) {
+        return new ConstantGenericTensorVertex<>(new GenericTensor<>(value));
     }
 
-    static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC[] values) {
-        return new ConstantGenericVertex<>(new GenericTensor<>(values));
-    }
-
-    static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {
-        return new ConstantGenericVertex<>(tensor);
+    static <GENERIC> ConstantGenericTensorVertex<GENERIC> of(GENERIC[] values) {
+        return new ConstantGenericTensorVertex<>(new GenericTensor<>(values));
     }
 }

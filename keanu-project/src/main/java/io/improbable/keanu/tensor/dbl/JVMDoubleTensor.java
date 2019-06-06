@@ -912,6 +912,11 @@ public class JVMDoubleTensor extends DoubleTensor {
         return new JVMDoubleTensor(newBuffer, resultShape);
     }
 
+    @Override
+    public DoubleTensor take(long... index) {
+        return JVMDoubleTensor.scalar(getValue(index));
+    }
+
     public static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
 
         long[] concatShape = getConcatResultShape(dimension, toConcat);

@@ -915,6 +915,11 @@ public class Nd4jDoubleTensor extends DoubleTensor {
         return new Nd4jDoubleTensor(INDArrayShim.slice(dup, dimension, index));
     }
 
+    @Override
+    public DoubleTensor take(long... index) {
+        return scalar(getValue(index));
+    }
+
     /**
      * @param dimension      the dimension to slice on
      * @param splitAtIndices the indices that the dimension to slice on should be slice on

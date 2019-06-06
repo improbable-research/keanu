@@ -162,6 +162,9 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     IntegerTensor reshape(long... newShape);
 
     @Override
+    IntegerTensor permute(int... rearrange);
+
+    @Override
     IntegerTensor duplicate();
 
     IntegerTensor diag();
@@ -222,6 +225,9 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     @Override
     IntegerTensor slice(int dimension, long index);
+
+    @Override
+    IntegerTensor take(long... index);
 
     // In Place
 

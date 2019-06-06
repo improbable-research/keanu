@@ -454,6 +454,11 @@ public class ScalarDoubleTensor extends DoubleTensor {
     }
 
     @Override
+    public DoubleTensor take(long... index) {
+        return new ScalarDoubleTensor(getValue(index));
+    }
+
+    @Override
     public List<DoubleTensor> split(int dimension, long[] splitAtIndices) {
         return Collections.singletonList(this);
     }
