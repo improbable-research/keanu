@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -91,5 +92,12 @@ public class MultiplexerVertexTest {
 
     private enum TestEnum {
         A, B, C, D
+    }
+
+    @Test
+    public void canStaticMuxWithIntegerSelect() {
+        assertEquals(MultiplexerVertex.mux(IntegerTensor.scalar(0), "a", "b", "c"), "a");
+        assertEquals(MultiplexerVertex.mux(IntegerTensor.scalar(1), "a", "b", "c"), "b");
+        assertEquals(MultiplexerVertex.mux(IntegerTensor.scalar(2), "a", "b", "c"), "c");
     }
 }

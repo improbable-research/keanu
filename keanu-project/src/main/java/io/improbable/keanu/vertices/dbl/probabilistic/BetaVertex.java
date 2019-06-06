@@ -46,7 +46,7 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
      */
     public BetaVertex(@LoadShape long[] tensorShape,
                       @LoadVertexParam(ALPHA_NAME) DoubleVertex alpha,
-                      @LoadVertexParam(BETA_NAME)DoubleVertex beta) {
+                      @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, alpha.getShape(), beta.getShape());
 
