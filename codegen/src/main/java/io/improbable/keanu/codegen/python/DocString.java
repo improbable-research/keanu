@@ -24,7 +24,7 @@ public class DocString {
         if (isEmpty()) {
             return "";
         }
-        if (parameterNameToDescriptionMap.size() == 0) {
+        if (parameterNameToDescriptionMap.isEmpty()) {
             return THREE_QUOTES + "\n" + methodDescription + THREE_QUOTES + "\n\n";
         }
         StringBuilder stringBuilder = new StringBuilder();

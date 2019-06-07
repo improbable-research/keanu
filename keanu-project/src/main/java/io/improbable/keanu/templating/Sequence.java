@@ -55,7 +55,7 @@ public class Sequence implements Iterable<SequenceItem> {
     }
 
     public BayesianNetwork toBayesianNetwork() {
-        if (containedItems.size() == 0) {
+        if (containedItems.isEmpty()) {
             throw new RuntimeException("Bayesian Network construction failed because the Sequence contains no SequenceItems");
         }
         Optional<Vertex<?>> seedVertex = containedItems

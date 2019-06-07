@@ -57,7 +57,7 @@ public class Forward implements PosteriorSamplingAlgorithm {
 
     private SamplingAlgorithm setupSampler(ProbabilisticModel model, List<? extends Variable> variablesToSampleFrom) {
         List<? extends Variable> latentVariables = model.getLatentVariables();
-        Preconditions.checkArgument(latentVariables.size() > 0, "Your model must contain latent variables in order to forward sample.");
+        Preconditions.checkArgument(!latentVariables.isEmpty(), "Your model must contain latent variables in order to forward sample.");
 
         List<Vertex> verticesToSampleFrom = new ArrayList<>();
         for (Variable variable : variablesToSampleFrom) {

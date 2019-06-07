@@ -36,7 +36,7 @@ public class SequenceLoader {
                 throw new SequenceConstructionException("The provided BayesianNetwork contains more than one Sequence");
             }
         }
-        if (sequences.size() == 0) {
+        if (sequences.isEmpty()) {
             throw new SequenceConstructionException("The provided BayesianNetwork contains no Sequences");
         }
         return sequences;

@@ -91,7 +91,7 @@ public class VertexLabel {
 
     public static VertexLabel parseLabel(String label) {
         List<String> namespaces = Arrays.asList(label.split("\\."));
-        if (namespaces.size() == 0) {
+        if (namespaces.isEmpty()) {
             return new VertexLabel(label);
         }
         if (namespaces.size() == 1) {
