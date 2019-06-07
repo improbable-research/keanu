@@ -19,6 +19,10 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
 
     T transpose();
 
+    T permute(int... rearrange);
+
+    T reshape(long... shape);
+
     T sum(int... overDimensions);
     
     // New tensor Ops and transforms

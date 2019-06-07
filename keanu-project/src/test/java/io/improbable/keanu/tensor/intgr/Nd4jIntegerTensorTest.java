@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.intgr;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorTestHelper;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 import junit.framework.TestCase;
@@ -27,6 +28,14 @@ public class Nd4jIntegerTensorTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
+    private IntegerTensor matrixA;
+    private IntegerTensor scalarA;
+
+    public Nd4jIntegerTensorTest() {
+        matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, 2, 2);
+        scalarA = IntegerTensor.scalar(2);
+    }
+
     @Test
     public void youCanCreateARankZeroTensor() {
         IntegerTensor scalar = IntegerTensor.create(new int[]{2}, new long[]{});
@@ -39,6 +48,68 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor vector = IntegerTensor.create(new int[]{1, 2, 3, 4, 5}, new long[]{5});
         assertEquals(4, (int) vector.getValue(3));
         TestCase.assertEquals(1, vector.getRank());
+    }
+
+    @Test
+    public void canEye() {
+        IntegerTensor expected = IntegerTensor.create(new int[]{1, 0, 0, 0, 1, 0, 0, 0, 1}, 3, 3);
+        IntegerTensor actual = IntegerTensor.eye(3);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canDiag() {
+        IntegerTensor expected = IntegerTensor.create(new int[]{1, 0, 0, 0, 2, 0, 0, 0, 3}, 3, 3);
+        IntegerTensor actual = IntegerTensor.create(1, 2, 3).diag();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canMatrixMultiply() {
+        IntegerTensor left = IntegerTensor.create(new int[]{
+            1, 2, 3,
+            4, 5, 6
+        }, 2, 3);
+
+        IntegerTensor right = IntegerTensor.create(new int[]{
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        }, 3, 3);
+
+        IntegerTensor result = left.matrixMultiply(right);
+
+        IntegerTensor expected = IntegerTensor.create(new int[]{
+            30, 36, 42,
+            66, 81, 96
+        }, 2, 3);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void canMatrixMultiply2x2() {
+
+        IntegerTensor left = IntegerTensor.create(new int[]{
+            1, 2,
+            3, 4
+        }, 2, 2);
+
+        IntegerTensor right = IntegerTensor.create(new int[]{
+            5, 6,
+            7, 8
+        }, 2, 2);
+
+        IntegerTensor result = left.matrixMultiply(right);
+
+        IntegerTensor expected = IntegerTensor.create(new int[]{
+            19, 22,
+            43, 50
+        }, 2, 2);
+
+        assertEquals(expected, result);
     }
 
     @Test
@@ -68,7 +139,7 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
-    public void doesTimesScalar() {
+    public void doesMatrixTimesScalar() {
         IntegerTensor matrixA = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor result = matrixA.times(2);
         int[] expected = new int[]{2, 4, 6, 8};
@@ -78,6 +149,16 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor resultInPlace = matrixA.timesInPlace(2);
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
+    }
+
+    @Test
+    public void doesScalarTimesMatrix() {
+        IntegerTensor matrixA = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        IntegerTensor two = Nd4jIntegerTensor.scalar(2);
+        IntegerTensor result = two.times(matrixA);
+        int[] expected = new int[]{2, 4, 6, 8};
+        assertArrayEquals(expected, result.asFlatIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
     }
 
     @Test
@@ -93,6 +174,123 @@ public class Nd4jIntegerTensorTest {
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
         assertArrayEquals(new double[]{0.0, 1.0, 1.0, 2.0}, matrixA.asFlatDoubleArray(), 0.0);
     }
+
+    @Test
+    public void doesDivideScalarByMatrix() {
+        IntegerTensor result = scalarA.div(matrixA);
+        assertArrayEquals(new double[]{2, 1, 0, 0}, result.asFlatDoubleArray(), 0.0);
+    }
+
+    @Test
+    public void canTranspose() {
+        IntegerTensor a = IntegerTensor.create(new int[]{1, 2, 3, 4}, 2, 2);
+        IntegerTensor actual = a.transpose();
+        IntegerTensor expected = IntegerTensor.create(new int[]{1, 3, 2, 4}, 2, 2);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotTransposeVector() {
+        IntegerTensor.create(1, 2, 3).transpose();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnIncorrectShape() {
+        IntegerTensor.create(new int[]{0, 1, 2, 3, 4, 5, 6}, 2, 3);
+    }
+
+    @Test
+    public void canReshape() {
+        IntegerTensor a = IntegerTensor.create(new int[]{0, 1, 2, 3, 4, 5}, 2, 3);
+        IntegerTensor actual = a.reshape(3, 2);
+        IntegerTensor expected = IntegerTensor.create(new int[]{0, 1, 2, 3, 4, 5}, 3, 2);
+
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    public void canReshapeWithWildCardDim() {
+        IntegerTensor a = IntegerTensor.create(new int[]{0, 1, 2, 3, 4, 5}, 2, 3);
+        IntegerTensor expected = IntegerTensor.create(new int[]{0, 1, 2, 3, 4, 5}, 3, 2);
+
+        assertEquals(a.reshape(3, -1), expected);
+        assertEquals(a.reshape(-1, 2), expected);
+    }
+
+    @Test
+    public void canReshapeWithWildCardDimEvenWithLengthOneDim() {
+        IntegerTensor a = IntegerTensor.create(new int[]{0, 1, 2, 3, 4, 5}, 1, 6);
+        IntegerTensor expected = IntegerTensor.create(new int[]{0, 1, 2, 3, 4, 5}, 1, 6);
+
+        assertEquals(a.reshape(-1, 6), expected);
+    }
+
+    @Test
+    public void scalarMinusInPlaceTensorBehavesSameAsMinus() {
+        IntegerTensor scalar = IntegerTensor.scalar(1);
+        IntegerTensor tensor = IntegerTensor.create(2, new long[]{1, 4});
+
+        assertArrayEquals(scalar.minus(tensor).asFlatIntegerArray(), scalar.minusInPlace(tensor).asFlatIntegerArray());
+    }
+
+    @Test
+    public void scalarPlusInPlaceTensorBehavesSameAsPlus() {
+        IntegerTensor scalar = IntegerTensor.scalar(1);
+        IntegerTensor tensor = IntegerTensor.create(2, new long[]{1, 4});
+
+        assertArrayEquals(scalar.plus(tensor).asFlatIntegerArray(), scalar.plusInPlace(tensor).asFlatIntegerArray());
+    }
+
+    @Test
+    public void scalarTimesInPlaceTensorBehavesSameAsTimes() {
+        IntegerTensor scalar = IntegerTensor.scalar(1);
+        IntegerTensor tensor = IntegerTensor.create(2, new long[]{1, 4});
+
+        assertArrayEquals(scalar.times(tensor).asFlatIntegerArray(), scalar.timesInPlace(tensor).asFlatIntegerArray());
+    }
+
+    @Test
+    public void scalarDivInPlaceTensorBehavesSameAsDiv() {
+        IntegerTensor scalar = IntegerTensor.scalar(1);
+        IntegerTensor tensor = IntegerTensor.create(2, new long[]{1, 4});
+
+        assertArrayEquals(scalar.div(tensor).asFlatIntegerArray(), scalar.divInPlace(tensor).asFlatIntegerArray());
+    }
+
+    @Test
+    public void smallerTensorMinusInPlaceLargerTensorBehavesSameAsMinus() {
+        IntegerTensor smallerTensor = IntegerTensor.create(2, new long[]{2, 2});
+        IntegerTensor largerTensor = IntegerTensor.create(3, new long[]{2, 2, 2});
+
+        assertArrayEquals(smallerTensor.minus(largerTensor).asFlatIntegerArray(), smallerTensor.minusInPlace(largerTensor).asFlatIntegerArray());
+    }
+
+    @Test
+    public void smallerTensorPlusInPlaceLargerTensorBehavesSameAsPlus() {
+        IntegerTensor smallerTensor = IntegerTensor.create(2, new long[]{2, 2});
+        IntegerTensor largerTensor = IntegerTensor.create(3, new long[]{2, 2, 2});
+
+        assertArrayEquals(smallerTensor.plus(largerTensor).asFlatIntegerArray(), smallerTensor.plusInPlace(largerTensor).asFlatIntegerArray());
+    }
+
+    @Test
+    public void smallerTensorTimesInPlaceLargerTensorBehavesSameAsTimes() {
+        IntegerTensor smallerTensor = IntegerTensor.create(2, new long[]{2, 2});
+        IntegerTensor largerTensor = IntegerTensor.create(3, new long[]{2, 2, 2});
+
+        assertArrayEquals(smallerTensor.times(largerTensor).asFlatIntegerArray(), smallerTensor.timesInPlace(largerTensor).asFlatIntegerArray());
+    }
+
+    @Test
+    public void smallerTensorDivInPlaceLargerTensorBehavesSameAsDiv() {
+        IntegerTensor smallerTensor = IntegerTensor.create(2, new long[]{2, 2});
+        IntegerTensor largerTensor = IntegerTensor.create(3, new long[]{2, 2, 2});
+
+        assertArrayEquals(smallerTensor.div(largerTensor).asFlatIntegerArray(), smallerTensor.divInPlace(largerTensor).asFlatIntegerArray());
+    }
+
+
 
     @Test
     public void doesElementwisePower() {
@@ -260,6 +458,20 @@ public class Nd4jIntegerTensorTest {
         assertArrayEquals(expected, maskFromScalar.asFlatIntegerArray());
     }
 
+    /**
+     * Zero is a special case because it's usually the value that the mask uses to mean "false"
+     */
+    @Test
+    public void canSetToZero() {
+        IntegerTensor matrixA = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+
+        IntegerTensor mask = matrixA.getLessThanMask(IntegerTensor.create(new int[]{2, 2, 2, 2}, 2, 2));
+        IntegerTensor result = matrixA.setWithMaskInPlace(mask, 0);
+
+        assertArrayEquals(new double[]{0, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
+
+    }
+
     @Test
     public void doesSetWithMask() {
         IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{-1, 2, 3, 4}, new long[]{2, 2});
@@ -297,7 +509,18 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
-    public void doesApplyUnaryFunction() {
+    public void doesApplyUnaryFunctionToScalar() {
+        IntegerTensor scalarTwo = IntegerTensor.scalar(2);
+        IntegerTensor result = scalarTwo.apply(a -> a * 2);
+        assertEquals(4, result.scalar(), 0);
+
+        IntegerTensor resultInPlace = scalarTwo.applyInPlace(a -> a * 2);
+        assertEquals(4, resultInPlace.scalar(), 0);
+        assertEquals(4, scalarTwo.scalar(), 0);
+    }
+
+    @Test
+    public void doesApplyUnaryFunctionToMatrix() {
         IntegerTensor matrixA = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor result = matrixA.apply(v -> v + 1);
         int[] expected = new int[]{2, 3, 4, 5};
@@ -307,6 +530,19 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor resultInPlace = matrixA.applyInPlace(v -> v + 1);
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
+    }
+
+    @Test
+    public void doesApplyUnaryFunctionToRank3() {
+        IntegerTensor rank3Tensor = IntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2);
+        IntegerTensor result = rank3Tensor.apply(a -> a * 2);
+        int[] expected = new int[]{2, 4, 6, 8, 10, 12, 14, 16};
+        assertArrayEquals(expected, result.asFlatIntegerArray());
+        assertFalse(Arrays.equals(expected, rank3Tensor.asFlatIntegerArray()));
+
+        IntegerTensor resultInPlace = rank3Tensor.applyInPlace(a -> a * 2);
+        assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
+        assertArrayEquals(expected, rank3Tensor.asFlatIntegerArray());
     }
 
     @Test
@@ -385,6 +621,103 @@ public class Nd4jIntegerTensorTest {
         assertArrayEquals(expected, result.asFlatArray());
     }
 
+    @Test
+    public void canTensorMultiplyWithVectorAndRank4() {
+        IntegerTensor a = IntegerTensor.create(new int[]{1, 2, 3}, 1, 1, 3, 1);
+        IntegerTensor b = IntegerTensor.create(new int[]{
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8
+        }, 1, 3, 1, 5);
+
+        IntegerTensor c = a.tensorMultiply(b, new int[]{2, 3}, new int[]{1, 0});
+
+        IntegerTensor expected = IntegerTensor.create(new int[]{
+            30, 12, 18, 42, 48
+        }, 1, 1, 1, 5);
+
+        assertEquals(expected, c);
+    }
+
+    @Test
+    public void canTensorMultiplyWithNumpyExample() {
+        IntegerTensor a = DoubleTensor.arange(0, 60).reshape(3, 4, 5).toInteger();
+        IntegerTensor b = DoubleTensor.arange(0, 24.).reshape(4, 3, 2).toInteger();
+        IntegerTensor c = a.tensorMultiply(b, new int[]{1, 0}, new int[]{0, 1});
+
+        IntegerTensor expected = IntegerTensor.create(new int[]{
+            4400, 4730,
+            4532, 4874,
+            4664, 5018,
+            4796, 5162,
+            4928, 5306
+        }, 5, 2);
+
+        assertEquals(expected, c);
+    }
+
+    @Test
+    public void canTensorMultiplyAllDimensions() {
+        IntegerTensor a = IntegerTensor.create(new int[]{2}).reshape(1);
+        IntegerTensor b = IntegerTensor.create(new int[]{1, 2, 3, 4}).reshape(2, 1, 2);
+        IntegerTensor resultAB = a.tensorMultiply(b, new int[]{0}, new int[]{1});
+        IntegerTensor resultBA = b.tensorMultiply(a, new int[]{1}, new int[]{0});
+
+        assertArrayEquals(new long[]{2, 2}, resultAB.getShape());
+        assertArrayEquals(new long[]{2, 2}, resultBA.getShape());
+    }
+
+    @Test
+    public void canPermuteUpperDimensions() {
+        IntegerTensor a = IntegerTensor.create(new int[]{
+            1, 2,
+            3, 4,
+            5, 6,
+            7, 8
+        }, 1, 2, 2, 2);
+        IntegerTensor permuted = a.permute(0, 1, 3, 2);
+        IntegerTensor expected = IntegerTensor.create(new int[]{
+            1, 3,
+            2, 4,
+            5, 7,
+            6, 8
+        }, 1, 2, 2, 2);
+
+        assertEquals(expected, permuted);
+    }
+
+    @Test
+    public void canPermute() {
+        IntegerTensor x = IntegerTensor.create(new int[]{1, 2, 3}, 1, 3);
+        IntegerTensor y = IntegerTensor.create(new int[]{4, 5, 6}, 1, 3);
+
+        IntegerTensor concatDimensionZero = IntegerTensor.concat(0, x, y);
+
+        assertArrayEquals(new int[]{1, 2, 3, 4, 5, 6}, concatDimensionZero.asFlatIntegerArray());
+
+        IntegerTensor concatDimensionOne = IntegerTensor.concat(1, x, y);
+        IntegerTensor permuttedConcatDimensionOne = concatDimensionOne.permute(1, 0);
+
+        assertArrayEquals(new int[]{1, 2, 3, 4, 5, 6}, permuttedConcatDimensionOne.asFlatIntegerArray());
+
+        x = IntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2);
+        y = IntegerTensor.create(new int[]{9, 10, 11, 12, 13, 14, 15, 16}, 2, 2, 2);
+
+        concatDimensionZero = IntegerTensor.concat(0, x, y);
+
+        assertArrayEquals(new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, concatDimensionZero.asFlatIntegerArray());
+
+        concatDimensionOne = IntegerTensor.concat(1, x, y);
+        permuttedConcatDimensionOne = concatDimensionOne.permute(1, 0, 2);
+
+        int[] sliced = new int[permuttedConcatDimensionOne.asFlatIntegerArray().length / 2];
+        for (int i = 0; i < permuttedConcatDimensionOne.asFlatDoubleArray().length / 2; i++) {
+            sliced[i] = permuttedConcatDimensionOne.asFlatIntegerArray()[i];
+        }
+
+        IntegerTensor answer = IntegerTensor.create(sliced, x.getShape()).permute(1, 0, 2);
+        assertArrayEquals(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, answer.asFlatIntegerArray());
+    }
 
     @Test
     public void canElementwiseEqualsAScalarValue() {
@@ -551,6 +884,26 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
+    public void canFindMinFromScalarToTensorInPlace() {
+        IntegerTensor a = IntegerTensor.create(5, 4, 3, 2).reshape(1, 4);
+        IntegerTensor b = IntegerTensor.scalar(3);
+
+        a.minInPlace(b);
+
+        assertArrayEquals(new int[]{3, 3, 3, 2}, a.asFlatIntegerArray());
+    }
+
+    @Test
+    public void canFindMaxFromScalarToTensorInPlace() {
+        IntegerTensor a = IntegerTensor.create(5, 4, 3, 2).reshape(1, 4);
+        IntegerTensor b = IntegerTensor.scalar(3);
+
+        a.maxInPlace(b);
+
+        assertArrayEquals(new int[]{5, 4, 3, 3}, a.asFlatIntegerArray());
+    }
+
+    @Test
     public void canFindElementWiseMinAndMax() {
         IntegerTensor a = IntegerTensor.create(1, 2, 3, 4).reshape(1, 4);
         IntegerTensor b = IntegerTensor.create(2, 3, 1, 4).reshape(1, 4);
@@ -650,6 +1003,46 @@ public class Nd4jIntegerTensorTest {
         assertThat(result, hasValue(true, false, false));
     }
 
+
+    @Test
+    public void canSumOverSpecifiedDimensionOfRank3() {
+        IntegerTensor x = IntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
+        IntegerTensor summation = x.sum(2);
+        IntegerTensor expected = IntegerTensor.create(new int[]{3, 7, 11, 15}, new long[]{2, 2});
+        assertThat(summation, equalTo(expected));
+        assertThat(summation.getShape(), equalTo(expected.getShape()));
+    }
+
+    @Test
+    public void canSumOverSpecifiedDimensionOfMatrix() {
+        IntegerTensor x = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        IntegerTensor summationRow = x.sum(1);
+        IntegerTensor expected = IntegerTensor.create(3, 7);
+        assertThat(summationRow, equalTo(expected));
+        assertThat(summationRow.getShape(), equalTo(expected.getShape()));
+    }
+
+    @Test
+    public void canSumOverSpecifiedDimensionOfVector() {
+        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4);
+        IntegerTensor summation = x.sum(0);
+        IntegerTensor expected = IntegerTensor.scalar(10);
+        assertThat(summation.asFlatArray(), equalTo(expected.asFlatArray()));
+        assertThat(summation.getShape(), equalTo(expected.getShape()));
+    }
+
+    @Test
+    public void canDuplicateRank1() {
+        IntegerTensor x = IntegerTensor.create(1, 2);
+        assertEquals(x, x.duplicate());
+    }
+
+    @Test
+    public void canDuplicateRank0() {
+        IntegerTensor x = IntegerTensor.scalar(1);
+        assertEquals(x, x.duplicate());
+    }
+
     @Test
     public void canSliceRank3To2() {
         IntegerTensor x = IntegerTensor.create(1, 2, 3, 4, 1, 2, 3, 4).reshape(2, 2, 2);
@@ -666,6 +1059,13 @@ public class Nd4jIntegerTensorTest {
     public void canSliceRank1ToScalar() {
         IntegerTensor x = IntegerTensor.create(1, 2, 3, 4).reshape(4);
         TensorTestHelper.doesDownRankOnSliceRank1ToScalar(x);
+    }
+
+    @Test
+    public void canSliceRank1() {
+        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4).reshape(4);
+        IntegerTensor slice = x.slice(0, 1);
+        assertArrayEquals(new int[]{2}, slice.asFlatIntegerArray());
     }
 
     @Test
@@ -732,7 +1132,7 @@ public class Nd4jIntegerTensorTest {
         assertEquals(IntegerTensor.create(2, 4, 3, 5).reshape(1, 2, 2), IntegerTensor.stack(2, x, y));
     }
 
-     @Test
+    @Test
     public void canStackIfDimensionIsNegative() {
         IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
         IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
@@ -763,6 +1163,46 @@ public class Nd4jIntegerTensorTest {
 
         IntegerTensor concat = IntegerTensor.concat(0, x, y);
         assertEquals(IntegerTensor.create(2, 3, 4, 5, 6), concat);
+    }
+
+    @Test
+    public void canGetValueByIndex() {
+        IntegerTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2).toInteger();
+        double value = A.getValue(1, 0, 1);
+        assertEquals(5, value, 1e-10);
+    }
+
+    @Test
+    public void canGetValueByFlatIndex() {
+        IntegerTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2).toInteger();
+        double value = A.getValue(7);
+        assertEquals(7, value, 1e-10);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnGetInvalidIndex() {
+        IntegerTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2).toInteger();
+        double value = A.getValue(1, 0);
+    }
+
+    @Test
+    public void canSetValueByFlatIndex() {
+        IntegerTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2).toInteger();
+        A.setValue(1, 6);
+        assertEquals(1, A.getValue(6), 0);
+    }
+
+    @Test
+    public void canSetValueByIndex() {
+        IntegerTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2).toInteger();
+        A.setValue(1, 1, 0, 1);
+        assertEquals(1, A.getValue(1, 0, 1), 0);
+    }
+
+    @Test(expected = Exception.class)
+    public void doesThrowOnSetByInvalidIndex() {
+        IntegerTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2).toInteger();
+        A.setValue(1, 1, 0);
     }
 
 
