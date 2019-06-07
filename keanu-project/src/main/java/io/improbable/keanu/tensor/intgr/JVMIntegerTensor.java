@@ -8,6 +8,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import java.util.Arrays;
 import java.util.function.Function;
 
+import static java.util.Arrays.copyOf;
+
 public class JVMIntegerTensor implements IntegerTensor {
 
     private int[] buffer;
@@ -22,11 +24,28 @@ public class JVMIntegerTensor implements IntegerTensor {
 
     private JVMIntegerTensor(int[] data, long[] shape) {
         if (data.length != TensorShape.getLength(shape)) {
-            throw new IllegalArgumentException("Shape " + Arrays.toString(shape) + " does not match buffer size " + data.length);
+            throw new IllegalArgumentException(
+                "Shape " + Arrays.toString(shape) + " does not match buffer size " + data.length);
         }
 
         this.shape = shape;
         this.stride = TensorShape.getRowFirstStride(shape);
+        this.buffer = data;
+    }
+
+    private JVMIntegerTensor(int[] data, long[] shape, long[] stride) {
+        if (data.length != TensorShape.getLength(shape)) {
+            throw new IllegalArgumentException(
+                "Shape " + Arrays.toString(shape) + " does not match buffer size" + data.length);
+        }
+
+        if (shape.length != stride.length) {
+            throw new IllegalArgumentException(
+                "Shape & Stride length don't match: (" + shape.length + ", " + stride.length + ")");
+        }
+
+        this.shape = shape;
+        this.stride = stride;
         this.buffer = data;
     }
 
@@ -67,6 +86,18 @@ public class JVMIntegerTensor implements IntegerTensor {
         return new JVMIntegerTensor(buffer, new long[]{n, n});
     }
 
+    private int[] copyBuffer() {
+        return copyOf(buffer, buffer.length);
+    }
+
+    private long[] copyShape() {
+        return copyOf(shape, shape.length);
+    }
+
+    private long[] copyStride() {
+        return copyOf(stride, stride.length);
+    }
+
     @Override
     public IntegerTensor setValue(Integer value, long... index) {
         return null;
@@ -79,7 +110,7 @@ public class JVMIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor duplicate() {
-        return null;
+        return new JVMIntegerTensor(copyBuffer(), copyShape(), copyStride());
     }
 
     @Override
