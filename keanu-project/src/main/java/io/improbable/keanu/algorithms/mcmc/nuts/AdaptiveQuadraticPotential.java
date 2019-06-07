@@ -5,15 +5,14 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.Getter;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.dotProduct;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.pow;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.times;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.withShape;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
+import java.util.Map.Entry;
 
 
 public class AdaptiveQuadraticPotential implements Potential {
@@ -82,15 +81,15 @@ public class AdaptiveQuadraticPotential implements Potential {
     public Map<VariableReference, DoubleTensor> randomMomentum(KeanuRandom random) {
 
         Map<VariableReference, DoubleTensor> result = new HashMap<>();
-        for (VariableReference variable : standardDeviation.keySet()) {
+        for (Entry<VariableReference, DoubleTensor> entry : standardDeviation.entrySet()) {
 
-            DoubleTensor standardDeviationForVariable = standardDeviation.get(variable);
+            DoubleTensor standardDeviationForVariable = entry.getValue();
 
             DoubleTensor randomForVariable = random
                 .nextGaussian(standardDeviationForVariable.getShape())
                 .divInPlace(standardDeviationForVariable);
 
-            result.put(variable, randomForVariable);
+            result.put(entry.getKey(), randomForVariable);
         }
 
         return result;

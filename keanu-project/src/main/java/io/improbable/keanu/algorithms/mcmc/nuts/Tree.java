@@ -9,12 +9,11 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-
 import java.util.List;
 import java.util.Map;
-
 import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
+import java.util.Map.Entry;
 
 
 /**
@@ -336,11 +335,11 @@ class Tree {
         double forward = 0.0;
         double backward = 0.0;
 
-        for (VariableReference latentId : velocityForward.keySet()) {
+        for (Entry<VariableReference, DoubleTensor> entry : velocityForward.entrySet()) {
 
-            final DoubleTensor vForward = velocityForward.get(latentId);
-            final DoubleTensor vBackward = velocityBackward.get(latentId);
-            final DoubleTensor rhoForLatent = rho.get(latentId);
+            final DoubleTensor vForward = entry.getValue();
+            final DoubleTensor vBackward = velocityBackward.get(entry.getKey());
+            final DoubleTensor rhoForLatent = rho.get(entry.getKey());
 
             forward += vForward.times(rhoForLatent).sum();
             backward += vBackward.times(rhoForLatent).sum();

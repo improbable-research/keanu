@@ -1,8 +1,8 @@
 package io.improbable.keanu.codegen.python;
 
 import org.apache.commons.lang3.StringUtils;
-
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class DocString {
     private static final String THREE_QUOTES = "\"\"\"";
@@ -32,12 +32,12 @@ public class DocString {
         stringBuilder.append(NEW_LINE_TAB);
         stringBuilder.append(methodDescription.replaceAll("\n ", NEW_LINE_TAB));
         stringBuilder.append(NEW_LINE_TAB);
-        for (String param : parameterNameToDescriptionMap.keySet()) {
+        for (Entry<String, String> entry : parameterNameToDescriptionMap.entrySet()) {
             stringBuilder.append(NEW_LINE_TAB);
             stringBuilder.append(":param ");
-            stringBuilder.append(param);
+            stringBuilder.append(entry.getKey());
             stringBuilder.append(": ");
-            stringBuilder.append(parameterNameToDescriptionMap.get(param));
+            stringBuilder.append(entry.getValue());
         }
         stringBuilder.append(NEW_LINE_TAB);
         stringBuilder.append(THREE_QUOTES);

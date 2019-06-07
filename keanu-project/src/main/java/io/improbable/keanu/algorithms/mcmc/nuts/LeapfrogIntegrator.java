@@ -4,9 +4,9 @@ import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 @AllArgsConstructor
 public class LeapfrogIntegrator {
@@ -45,14 +45,14 @@ public class LeapfrogIntegrator {
 
         Map<VariableReference, DoubleTensor> nextPosition = new HashMap<>();
 
-        for (VariableReference variableReference : position.keySet()) {
+        for (Entry<VariableReference, DoubleTensor> entry : position.entrySet()) {
 
-            final DoubleTensor variablePosition = position.get(variableReference);
-            final DoubleTensor variableVelocity = velocity.get(variableReference);
+            final DoubleTensor variablePosition = entry.getValue();
+            final DoubleTensor variableVelocity = velocity.get(entry.getKey());
 
             final DoubleTensor nextPositionForLatent = variableVelocity.times(dt).plusInPlace(variablePosition);
 
-            nextPosition.put(variableReference, nextPositionForLatent);
+            nextPosition.put(entry.getKey(), nextPositionForLatent);
         }
 
         return nextPosition;
