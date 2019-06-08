@@ -57,7 +57,7 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
         if (labelQualifiedName != null) {
             stringBuilder.append(" (" + labelQualifiedName + ")");
         }
-        if (!errorMessage.equals("")) {
+        if (!"".equals(errorMessage)) {
             stringBuilder.append(": " + errorMessage);
         }
         return stringBuilder.toString();

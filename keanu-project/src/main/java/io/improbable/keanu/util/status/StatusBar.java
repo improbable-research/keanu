@@ -62,7 +62,7 @@ public class StatusBar {
 
         // Status bar is disabled for testing.
         String disableStatusBar = System.getProperty("io.improbable.keanu.util.status.StatusBar.disableStatusBar");
-        if (disableStatusBar != null && disableStatusBar.equals("true")) {
+        if ("true".equals(disableStatusBar)) {
             StatusBar.disable();
         }
 
@@ -109,7 +109,7 @@ public class StatusBar {
         StringBuilder sb = new StringBuilder();
         for (StatusBarComponent component : components) {
             String render = component.render();
-            if (render != "") {
+            if (!"".equals(render)) {
                 sb.append(component.render()).append(" ");
             }
         }

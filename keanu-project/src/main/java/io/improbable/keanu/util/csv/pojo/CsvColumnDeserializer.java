@@ -81,7 +81,7 @@ class CsvColumnDeserializer {
             if (StringUtils.isNumeric(val)) {
                 return Double.parseDouble(val) == 1.0;
             } else {
-                return val.equalsIgnoreCase("true") || val.equalsIgnoreCase("t");
+                return "true".equalsIgnoreCase(val) || "t".equalsIgnoreCase(val);
             }
         }).collect(Collectors.toList());
 
