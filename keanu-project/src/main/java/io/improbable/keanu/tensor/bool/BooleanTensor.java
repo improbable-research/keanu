@@ -11,11 +11,11 @@ import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<BooleanTensor> {
 
     static BooleanTensor create(boolean value, long[] shape) {
-        return new JVMBooleanTensor(value, shape);
+        return JVMBooleanTensor.create(value, shape);
     }
 
     static BooleanTensor create(boolean[] values, long... shape) {
-        return new JVMBooleanTensor(values, shape);
+        return JVMBooleanTensor.create(values, shape);
     }
 
     static BooleanTensor create(boolean... values) {
@@ -23,7 +23,7 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
     }
 
     static BooleanTensor scalar(boolean scalarValue) {
-        return new JVMBooleanTensor(scalarValue);
+        return JVMBooleanTensor.scalar(scalarValue);
     }
 
     static BooleanTensor vector(boolean... values) {
@@ -31,11 +31,11 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
     }
 
     static BooleanTensor trues(long... shape) {
-        return new JVMBooleanTensor(true, shape);
+        return JVMBooleanTensor.create(true, shape);
     }
 
     static BooleanTensor falses(long... shape) {
-        return new JVMBooleanTensor(false, shape);
+        return JVMBooleanTensor.create(false, shape);
     }
 
     /**

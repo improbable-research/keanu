@@ -287,4 +287,34 @@ public class TensorShape {
         return inverted;
     }
 
+    public static long[] getReshaped(long[] oldShape, long[] newShape, int bufferLength) {
+        long newLength = 1;
+        int negativeDimension = -1;
+        long[] newShapeCopy = new long[newShape.length];
+        System.arraycopy(newShape, 0, newShapeCopy, 0, newShape.length);
+
+        for (int i = 0; i < newShapeCopy.length; i++) {
+
+            long dimILength = newShapeCopy[i];
+            if (dimILength > 0) {
+                newLength *= dimILength;
+            } else if (dimILength < 0) {
+                if (negativeDimension >= 0) {
+                    throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(oldShape) + " to " + Arrays.toString(newShapeCopy));
+                }
+                negativeDimension = i;
+            }
+        }
+
+        if (newLength != bufferLength || negativeDimension >= 0) {
+            if (negativeDimension < 0) {
+                throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(oldShape) + " to " + Arrays.toString(newShapeCopy));
+            } else {
+                newShapeCopy[negativeDimension] = bufferLength / newLength;
+            }
+        }
+
+        return newShapeCopy;
+    }
+
 }

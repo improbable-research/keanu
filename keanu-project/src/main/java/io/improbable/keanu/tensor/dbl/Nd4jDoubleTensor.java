@@ -1142,7 +1142,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getDouble(i) != 0.0;
         }
-        return new JVMBooleanTensor(boolsFromMask, shape);
+        return JVMBooleanTensor.create(boolsFromMask, shape);
     }
 
     @Override

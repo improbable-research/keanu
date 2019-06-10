@@ -676,7 +676,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getInt(i) != 0;
         }
-        return new JVMBooleanTensor(boolsFromMask, shape);
+        return JVMBooleanTensor.create(boolsFromMask, shape);
     }
 
     @Override

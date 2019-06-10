@@ -205,34 +205,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reshape(long... newShape) {
-
-        long newLength = 1;
-        int negativeDimension = -1;
-        long newShapeCopy[] = new long[newShape.length];
-        System.arraycopy(newShape, 0, newShapeCopy, 0, newShape.length);
-
-        for (int i = 0; i < newShapeCopy.length; i++) {
-
-            long dimILength = newShapeCopy[i];
-            if (dimILength > 0) {
-                newLength *= dimILength;
-            } else if (dimILength < 0) {
-                if (negativeDimension >= 0) {
-                    throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(shape) + " to " + Arrays.toString(newShapeCopy));
-                }
-                negativeDimension = i;
-            }
-        }
-
-        if (newLength != buffer.length || negativeDimension >= 0) {
-            if (negativeDimension < 0) {
-                throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(shape) + " to " + Arrays.toString(newShapeCopy));
-            } else {
-                newShapeCopy[negativeDimension] = buffer.length / newLength;
-            }
-        }
-
-        return new JVMDoubleTensor(bufferCopy(), newShapeCopy);
+        return new JVMDoubleTensor(bufferCopy(), TensorShape.getReshaped(shape, newShape, buffer.length));
     }
 
     @Override

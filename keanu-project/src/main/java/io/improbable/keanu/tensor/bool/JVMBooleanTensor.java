@@ -24,45 +24,56 @@ public class JVMBooleanTensor implements BooleanTensor {
      * @param data  tensor data used c ordering
      * @param shape desired shape of tensor
      */
-    public JVMBooleanTensor(boolean[] data, long[] shape) {
-        Preconditions.checkArgument(
-            TensorShape.getLength(shape) == data.length,
-            "Shape " + Arrays.toString(shape) + " does not match data length " + data.length
-        );
-        this.data = new boolean[data.length];
-        System.arraycopy(data, 0, this.data, 0, this.data.length);
-        this.shape = Arrays.copyOf(shape, shape.length);
+    JVMBooleanTensor(boolean[] data, long[] shape) {
+        this.data = data;
+        this.shape = shape;
         this.stride = TensorShape.getRowFirstStride(shape);
+    }
+
+    JVMBooleanTensor(boolean[] data, long[] shape, long[] stride) {
+        this.data = data;
+        this.shape = shape;
+        this.stride = stride;
     }
 
     /**
      * @param constant constant boolean value to fill shape
      */
-    public JVMBooleanTensor(boolean constant) {
+    JVMBooleanTensor(boolean constant) {
         this.data = new boolean[]{constant};
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
     }
 
-    /**
-     * @param constant constant boolean value to fill shape
-     * @param shape    desired shape of tensor
-     */
-    public JVMBooleanTensor(boolean constant, long[] shape) {
-        int dataLength = TensorShape.getLengthAsInt(shape);
-        this.data = new boolean[dataLength];
-        Arrays.fill(this.data, constant);
-        this.shape = Arrays.copyOf(shape, shape.length);
-        this.stride = TensorShape.getRowFirstStride(shape);
+    public static JVMBooleanTensor scalar(boolean scalarValue) {
+        return new JVMBooleanTensor(scalarValue);
+    }
+
+    public static JVMBooleanTensor create(boolean[] values, long... shape) {
+        Preconditions.checkArgument(
+            TensorShape.getLength(shape) == values.length,
+            "Shape " + Arrays.toString(shape) + " does not match data length " + values.length
+        );
+        return new JVMBooleanTensor(values, shape);
+    }
+
+    public static JVMBooleanTensor create(boolean value, long... shape) {
+        boolean[] buffer = new boolean[TensorShape.getLengthAsInt(shape)];
+
+        if (value) {
+            Arrays.fill(buffer, value);
+        }
+
+        return new JVMBooleanTensor(buffer, shape);
+    }
+
+    private boolean[] bufferCopy() {
+        return copyOf(data, data.length);
     }
 
     @Override
     public BooleanTensor reshape(long... newShape) {
-        if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
-            throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
-                + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
-        }
-        return new JVMBooleanTensor(data, newShape);
+        return new JVMBooleanTensor(bufferCopy(), TensorShape.getReshaped(shape, newShape, data.length));
     }
 
     @Override
