@@ -212,6 +212,11 @@ public class JVMBooleanTensorTest {
         BooleanTensor reshaped = matrixA.reshape(4, 1);
         assertArrayEquals(reshaped.asFlatIntegerArray(), matrixA.asFlatIntegerArray());
         assertArrayEquals(new long[]{4, 1}, reshaped.getShape());
+
+        matrixA.setValue(true, 0, 1);
+        assertTrue(matrixA.getValue(0, 1));
+        assertFalse(reshaped.getValue(1));
+
     }
 
     @Test
