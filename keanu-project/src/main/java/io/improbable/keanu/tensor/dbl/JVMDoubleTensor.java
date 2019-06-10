@@ -21,6 +21,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
+import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
@@ -467,7 +468,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             throw new IllegalArgumentException("Cannot take arg max of axis " + axis + " on a " + shape.length + " rank tensor.");
         }
 
-        int[] rearrange = shiftDimensionToDimensionZero(axis, shape);
+        int[] rearrange = getPermutationForDimensionToDimensionZero(axis, shape);
 
         JVMDoubleTensor permuted = (JVMDoubleTensor) permute(rearrange);
         double[] permutedBuffer = permuted.buffer;
@@ -885,22 +886,22 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     public static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
 
-        long[] concatShape = getConcatResultShape(dimension, toConcat);
+        long[] concatShape = TensorShape.getConcatResultShape(dimension, toConcat);
 
         boolean shouldRearrange = dimension != 0;
 
         if (shouldRearrange) {
 
-            int[] rearrange = shiftDimensionToDimensionZero(dimension, concatShape);
+            int[] rearrange = getPermutationForDimensionToDimensionZero(dimension, concatShape);
 
-            DoubleTensor[] toConcatOnDimensionZero = new DoubleTensor[toConcat.length];
+            Tensor[] toConcatOnDimensionZero = new Tensor[toConcat.length];
 
             for (int i = 0; i < toConcatOnDimensionZero.length; i++) {
                 toConcatOnDimensionZero[i] = toConcat[i].permute(rearrange);
             }
 
             long[] permutedConcatShape = TensorShape.getPermutedIndices(concatShape, rearrange);
-            JVMDoubleTensor concatOnDimZero = concatOnDimensionZero(permutedConcatShape, toConcatOnDimensionZero);
+            DoubleTensor concatOnDimZero = concatOnDimensionZero(permutedConcatShape, toConcatOnDimensionZero);
 
             return concatOnDimZero.permute(invertedPermute(rearrange));
         } else {
@@ -909,7 +910,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
     }
 
-    private static JVMDoubleTensor concatOnDimensionZero(long[] concatShape, DoubleTensor... toConcat) {
+    private static JVMDoubleTensor concatOnDimensionZero(long[] concatShape, Tensor... toConcat) {
 
         double[] concatBuffer = new double[TensorShape.getLengthAsInt(concatShape)];
         int bufferPosition = 0;
@@ -924,57 +925,12 @@ public class JVMDoubleTensor extends DoubleTensor {
         return new JVMDoubleTensor(concatBuffer, concatShape);
     }
 
-    private static int[] shiftDimensionToDimensionZero(int dimension, long[] shape) {
-
-        int[] rearrange = new int[shape.length];
-        rearrange[0] = dimension;
-        for (int i = 1; i < rearrange.length; i++) {
-            if (i > dimension) {
-                rearrange[i] = i;
-            } else {
-                rearrange[i] = i - 1;
-            }
-        }
-        return rearrange;
-    }
-
-    private static long[] getConcatResultShape(int dimension, DoubleTensor... toConcat) {
-        Preconditions.checkArgument(toConcat.length > 0);
-
-        DoubleTensor first = toConcat[0];
-        long[] firstShape = first.getShape();
-
-        if (firstShape.length == 0 && dimension != 0) {
-            throw new IllegalArgumentException("Cannot concat scalars on dimension " + dimension);
-        }
-
-        long[] concatShape = firstShape.length == 0 ? new long[]{1} : Arrays.copyOf(firstShape, firstShape.length);
-
-        for (int i = 1; i < toConcat.length; i++) {
-            DoubleTensor c = toConcat[i];
-
-            long[] cShape = c.getShape();
-            for (int dim = 0; dim < concatShape.length; dim++) {
-
-                if (dim == dimension) {
-                    concatShape[dimension] += cShape.length == 0 ? 1 : cShape[dimension];
-                } else {
-                    if (cShape[dim] != concatShape[dim]) {
-                        throw new IllegalArgumentException("Cannot concat shape " + Arrays.toString(cShape));
-                    }
-                }
-            }
-        }
-
-        return concatShape;
-    }
-
     @Override
     public double[] asFlatDoubleArray() {
         return bufferCopy();
     }
 
-    private static double[] getRawBufferIfJVMTensor(DoubleTensor tensor) {
+    private static double[] getRawBufferIfJVMTensor(Tensor tensor) {
         if (tensor instanceof JVMDoubleTensor) {
             return ((JVMDoubleTensor) tensor).buffer;
         } else {

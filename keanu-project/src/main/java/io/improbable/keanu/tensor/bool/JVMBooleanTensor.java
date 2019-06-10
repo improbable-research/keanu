@@ -12,6 +12,8 @@ import java.util.Arrays;
 
 import static com.google.common.primitives.Ints.checkedCast;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
+import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
+import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static java.util.Arrays.copyOf;
 
 public class JVMBooleanTensor implements BooleanTensor {
@@ -95,6 +97,55 @@ public class JVMBooleanTensor implements BooleanTensor {
         }
 
         return new JVMBooleanTensor(newBuffer, resultShape);
+    }
+
+    public static BooleanTensor concat(int dimension, BooleanTensor... toConcat) {
+
+        long[] concatShape = TensorShape.getConcatResultShape(dimension, toConcat);
+
+        boolean shouldRearrange = dimension != 0;
+
+        if (shouldRearrange) {
+
+            int[] rearrange = getPermutationForDimensionToDimensionZero(dimension, concatShape);
+
+            BooleanTensor[] toConcatOnDimensionZero = new BooleanTensor[toConcat.length];
+
+            for (int i = 0; i < toConcatOnDimensionZero.length; i++) {
+                toConcatOnDimensionZero[i] = toConcat[i].permute(rearrange);
+            }
+
+            long[] permutedConcatShape = TensorShape.getPermutedIndices(concatShape, rearrange);
+            BooleanTensor concatOnDimZero = concatOnDimensionZero(permutedConcatShape, toConcatOnDimensionZero);
+
+            return concatOnDimZero.permute(invertedPermute(rearrange));
+        } else {
+
+            return concatOnDimensionZero(concatShape, toConcat);
+        }
+    }
+
+    private static JVMBooleanTensor concatOnDimensionZero(long[] concatShape, BooleanTensor... toConcat) {
+
+        boolean[] concatBuffer = new boolean[TensorShape.getLengthAsInt(concatShape)];
+        int bufferPosition = 0;
+
+        for (int i = 0; i < toConcat.length; i++) {
+
+            boolean[] cBuffer = getRawBufferIfJVMTensor(toConcat[i]);
+            System.arraycopy(cBuffer, 0, concatBuffer, bufferPosition, cBuffer.length);
+            bufferPosition += cBuffer.length;
+        }
+
+        return new JVMBooleanTensor(concatBuffer, concatShape);
+    }
+
+    private static boolean[] getRawBufferIfJVMTensor(BooleanTensor tensor) {
+        if (tensor instanceof JVMBooleanTensor) {
+            return ((JVMBooleanTensor) tensor).data;
+        } else {
+            return tensor.asFlatBooleanArray();
+        }
     }
 
     @Override

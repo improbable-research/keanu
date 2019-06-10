@@ -317,4 +317,49 @@ public class TensorShape {
         return newShapeCopy;
     }
 
+    public static long[] getConcatResultShape(int dimension, Tensor... toConcat) {
+        Preconditions.checkArgument(toConcat.length > 0);
+
+        Tensor first = toConcat[0];
+        long[] firstShape = first.getShape();
+
+        if (firstShape.length == 0 && dimension != 0) {
+            throw new IllegalArgumentException("Cannot concat scalars on dimension " + dimension);
+        }
+
+        long[] concatShape = firstShape.length == 0 ? new long[]{1} : Arrays.copyOf(firstShape, firstShape.length);
+
+        for (int i = 1; i < toConcat.length; i++) {
+            Tensor c = toConcat[i];
+
+            long[] cShape = c.getShape();
+            for (int dim = 0; dim < concatShape.length; dim++) {
+
+                if (dim == dimension) {
+                    concatShape[dimension] += cShape.length == 0 ? 1 : cShape[dimension];
+                } else {
+                    if (cShape[dim] != concatShape[dim]) {
+                        throw new IllegalArgumentException("Cannot concat shape " + Arrays.toString(cShape));
+                    }
+                }
+            }
+        }
+
+        return concatShape;
+    }
+
+    public static int[] getPermutationForDimensionToDimensionZero(int dimension, long[] shape) {
+
+        int[] rearrange = new int[shape.length];
+        rearrange[0] = dimension;
+        for (int i = 1; i < rearrange.length; i++) {
+            if (i > dimension) {
+                rearrange[i] = i;
+            } else {
+                rearrange[i] = i - 1;
+            }
+        }
+        return rearrange;
+    }
+
 }
