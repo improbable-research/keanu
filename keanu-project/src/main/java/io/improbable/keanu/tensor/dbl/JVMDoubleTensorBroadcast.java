@@ -12,10 +12,46 @@ import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 
 public class JVMDoubleTensorBroadcast {
 
-    static JVMDoubleTensor broadcastScalar(double[] leftBuffer, long[] leftShape, long[] leftStride,
-                                           double[] rightBuffer, long[] rightShape, long[] rightStride,
-                                           BiFunction<Double, Double, Double> op,
-                                           boolean inPlace) {
+    static JVMDoubleTensor broadcastIfNeeded(double[] leftBuffer, long[] leftShape, long[] leftStride,
+                                             double[] rightBuffer, long[] rightShape, long[] rightStride,
+                                             BiFunction<Double, Double, Double> op,
+                                             boolean inPlace) {
+        final boolean needsBroadcast = !Arrays.equals(leftShape, rightShape);
+
+        JVMDoubleTensor result;
+        if (needsBroadcast) {
+
+            boolean isScalarBroadcast = leftShape.length == 0 || rightShape.length == 0;
+
+            //Short circuit for broadcast with scalars
+            if (isScalarBroadcast) {
+
+                result = broadcastScalar(
+                    leftBuffer, leftShape, leftStride,
+                    rightBuffer, rightShape, rightStride,
+                    op, inPlace
+                );
+
+            } else {
+
+                result = broadcastBinaryOp(
+                    leftBuffer, leftShape,
+                    rightBuffer, rightShape,
+                    op, inPlace
+                );
+            }
+
+        } else {
+            result = elementwiseBinaryOp(leftBuffer, rightBuffer, leftShape, leftStride, op, inPlace);
+        }
+
+        return result;
+    }
+
+    private static JVMDoubleTensor broadcastScalar(double[] leftBuffer, long[] leftShape, long[] leftStride,
+                                                   double[] rightBuffer, long[] rightShape, long[] rightStride,
+                                                   BiFunction<Double, Double, Double> op,
+                                                   boolean inPlace) {
         final double[] outputBuffer;
         final long[] resultShape;
         final long[] resultStride;
@@ -49,9 +85,9 @@ public class JVMDoubleTensorBroadcast {
         }
     }
 
-    static JVMDoubleTensor elementwiseBinaryOp(double[] leftBuffer, double[] rightBuffer, long[] shape, long[] stride,
-                                               BiFunction<Double, Double, Double> op,
-                                               boolean inPlace) {
+    private static JVMDoubleTensor elementwiseBinaryOp(double[] leftBuffer, double[] rightBuffer, long[] shape, long[] stride,
+                                                       BiFunction<Double, Double, Double> op,
+                                                       boolean inPlace) {
 
         final double[] outputBuffer = inPlace ? leftBuffer : new double[leftBuffer.length];
 
@@ -62,10 +98,10 @@ public class JVMDoubleTensorBroadcast {
         return new JVMDoubleTensor(outputBuffer, shape, stride);
     }
 
-    static JVMDoubleTensor broadcastBinaryOp(double[] leftBuffer, long[] leftShape,
-                                             double[] rightBuffer, long[] rightShape,
-                                             BiFunction<Double, Double, Double> op,
-                                             boolean inPlace) {
+    private static JVMDoubleTensor broadcastBinaryOp(double[] leftBuffer, long[] leftShape,
+                                                     double[] rightBuffer, long[] rightShape,
+                                                     BiFunction<Double, Double, Double> op,
+                                                     boolean inPlace) {
 
         //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
         final int resultRank = Math.max(leftShape.length, rightShape.length);

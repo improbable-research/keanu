@@ -31,9 +31,7 @@ import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LTE_M
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LT_MASK;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.MUL;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.SUB;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastBinaryOp;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastScalar;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.elementwiseBinaryOp;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotrf;
@@ -1371,34 +1369,11 @@ public class JVMDoubleTensor extends DoubleTensor {
         final double[] rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final boolean needsBroadcast = !Arrays.equals(shape, rightShape);
-
-        JVMDoubleTensor result;
-        if (needsBroadcast) {
-
-            boolean isScalarBroadcast = shape.length == 0 || rightShape.length == 0;
-
-            //Short circuit for broadcast with scalars
-            if (isScalarBroadcast) {
-
-                result = broadcastScalar(
-                    buffer, shape, stride,
-                    rightBuffer, rightShape, right.getStride(),
-                    op, inPlace
-                );
-
-            } else {
-
-                result = broadcastBinaryOp(
-                    buffer, shape,
-                    rightBuffer, right.getShape(),
-                    op, inPlace
-                );
-            }
-
-        } else {
-            result = elementwiseBinaryOp(buffer, rightBuffer, shape, stride, op, inPlace);
-        }
+        final JVMDoubleTensor result = broadcastIfNeeded(
+            buffer, shape, stride,
+            rightBuffer, rightShape, right.getStride(),
+            op, inPlace
+        );
 
         if (inPlace) {
             this.buffer = result.buffer;
