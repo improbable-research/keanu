@@ -247,13 +247,21 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor slice(int dimension, long index) {
-        DoubleTensor tadDoubles = DoubleTensor.create(asFlatDoubleArray(), shape).slice(dimension, index);
-        double[] tadFlat = tadDoubles.asFlatDoubleArray();
-        boolean[] tadToBooleans = new boolean[tadFlat.length];
-        for (int i = 0; i < tadFlat.length; i++) {
-            tadToBooleans[i] = tadFlat[i] == 1;
+        Preconditions.checkArgument(dimension < shape.length && index < shape[dimension]);
+        long[] resultShape = ArrayUtils.remove(shape, dimension);
+        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        boolean[] newBuffer = new boolean[TensorShape.getLengthAsInt(resultShape)];
+
+        for (int i = 0; i < newBuffer.length; i++) {
+
+            long[] shapeIndices = ArrayUtils.insert(dimension, TensorShape.getShapeIndices(resultShape, resultStride, i), index);
+
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(shape, stride, shapeIndices));
+
+            newBuffer[i] = data[j];
         }
-        return new JVMBooleanTensor(tadToBooleans, tadDoubles.getShape());
+
+        return new JVMBooleanTensor(newBuffer, resultShape);
     }
 
     @Override

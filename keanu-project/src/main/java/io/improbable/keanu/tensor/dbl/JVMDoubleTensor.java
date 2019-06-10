@@ -134,10 +134,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         return new JVMDoubleTensor(buffer, new long[]{buffer.length});
     }
 
-    private double[] newBufferOfSameLength() {
-        return new double[buffer.length];
-    }
-
     private double[] bufferCopy() {
         return copyOf(buffer, buffer.length);
     }
@@ -270,7 +266,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         Preconditions.checkArgument(rearrange.length == shape.length);
         long[] resultShape = TensorShape.getPermutedResultShape(shape, rearrange);
         long[] resultStride = TensorShape.getRowFirstStride(resultShape);
-        double[] newBuffer = newBufferOfSameLength();
+        double[] newBuffer = new double[buffer.length];
 
         for (int i = 0; i < buffer.length; i++) {
             long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
@@ -906,7 +902,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
             int j = Ints.checkedCast(TensorShape.getFlatIndex(shape, stride, shapeIndices));
 
-            newBuffer[i] += buffer[j];
+            newBuffer[i] = buffer[j];
         }
 
         return new JVMDoubleTensor(newBuffer, resultShape);
