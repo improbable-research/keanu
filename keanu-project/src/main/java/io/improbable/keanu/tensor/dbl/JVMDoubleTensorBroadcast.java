@@ -1,7 +1,11 @@
 package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.TensorShape;
+import org.nd4j.linalg.api.shape.Shape;
 
+import java.util.Arrays;
 import java.util.function.BiFunction;
 
 public class JVMDoubleTensorBroadcast {
@@ -148,6 +152,72 @@ public class JVMDoubleTensorBroadcast {
         }
 
         return toFlatIndex;
+    }
+
+    private static long[] getShapeOrPadToRank(long[] shape, int rank) {
+        if (shape.length == rank) {
+            return shape;
+        } else {
+            return TensorShape.shapeToDesiredRankByPrependingOnes(shape, rank);
+        }
+    }
+
+    static JVMDoubleTensor broadcastBinaryDoubleOp(double[] leftBuffer, long[] leftShape,
+                                            double[] rightBuffer, long[] rightShape,
+                                            BiFunction<Double, Double, Double> op,
+                                            boolean inPlace) {
+
+        //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
+        int resultRank = Math.max(leftShape.length, rightShape.length);
+        long[] paddedLeftShape = getShapeOrPadToRank(leftShape, resultRank);
+        long[] paddedLeftStride = TensorShape.getRowFirstStride(paddedLeftShape);
+
+        long[] paddedRightShape = getShapeOrPadToRank(rightShape, resultRank);
+        long[] paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
+
+        long[] resultShape = Shape.broadcastOutputShape(paddedLeftShape, paddedRightShape);
+        boolean resultShapeIsLeftSideShape = Arrays.equals(resultShape, paddedLeftShape);
+
+        final double[] outputBuffer;
+        if (!resultShapeIsLeftSideShape) {
+
+            boolean resultShapeIsRightSideShape = Arrays.equals(resultShape, paddedRightShape);
+
+            if (!resultShapeIsRightSideShape) {
+                throw new IllegalArgumentException(
+                    "Broadcasting of shape " + Arrays.toString(paddedLeftShape) + " and " + Arrays.toString(paddedRightShape) + " not supported."
+                );
+            }
+
+            outputBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
+
+        } else {
+            outputBuffer = inPlace ? leftBuffer : new double[leftBuffer.length];
+        }
+
+        //Allow broadcasting from left and right
+        if (paddedLeftShape.length > paddedRightShape.length || leftBuffer.length > rightBuffer.length) {
+            //e.g. [2, 2] * [1, 2]
+            broadcastFromRight(leftBuffer, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
+        } else {
+            //e.g. [2] / [2, 2]
+            broadcastFromLeft(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightStride, outputBuffer, op);
+        }
+
+        return new JVMDoubleTensor(outputBuffer, resultShape);
+    }
+
+    static JVMDoubleTensor elementwiseBinaryOp(double[] leftBuffer, double[] rightBuffer, long[] shape, long[] stride,
+                                        BiFunction<Double, Double, Double> op,
+                                        boolean inPlace) {
+
+        final double[] outputBuffer = inPlace ? leftBuffer : new double[leftBuffer.length];
+
+        for (int i = 0; i < outputBuffer.length; i++) {
+            outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[i]);
+        }
+
+        return new JVMDoubleTensor(outputBuffer, shape, stride);
     }
 
 
