@@ -32,9 +32,8 @@ import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.Broadcasta
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.MUL;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.SUB;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastBinaryDoubleOp;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastScalar;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.elementwiseBinaryOp;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarLeft;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarRight;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotrf;
@@ -1407,42 +1406,25 @@ public class JVMDoubleTensor extends DoubleTensor {
         JVMDoubleTensor result;
         if (needsBroadcast) {
 
+            boolean isScalarBroadcast = shape.length == 0 || rightShape.length == 0;
+
             //Short circuit for broadcast with scalars
-            if (shape.length == 0 || rightShape.length == 0) {
+            if (isScalarBroadcast) {
 
-                final double[] outputBuffer;
-                final long[] resultShape;
-                final long[] resultStride;
+                result = broadcastScalar(
+                    buffer, shape, stride,
+                    rightBuffer, rightShape, right.getStride(),
+                    op, inPlace
+                );
 
-                if (shape.length == 0) {
-                    outputBuffer = new double[rightBuffer.length];
-                    resultShape = Arrays.copyOf(rightShape, rightShape.length);
-                    resultStride = Arrays.copyOf(right.getStride(), rightShape.length);
-                    scalarLeft(buffer[0], rightBuffer, outputBuffer, op);
-                } else {
-                    outputBuffer = inPlace ? buffer : new double[buffer.length];
-                    resultShape = Arrays.copyOf(shape, shape.length);
-                    resultStride = stride;
-                    scalarRight(buffer, rightBuffer[0], outputBuffer, op);
-                }
+            } else {
 
-                if (inPlace) {
-                    buffer = outputBuffer;
-                    shape = resultShape;
-                    stride = resultStride;
-
-                    return this;
-                } else {
-                    return new JVMDoubleTensor(outputBuffer, resultShape);
-                }
-
+                result = broadcastBinaryDoubleOp(
+                    buffer, shape,
+                    rightBuffer, right.getShape(),
+                    op, inPlace
+                );
             }
-
-            result = broadcastBinaryDoubleOp(
-                buffer, shape,
-                rightBuffer, right.getShape(),
-                op, inPlace
-            );
 
         } else {
             result = elementwiseBinaryOp(buffer, rightBuffer, shape, stride, op, inPlace);
