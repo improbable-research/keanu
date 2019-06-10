@@ -1,8 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.TensorShape;
 
 import java.util.function.BiFunction;
 
@@ -89,7 +87,6 @@ public class JVMDoubleTensorBroadcast {
      * Right buffer is shorter than left
      *
      * @param leftBuffer
-     * @param leftShape
      * @param leftStride
      * @param rightBuffer
      * @param rightShape
@@ -98,21 +95,13 @@ public class JVMDoubleTensorBroadcast {
      * @param op
      * @return
      */
-    static void broadcastFromRight(double[] leftBuffer, long[] leftShape, long[] leftStride,
+    static void broadcastFromRight(double[] leftBuffer, long[] leftStride,
                                    double[] rightBuffer, long[] rightShape, long[] rightStride,
                                    double[] outputBuffer, BiFunction<Double, Double, Double> op) {
         Preconditions.checkArgument(leftBuffer.length >= rightBuffer.length);
         for (int i = 0; i < outputBuffer.length; i++) {
 
-            long[] shapeIndices = TensorShape.getShapeIndices(leftShape, leftStride, i);
-
-            long[] mappedShapeIndices = new long[shapeIndices.length];
-
-            for (int s = 0; s < shapeIndices.length; s++) {
-                mappedShapeIndices[s] = shapeIndices[s] % rightShape[s];
-            }
-
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(rightShape, rightStride, mappedShapeIndices));
+            int j = mapBroadcastIndex(i, leftStride, rightShape, rightStride);
 
             outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[j]);
         }
@@ -126,31 +115,39 @@ public class JVMDoubleTensorBroadcast {
      * @param leftShape
      * @param leftStride
      * @param rightBuffer
-     * @param rightShape
      * @param rightStride
      * @param outputBuffer
      * @param op
      * @return
      */
     static void broadcastFromLeft(double[] leftBuffer, long[] leftShape, long[] leftStride,
-                                  double[] rightBuffer, long[] rightShape, long[] rightStride,
+                                  double[] rightBuffer, long[] rightStride,
                                   double[] outputBuffer, BiFunction<Double, Double, Double> op) {
         Preconditions.checkArgument(leftBuffer.length <= rightBuffer.length);
         for (int i = 0; i < outputBuffer.length; i++) {
 
-            long[] shapeIndices = TensorShape.getShapeIndices(rightShape, rightStride, i);
-
-            long[] mappedShapeIndices = new long[shapeIndices.length];
-
-            for (int s = 0; s < shapeIndices.length; s++) {
-                mappedShapeIndices[s] = shapeIndices[s] % leftShape[s];
-            }
-
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(leftShape, leftStride, mappedShapeIndices));
+            int j = mapBroadcastIndex(i, rightStride, leftShape, leftStride);
 
             outputBuffer[i] = op.apply(leftBuffer[j], rightBuffer[i]);
         }
 
+    }
+
+    private static int mapBroadcastIndex(int fromFlatIndex, long[] fromStride, long[] toShape, long[] toStride) {
+
+        final long[] fromShapeIndex = new long[fromStride.length];
+        final long[] toShapeIndex = new long[fromShapeIndex.length];
+        int remainder = fromFlatIndex;
+        int toFlatIndex = 0;
+
+        for (int i = 0; i < fromStride.length; i++) {
+            fromShapeIndex[i] = remainder / fromStride[i];
+            remainder -= fromShapeIndex[i] * fromStride[i];
+            toShapeIndex[i] = fromShapeIndex[i] % toShape[i];
+            toFlatIndex += toStride[i] * toShapeIndex[i];
+        }
+
+        return toFlatIndex;
     }
 
 
