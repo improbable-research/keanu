@@ -52,7 +52,7 @@ public class DoubleTensorBroadcastTest {
         assertTimesInPlaceOperationEquals(rank4, matrix, expected);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void canBroadcastMultiplyToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -313,7 +313,7 @@ public class DoubleTensorBroadcastTest {
         assertEquals(expected, result);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void canBroadcastAddToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -413,7 +413,7 @@ public class DoubleTensorBroadcastTest {
         assertEquals(expected, diff);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void canBroadcastSubtractToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -517,7 +517,7 @@ public class DoubleTensorBroadcastTest {
         assertEquals(expected, diff);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void canBroadcastDivideToHigherRankWithDimensionsOfOneTailing() {
 
         /*
