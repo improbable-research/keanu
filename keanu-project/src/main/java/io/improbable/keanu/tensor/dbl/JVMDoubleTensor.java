@@ -1495,10 +1495,10 @@ public class JVMDoubleTensor extends DoubleTensor {
         //Allow broadcasting from left and right
         if (paddedLeftShape.length > paddedRightShape.length || leftBuffer.length > rightBuffer.length) {
             //e.g. [2, 2] * [1, 2]
-            broadcastFromRight(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
+            broadcastFromRight(leftBuffer, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
         } else {
             //e.g. [2] / [2, 2]
-            broadcastFromLeft(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
+            broadcastFromLeft(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightStride, outputBuffer, op);
         }
 
         if (inPlace) {
