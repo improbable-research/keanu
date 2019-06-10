@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -210,6 +211,8 @@ public class MultinomialVertexTest {
     public void itWorksWithAlmostOneProbability() {
         int n = 100;
         DoubleTensor p = DoubleTensor.create(0.1, new long[]{10});
+
+        assertThat(p.sum(), not(equalTo(1.0)));
 
         MultinomialVertex multinomial = new MultinomialVertex(n, p);
         IntegerTensor samples = multinomial.sample();

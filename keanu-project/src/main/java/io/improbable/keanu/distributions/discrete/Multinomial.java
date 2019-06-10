@@ -180,7 +180,7 @@ public class Multinomial implements DiscreteDistribution {
             throw new IllegalArgumentException(
                 "p shape " + Arrays.toString(pShape) + " incompatible with n shape " +
                     Arrays.toString(nShape)
-            );
+                , e);
         }
 
         if (!isBroadcastable(broadcastResultShape, xShape)) {
