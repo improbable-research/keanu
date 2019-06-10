@@ -4,7 +4,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -22,21 +21,8 @@ import static org.junit.Assert.assertFalse;
 
 public class JVMBooleanTensorTest {
 
-    private BooleanTensor matrixA;
-    private BooleanTensor matrixB;
-    private BooleanTensor matrixC;
-    private static final BooleanTensor matrixD = BooleanTensor.create(new boolean[]{true, false}, 1, 2);
-
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    @Before
-    public void setup() {
-
-        matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
-        matrixB = new JVMBooleanTensor(new boolean[]{false, false, true, true}, new long[]{2, 2});
-        matrixC = new JVMBooleanTensor(new boolean[]{true, true, true, false}, new long[]{2, 2});
-    }
 
     @Test
     public void youCanCreateARankZeroTensor() {
@@ -54,6 +40,8 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesElementwiseAnd() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixB = new JVMBooleanTensor(new boolean[]{false, false, true, true}, new long[]{2, 2});
         BooleanTensor result = matrixA.and(matrixB);
         Boolean[] expected = new Boolean[]{false, false, true, false};
         assertArrayEquals(expected, result.asFlatArray());
@@ -66,6 +54,8 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesElementwiseOr() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixB = new JVMBooleanTensor(new boolean[]{false, false, true, true}, new long[]{2, 2});
         BooleanTensor result = matrixA.or(matrixB);
         Boolean[] expected = new Boolean[]{true, false, true, true};
         assertArrayEquals(expected, result.asFlatArray());
@@ -78,6 +68,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesElementwiseNot() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
         BooleanTensor result = matrixA.not();
         Boolean[] expected = new Boolean[]{false, true, false, true};
         assertArrayEquals(expected, result.asFlatArray());
@@ -90,6 +81,8 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesSetDoubleIf() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+
         DoubleTensor trueCase = DoubleTensor.create(new double[]{1.5, 2.0, 3.3, 4.65}, new long[]{2, 2});
         DoubleTensor falseCase = DoubleTensor.create(new double[]{5.1, 7.2, 11.4, 23.22}, new long[]{2, 2});
 
@@ -99,6 +92,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesSetIntegerIf() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
         IntegerTensor trueCase = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor falseCase = IntegerTensor.create(new int[]{5, 7, 11, 23}, new long[]{2, 2});
 
@@ -108,6 +102,9 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesSetBooleanIf() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixB = new JVMBooleanTensor(new boolean[]{false, false, true, true}, new long[]{2, 2});
+        BooleanTensor matrixC = new JVMBooleanTensor(new boolean[]{true, true, true, false}, new long[]{2, 2});
         BooleanTensor result = matrixA.booleanWhere(matrixB, matrixC);
         assertArrayEquals(new Boolean[]{false, true, true, false}, result.asFlatArray());
     }
@@ -129,6 +126,7 @@ public class JVMBooleanTensorTest {
             new long[]{2, 2}
         );
 
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
         Tensor<Something> result = matrixA.where(trueCase, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.C, Something.A},
@@ -138,6 +136,8 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesWhereWithScalarTensors() {
+
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
 
         Tensor<Something> trueCase = GenericTensor.scalar(Something.A);
         Tensor<Something> falseCase = GenericTensor.scalar(Something.C);
@@ -174,6 +174,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void canGetRandomAccessValue() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
         assertTrue(matrixA.getValue(0, 0));
         assertFalse(matrixA.getValue(0, 1));
         assertTrue(matrixA.getValue(1, 0));
@@ -182,6 +183,8 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void canSetRandomAccessValue() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+
         matrixA.setValue(false, 0, 0);
         matrixA.setValue(true, 0, 1);
         matrixA.setValue(false, 1, 0);
@@ -192,16 +195,20 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void canConvertToDoubles() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
         assertArrayEquals(new double[]{1.0, 0.0, 1.0, 0.0}, matrixA.asFlatDoubleArray(), 0.0);
     }
 
     @Test
     public void canConvertToIntegers() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+
         assertArrayEquals(new int[]{1, 0, 1, 0}, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void canReshape() {
+        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
         BooleanTensor reshaped = matrixA.reshape(4, 1);
         assertArrayEquals(reshaped.asFlatIntegerArray(), matrixA.asFlatIntegerArray());
         assertArrayEquals(new long[]{4, 1}, reshaped.getShape());
@@ -226,6 +233,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void canStackMatrices() {
+        BooleanTensor matrixD = BooleanTensor.create(new boolean[]{true, false}, 1, 2);
         assertThat(BooleanTensor.create(true, false, true, false).reshape(2, 1, 2), valuesAndShapesMatch(BooleanTensor.stack(0, matrixD, matrixD)));
         assertThat(BooleanTensor.create(true, false, true, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(1, matrixD, matrixD)));
         assertThat(BooleanTensor.create(true, true, false, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(2, matrixD, matrixD)));
@@ -233,6 +241,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void canStackIfDimensionIsNegative() {
+        BooleanTensor matrixD = BooleanTensor.create(new boolean[]{true, false}, 1, 2);
         assertThat(BooleanTensor.create(true, false, true, false).reshape(2, 1, 2), valuesAndShapesMatch(BooleanTensor.stack(-3, matrixD, matrixD)));
         assertThat(BooleanTensor.create(true, false, true, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(-2, matrixD, matrixD)));
         assertThat(BooleanTensor.create(true, true, false, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(-1, matrixD, matrixD)));
@@ -240,11 +249,13 @@ public class JVMBooleanTensorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotStackIfPositiveDimensionIsOutOfBounds() {
+        BooleanTensor matrixD = BooleanTensor.create(new boolean[]{true, false}, 1, 2);
         BooleanTensor.stack(3, matrixD, matrixD);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotStackIfNegativeDimensionIsOutOfBounds() {
+        BooleanTensor matrixD = BooleanTensor.create(new boolean[]{true, false}, 1, 2);
         BooleanTensor.stack(-4, matrixD, matrixD);
     }
 
