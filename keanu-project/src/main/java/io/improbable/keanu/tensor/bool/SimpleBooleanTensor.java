@@ -16,14 +16,6 @@ import static java.util.Arrays.copyOf;
 
 public class SimpleBooleanTensor implements BooleanTensor {
 
-    static BooleanTensor create(boolean[] data, long[] shape) {
-        return new SimpleBooleanTensor(data, shape);
-    }
-
-    static BooleanTensor scalar(boolean value) {
-        return new SimpleBooleanTensor(value);
-    }
-
     private final boolean[] data;
     private final long[] shape;
     private final long[] stride;
@@ -266,7 +258,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor take(long... index) {
-        return scalar(getValue(index));
+        return new SimpleBooleanTensor(getValue(index));
     }
 
     @Override

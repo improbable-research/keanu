@@ -22,9 +22,9 @@ import static org.junit.Assert.assertFalse;
 
 public class SimpleBooleanTensorTest {
 
-    BooleanTensor matrixA;
-    BooleanTensor matrixB;
-    BooleanTensor matrixC;
+    private BooleanTensor matrixA;
+    private BooleanTensor matrixB;
+    private BooleanTensor matrixC;
     private static final BooleanTensor matrixD = BooleanTensor.create(new boolean[]{true, false}, 1, 2);
 
     @Rule
@@ -33,21 +33,21 @@ public class SimpleBooleanTensorTest {
     @Before
     public void setup() {
 
-        matrixA = SimpleBooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
-        matrixB = SimpleBooleanTensor.create(new boolean[]{false, false, true, true}, new long[]{2, 2});
-        matrixC = SimpleBooleanTensor.create(new boolean[]{true, true, true, false}, new long[]{2, 2});
+        matrixA = new SimpleBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        matrixB = new SimpleBooleanTensor(new boolean[]{false, false, true, true}, new long[]{2, 2});
+        matrixC = new SimpleBooleanTensor(new boolean[]{true, true, true, false}, new long[]{2, 2});
     }
 
     @Test
     public void youCanCreateARankZeroTensor() {
-        BooleanTensor scalarTrue = SimpleBooleanTensor.create(new boolean[]{true}, new long[]{});
+        BooleanTensor scalarTrue = new SimpleBooleanTensor(new boolean[]{true}, new long[]{});
         assertTrue(scalarTrue.scalar());
         assertEquals(0, scalarTrue.getRank());
     }
 
     @Test
     public void youCanCreateARankOneTensor() {
-        BooleanTensor booleanVector = SimpleBooleanTensor.create(new boolean[]{true, false, false, true, true}, new long[]{5});
+        BooleanTensor booleanVector = new SimpleBooleanTensor(new boolean[]{true, false, false, true, true}, new long[]{5});
         assertTrue(booleanVector.getValue(3));
         assertEquals(1, booleanVector.getRank());
     }
@@ -207,7 +207,7 @@ public class SimpleBooleanTensorTest {
         assertArrayEquals(new long[]{4, 1}, reshaped.getShape());
     }
 
-     @Test
+    @Test
     public void canStackScalars() {
         BooleanTensor x = BooleanTensor.scalar(true);
         BooleanTensor y = BooleanTensor.scalar(true);
