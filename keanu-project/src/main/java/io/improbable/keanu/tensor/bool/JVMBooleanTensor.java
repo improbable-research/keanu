@@ -14,7 +14,7 @@ import static com.google.common.primitives.Ints.checkedCast;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static java.util.Arrays.copyOf;
 
-public class SimpleBooleanTensor implements BooleanTensor {
+public class JVMBooleanTensor implements BooleanTensor {
 
     private final boolean[] data;
     private final long[] shape;
@@ -24,7 +24,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param data  tensor data used c ordering
      * @param shape desired shape of tensor
      */
-    public SimpleBooleanTensor(boolean[] data, long[] shape) {
+    public JVMBooleanTensor(boolean[] data, long[] shape) {
         Preconditions.checkArgument(
             TensorShape.getLength(shape) == data.length,
             "Shape " + Arrays.toString(shape) + " does not match data length " + data.length
@@ -38,7 +38,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     /**
      * @param constant constant boolean value to fill shape
      */
-    public SimpleBooleanTensor(boolean constant) {
+    public JVMBooleanTensor(boolean constant) {
         this.data = new boolean[]{constant};
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
@@ -48,7 +48,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param constant constant boolean value to fill shape
      * @param shape    desired shape of tensor
      */
-    public SimpleBooleanTensor(boolean constant, long[] shape) {
+    public JVMBooleanTensor(boolean constant, long[] shape) {
         int dataLength = TensorShape.getLengthAsInt(shape);
         this.data = new boolean[dataLength];
         Arrays.fill(this.data, constant);
@@ -62,7 +62,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
             throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
                 + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
         }
-        return new SimpleBooleanTensor(data, newShape);
+        return new JVMBooleanTensor(data, newShape);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
             newBuffer[j] = data[i];
         }
 
-        return new SimpleBooleanTensor(newBuffer, resultShape);
+        return new JVMBooleanTensor(newBuffer, resultShape);
     }
 
     @Override
@@ -253,12 +253,12 @@ public class SimpleBooleanTensor implements BooleanTensor {
         for (int i = 0; i < tadFlat.length; i++) {
             tadToBooleans[i] = tadFlat[i] == 1;
         }
-        return new SimpleBooleanTensor(tadToBooleans, tadDoubles.getShape());
+        return new JVMBooleanTensor(tadToBooleans, tadDoubles.getShape());
     }
 
     @Override
     public BooleanTensor take(long... index) {
-        return new SimpleBooleanTensor(getValue(index));
+        return new JVMBooleanTensor(getValue(index));
     }
 
     @Override
@@ -302,7 +302,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor duplicate() {
-        return new SimpleBooleanTensor(copyOf(data, data.length), copyOf(shape, shape.length));
+        return new JVMBooleanTensor(copyOf(data, data.length), copyOf(shape, shape.length));
     }
 
     @Override

@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
+import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
@@ -1142,7 +1142,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getDouble(i) != 0.0;
         }
-        return new SimpleBooleanTensor(boolsFromMask, shape);
+        return new JVMBooleanTensor(boolsFromMask, shape);
     }
 
     @Override

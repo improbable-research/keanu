@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
+import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -67,8 +67,8 @@ public class BooleanConcatenationVertexTest {
 
     @Test
     public void canConcatMatricesOfSameSize() {
-        ConstantBooleanVertex m = new ConstantBooleanVertex(new SimpleBooleanTensor(new boolean[]{true, true, true, true}, new long[]{2, 2}));
-        ConstantBooleanVertex a = new ConstantBooleanVertex(new SimpleBooleanTensor(new boolean[]{false, false, false, false}, new long[]{2, 2}));
+        ConstantBooleanVertex m = new ConstantBooleanVertex(new JVMBooleanTensor(new boolean[]{true, true, true, true}, new long[]{2, 2}));
+        ConstantBooleanVertex a = new ConstantBooleanVertex(new JVMBooleanTensor(new boolean[]{false, false, false, false}, new long[]{2, 2}));
 
         BooleanConcatenationVertex concatZero = new BooleanConcatenationVertex(0, m, a);
 
@@ -84,9 +84,9 @@ public class BooleanConcatenationVertexTest {
     @Test
     public void canConcatHighDimensionalShapes() {
         ConstantBooleanVertex a = new ConstantBooleanVertex(
-            new SimpleBooleanTensor(new boolean[]{true, true, true, true, true, true, true, true}, new long[]{2, 2, 2}));
+            new JVMBooleanTensor(new boolean[]{true, true, true, true, true, true, true, true}, new long[]{2, 2, 2}));
         ConstantBooleanVertex b = new ConstantBooleanVertex(
-            new SimpleBooleanTensor(new boolean[]{false, false, false, false, false, false, false, false}, new long[]{2, 2, 2}));
+            new JVMBooleanTensor(new boolean[]{false, false, false, false, false, false, false, false}, new long[]{2, 2, 2}));
 
         BooleanConcatenationVertex concatZero = new BooleanConcatenationVertex(0, a, b);
 

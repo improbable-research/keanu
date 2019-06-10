@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 
-public class SimpleBooleanTensorTest {
+public class JVMBooleanTensorTest {
 
     private BooleanTensor matrixA;
     private BooleanTensor matrixB;
@@ -33,21 +33,21 @@ public class SimpleBooleanTensorTest {
     @Before
     public void setup() {
 
-        matrixA = new SimpleBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
-        matrixB = new SimpleBooleanTensor(new boolean[]{false, false, true, true}, new long[]{2, 2});
-        matrixC = new SimpleBooleanTensor(new boolean[]{true, true, true, false}, new long[]{2, 2});
+        matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        matrixB = new JVMBooleanTensor(new boolean[]{false, false, true, true}, new long[]{2, 2});
+        matrixC = new JVMBooleanTensor(new boolean[]{true, true, true, false}, new long[]{2, 2});
     }
 
     @Test
     public void youCanCreateARankZeroTensor() {
-        BooleanTensor scalarTrue = new SimpleBooleanTensor(new boolean[]{true}, new long[]{});
+        BooleanTensor scalarTrue = new JVMBooleanTensor(new boolean[]{true}, new long[]{});
         assertTrue(scalarTrue.scalar());
         assertEquals(0, scalarTrue.getRank());
     }
 
     @Test
     public void youCanCreateARankOneTensor() {
-        BooleanTensor booleanVector = new SimpleBooleanTensor(new boolean[]{true, false, false, true, true}, new long[]{5});
+        BooleanTensor booleanVector = new JVMBooleanTensor(new boolean[]{true, false, false, true, true}, new long[]{5});
         assertTrue(booleanVector.getValue(3));
         assertEquals(1, booleanVector.getRank());
     }
@@ -151,14 +151,14 @@ public class SimpleBooleanTensorTest {
 
     @Test
     public void doesAllTrue() {
-        assertFalse(new SimpleBooleanTensor(new boolean[]{false, true, false, false}, new long[]{2, 2}).allTrue());
-        assertTrue(new SimpleBooleanTensor(new boolean[]{true, true, true, true}, new long[]{2, 2}).allTrue());
+        assertFalse(new JVMBooleanTensor(new boolean[]{false, true, false, false}, new long[]{2, 2}).allTrue());
+        assertTrue(new JVMBooleanTensor(new boolean[]{true, true, true, true}, new long[]{2, 2}).allTrue());
     }
 
     @Test
     public void doesAllFalse() {
-        assertFalse(new SimpleBooleanTensor(new boolean[]{false, true, false, false}, new long[]{2, 2}).allFalse());
-        assertTrue(new SimpleBooleanTensor(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse());
+        assertFalse(new JVMBooleanTensor(new boolean[]{false, true, false, false}, new long[]{2, 2}).allFalse());
+        assertTrue(new JVMBooleanTensor(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse());
     }
 
 
