@@ -62,10 +62,10 @@ public class JVMDoubleTensorBroadcast {
         return new JVMDoubleTensor(outputBuffer, shape, stride);
     }
 
-    static JVMDoubleTensor broadcastBinaryDoubleOp(double[] leftBuffer, long[] leftShape,
-                                                   double[] rightBuffer, long[] rightShape,
-                                                   BiFunction<Double, Double, Double> op,
-                                                   boolean inPlace) {
+    static JVMDoubleTensor broadcastBinaryOp(double[] leftBuffer, long[] leftShape,
+                                             double[] rightBuffer, long[] rightShape,
+                                             BiFunction<Double, Double, Double> op,
+                                             boolean inPlace) {
 
         //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
         final int resultRank = Math.max(leftShape.length, rightShape.length);
@@ -134,7 +134,9 @@ public class JVMDoubleTensorBroadcast {
     }
 
     /**
-     * Right buffer is shorter than left
+     * The broadcast result shape is equal to the left operand shape.
+     * <p>
+     * e.g. [2, 2] * [1, 2]
      *
      * @param leftBuffer
      * @param leftStride
@@ -159,7 +161,7 @@ public class JVMDoubleTensorBroadcast {
 
     /**
      * The broadcast result shape is equal to the right operand shape.
-     *
+     * <p>
      * e.g. [2] / [2, 2]
      *
      * @param leftBuffer
@@ -185,7 +187,7 @@ public class JVMDoubleTensorBroadcast {
 
     /**
      * Neither the left operand shape nor the right operand shape equal the result shape.
-     *
+     * <p>
      * e.g. [2, 2, 1] * [2, 2] = [2, 2, 2]
      *
      * @param leftBuffer

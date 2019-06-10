@@ -31,7 +31,7 @@ import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LTE_M
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LT_MASK;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.MUL;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.SUB;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastBinaryDoubleOp;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastBinaryOp;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastScalar;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.elementwiseBinaryOp;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
@@ -1419,7 +1419,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
             } else {
 
-                result = broadcastBinaryDoubleOp(
+                result = broadcastBinaryOp(
                     buffer, shape,
                     rightBuffer, right.getShape(),
                     op, inPlace
