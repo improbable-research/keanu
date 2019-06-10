@@ -215,7 +215,7 @@ public class GenericTensor<T> implements Tensor<T> {
     @Override
     public Tensor<T> permute(int... rearrange) {
 
-        long[] resultShape = TensorShape.getPermutedResultShape(shape, rearrange);
+        long[] resultShape = TensorShape.getPermutedIndices(shape, rearrange);
         long[] resultStride = TensorShape.getRowFirstStride(resultShape);
         T[] newBuffer = Arrays.copyOf(data, data.length);
 
@@ -223,11 +223,7 @@ public class GenericTensor<T> implements Tensor<T> {
 
             long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
 
-            long[] permutedIndex = new long[shapeIndices.length];
-
-            for (int p = 0; p < permutedIndex.length; p++) {
-                permutedIndex[p] = shapeIndices[rearrange[p]];
-            }
+            long[] permutedIndex = TensorShape.getPermutedIndices(shapeIndices, rearrange);
 
             int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, permutedIndex));
 

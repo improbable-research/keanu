@@ -79,7 +79,7 @@ public class JVMBooleanTensor implements BooleanTensor {
     @Override
     public BooleanTensor permute(int... rearrange) {
 
-        long[] resultShape = TensorShape.getPermutedResultShape(shape, rearrange);
+        long[] resultShape = TensorShape.getPermutedIndices(shape, rearrange);
         long[] resultStride = TensorShape.getRowFirstStride(resultShape);
         boolean[] newBuffer = new boolean[data.length];
 
@@ -87,11 +87,7 @@ public class JVMBooleanTensor implements BooleanTensor {
 
             long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
 
-            long[] permutedIndex = new long[shapeIndices.length];
-
-            for (int p = 0; p < permutedIndex.length; p++) {
-                permutedIndex[p] = shapeIndices[rearrange[p]];
-            }
+            long[] permutedIndex = TensorShape.getPermutedIndices(shapeIndices, rearrange);
 
             int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, permutedIndex));
 

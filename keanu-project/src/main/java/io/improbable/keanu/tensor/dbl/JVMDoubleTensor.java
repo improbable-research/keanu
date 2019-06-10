@@ -239,17 +239,14 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor permute(int... rearrange) {
         Preconditions.checkArgument(rearrange.length == shape.length);
-        long[] resultShape = TensorShape.getPermutedResultShape(shape, rearrange);
+        long[] resultShape = TensorShape.getPermutedIndices(shape, rearrange);
         long[] resultStride = TensorShape.getRowFirstStride(resultShape);
         double[] newBuffer = new double[buffer.length];
 
         for (int i = 0; i < buffer.length; i++) {
             long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
-            long[] permutedIndex = new long[shapeIndices.length];
 
-            for (int p = 0; p < permutedIndex.length; p++) {
-                permutedIndex[p] = shapeIndices[rearrange[p]];
-            }
+            long[] permutedIndex = TensorShape.getPermutedIndices(shapeIndices, rearrange);
 
             int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, permutedIndex));
 
@@ -904,7 +901,7 @@ public class JVMDoubleTensor extends DoubleTensor {
                 toConcatOnDimensionZero[i] = toConcat[i].permute(rearrange);
             }
 
-            long[] permutedConcatShape = TensorShape.getPermutedResultShape(concatShape, rearrange);
+            long[] permutedConcatShape = TensorShape.getPermutedIndices(concatShape, rearrange);
             JVMDoubleTensor concatOnDimZero = concatOnDimensionZero(permutedConcatShape, toConcatOnDimensionZero);
 
             return concatOnDimZero.permute(invertedPermute(rearrange));
@@ -1057,7 +1054,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             double[] buffer = new double[subTensorLength];
             System.arraycopy(rawBuffer, rawBufferPosition, buffer, 0, buffer.length);
 
-            long[] subTensorPermutedShape = TensorShape.getPermutedResultShape(subTensorShape, moveDimToZero);
+            long[] subTensorPermutedShape = TensorShape.getPermutedIndices(subTensorShape, moveDimToZero);
             DoubleTensor subTensor = DoubleTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
             splitTensor.add(subTensor);
 

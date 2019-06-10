@@ -269,12 +269,12 @@ public class TensorShape {
         }
     }
 
-    public static long[] getPermutedResultShape(long[] shape, int... rearrange) {
-        long[] permutedShape = new long[shape.length];
-        for (int i = 0; i < shape.length; i++) {
-            permutedShape[i] = shape[rearrange[i]];
+    public static long[] getPermutedIndices(long[] indices, int... rearrange) {
+        long[] permutedIndices = new long[indices.length];
+        for (int i = 0; i < indices.length; i++) {
+            permutedIndices[i] = indices[rearrange[i]];
         }
-        return permutedShape;
+        return permutedIndices;
     }
 
     public static int[] invertedPermute(int[] rearrange) {
