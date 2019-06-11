@@ -1302,10 +1302,10 @@ public class JVMDoubleTensor extends DoubleTensor {
         final long[] rightShape = right.getShape();
 
         final JVMDoubleTensor result = broadcastIfNeeded(
-            buffer, shape, stride,
-            rightBuffer, rightShape, right.getStride(),
+            buffer, shape, stride, buffer.length,
+            rightBuffer, rightShape, right.getStride(), rightBuffer.length,
             op, inPlace
-        );
+        ).toJVMDoubleTensor();
 
         if (inPlace) {
             this.buffer = result.buffer;
