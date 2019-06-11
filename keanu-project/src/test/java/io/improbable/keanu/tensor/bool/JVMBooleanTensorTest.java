@@ -319,4 +319,65 @@ public class JVMBooleanTensorTest {
         assertThat(actual, valuesAndShapesMatch(expected));
     }
 
+    @Test
+    public void canConvertToIntegerMask() {
+        BooleanTensor a = BooleanTensor.create(
+            true, true, false,
+            true, false, true
+        ).reshape(2, 3);
+
+        IntegerTensor actual = a.toIntegerMask();
+        IntegerTensor expected = IntegerTensor.create(
+            1, 1, 0,
+            1, 0, 1
+        ).reshape(2, 3);
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canConvertToDoubleMask() {
+        BooleanTensor a = BooleanTensor.create(
+            true, true, false,
+            true, false, true
+        ).reshape(2, 3);
+
+        DoubleTensor actual = a.toDoubleMask();
+        DoubleTensor expected = DoubleTensor.create(
+            1., 1., 0.,
+            1., 0., 1.
+        ).reshape(2, 3);
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canSliceBooleanTensor() {
+        BooleanTensor a = BooleanTensor.create(
+            true, true, false,
+            true, false, true
+        ).reshape(2, 3);
+
+        assertThat(a.slice(0, 0), valuesAndShapesMatch(BooleanTensor.create(true, true, false)));
+        assertThat(a.slice(0, 1), valuesAndShapesMatch(BooleanTensor.create(true, false, true)));
+        assertThat(a.slice(1, 0), valuesAndShapesMatch(BooleanTensor.create(true, true)));
+        assertThat(a.slice(1, 1), valuesAndShapesMatch(BooleanTensor.create(true, false)));
+        assertThat(a.slice(1, 2), valuesAndShapesMatch(BooleanTensor.create(false, true)));
+    }
+
+    @Test
+    public void canTakeBooleanTensor() {
+        BooleanTensor a = BooleanTensor.create(
+            true, true, false,
+            true, false, true
+        ).reshape(2, 3);
+
+        assertThat(a.take(0, 0), valuesAndShapesMatch(BooleanTensor.scalar(true)));
+        assertThat(a.take(0, 1), valuesAndShapesMatch(BooleanTensor.scalar(true)));
+        assertThat(a.take(0, 2), valuesAndShapesMatch(BooleanTensor.scalar(false)));
+        assertThat(a.take(1, 0), valuesAndShapesMatch(BooleanTensor.scalar(true)));
+        assertThat(a.take(1, 1), valuesAndShapesMatch(BooleanTensor.scalar(false)));
+        assertThat(a.take(1, 2), valuesAndShapesMatch(BooleanTensor.scalar(true)));
+    }
+
 }
