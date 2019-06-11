@@ -5,10 +5,12 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
@@ -18,13 +20,14 @@ import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.getShapeIndices;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastIfNeeded;
 import static java.util.Arrays.copyOf;
 
 public class JVMBooleanTensor implements BooleanTensor {
 
-    private final boolean[] buffer;
-    private final long[] shape;
-    private final long[] stride;
+    private boolean[] buffer;
+    private long[] shape;
+    private long[] stride;
 
     /**
      * @param buffer tensor buffer used c ordering
@@ -243,29 +246,17 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor andInPlace(BooleanTensor that) {
-        Boolean[] thatData = that.asFlatArray();
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = buffer[i] && thatData[i];
-        }
-        return this;
+        return binaryBooleanOpWithAutoBroadcast(that, (l, r) -> l && r, true);
     }
 
     @Override
     public BooleanTensor orInPlace(BooleanTensor that) {
-        Boolean[] thatData = that.asFlatArray();
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = buffer[i] || thatData[i];
-        }
-        return this;
+        return binaryBooleanOpWithAutoBroadcast(that, (l, r) -> l || r, true);
     }
 
     @Override
     public BooleanTensor xorInPlace(BooleanTensor that) {
-        Boolean[] thatData = that.asFlatArray();
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = buffer[i] ^ thatData[i];
-        }
-        return this;
+        return binaryBooleanOpWithAutoBroadcast(that, (l, r) -> l ^ r, true);
     }
 
     @Override
@@ -294,6 +285,29 @@ public class JVMBooleanTensor implements BooleanTensor {
             }
         }
         return true;
+    }
+
+    private BooleanTensor binaryBooleanOpWithAutoBroadcast(BooleanTensor right,
+                                                           BiFunction<Boolean, Boolean, Boolean> op,
+                                                           boolean inPlace) {
+        final boolean[] rightBuffer = getRawBufferIfJVMTensor(right);
+        final long[] rightShape = right.getShape();
+
+        final JVMDoubleTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
+            buffer, shape, stride, buffer.length,
+            rightBuffer, rightShape, right.getStride(), rightBuffer.length,
+            op, inPlace
+        );
+
+        if (inPlace) {
+            this.buffer = (boolean[]) result.outputBuffer;
+            this.shape = result.outputShape;
+            this.stride = result.outputStride;
+
+            return this;
+        } else {
+            return new JVMBooleanTensor((boolean[]) result.outputBuffer, result.outputShape, result.outputStride);
+        }
     }
 
     @Override

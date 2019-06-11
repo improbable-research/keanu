@@ -1301,22 +1301,21 @@ public class JVMDoubleTensor extends DoubleTensor {
         final double[] rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMDoubleTensor result = broadcastIfNeeded(
+        final JVMDoubleTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
             buffer, shape, stride, buffer.length,
             rightBuffer, rightShape, right.getStride(), rightBuffer.length,
             op, inPlace
-        ).toJVMDoubleTensor();
+        );
 
         if (inPlace) {
-            this.buffer = result.buffer;
-            this.shape = result.shape;
-            this.stride = result.stride;
+            this.buffer = (double[]) result.outputBuffer;
+            this.shape = result.outputShape;
+            this.stride = result.outputStride;
 
             return this;
         } else {
-            return result;
+            return new JVMDoubleTensor((double[]) result.outputBuffer, result.outputShape, result.outputStride);
         }
-
     }
 
     @Override

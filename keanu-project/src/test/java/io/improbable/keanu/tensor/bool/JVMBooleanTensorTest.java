@@ -265,4 +265,58 @@ public class JVMBooleanTensorTest {
         BooleanTensor.stack(-4, matrixD, matrixD);
     }
 
+    @Test
+    public void canBroadcastAnd() {
+        BooleanTensor a = BooleanTensor.create(
+            true, true, false,
+            true, true, true
+        ).reshape(2, 3);
+
+        BooleanTensor b = BooleanTensor.create(true, false, true);
+
+        BooleanTensor actual = a.and(b);
+        BooleanTensor expected = BooleanTensor.create(
+            true, false, false,
+            true, false, true
+        ).reshape(2, 3);
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canBroadcastOr() {
+        BooleanTensor a = BooleanTensor.create(
+            true, true, false,
+            true, false, true
+        ).reshape(2, 3);
+
+        BooleanTensor b = BooleanTensor.create(true, false, true);
+
+        BooleanTensor actual = a.or(b);
+        BooleanTensor expected = BooleanTensor.create(
+            true, true, true,
+            true, false, true
+        ).reshape(2, 3);
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canBroadcastXor() {
+        BooleanTensor a = BooleanTensor.create(
+            true, true, false,
+            true, false, true
+        ).reshape(2, 3);
+
+        BooleanTensor b = BooleanTensor.create(true, false, true);
+
+        BooleanTensor actual = a.xor(b);
+        BooleanTensor expected = BooleanTensor.create(
+            false, true, true,
+            false, false, false
+        ).reshape(2, 3);
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
 }
