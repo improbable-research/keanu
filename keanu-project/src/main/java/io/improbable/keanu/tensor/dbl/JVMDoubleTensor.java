@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
@@ -219,7 +220,9 @@ public class JVMDoubleTensor extends DoubleTensor {
             } else if (that.isScalar()) {
                 return elementwiseEquals(((DoubleTensor) that).scalar());
             } else {
-                DoubleTensor equalsMask = broadcastableBinaryDoubleOp((l, r) -> l.equals(r) ? 1.0 : 0.0, (DoubleTensor) that);
+                DoubleTensor equalsMask = broadcastableBinaryDoubleOp(
+                    (l, r) -> l.doubleValue() == r.doubleValue() ? 1.0 : 0.0, (DoubleTensor) that
+                );
 
                 return maskToBooleanTensor(equalsMask);
             }
@@ -423,9 +426,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     public DoubleTensor matrixMultiply(DoubleTensor that) {
 
         final long[] thatShape = that.getShape();
-        if (this.shape.length != 2 || thatShape.length != 2 || shape[1] != thatShape[0]) {
-            throw new IllegalArgumentException("Cannot matrix multiply shape " + Arrays.toString(shape) + " shape " + Arrays.toString(thatShape));
-        }
+        TensorShapeValidation.getMatrixMultiplicationResultingShape(shape, thatShape);
 
         //C = alpha*A*B + beta*C
         //(M,N) = (M,k)(k,N) + (M,N)
@@ -1400,7 +1401,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public String toString() {
-        return "JVMDoubleTensor{" +
+        return "{" +
             "shape=" + Arrays.toString(shape) +
             ", buffer=" + Arrays.toString(buffer) +
             '}';

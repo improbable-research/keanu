@@ -2,12 +2,10 @@ package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
@@ -22,19 +20,12 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
     }
 
     public static DoubleTensor create(double value, long[] shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarDoubleTensor(value);
-        } else {
-            return factory.create(value, shape);
-        }
+        return factory.create(value, shape);
+
     }
 
     public static DoubleTensor create(double[] values, long... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
-            return new ScalarDoubleTensor(values[0]);
-        } else {
-            return factory.create(values, shape);
-        }
+        return factory.create(values, shape);
     }
 
     public static DoubleTensor create(double... values) {
@@ -42,27 +33,15 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
     }
 
     public static DoubleTensor ones(long... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarDoubleTensor(1.0);
-        } else {
-            return factory.ones(shape);
-        }
+        return factory.ones(shape);
     }
 
     public static DoubleTensor eye(long n) {
-        if (n == 1) {
-            return new ScalarDoubleTensor(1.0);
-        } else {
-            return factory.eye(n);
-        }
+        return factory.eye(n);
     }
 
     public static DoubleTensor zeros(long... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarDoubleTensor(0.0);
-        } else {
-            return factory.zeros(shape);
-        }
+        return factory.zeros(shape);
     }
 
     public static DoubleTensor linspace(double start, double end, int numberOfPoints) {
@@ -89,7 +68,7 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
     }
 
     public static DoubleTensor scalar(double scalarValue) {
-        return new ScalarDoubleTensor(scalarValue);
+        return factory.scalar(scalarValue);
     }
 
     public static DoubleTensor vector(double... values) {

@@ -328,6 +328,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor value) {
+        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
         INDArray mmulResult = tensor.mmul(unsafeGetNd4J(value));
         return new Nd4jDoubleTensor(mmulResult);
     }

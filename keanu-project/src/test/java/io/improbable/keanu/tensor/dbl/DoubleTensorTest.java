@@ -375,6 +375,14 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canTestIfIsNaNWithScalar() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
+        assertThat(nan.isNaN(), hasValue(true));
+        assertThat(notNan.isNaN(), hasValue(false));
+    }
+
+    @Test
     public void canSetWhenNaN() {
         DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new long[]{2, 2});
 
@@ -458,6 +466,15 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canElementwiseEqualsAScalarValueWithScalar() {
+        double value = 42.0;
+        DoubleTensor tensor = DoubleTensor.create(value);
+
+        assertThat(tensor.elementwiseEquals(value), hasValue(true));
+        assertThat(tensor.elementwiseEquals(value + 0.1), hasValue(false));
+    }
+
+    @Test
     public void canEqualsWithEpsilon() {
         double[] aData = new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
@@ -488,6 +505,30 @@ public class DoubleTensorTest {
         DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(-4.5), DoubleTensor.scalar(2.0));
         DoubleTensor expected = DoubleTensor.create(new double[]{0.25, 2.0, -4.0, -4.5}, new long[]{1, 4});
         assertEquals(expected, clampedA);
+    }
+
+    @Test
+    public void doesClampScalarWithinBounds() {
+        DoubleTensor A = DoubleTensor.scalar(0.25);
+        DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));
+        double expected = 0.25;
+        assertEquals(expected, clampedA.scalar(), 0.0);
+    }
+
+    @Test
+    public void doesClampScalarGreaterThanBounds() {
+        DoubleTensor A = DoubleTensor.scalar(5);
+        DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));
+        double expected = 1.0;
+        assertEquals(expected, clampedA.scalar(), 0.0);
+    }
+
+    @Test
+    public void doesClampScalarLessThanBounds() {
+        DoubleTensor A = DoubleTensor.scalar(-2);
+        DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));
+        double expected = 0.0;
+        assertEquals(expected, clampedA.scalar(), 0.0);
     }
 
     private void assertAllValuesAre(DoubleTensor tensor, double v) {
@@ -936,6 +977,12 @@ public class DoubleTensorTest {
         tensor.argMax(2);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void argMaxFailsForAxisTooHighWithScalar() {
+        DoubleTensor tensor = DoubleTensor.scalar(1);
+        tensor.argMax(2);
+    }
+
     private void assertCanSplit(long[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {
 
         long[] splitIndices = new long[concatenatedIndices.length];
@@ -979,6 +1026,18 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void youCanFixAValidationIssueByReplacingANaN() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor zero = DoubleTensor.scalar(0.);
+        DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.NAN_FIXER;
+        nan = validator.validate(nan);
+        notNan = validator.validate(notNan);
+        assertThat(nan, equalTo(zero));
+        assertThat(notNan, equalTo(notNan));
+    }
+
+    @Test
     public void youCanCheckForNaNs() {
         DoubleTensor containsNan = DoubleTensor.create(new double[]{
                 0.0, -1.0, -Double.NEGATIVE_INFINITY, Double.NaN,
@@ -1012,6 +1071,48 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void youCanReplaceNaNsWithScalar() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
+        assertThat(nan.replaceNaN(0.), hasValue(0.));
+        assertThat(notNan.replaceNaN(0.), hasValue(Double.NEGATIVE_INFINITY));
+    }
+
+    @Test
+    public void canSetWhenNaNWithScalar() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor mask = DoubleTensor.scalar(1.);
+        assertThat(nan.setWithMaskInPlace(mask, 2.), hasValue(2.));
+    }
+
+    @Test
+    public void canSetToZeroWhenNaNWithScalar() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor mask = DoubleTensor.scalar(1.);
+        assertThat(nan.setWithMaskInPlace(mask, 0.), hasValue(0.));
+    }
+
+    @Test
+    public void youCanCheckForZerosWithScalar() {
+        DoubleTensor zero = DoubleTensor.scalar(0.);
+        DoubleTensor nonZero = DoubleTensor.scalar(1e-8);
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.ZERO_CATCHER;
+        assertThat(validator.check(zero), equalTo(BooleanTensor.scalar(false)));
+        assertThat(validator.check(nonZero), equalTo(BooleanTensor.scalar(true)));
+    }
+
+    @Test
+    public void youCanCheckForNans() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.NAN_CATCHER;
+        assertThat(nan.isNaN(), equalTo(BooleanTensor.scalar(true)));
+        assertThat(notNan.isNaN(), equalTo(BooleanTensor.scalar(false)));
+        assertThat(validator.check(nan), equalTo(BooleanTensor.scalar(false)));
+        assertThat(validator.check(notNan), equalTo(BooleanTensor.scalar(true)));
+    }
+
+    @Test
     public void youCanDoYLogXEvenWhenBothAreZero() {
         DoubleTensor x = DoubleTensor.create(
             Double.MIN_VALUE, 1e-8, 1., 1e8);
@@ -1025,6 +1126,13 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void youCanDoYLogXEvenWhenBothAreZeroWithScalar() {
+        DoubleTensor zero = DoubleTensor.scalar(0.);
+        assertThat(zero.safeLogTimes(zero), hasValue(0.));
+        assertThat(zero.log().times(zero), hasValue(Double.NaN));
+    }
+
+    @Test
     public void logTimesFailsIfYouPassInATensorThatAlreadyContainsNaN() {
         expectedException.expect(TensorValueException.class);
         expectedException.expectMessage("Invalid value found");
@@ -1035,12 +1143,32 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void logTimesFailsIfYouPassInATensorThatAlreadyContainsNaNWithScalar() {
+        expectedException.expect(TensorValueException.class);
+        expectedException.expectMessage("Invalid value found");
+
+        DoubleTensor x = DoubleTensor.scalar(1.);
+        DoubleTensor y = DoubleTensor.scalar(Double.NaN);
+        x.safeLogTimes(y);
+    }
+
+    @Test
     public void logTimesFailsIfYouStartWithATensorThatAlreadyContainsNaN() {
         expectedException.expect(TensorValueException.class);
         expectedException.expectMessage("Invalid value found");
 
         DoubleTensor x = DoubleTensor.create(1., Double.NaN);
         DoubleTensor y = DoubleTensor.create(1., 1.);
+        x.safeLogTimes(y);
+    }
+
+    @Test
+    public void logTimesFailsIfYouStartWithATensorThatAlreadyContainsNaNWithScalar() {
+        expectedException.expect(TensorValueException.class);
+        expectedException.expectMessage("Invalid value found");
+
+        DoubleTensor x = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor y = DoubleTensor.scalar(1.);
         x.safeLogTimes(y);
     }
 
@@ -1062,6 +1190,20 @@ public class DoubleTensorTest {
         TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(x -> x > 0., TensorValidationPolicy.changeValueTo(1e-8));
         DoubleTensor actual = validator.validate(containsZero);
         assertThat(actual, equalTo(expectedResult));
+    }
+
+    @Test
+    public void youCanFixACustomValidationIssueByReplacingTheValueWithScalar() {
+        DoubleTensor tensor1 = DoubleTensor.scalar(0.);
+        DoubleTensor tensor2 = DoubleTensor.scalar(1.);
+        DoubleTensor one = DoubleTensor.scalar(1.);
+        DoubleTensor notZero = DoubleTensor.scalar(1e-8);
+        Function<Double, Boolean> checkFunction = x -> x > 0.;
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(checkFunction, TensorValidationPolicy.changeValueTo(1e-8));
+        tensor1 = validator.validate(tensor1);
+        tensor2 = validator.validate(tensor2);
+        assertThat(tensor1, equalTo(notZero));
+        assertThat(tensor2, equalTo(one));
     }
 
     @Test
@@ -1342,6 +1484,97 @@ public class DoubleTensorTest {
     public void doesThrowOnSetByInvalidIndex() {
         DoubleTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2);
         A.setValue(0.5, 1, 0);
+    }
+
+    @Test
+    public void youCanDoTensorYLogXEvenWhenBothAreZero() {
+        DoubleTensor zero = DoubleTensor.scalar(0.);
+        DoubleTensor zeroTensor = DoubleTensor.create(0., 0., 0.);
+        assertThat(zero.log().times(zeroTensor), hasValue(Double.NaN, Double.NaN, Double.NaN));
+        assertThat(zero.safeLogTimes(zeroTensor), hasValue(0., 0., 0.));
+    }
+
+    @Test
+    public void canArgFindMaxOfScalar() {
+        DoubleTensor tensor = DoubleTensor.scalar(1).reshape(1, 1);
+
+        assertEquals(0, tensor.argMax());
+        assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.vector(0)));
+        assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.vector(0)));
+    }
+
+    @Test
+    public void comparesScalarWithDoubleTensor() {
+        DoubleTensor value = DoubleTensor.scalar(1.);
+        DoubleTensor differentValue = DoubleTensor.create(1., 2., 3.);
+        BooleanTensor result = value.elementwiseEquals(differentValue);
+        assertThat(result, hasValue(true, false, false));
+    }
+
+    @Test
+    public void doesKeepRankOnGTEq() {
+        DoubleTensor value = DoubleTensor.create(new double[]{1}, 1, 1, 1);
+        assertEquals(3, value.greaterThanOrEqual(2).getRank());
+    }
+
+    @Test
+    public void doesKeepRankOnGT() {
+        DoubleTensor value = DoubleTensor.create(new double[]{1}, 1, 1, 1);
+        assertEquals(3, value.greaterThan(2).getRank());
+    }
+
+    @Test
+    public void doesKeepRankOnLT() {
+        DoubleTensor value = DoubleTensor.create(new double[]{1}, 1, 1, 1);
+        assertEquals(3, value.lessThan(2).getRank());
+    }
+
+    @Test
+    public void doesKeepRankOnLTEq() {
+        DoubleTensor value = DoubleTensor.create(new double[]{1}, 1, 1, 1);
+        assertEquals(3, value.lessThanOrEqual(2).getRank());
+    }
+
+    @Test
+    public void doesMatrixMultiplyWhen1x1() {
+        DoubleTensor lengthOne = DoubleTensor.scalar(2).reshape(1, 1);
+        DoubleTensor matrix = DoubleTensor.create(3, 4).reshape(1, 2);
+        DoubleTensor result = lengthOne.matrixMultiply(matrix);
+        DoubleTensor expected = DoubleTensor.create(6, 8).reshape(1, 2);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void doesThrowOnMatrixMultiplyWhenRank0() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Matrix multiply must be used on matrices");
+
+        DoubleTensor lengthOne = DoubleTensor.scalar(2);
+        DoubleTensor matrix = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
+        lengthOne.matrixMultiply(matrix);
+    }
+
+    @Test
+    public void doesTensorMultiplyWithScalar() {
+        DoubleTensor lengthOne = DoubleTensor.scalar(2).reshape(1);
+        DoubleTensor matrix = DoubleTensor.arange(0, 4).reshape(2, 1, 2);
+        DoubleTensor result = lengthOne.tensorMultiply(matrix, new int[]{0}, new int[]{1});
+        DoubleTensor expected = DoubleTensor.create(0, 2, 4, 6).reshape(2, 2);
+        assertEquals(expected, result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnInvalidLeftDimsTensorMultiply() {
+        DoubleTensor lengthOne = DoubleTensor.scalar(2);
+        DoubleTensor matrix = DoubleTensor.arange(0, 4).reshape(2, 1, 2);
+        lengthOne.tensorMultiply(matrix, new int[]{0}, new int[]{1});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnInvalidRightDimsTensorMultiply() {
+        DoubleTensor lengthOne = DoubleTensor.scalar(2).reshape(1);
+        DoubleTensor matrix = DoubleTensor.arange(0, 4).reshape(2, 1, 2);
+        lengthOne.tensorMultiply(matrix, new int[]{0}, new int[]{3});
     }
 
 

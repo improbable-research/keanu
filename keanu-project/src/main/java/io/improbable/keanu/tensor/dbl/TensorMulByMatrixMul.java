@@ -4,6 +4,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class TensorMulByMatrixMul {
@@ -49,6 +50,18 @@ class TensorMulByMatrixMul {
 
         int validationLength = Math.min(dimsLeft.length, dimsRight.length);
         for (int i = 0; i < validationLength; i++) {
+
+            if (leftShape.length <= dimsLeft[i]) {
+                throw new IllegalArgumentException(
+                    "Invalid left dimension " + dimsLeft[i] + " for shape " + Arrays.toString(leftShape)
+                );
+            }
+
+            if (rightShape.length <= dimsRight[i]) {
+                throw new IllegalArgumentException(
+                    "Invalid right dimension " + dimsRight[i] + " for shape " + Arrays.toString(rightShape)
+                );
+            }
 
             if (leftShape[dimsLeft[i]] != rightShape[dimsRight[i]]) {
                 throw new IllegalArgumentException("Size of the given axes at each dimension must be the same size.");

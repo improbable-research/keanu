@@ -14,14 +14,14 @@ public class DoubleScalarTensorShapePreservationTest {
 
     private static DoubleTensor doubleTensor;
     private static DoubleTensor lengthOneTensor;
-    private static ScalarDoubleTensor scalarDoubleTensor;
+    private static DoubleTensor scalarDoubleTensor;
     private static DoubleTensor[] tensors;
 
     @Before
     public void setup() {
         doubleTensor = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, new long[]{2, 3});
         lengthOneTensor = DoubleTensor.create(new double[]{1.0}, new long[]{1, 1, 1, 1});
-        scalarDoubleTensor = new ScalarDoubleTensor(1.);
+        scalarDoubleTensor = DoubleTensor.scalar(1.0);
         tensors = new DoubleTensor[]{doubleTensor, lengthOneTensor, scalarDoubleTensor};
     }
 

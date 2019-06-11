@@ -4,10 +4,8 @@ import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.tensor.INDArrayShim;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import org.nd4j.linalg.api.buffer.DataBuffer;
@@ -16,7 +14,6 @@ import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
 import org.nd4j.linalg.factory.Nd4j;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class KeanuRandom {
@@ -58,11 +55,7 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextDouble(long[] shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarDoubleTensor(nextDouble());
-        } else {
-            return DoubleTensor.create(doubleNextDouble(shape), shape);
-        }
+        return DoubleTensor.create(doubleNextDouble(shape), shape);
     }
 
     public double nextDouble() {
@@ -82,11 +75,7 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGaussian(long[] shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarDoubleTensor(nextGaussian());
-        } else {
-            return DoubleTensor.create(doubleNextGaussian(shape), shape);
-        }
+        return DoubleTensor.create(doubleNextGaussian(shape), shape);
     }
 
     public DoubleTensor nextGaussian(long[] shape, DoubleTensor mu, DoubleTensor sigma) {
@@ -119,7 +108,6 @@ public class KeanuRandom {
 
     public IntegerTensor nextPoisson(long[] shape, DoubleTensor mu) {
         return Poisson.withParameters(mu).sample(shape, this);
-
     }
 
     public int nextInt(int maxExclusive) {
