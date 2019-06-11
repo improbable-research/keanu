@@ -287,7 +287,28 @@ public class TensorShape {
         return inverted;
     }
 
-    public static long[] getReshaped(long[] oldShape, long[] newShape, int bufferLength) {
+    public static int convertFromFlatIndexToPermutedFlatIndex(int fromFlatIndex,
+                                                              long[] shape, long[] stride,
+                                                              long[] permutedShape, long[] permutedStride,
+                                                              int[] rearrange) {
+        long[] shapeIndices = getShapeIndices(shape, stride, fromFlatIndex);
+
+        long[] permutedIndex = getPermutedIndices(shapeIndices, rearrange);
+
+        return Ints.checkedCast(getFlatIndex(permutedShape, permutedStride, permutedIndex));
+    }
+
+    /**
+     * @param oldShape       The original shape to reshape from. This should have a shape length that
+     *                       matches oldShapeLength
+     * @param oldShapeLength The length of the old shape. e.g shape = [2, 2] then the length is 4
+     * @param newShape       A shape that must be the same length as oldShape unless a single -1 dimension length
+     *                       is specified. If -1 is used then a dimension length will be calculated in order to ensure
+     *                       the new shape length is equal to the old shape length.
+     * @return a copy of newShape if there is no wildcard used or a wildcard free shape with a length that matches
+     * the oldShapeLength
+     */
+    public static long[] getReshapeAllowingWildcard(long[] oldShape, int oldShapeLength, long[] newShape) {
         long newLength = 1;
         int negativeDimension = -1;
         long[] newShapeCopy = new long[newShape.length];
@@ -306,11 +327,11 @@ public class TensorShape {
             }
         }
 
-        if (newLength != bufferLength || negativeDimension >= 0) {
+        if (newLength != oldShapeLength || negativeDimension >= 0) {
             if (negativeDimension < 0) {
                 throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(oldShape) + " to " + Arrays.toString(newShapeCopy));
             } else {
-                newShapeCopy[negativeDimension] = bufferLength / newLength;
+                newShapeCopy[negativeDimension] = oldShapeLength / newLength;
             }
         }
 

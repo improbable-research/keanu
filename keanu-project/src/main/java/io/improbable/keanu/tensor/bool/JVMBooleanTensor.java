@@ -11,8 +11,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Arrays;
 
 import static com.google.common.primitives.Ints.checkedCast;
+import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
+import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
+import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
+import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
+import static io.improbable.keanu.tensor.TensorShape.getShapeIndices;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static java.util.Arrays.copyOf;
 
@@ -29,7 +34,7 @@ public class JVMBooleanTensor implements BooleanTensor {
     JVMBooleanTensor(boolean[] data, long[] shape) {
         this.data = data;
         this.shape = shape;
-        this.stride = TensorShape.getRowFirstStride(shape);
+        this.stride = getRowFirstStride(shape);
     }
 
     JVMBooleanTensor(boolean[] data, long[] shape, long[] stride) {
@@ -75,25 +80,26 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor reshape(long... newShape) {
-        return new JVMBooleanTensor(bufferCopy(), TensorShape.getReshaped(shape, newShape, data.length));
+        return new JVMBooleanTensor(bufferCopy(), getReshapeAllowingWildcard(shape, data.length, newShape));
     }
 
     @Override
     public BooleanTensor permute(int... rearrange) {
-
-        long[] resultShape = TensorShape.getPermutedIndices(shape, rearrange);
-        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        Preconditions.checkArgument(rearrange.length == shape.length);
+        long[] resultShape = getPermutedIndices(shape, rearrange);
+        long[] resultStride = getRowFirstStride(resultShape);
         boolean[] newBuffer = new boolean[data.length];
 
-        for (int i = 0; i < data.length; i++) {
+        for (int flatIndex = 0; flatIndex < data.length; flatIndex++) {
 
-            long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
+            int permutedFlatIndex = convertFromFlatIndexToPermutedFlatIndex(
+                flatIndex,
+                shape, stride,
+                resultShape, resultStride,
+                rearrange
+            );
 
-            long[] permutedIndex = TensorShape.getPermutedIndices(shapeIndices, rearrange);
-
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, permutedIndex));
-
-            newBuffer[j] = data[i];
+            newBuffer[permutedFlatIndex] = data[flatIndex];
         }
 
         return new JVMBooleanTensor(newBuffer, resultShape);
@@ -115,7 +121,7 @@ public class JVMBooleanTensor implements BooleanTensor {
                 toConcatOnDimensionZero[i] = toConcat[i].permute(rearrange);
             }
 
-            long[] permutedConcatShape = TensorShape.getPermutedIndices(concatShape, rearrange);
+            long[] permutedConcatShape = getPermutedIndices(concatShape, rearrange);
             BooleanTensor concatOnDimZero = concatOnDimensionZero(permutedConcatShape, toConcatOnDimensionZero);
 
             return concatOnDimZero.permute(invertedPermute(rearrange));
@@ -307,14 +313,14 @@ public class JVMBooleanTensor implements BooleanTensor {
     public BooleanTensor slice(int dimension, long index) {
         Preconditions.checkArgument(dimension < shape.length && index < shape[dimension]);
         long[] resultShape = ArrayUtils.remove(shape, dimension);
-        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        long[] resultStride = getRowFirstStride(resultShape);
         boolean[] newBuffer = new boolean[TensorShape.getLengthAsInt(resultShape)];
 
         for (int i = 0; i < newBuffer.length; i++) {
 
-            long[] shapeIndices = ArrayUtils.insert(dimension, TensorShape.getShapeIndices(resultShape, resultStride, i), index);
+            long[] shapeIndices = ArrayUtils.insert(dimension, getShapeIndices(resultShape, resultStride, i), index);
 
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(shape, stride, shapeIndices));
+            int j = Ints.checkedCast(getFlatIndex(shape, stride, shapeIndices));
 
             newBuffer[i] = data[j];
         }

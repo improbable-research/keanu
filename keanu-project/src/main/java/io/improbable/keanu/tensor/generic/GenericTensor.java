@@ -1,6 +1,6 @@
 package io.improbable.keanu.tensor.generic;
 
-import com.google.common.primitives.Ints;
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -10,7 +10,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.primitives.Ints.checkedCast;
+import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
+import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
+import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
+import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static java.util.Arrays.copyOf;
 
 public class GenericTensor<T> implements Tensor<T> {
@@ -34,7 +38,7 @@ public class GenericTensor<T> implements Tensor<T> {
     public GenericTensor(T[] data, long[] shape) {
         this.data = Arrays.copyOf(data, data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
-        this.stride = TensorShape.getRowFirstStride(shape);
+        this.stride = getRowFirstStride(shape);
 
         if (getLength() != data.length) {
             throw new IllegalArgumentException("Shape size does not match data length");
@@ -205,29 +209,26 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public Tensor<T> reshape(long... newShape) {
-        if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
-            throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
-                + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
-        }
-        return new GenericTensor<>(data, newShape);
+        return new GenericTensor<>(Arrays.copyOf(data, data.length), getReshapeAllowingWildcard(shape, data.length, newShape));
     }
 
     @Override
     public Tensor<T> permute(int... rearrange) {
-
-        long[] resultShape = TensorShape.getPermutedIndices(shape, rearrange);
-        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        Preconditions.checkArgument(rearrange.length == shape.length);
+        long[] resultShape = getPermutedIndices(shape, rearrange);
+        long[] resultStride = getRowFirstStride(resultShape);
         T[] newBuffer = Arrays.copyOf(data, data.length);
 
-        for (int i = 0; i < data.length; i++) {
+        for (int flatIndex = 0; flatIndex < data.length; flatIndex++) {
 
-            long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
+            int permutedFlatIndex = convertFromFlatIndexToPermutedFlatIndex(
+                flatIndex,
+                shape, stride,
+                resultShape, resultStride,
+                rearrange
+            );
 
-            long[] permutedIndex = TensorShape.getPermutedIndices(shapeIndices, rearrange);
-
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, permutedIndex));
-
-            newBuffer[j] = data[i];
+            newBuffer[permutedFlatIndex] = data[flatIndex];
         }
 
         return new GenericTensor<>(newBuffer, resultShape);

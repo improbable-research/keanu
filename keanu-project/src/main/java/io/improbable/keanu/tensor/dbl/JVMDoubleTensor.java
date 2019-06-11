@@ -20,8 +20,12 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
+import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
+import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
+import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
@@ -55,7 +59,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     JVMDoubleTensor(double[] data, long[] shape) {
         this.shape = shape;
-        this.stride = TensorShape.getRowFirstStride(shape);
+        this.stride = getRowFirstStride(shape);
         this.buffer = data;
     }
 
@@ -204,7 +208,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reshape(long... newShape) {
-        return new JVMDoubleTensor(bufferCopy(), TensorShape.getReshaped(shape, newShape, buffer.length));
+        return new JVMDoubleTensor(bufferCopy(), getReshapeAllowingWildcard(shape, buffer.length, newShape));
     }
 
     @Override
@@ -238,18 +242,20 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor permute(int... rearrange) {
         Preconditions.checkArgument(rearrange.length == shape.length);
-        long[] resultShape = TensorShape.getPermutedIndices(shape, rearrange);
-        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        long[] resultShape = getPermutedIndices(shape, rearrange);
+        long[] resultStride = getRowFirstStride(resultShape);
         double[] newBuffer = new double[buffer.length];
 
-        for (int i = 0; i < buffer.length; i++) {
-            long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
+        for (int flatIndex = 0; flatIndex < buffer.length; flatIndex++) {
 
-            long[] permutedIndex = TensorShape.getPermutedIndices(shapeIndices, rearrange);
+            int permutedFlatIndex = convertFromFlatIndexToPermutedFlatIndex(
+                flatIndex,
+                shape, stride,
+                resultShape, resultStride,
+                rearrange
+            );
 
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, permutedIndex));
-
-            newBuffer[j] = buffer[i];
+            newBuffer[permutedFlatIndex] = buffer[flatIndex];
         }
 
         return new JVMDoubleTensor(newBuffer, resultShape);
@@ -304,7 +310,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         overDimensions = TensorShape.getAbsoluteDimensions(this.shape.length, overDimensions);
 
         long[] resultShape = TensorShape.getSummationResultShape(shape, overDimensions);
-        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        long[] resultStride = getRowFirstStride(resultShape);
         double[] newBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
 
         for (int i = 0; i < buffer.length; i++) {
@@ -864,7 +870,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     public DoubleTensor slice(int dimension, long index) {
         Preconditions.checkArgument(dimension < shape.length && index < shape[dimension]);
         long[] resultShape = ArrayUtils.remove(shape, dimension);
-        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        long[] resultStride = getRowFirstStride(resultShape);
         double[] newBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
 
         for (int i = 0; i < newBuffer.length; i++) {
@@ -900,7 +906,7 @@ public class JVMDoubleTensor extends DoubleTensor {
                 toConcatOnDimensionZero[i] = toConcat[i].permute(rearrange);
             }
 
-            long[] permutedConcatShape = TensorShape.getPermutedIndices(concatShape, rearrange);
+            long[] permutedConcatShape = getPermutedIndices(concatShape, rearrange);
             DoubleTensor concatOnDimZero = concatOnDimensionZero(permutedConcatShape, toConcatOnDimensionZero);
 
             return concatOnDimZero.permute(invertedPermute(rearrange));
@@ -1008,7 +1014,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             double[] buffer = new double[subTensorLength];
             System.arraycopy(rawBuffer, rawBufferPosition, buffer, 0, buffer.length);
 
-            long[] subTensorPermutedShape = TensorShape.getPermutedIndices(subTensorShape, moveDimToZero);
+            long[] subTensorPermutedShape = getPermutedIndices(subTensorShape, moveDimToZero);
             DoubleTensor subTensor = DoubleTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
             splitTensor.add(subTensor);
 
