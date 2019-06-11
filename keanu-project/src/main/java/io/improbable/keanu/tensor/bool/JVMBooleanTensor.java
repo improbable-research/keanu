@@ -361,7 +361,7 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor duplicate() {
-        return new JVMBooleanTensor(copyOf(buffer, buffer.length), copyOf(shape, shape.length));
+        return new JVMBooleanTensor(copyOf(buffer, buffer.length), copyOf(shape, shape.length), copyOf(stride, stride.length));
     }
 
     @Override
