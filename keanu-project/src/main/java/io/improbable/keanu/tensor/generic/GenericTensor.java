@@ -25,6 +25,10 @@ public class GenericTensor<T> implements Tensor<T> {
         return new GenericTensor<>(shape, data);
     }
 
+    public static <T> GenericTensor<T> create(T... data) {
+        return create(data, new long[]{data.length});
+    }
+
     public static <T> GenericTensor<T> create(T[] data, long[] shape) {
         return new GenericTensor<>(data, shape);
     }
@@ -95,9 +99,8 @@ public class GenericTensor<T> implements Tensor<T> {
 
         GenericTensor<?> that = (GenericTensor<?>) o;
 
-        if (!Arrays.equals(data, that.data)) return false;
         if (!Arrays.equals(shape, that.shape)) return false;
-        return Arrays.equals(stride, that.stride);
+        return Arrays.equals(data, that.data);
     }
 
     @Override
@@ -109,7 +112,7 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public FlattenedView<T> getFlattenedView() {
-        return new BaseSimpleFlattenedView<T>(data);
+        return new BaseSimpleFlattenedView<>(data);
     }
 
     @Override
@@ -189,12 +192,12 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public Tensor<T> reshape(long... newShape) {
+    public GenericTensor<T> reshape(long... newShape) {
         return new GenericTensor<>(Arrays.copyOf(data, data.length), getReshapeAllowingWildcard(shape, data.length, newShape));
     }
 
     @Override
-    public Tensor<T> permute(int... rearrange) {
+    public GenericTensor<T> permute(int... rearrange) {
         Preconditions.checkArgument(rearrange.length == shape.length);
         long[] resultShape = getPermutedIndices(shape, rearrange);
         long[] resultStride = getRowFirstStride(resultShape);
@@ -216,7 +219,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public Tensor<T> slice(int dimension, long index) {
+    public GenericTensor<T> slice(int dimension, long index) {
         T[] flat = asFlatArray();
         List<T> tadded = new ArrayList<>();
         for (int i = 0; i < flat.length; i++) {
@@ -231,7 +234,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public Tensor<T> take(long... index) {
+    public GenericTensor<T> take(long... index) {
         return scalar(getValue(index));
     }
 
