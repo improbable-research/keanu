@@ -1,7 +1,10 @@
 package io.improbable.keanu.tensor.generic;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
@@ -20,7 +23,7 @@ public class GenericTensorTest {
     public void canElementwiseEqualsAScalarValue() {
         String value = "foo";
         String otherValue = "bar";
-        GenericTensor<String> allTheSame = new GenericTensor<>(new long[]{2, 3}, value);
+        GenericTensor<String> allTheSame = GenericTensor.createFilled(value, new long[]{2, 3});
         GenericTensor<String> notAllTheSame = allTheSame.duplicate();
         notAllTheSame.setValue(otherValue, 1, 1);
 
@@ -31,7 +34,7 @@ public class GenericTensorTest {
     @Test
     public void canGetRandomAccessValue() {
 
-        Tensor<Something> somethingTensor = new GenericTensor<>(
+        Tensor<Something> somethingTensor = GenericTensor.create(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,
@@ -46,7 +49,7 @@ public class GenericTensorTest {
     @Test
     public void canSetRandomAccessValue() {
 
-        GenericTensor<Something> somethingTensor = new GenericTensor<>(
+        GenericTensor<Something> somethingTensor = GenericTensor.create(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,
@@ -65,7 +68,7 @@ public class GenericTensorTest {
     @Test
     public void canReshape() {
 
-        GenericTensor<Something> somethingTensor = new GenericTensor<>(
+        GenericTensor<Something> somethingTensor = GenericTensor.create(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,
@@ -83,7 +86,7 @@ public class GenericTensorTest {
     @Test
     public void canTake() {
 
-        Tensor<Something> somethingTensor = new GenericTensor<>(
+        Tensor<Something> somethingTensor = GenericTensor.create(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,
@@ -98,7 +101,7 @@ public class GenericTensorTest {
     @Test
     public void canSliceRankTwoTensor() {
 
-        Tensor<Something> somethingTensor = new GenericTensor<>(
+        Tensor<Something> somethingTensor = GenericTensor.create(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,
@@ -150,15 +153,77 @@ public class GenericTensorTest {
 
     @Test
     public void canGetFlatDoubles() {
-        GenericTensor<Double> somethingTensor = GenericTensor.create(
+        GenericTensor<Double> a = GenericTensor.create(
             1., 2., 3.,
             4., 5., 6.,
             7., 8., 9.
         ).reshape(3, 3);
 
-        double[] actual = somethingTensor.asFlatDoubleArray();
+        double[] actual = a.asFlatDoubleArray();
 
         assertArrayEquals(actual, new double[]{1., 2., 3., 4., 5., 6., 7., 8., 9.}, 1e-8);
+    }
+
+    @Test
+    public void canApplyMultiplyWithBroadcast() {
+        GenericTensor<Double> a = GenericTensor.create(
+            1., 2., 3.,
+            4., 5., 6.,
+            7., 8., 9.
+        ).reshape(3, 3);
+
+        GenericTensor<Double> actual = a.apply(DoubleTensor.create(0.5, 0.25, 0.1), (l, r) -> l * r);
+
+        GenericTensor<Double> expected = GenericTensor.create(
+            0.5, 0.5, 0.3,
+            2., 1.25, 0.6,
+            3.5, 2., 0.9
+        ).reshape(3, 3);
+
+        assertArrayEquals(
+            Arrays.stream(actual.asFlatArray()).mapToDouble(x -> x).toArray(),
+            Arrays.stream(expected.asFlatArray()).mapToDouble(x -> x).toArray(),
+            1e-8
+        );
+    }
+
+    @Test
+    public void canApplyStringConcatWithBroadcast() {
+        GenericTensor<String> a = GenericTensor.create(
+            "a", "b", "c",
+            "d", "e", "f",
+            "g", "h", "i"
+        ).reshape(3, 3);
+
+        GenericTensor<String> actualFromLeft = a.apply(GenericTensor.create("x", "y", "z"), (l, r) -> l + r);
+
+        GenericTensor<String> expectedFromLeft = GenericTensor.create(
+            "ax", "by", "cz",
+            "dx", "ey", "fz",
+            "gx", "hy", "iz"
+        ).reshape(3, 3);
+
+        assertArrayEquals(actualFromLeft.asFlatArray(), expectedFromLeft.asFlatArray());
+
+        GenericTensor<String> actualFromRight = GenericTensor.create("x", "y", "z").apply(a, (l, r) -> l + r);
+
+        GenericTensor<String> expectedFromRight = GenericTensor.create(
+            "xa", "yb", "zc",
+            "xd", "ye", "zf",
+            "xg", "yh", "zi"
+        ).reshape(3, 3);
+
+        assertArrayEquals(actualFromRight.asFlatArray(), expectedFromRight.asFlatArray());
+
+        GenericTensor<String> actualByColumn = GenericTensor.create("x", "y", "z").reshape(3, 1).apply(a, (l, r) -> l + r);
+
+        GenericTensor<String> expectedByColumn = GenericTensor.create(
+            "xa", "xb", "xc",
+            "yd", "ye", "yf",
+            "zg", "zh", "zi"
+        ).reshape(3, 3);
+
+        assertArrayEquals(actualByColumn.asFlatArray(), expectedByColumn.asFlatArray());
     }
 
 }

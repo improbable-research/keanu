@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
@@ -37,7 +39,6 @@ import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LTE_M
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LT_MASK;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.MUL;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.SUB;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotrf;
@@ -1301,7 +1302,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         final double[] rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMDoubleTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
+        final JVMTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
             buffer, shape, stride, buffer.length,
             rightBuffer, rightShape, right.getStride(), rightBuffer.length,
             op, inPlace

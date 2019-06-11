@@ -2,16 +2,17 @@ package io.improbable.keanu.tensor.bool;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
+import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
@@ -20,7 +21,6 @@ import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.getShapeIndices;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastIfNeeded;
 import static java.util.Arrays.copyOf;
 
 public class JVMBooleanTensor implements BooleanTensor {
@@ -293,7 +293,7 @@ public class JVMBooleanTensor implements BooleanTensor {
         final boolean[] rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMDoubleTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
+        final JVMTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
             buffer, shape, stride, buffer.length,
             rightBuffer, rightShape, right.getStride(), rightBuffer.length,
             op, inPlace

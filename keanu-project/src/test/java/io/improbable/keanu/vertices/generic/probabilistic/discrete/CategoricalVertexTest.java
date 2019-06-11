@@ -273,7 +273,7 @@ public class CategoricalVertexTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(probB));
 
         CategoricalVertex<TestEnum> select = new CategoricalVertex<>(selectableValues);
-        select.logProb(new GenericTensor<>(TestEnum.A));
+        select.logProb(GenericTensor.scalar(TestEnum.A));
     }
 
     @Test

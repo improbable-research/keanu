@@ -26,22 +26,22 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void youCanCreateARankZeroTensor() {
-        BooleanTensor scalarTrue = new JVMBooleanTensor(new boolean[]{true}, new long[]{});
+        BooleanTensor scalarTrue = BooleanTensor.create(new boolean[]{true}, new long[]{});
         assertTrue(scalarTrue.scalar());
         assertEquals(0, scalarTrue.getRank());
     }
 
     @Test
     public void youCanCreateARankOneTensor() {
-        BooleanTensor booleanVector = new JVMBooleanTensor(new boolean[]{true, false, false, true, true}, new long[]{5});
+        BooleanTensor booleanVector = BooleanTensor.create(new boolean[]{true, false, false, true, true}, new long[]{5});
         assertTrue(booleanVector.getValue(3));
         assertEquals(1, booleanVector.getRank());
     }
 
     @Test
     public void doesElementwiseAnd() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
-        BooleanTensor matrixB = new JVMBooleanTensor(new boolean[]{false, false, true, true}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixB = BooleanTensor.create(new boolean[]{false, false, true, true}, new long[]{2, 2});
         BooleanTensor result = matrixA.and(matrixB);
         Boolean[] expected = new Boolean[]{false, false, true, false};
         assertArrayEquals(expected, result.asFlatArray());
@@ -54,8 +54,8 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesElementwiseOr() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
-        BooleanTensor matrixB = new JVMBooleanTensor(new boolean[]{false, false, true, true}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixB = BooleanTensor.create(new boolean[]{false, false, true, true}, new long[]{2, 2});
         BooleanTensor result = matrixA.or(matrixB);
         Boolean[] expected = new Boolean[]{true, false, true, true};
         assertArrayEquals(expected, result.asFlatArray());
@@ -68,7 +68,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesElementwiseNot() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
         BooleanTensor result = matrixA.not();
         Boolean[] expected = new Boolean[]{false, true, false, true};
         assertArrayEquals(expected, result.asFlatArray());
@@ -81,7 +81,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesSetDoubleIf() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
 
         DoubleTensor trueCase = DoubleTensor.create(new double[]{1.5, 2.0, 3.3, 4.65}, new long[]{2, 2});
         DoubleTensor falseCase = DoubleTensor.create(new double[]{5.1, 7.2, 11.4, 23.22}, new long[]{2, 2});
@@ -92,7 +92,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesSetIntegerIf() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
         IntegerTensor trueCase = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor falseCase = IntegerTensor.create(new int[]{5, 7, 11, 23}, new long[]{2, 2});
 
@@ -102,9 +102,9 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesSetBooleanIf() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
-        BooleanTensor matrixB = new JVMBooleanTensor(new boolean[]{false, false, true, true}, new long[]{2, 2});
-        BooleanTensor matrixC = new JVMBooleanTensor(new boolean[]{true, true, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixB = BooleanTensor.create(new boolean[]{false, false, true, true}, new long[]{2, 2});
+        BooleanTensor matrixC = BooleanTensor.create(new boolean[]{true, true, true, false}, new long[]{2, 2});
         BooleanTensor result = matrixA.booleanWhere(matrixB, matrixC);
         assertArrayEquals(new Boolean[]{false, true, true, false}, result.asFlatArray());
     }
@@ -116,17 +116,17 @@ public class JVMBooleanTensorTest {
     @Test
     public void doesWhereWithNonScalarTensors() {
 
-        Tensor<Something> trueCase = new GenericTensor<>(
+        Tensor<Something> trueCase = GenericTensor.create(
             new Something[]{Something.A, Something.B, Something.C, Something.D},
             new long[]{2, 2}
         );
 
-        Tensor<Something> falseCase = new GenericTensor<>(
+        Tensor<Something> falseCase = GenericTensor.create(
             new Something[]{Something.D, Something.C, Something.C, Something.A},
             new long[]{2, 2}
         );
 
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
         Tensor<Something> result = matrixA.where(trueCase, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.C, Something.A},
@@ -137,7 +137,7 @@ public class JVMBooleanTensorTest {
     @Test
     public void doesWhereWithScalarTensors() {
 
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
 
         Tensor<Something> trueCase = GenericTensor.scalar(Something.A);
         Tensor<Something> falseCase = GenericTensor.scalar(Something.C);
@@ -151,14 +151,14 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesAllTrue() {
-        assertFalse(new JVMBooleanTensor(new boolean[]{false, true, false, false}, new long[]{2, 2}).allTrue());
-        assertTrue(new JVMBooleanTensor(new boolean[]{true, true, true, true}, new long[]{2, 2}).allTrue());
+        assertFalse(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).allTrue());
+        assertTrue(BooleanTensor.create(new boolean[]{true, true, true, true}, new long[]{2, 2}).allTrue());
     }
 
     @Test
     public void doesAllFalse() {
-        assertFalse(new JVMBooleanTensor(new boolean[]{false, true, false, false}, new long[]{2, 2}).allFalse());
-        assertTrue(new JVMBooleanTensor(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse());
+        assertFalse(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).allFalse());
+        assertTrue(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse());
     }
 
 
@@ -175,7 +175,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void canGetRandomAccessValue() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
         assertTrue(matrixA.getValue(0, 0));
         assertFalse(matrixA.getValue(0, 1));
         assertTrue(matrixA.getValue(1, 0));
@@ -184,7 +184,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void canSetRandomAccessValue() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
 
         matrixA.setValue(false, 0, 0);
         matrixA.setValue(true, 0, 1);
@@ -196,20 +196,20 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void canConvertToDoubles() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
         assertArrayEquals(new double[]{1.0, 0.0, 1.0, 0.0}, matrixA.asFlatDoubleArray(), 0.0);
     }
 
     @Test
     public void canConvertToIntegers() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
 
         assertArrayEquals(new int[]{1, 0, 1, 0}, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void canReshape() {
-        BooleanTensor matrixA = new JVMBooleanTensor(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
         BooleanTensor reshaped = matrixA.reshape(4, 1);
         assertArrayEquals(reshaped.asFlatIntegerArray(), matrixA.asFlatIntegerArray());
         assertArrayEquals(new long[]{4, 1}, reshaped.getShape());
@@ -310,13 +310,15 @@ public class JVMBooleanTensorTest {
 
         BooleanTensor b = BooleanTensor.create(true, false, true);
 
-        BooleanTensor actual = a.xor(b);
+        BooleanTensor actualFromLeft = a.xor(b);
+        BooleanTensor actualFromRight = b.xor(a);
         BooleanTensor expected = BooleanTensor.create(
             false, true, true,
             false, false, false
         ).reshape(2, 3);
 
-        assertThat(actual, valuesAndShapesMatch(expected));
+        assertThat(actualFromLeft, valuesAndShapesMatch(expected));
+        assertThat(actualFromRight, valuesAndShapesMatch(expected));
     }
 
     @Test

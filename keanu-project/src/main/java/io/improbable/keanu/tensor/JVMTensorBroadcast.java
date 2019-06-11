@@ -1,6 +1,5 @@
-package io.improbable.keanu.tensor.dbl;
+package io.improbable.keanu.tensor;
 
-import io.improbable.keanu.tensor.TensorShape;
 import lombok.AllArgsConstructor;
 import org.nd4j.linalg.api.shape.Shape;
 
@@ -11,7 +10,7 @@ import static io.improbable.keanu.tensor.TensorShape.getBroadcastedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getLengthAsInt;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 
-public class JVMDoubleTensorBroadcast {
+public class JVMTensorBroadcast {
 
     @AllArgsConstructor
     public static class ResultWrapper {
@@ -21,9 +20,9 @@ public class JVMDoubleTensorBroadcast {
     }
 
     public static ResultWrapper broadcastIfNeeded(Object leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
-                                           Object rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
-                                           BiFunction op,
-                                           boolean inPlace) {
+                                                  Object rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
+                                                  BiFunction op,
+                                                  boolean inPlace) {
         final boolean needsBroadcast = !Arrays.equals(leftShape, rightShape);
 
         Object outputBuffer;
@@ -70,6 +69,10 @@ public class JVMDoubleTensorBroadcast {
     private static Object arrayLikeWithLength(Object likeThis, int length) {
         if (likeThis instanceof double[]) {
             return new double[length];
+        } else if (likeThis instanceof boolean[]) {
+            return new boolean[length];
+        } else if (likeThis instanceof Object[]) {
+            return new Object[length];
         } else {
             throw new IllegalArgumentException("Cannot create array like " + likeThis.getClass().getSimpleName());
         }
@@ -78,23 +81,32 @@ public class JVMDoubleTensorBroadcast {
     private static void scalarLeftAllTypes(Object leftBuffer, Object rightBuffer, Object outputBuffer, BiFunction op) {
 
         if (leftBuffer instanceof double[]) {
-            scalarLeftDouble(((double[]) leftBuffer)[0], (double[]) rightBuffer, (double[]) outputBuffer, op);
+            scalarLeft(((double[]) leftBuffer)[0], (double[]) rightBuffer, (double[]) outputBuffer, op);
         } else if (leftBuffer instanceof boolean[]) {
-            scalarLeftBoolean(((boolean[]) leftBuffer)[0], (boolean[]) rightBuffer, (boolean[]) outputBuffer, op);
+            scalarLeft(((boolean[]) leftBuffer)[0], (boolean[]) rightBuffer, (boolean[]) outputBuffer, op);
+        } else if (leftBuffer instanceof Object[]) {
+            scalarLeft(((Object[]) leftBuffer)[0], (Object[]) rightBuffer, (Object[]) outputBuffer, op);
         } else {
             throw new IllegalArgumentException("Cannot broadcast for data type " + leftBuffer.getClass().getSimpleName());
         }
     }
 
-    private static void scalarLeftDouble(double left, double[] rightBuffer, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
-
+    private static void scalarLeft(double left, double[] rightBuffer, double[] outputBuffer,
+                                   BiFunction<Double, Double, Double> op) {
         for (int i = 0; i < outputBuffer.length; i++) {
             outputBuffer[i] = op.apply(left, rightBuffer[i]);
         }
     }
 
-    private static void scalarLeftBoolean(boolean left, boolean[] rightBuffer, boolean[] outputBuffer, BiFunction<Boolean, Boolean, Boolean> op) {
+    private static void scalarLeft(boolean left, boolean[] rightBuffer, boolean[] outputBuffer,
+                                   BiFunction<Boolean, Boolean, Boolean> op) {
+        for (int i = 0; i < outputBuffer.length; i++) {
+            outputBuffer[i] = op.apply(left, rightBuffer[i]);
+        }
+    }
 
+    private static void scalarLeft(Object left, Object[] rightBuffer, Object[] outputBuffer,
+                                   BiFunction op) {
         for (int i = 0; i < outputBuffer.length; i++) {
             outputBuffer[i] = op.apply(left, rightBuffer[i]);
         }
@@ -103,23 +115,32 @@ public class JVMDoubleTensorBroadcast {
     private static void scalarRightAllTypes(Object leftBuffer, Object rightBuffer, Object outputBuffer, BiFunction op) {
 
         if (leftBuffer instanceof double[]) {
-            scalarRightDouble((double[]) leftBuffer, ((double[]) rightBuffer)[0], (double[]) outputBuffer, op);
+            scalarRight((double[]) leftBuffer, ((double[]) rightBuffer)[0], (double[]) outputBuffer, op);
         } else if (leftBuffer instanceof boolean[]) {
-            scalarRightBoolean((boolean[]) leftBuffer, ((boolean[]) rightBuffer)[0], (boolean[]) outputBuffer, op);
+            scalarRight((boolean[]) leftBuffer, ((boolean[]) rightBuffer)[0], (boolean[]) outputBuffer, op);
+        } else if (leftBuffer instanceof Object[]) {
+            scalarRight((Object[]) leftBuffer, ((Object[]) rightBuffer)[0], (Object[]) outputBuffer, op);
         } else {
             throw new IllegalArgumentException("Cannot broadcast for data type " + leftBuffer.getClass().getSimpleName());
         }
     }
 
-    private static void scalarRightDouble(double[] leftBuffer, double right, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
-
+    private static void scalarRight(double[] leftBuffer, double right, double[] outputBuffer,
+                                    BiFunction<Double, Double, Double> op) {
         for (int i = 0; i < leftBuffer.length; i++) {
             outputBuffer[i] = op.apply(leftBuffer[i], right);
         }
     }
 
-    private static void scalarRightBoolean(boolean[] leftBuffer, boolean right, boolean[] outputBuffer, BiFunction<Boolean, Boolean, Boolean> op) {
+    private static void scalarRight(boolean[] leftBuffer, boolean right, boolean[] outputBuffer,
+                                    BiFunction<Boolean, Boolean, Boolean> op) {
+        for (int i = 0; i < leftBuffer.length; i++) {
+            outputBuffer[i] = op.apply(leftBuffer[i], right);
+        }
+    }
 
+    private static void scalarRight(Object[] leftBuffer, Object right, Object[] outputBuffer,
+                                    BiFunction op) {
         for (int i = 0; i < leftBuffer.length; i++) {
             outputBuffer[i] = op.apply(leftBuffer[i], right);
         }
@@ -130,32 +151,46 @@ public class JVMDoubleTensorBroadcast {
                                                     Object outputBuffer) {
 
         if (leftBuffer instanceof double[]) {
-            elementwiseBinaryOpDouble(
+            elementwiseBinaryOp(
                 (double[]) leftBuffer, (double[]) rightBuffer,
                 op, (double[]) outputBuffer
             );
         } else if (leftBuffer instanceof boolean[]) {
-            elementwiseBinaryOpBoolean(
+            elementwiseBinaryOp(
                 (boolean[]) leftBuffer, (boolean[]) rightBuffer,
                 op, (boolean[]) outputBuffer
+            );
+        } else if (leftBuffer instanceof Object[]) {
+            elementwiseBinaryOp(
+                (Object[]) leftBuffer, (Object[]) rightBuffer,
+                op, (Object[]) outputBuffer
             );
         } else {
             throw new IllegalArgumentException("Cannot broadcast for data type " + leftBuffer.getClass().getSimpleName());
         }
     }
 
-    private static void elementwiseBinaryOpDouble(double[] leftBuffer, double[] rightBuffer,
-                                                  BiFunction<Double, Double, Double> op,
-                                                  double[] outputBuffer) {
+    private static void elementwiseBinaryOp(double[] leftBuffer, double[] rightBuffer,
+                                            BiFunction<Double, Double, Double> op,
+                                            double[] outputBuffer) {
 
         for (int i = 0; i < outputBuffer.length; i++) {
             outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[i]);
         }
     }
 
-    private static void elementwiseBinaryOpBoolean(boolean[] leftBuffer, boolean[] rightBuffer,
-                                                   BiFunction<Boolean, Boolean, Boolean> op,
-                                                   boolean[] outputBuffer) {
+    private static void elementwiseBinaryOp(boolean[] leftBuffer, boolean[] rightBuffer,
+                                            BiFunction<Boolean, Boolean, Boolean> op,
+                                            boolean[] outputBuffer) {
+
+        for (int i = 0; i < outputBuffer.length; i++) {
+            outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[i]);
+        }
+    }
+
+    private static void elementwiseBinaryOp(Object[] leftBuffer, Object[] rightBuffer,
+                                            BiFunction op,
+                                            Object[] outputBuffer) {
 
         for (int i = 0; i < outputBuffer.length; i++) {
             outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[i]);
@@ -245,16 +280,22 @@ public class JVMDoubleTensorBroadcast {
                                                    Object outputBuffer, BiFunction op) {
 
         if (leftBuffer instanceof double[]) {
-            broadcastFromRightDouble(
+            broadcastFromRight(
                 (double[]) leftBuffer, leftStride,
                 (double[]) rightBuffer, rightShape, rightStride,
                 (double[]) outputBuffer, op
             );
         } else if (leftBuffer instanceof boolean[]) {
-            broadcastFromRightBoolean(
+            broadcastFromRight(
                 (boolean[]) leftBuffer, leftStride,
                 (boolean[]) rightBuffer, rightShape, rightStride,
                 (boolean[]) outputBuffer, op
+            );
+        } else if (leftBuffer instanceof Object[]) {
+            broadcastFromRight(
+                (Object[]) leftBuffer, leftStride,
+                (Object[]) rightBuffer, rightShape, rightStride,
+                (Object[]) outputBuffer, op
             );
         } else {
             throw new IllegalArgumentException("Cannot broadcast for data type " + leftBuffer.getClass().getSimpleName());
@@ -262,9 +303,9 @@ public class JVMDoubleTensorBroadcast {
     }
 
 
-    private static void broadcastFromRightDouble(double[] leftBuffer, long[] leftStride,
-                                                 double[] rightBuffer, long[] rightShape, long[] rightStride,
-                                                 double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+    private static void broadcastFromRight(double[] leftBuffer, long[] leftStride,
+                                           double[] rightBuffer, long[] rightShape, long[] rightStride,
+                                           double[] outputBuffer, BiFunction<Double, Double, Double> op) {
         for (int i = 0; i < outputBuffer.length; i++) {
 
             int j = getBroadcastedFlatIndex(i, leftStride, rightShape, rightStride);
@@ -273,9 +314,20 @@ public class JVMDoubleTensorBroadcast {
         }
     }
 
-    private static void broadcastFromRightBoolean(boolean[] leftBuffer, long[] leftStride,
-                                                  boolean[] rightBuffer, long[] rightShape, long[] rightStride,
-                                                  boolean[] outputBuffer, BiFunction<Boolean, Boolean, Boolean> op) {
+    private static void broadcastFromRight(boolean[] leftBuffer, long[] leftStride,
+                                           boolean[] rightBuffer, long[] rightShape, long[] rightStride,
+                                           boolean[] outputBuffer, BiFunction<Boolean, Boolean, Boolean> op) {
+        for (int i = 0; i < outputBuffer.length; i++) {
+
+            int j = getBroadcastedFlatIndex(i, leftStride, rightShape, rightStride);
+
+            outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[j]);
+        }
+    }
+
+    private static void broadcastFromRight(Object[] leftBuffer, long[] leftStride,
+                                           Object[] rightBuffer, long[] rightShape, long[] rightStride,
+                                           Object[] outputBuffer, BiFunction op) {
         for (int i = 0; i < outputBuffer.length; i++) {
 
             int j = getBroadcastedFlatIndex(i, leftStride, rightShape, rightStride);
@@ -303,16 +355,22 @@ public class JVMDoubleTensorBroadcast {
                                                   Object outputBuffer, BiFunction op) {
 
         if (leftBuffer instanceof double[]) {
-            broadcastFromLeftDouble(
+            broadcastFromLeft(
                 (double[]) leftBuffer, leftShape, leftStride,
                 (double[]) rightBuffer, rightStride,
                 (double[]) outputBuffer, op
             );
         } else if (leftBuffer instanceof boolean[]) {
-            broadcastFromLeftBoolean(
+            broadcastFromLeft(
                 (boolean[]) leftBuffer, leftShape, leftStride,
                 (boolean[]) rightBuffer, rightStride,
                 (boolean[]) outputBuffer, op
+            );
+        } else if (leftBuffer instanceof Object[]) {
+            broadcastFromLeft(
+                (Object[]) leftBuffer, leftShape, leftStride,
+                (Object[]) rightBuffer, rightStride,
+                (Object[]) outputBuffer, op
             );
         } else {
             throw new IllegalArgumentException("Cannot broadcast for data type " + leftBuffer.getClass().getSimpleName());
@@ -320,9 +378,9 @@ public class JVMDoubleTensorBroadcast {
     }
 
 
-    private static void broadcastFromLeftDouble(double[] leftBuffer, long[] leftShape, long[] leftStride,
-                                                double[] rightBuffer, long[] rightStride,
-                                                double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+    private static void broadcastFromLeft(double[] leftBuffer, long[] leftShape, long[] leftStride,
+                                          double[] rightBuffer, long[] rightStride,
+                                          double[] outputBuffer, BiFunction<Double, Double, Double> op) {
 
         for (int i = 0; i < outputBuffer.length; i++) {
 
@@ -332,9 +390,21 @@ public class JVMDoubleTensorBroadcast {
         }
     }
 
-    private static void broadcastFromLeftBoolean(boolean[] leftBuffer, long[] leftShape, long[] leftStride,
-                                                 boolean[] rightBuffer, long[] rightStride,
-                                                 boolean[] outputBuffer, BiFunction<Boolean, Boolean, Boolean> op) {
+    private static void broadcastFromLeft(boolean[] leftBuffer, long[] leftShape, long[] leftStride,
+                                          boolean[] rightBuffer, long[] rightStride,
+                                          boolean[] outputBuffer, BiFunction<Boolean, Boolean, Boolean> op) {
+
+        for (int i = 0; i < outputBuffer.length; i++) {
+
+            int j = getBroadcastedFlatIndex(i, rightStride, leftShape, leftStride);
+
+            outputBuffer[i] = op.apply(leftBuffer[j], rightBuffer[i]);
+        }
+    }
+
+    private static void broadcastFromLeft(Object[] leftBuffer, long[] leftShape, long[] leftStride,
+                                          Object[] rightBuffer, long[] rightStride,
+                                          Object[] outputBuffer, BiFunction op) {
 
         for (int i = 0; i < outputBuffer.length; i++) {
 
@@ -365,26 +435,32 @@ public class JVMDoubleTensorBroadcast {
                                                           BiFunction op) {
 
         if (leftBuffer instanceof double[]) {
-            broadcastFromLeftAndRightDouble(
+            broadcastFromLeftAndRight(
                 (double[]) leftBuffer, leftShape, leftStride,
                 (double[]) rightBuffer, rightShape, rightStride,
                 (double[]) outputBuffer, outputStride, op
             );
         } else if (leftBuffer instanceof boolean[]) {
-            broadcastFromLeftAndRightBoolean(
+            broadcastFromLeftAndRight(
                 (boolean[]) leftBuffer, leftShape, leftStride,
                 (boolean[]) rightBuffer, rightShape, rightStride,
                 (boolean[]) outputBuffer, outputStride, op
+            );
+        } else if (leftBuffer instanceof Object[]) {
+            broadcastFromLeftAndRight(
+                (Object[]) leftBuffer, leftShape, leftStride,
+                (Object[]) rightBuffer, rightShape, rightStride,
+                (Object[]) outputBuffer, outputStride, op
             );
         } else {
             throw new IllegalArgumentException("Cannot broadcast for data type " + leftBuffer.getClass().getSimpleName());
         }
     }
 
-    private static void broadcastFromLeftAndRightDouble(double[] leftBuffer, long[] leftShape, long[] leftStride,
-                                                        double[] rightBuffer, long[] rightShape, long[] rightStride,
-                                                        double[] outputBuffer, long[] outputStride,
-                                                        BiFunction<Double, Double, Double> op) {
+    private static void broadcastFromLeftAndRight(double[] leftBuffer, long[] leftShape, long[] leftStride,
+                                                  double[] rightBuffer, long[] rightShape, long[] rightStride,
+                                                  double[] outputBuffer, long[] outputStride,
+                                                  BiFunction<Double, Double, Double> op) {
 
         for (int i = 0; i < outputBuffer.length; i++) {
 
@@ -395,10 +471,24 @@ public class JVMDoubleTensorBroadcast {
         }
     }
 
-    private static void broadcastFromLeftAndRightBoolean(boolean[] leftBuffer, long[] leftShape, long[] leftStride,
-                                                         boolean[] rightBuffer, long[] rightShape, long[] rightStride,
-                                                         boolean[] outputBuffer, long[] outputStride,
-                                                         BiFunction<Boolean, Boolean, Boolean> op) {
+    private static void broadcastFromLeftAndRight(boolean[] leftBuffer, long[] leftShape, long[] leftStride,
+                                                  boolean[] rightBuffer, long[] rightShape, long[] rightStride,
+                                                  boolean[] outputBuffer, long[] outputStride,
+                                                  BiFunction<Boolean, Boolean, Boolean> op) {
+
+        for (int i = 0; i < outputBuffer.length; i++) {
+
+            int k = getBroadcastedFlatIndex(i, outputStride, leftShape, leftStride);
+            int j = getBroadcastedFlatIndex(i, outputStride, rightShape, rightStride);
+
+            outputBuffer[i] = op.apply(leftBuffer[k], rightBuffer[j]);
+        }
+    }
+
+    private static void broadcastFromLeftAndRight(Object[] leftBuffer, long[] leftShape, long[] leftStride,
+                                                  Object[] rightBuffer, long[] rightShape, long[] rightStride,
+                                                  Object[] outputBuffer, long[] outputStride,
+                                                  BiFunction op) {
 
         for (int i = 0; i < outputBuffer.length; i++) {
 

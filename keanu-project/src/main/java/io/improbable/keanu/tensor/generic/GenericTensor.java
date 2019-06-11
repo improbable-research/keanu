@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.generic;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -8,7 +9,9 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 
+import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
@@ -22,7 +25,7 @@ public class GenericTensor<T> implements Tensor<T> {
     private long[] stride;
 
     public static <T> GenericTensor<T> createFilled(T data, long[] shape) {
-        return new GenericTensor<>(shape, data);
+        return new GenericTensor<>(fillArray(shape, data), shape);
     }
 
     public static <T> GenericTensor<T> create(T... data) {
@@ -37,28 +40,26 @@ public class GenericTensor<T> implements Tensor<T> {
         return new GenericTensor<>(data);
     }
 
-    public GenericTensor(T[] data, long[] shape) {
+    private GenericTensor(T[] data, long[] shape, long[] stride) {
+        this.data = data;
+        this.shape = shape;
+        this.stride = stride;
+    }
+
+    private GenericTensor(T[] data, long[] shape) {
+        if (TensorShape.getLength(shape) != data.length) {
+            throw new IllegalArgumentException("Shape size does not match data length");
+        }
+
         this.data = Arrays.copyOf(data, data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = getRowFirstStride(shape);
-
-        if (getLength() != data.length) {
-            throw new IllegalArgumentException("Shape size does not match data length");
-        }
     }
 
-    public GenericTensor(T[] data) {
-        this(data, new long[]{data.length});
-    }
-
-    public GenericTensor(T scalar) {
+    private GenericTensor(T scalar) {
         this.data = (T[]) (new Object[]{scalar});
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
-    }
-
-    public GenericTensor(long[] shape, T value) {
-        this(fillArray(shape, value), shape);
     }
 
     private static <T> T[] fillArray(long[] shape, T value) {
@@ -117,7 +118,11 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public BooleanTensor elementwiseEquals(T value) {
-        return elementwiseEquals(new GenericTensor<>(shape, value));
+        boolean[] result = new boolean[data.length];
+        for (int i = 0; i < data.length; i++) {
+            result[i] = data[i].equals(value);
+        }
+        return BooleanTensor.create(result, shape);
     }
 
     private static class BaseSimpleFlattenedView<T> implements FlattenedView<T> {
@@ -236,6 +241,20 @@ public class GenericTensor<T> implements Tensor<T> {
     @Override
     public GenericTensor<T> take(long... index) {
         return scalar(getValue(index));
+    }
+
+    public <R> GenericTensor<R> apply(Tensor<T> right,
+                                      BiFunction<T, T, R> op) {
+        final T[] rightBuffer = right.asFlatArray();
+        final long[] rightShape = right.getShape();
+
+        final JVMTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
+            data, shape, stride, data.length,
+            rightBuffer, rightShape, right.getStride(), rightBuffer.length,
+            op, false
+        );
+
+        return new GenericTensor<>((R[]) result.outputBuffer, result.outputShape, result.outputStride);
     }
 
     private void assertIsNumber() {
