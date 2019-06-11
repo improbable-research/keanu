@@ -417,7 +417,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         super.observe(DoubleTensor.create(values));
     }
 
-    public double getValue(int... index) {
+    public double getValue(long... index) {
         return getValue().getValue(index);
     }
 

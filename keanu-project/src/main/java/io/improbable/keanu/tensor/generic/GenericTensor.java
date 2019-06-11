@@ -85,20 +85,15 @@ public class GenericTensor<T> implements Tensor<T> {
         return TensorShape.getLength(shape);
     }
 
-    @Override
-    public T getValue(long... index) {
-        return data[checkedCast(getFlatIndex(shape, stride, index))];
-    }
+//    @Override
+//    public T getValue(long... index) {
+//        return data[checkedCast(getFlatIndex(shape, stride, index))];
+//    }
 
     @Override
     public GenericTensor<T> setValue(T value, long... index) {
         data[checkedCast(getFlatIndex(shape, stride, index))] = value;
         return this;
-    }
-
-    @Override
-    public T scalar() {
-        return data[0];
     }
 
     @Override

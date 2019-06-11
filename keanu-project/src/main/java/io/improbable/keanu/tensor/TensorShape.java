@@ -97,9 +97,9 @@ public class TensorShape {
      */
     public static long getFlatIndex(long[] shape, long[] stride, long... index) {
         long flatIndex = 0;
-        for (int i = 0; i < index.length; i++) {
+        for (int i = 0; i < shape.length; i++) {
 
-            if (index[i] >= shape[i]) {
+            if (i >= index.length || index[i] >= shape[i]) {
                 throw new IllegalArgumentException(
                     "Invalid index " + Arrays.toString(index) + " for shape " + Arrays.toString(shape)
                 );

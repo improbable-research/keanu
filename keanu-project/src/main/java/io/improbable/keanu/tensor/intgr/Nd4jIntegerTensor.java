@@ -579,22 +579,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public Integer getValue(long... index) {
-        return (int) tensor.getDouble(index);
-    }
-
-    @Override
     public IntegerTensor setValue(Integer value, long... index) {
         tensor.putScalar(index, value);
         return this;
-    }
-
-    @Override
-    public Integer scalar() {
-        if (this.getLength() > 1) {
-            throw new IllegalArgumentException("Not a scalar");
-        }
-        return (int) tensor.getDouble(0);
     }
 
     @Override

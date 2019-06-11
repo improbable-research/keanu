@@ -187,14 +187,6 @@ public class JVMBooleanTensor implements BooleanTensor {
         return DoubleTensor.create(result, copyOf(shape, shape.length));
     }
 
-    private double getOrScalar(double[] values, int index) {
-        if (values.length == 1) {
-            return values[0];
-        } else {
-            return values[index];
-        }
-    }
-
     @Override
     public IntegerTensor integerWhere(IntegerTensor trueValue, IntegerTensor falseValue) {
         FlattenedView<Integer> trueValuesFlattened = trueValue.getFlattenedView();
@@ -239,6 +231,14 @@ public class JVMBooleanTensor implements BooleanTensor {
             }
 
             return Tensor.create(result, copyOf(shape, shape.length));
+        }
+    }
+
+    private double getOrScalar(double[] values, int index) {
+        if (values.length == 1) {
+            return values[0];
+        } else {
+            return values[index];
         }
     }
 
@@ -354,22 +354,9 @@ public class JVMBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public Boolean getValue(long... index) {
-        return data[checkedCast(getFlatIndex(shape, stride, index))];
-    }
-
-    @Override
     public BooleanTensor setValue(Boolean value, long... index) {
         data[checkedCast(getFlatIndex(shape, stride, index))] = value;
         return this;
-    }
-
-    @Override
-    public Boolean scalar() {
-        if (this.getLength() > 1) {
-            throw new IllegalArgumentException("Not a scalar");
-        }
-        return data[0];
     }
 
     @Override
@@ -421,7 +408,7 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public FlattenedView<Boolean> getFlattenedView() {
-        return new SimpleBooleanFlattenedView(data);
+        return new JVMBooleanFlattenedView(data);
     }
 
     @Override
@@ -429,11 +416,11 @@ public class JVMBooleanTensor implements BooleanTensor {
         return Tensor.elementwiseEquals(this, BooleanTensor.create(value, this.getShape()));
     }
 
-    private static class SimpleBooleanFlattenedView implements FlattenedView<Boolean> {
+    private static class JVMBooleanFlattenedView implements FlattenedView<Boolean> {
 
         private boolean[] data;
 
-        public SimpleBooleanFlattenedView(boolean[] data) {
+        public JVMBooleanFlattenedView(boolean[] data) {
             this.data = data;
         }
 
@@ -444,10 +431,7 @@ public class JVMBooleanTensor implements BooleanTensor {
 
         @Override
         public Boolean get(long index) {
-            if (index > Integer.MAX_VALUE) {
-                throw new IllegalArgumentException("Only integer based indexing supported for boolean tensors");
-            }
-            return data[(int) index];
+            return data[Ints.checkedCast(index)];
         }
 
         @Override
@@ -461,10 +445,7 @@ public class JVMBooleanTensor implements BooleanTensor {
 
         @Override
         public void set(long index, Boolean value) {
-            if (index > Integer.MAX_VALUE) {
-                throw new IllegalArgumentException("Only integer based indexing supported for generic tensors");
-            }
-            data[(int) index] = value;
+            data[Ints.checkedCast(index)] = value;
         }
 
     }

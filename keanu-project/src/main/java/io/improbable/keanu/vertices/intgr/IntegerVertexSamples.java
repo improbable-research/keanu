@@ -34,7 +34,7 @@ public class IntegerVertexSamples extends Samples<IntegerTensor> {
         return getModeAtIndex(0, 0);
     }
 
-    public Integer getModeAtIndex(int... index) {
+    public Integer getModeAtIndex(long... index) {
 
         if (samples.isEmpty()) {
             throw new IllegalStateException("Mode for empty samples is undefined");

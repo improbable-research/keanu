@@ -79,7 +79,7 @@ public interface Tensor<T> {
 
     /**
      * Returns the stride for each dimension of the tensor (based on C ordering).
-     *
+     * <p>
      * The stride is the distance you'd move in a flat representation of the tensor for each index within that dimension
      * EG) For a 2x2 Tensor the Tensor would be laid out (in C order):
      * [{0, 0}, {0, 1}, {1, 0}, {1, 1}]
@@ -92,15 +92,22 @@ public interface Tensor<T> {
 
     long getLength();
 
-    T getValue(long... index);
-
-    default T getValue(int... index) {
-        return getValue(Arrays.stream(index).mapToLong(i -> i).toArray());
+    default T getValue(long... index){
+        if(index.length == 1){
+            return getFlattenedView().get(index[0]);
+        }else{
+            return getFlattenedView().get(TensorShape.getFlatIndex(getShape(), getStride(), index));
+        }
     }
 
     Tensor<T> setValue(T value, long... index);
 
-    T scalar();
+    default T scalar() {
+        if (this.getLength() > 1) {
+            throw new IllegalArgumentException("Not a scalar");
+        }
+        return getValue(0);
+    }
 
     Tensor<T> duplicate();
 

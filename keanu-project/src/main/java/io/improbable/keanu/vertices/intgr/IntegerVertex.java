@@ -231,7 +231,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         super.observe(IntegerTensor.create(values));
     }
 
-    public int getValue(int... index) {
+    public int getValue(long... index) {
         return getValue().getValue(index);
     }
 
