@@ -200,10 +200,16 @@ public class TensorShape {
     }
 
     private static long[] increaseRankByPaddingValue(long[] lowRankTensorShape, int desiredRank, boolean append) {
-        long[] paddedShape = new long[desiredRank];
+
+        if (lowRankTensorShape.length == desiredRank) {
+            return lowRankTensorShape;
+        }
+
         if (lowRankTensorShape.length > desiredRank) {
             throw new IllegalArgumentException("low rank tensor must be rank less than or equal to desired rank");
         }
+
+        long[] paddedShape = new long[desiredRank];
 
         Arrays.fill(paddedShape, 1);
         if (append) {

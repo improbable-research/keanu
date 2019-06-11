@@ -10,7 +10,6 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 
-import static com.google.common.primitives.Ints.checkedCast;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;

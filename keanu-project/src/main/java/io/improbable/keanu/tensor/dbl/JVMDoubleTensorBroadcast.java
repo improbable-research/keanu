@@ -105,10 +105,10 @@ public class JVMDoubleTensorBroadcast {
 
         //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
         final int resultRank = Math.max(leftShape.length, rightShape.length);
-        final long[] paddedLeftShape = getShapeOrPadToRank(leftShape, resultRank);
+        final long[] paddedLeftShape = TensorShape.shapeToDesiredRankByPrependingOnes(leftShape, resultRank);
         final long[] paddedLeftStride = TensorShape.getRowFirstStride(paddedLeftShape);
 
-        final long[] paddedRightShape = getShapeOrPadToRank(rightShape, resultRank);
+        final long[] paddedRightShape = TensorShape.shapeToDesiredRankByPrependingOnes(rightShape, resultRank);
         final long[] paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
 
         final long[] resultShape = Shape.broadcastOutputShape(paddedLeftShape, paddedRightShape);
@@ -159,14 +159,6 @@ public class JVMDoubleTensorBroadcast {
         }
 
         return new JVMDoubleTensor(outputBuffer, resultShape, outputStride);
-    }
-
-    private static long[] getShapeOrPadToRank(long[] shape, int rank) {
-        if (shape.length == rank) {
-            return shape;
-        } else {
-            return TensorShape.shapeToDesiredRankByPrependingOnes(shape, rank);
-        }
     }
 
     /**
