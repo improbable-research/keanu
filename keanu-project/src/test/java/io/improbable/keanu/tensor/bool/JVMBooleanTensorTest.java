@@ -166,7 +166,8 @@ public class JVMBooleanTensorTest {
     public void canElementwiseEqualsAScalarValue() {
         boolean value = true;
         BooleanTensor allTheSame = BooleanTensor.create(value, new long[]{2, 3});
-        Tensor<Boolean> notAllTheSame = allTheSame.duplicate().setValue(!value, 1, 1);
+        BooleanTensor notAllTheSame = allTheSame.duplicate();
+        notAllTheSame.setValue(!value, 1, 1);
 
         assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));

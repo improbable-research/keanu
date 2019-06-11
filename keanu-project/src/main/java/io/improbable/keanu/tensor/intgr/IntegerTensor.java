@@ -156,9 +156,6 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     @Override
-    IntegerTensor setValue(Integer value, long... index);
-
-    @Override
     IntegerTensor reshape(long... newShape);
 
     @Override

@@ -140,20 +140,6 @@ public class Nd4jDoubleTensor extends DoubleTensor {
         return tensor.lengthLong();
     }
 
-    public Double getValue(long... index) {
-        if (index.length == 1) {
-            return tensor.getDouble(index[0]);
-        } else {
-            return tensor.getDouble(index);
-        }
-    }
-
-    public DoubleTensor setValue(Double value, long... index) {
-
-        tensor.putScalar(index, value);
-        return this;
-    }
-
     @Override
     public DoubleTensor reshape(long... newShape) {
         return new Nd4jDoubleTensor(tensor.reshape(newShape));

@@ -459,7 +459,8 @@ public class DoubleTensorTest {
         double value = 42.0;
         double otherValue = 42.1;
         DoubleTensor allTheSame = DoubleTensor.create(value, new long[]{2, 3});
-        DoubleTensor notAllTheSame = allTheSame.duplicate().setValue(otherValue, 1, 1);
+        DoubleTensor notAllTheSame = allTheSame.duplicate();
+        notAllTheSame.setValue(otherValue, 1, 1);
 
         assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));

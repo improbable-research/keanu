@@ -11,8 +11,9 @@ public class GenericTensorTest {
     public void canElementwiseEqualsAScalarValue() {
         String value = "foo";
         String otherValue = "bar";
-        GenericTensor allTheSame = new GenericTensor(new long[] {2, 3}, value);
-        GenericTensor notAllTheSame = allTheSame.duplicate().setValue(otherValue, 1, 1);
+        GenericTensor<String> allTheSame = new GenericTensor<>(new long[] {2, 3}, value);
+        GenericTensor<String> notAllTheSame = allTheSame.duplicate();
+        notAllTheSame.setValue(otherValue, 1, 1);
 
         assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));

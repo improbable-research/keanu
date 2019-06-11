@@ -58,17 +58,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public Integer getValue(long... index) {
-        return value;
-    }
-
-    @Override
-    public IntegerTensor setValue(Integer value, long... index) {
-        this.value = value;
-        return this;
-    }
-
-    @Override
     public Integer sum() {
         return value;
     }

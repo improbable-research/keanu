@@ -92,15 +92,21 @@ public interface Tensor<T> {
 
     long getLength();
 
-    default T getValue(long... index){
-        if(index.length == 1){
+    default T getValue(long... index) {
+        if (index.length == 1) {
             return getFlattenedView().get(index[0]);
-        }else{
+        } else {
             return getFlattenedView().get(TensorShape.getFlatIndex(getShape(), getStride(), index));
         }
     }
 
-    Tensor<T> setValue(T value, long... index);
+    default void setValue(T value, long... index) {
+        if (index.length == 1) {
+            getFlattenedView().set(index[0], value);
+        } else {
+            getFlattenedView().set(TensorShape.getFlatIndex(getShape(), getStride(), index), value);
+        }
+    }
 
     default T scalar() {
         if (this.getLength() > 1) {

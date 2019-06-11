@@ -85,17 +85,6 @@ public class GenericTensor<T> implements Tensor<T> {
         return TensorShape.getLength(shape);
     }
 
-//    @Override
-//    public T getValue(long... index) {
-//        return data[checkedCast(getFlatIndex(shape, stride, index))];
-//    }
-
-    @Override
-    public GenericTensor<T> setValue(T value, long... index) {
-        data[checkedCast(getFlatIndex(shape, stride, index))] = value;
-        return this;
-    }
-
     @Override
     public GenericTensor<T> duplicate() {
         return new GenericTensor<>(copyOf(data, data.length), copyOf(shape, shape.length));
@@ -117,7 +106,6 @@ public class GenericTensor<T> implements Tensor<T> {
     public int hashCode() {
         int result = Arrays.hashCode(data);
         result = 31 * result + Arrays.hashCode(shape);
-        result = 31 * result + Arrays.hashCode(stride);
         return result;
     }
 

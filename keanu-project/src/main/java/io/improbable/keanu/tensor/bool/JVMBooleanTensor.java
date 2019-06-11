@@ -354,12 +354,6 @@ public class JVMBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor setValue(Boolean value, long... index) {
-        buffer[checkedCast(getFlatIndex(shape, stride, index))] = value;
-        return this;
-    }
-
-    @Override
     public BooleanTensor duplicate() {
         return new JVMBooleanTensor(copyOf(buffer, buffer.length), copyOf(shape, shape.length), copyOf(stride, stride.length));
     }

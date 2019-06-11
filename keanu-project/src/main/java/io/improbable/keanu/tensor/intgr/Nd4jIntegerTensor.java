@@ -579,12 +579,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor setValue(Integer value, long... index) {
-        tensor.putScalar(index, value);
-        return this;
-    }
-
-    @Override
     public IntegerTensor duplicate() {
         return new Nd4jIntegerTensor(tensor.dup());
     }

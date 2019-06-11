@@ -399,7 +399,8 @@ public class Nd4jIntegerTensorTest {
         int value = 42;
         int otherValue = 43;
         IntegerTensor allTheSame = IntegerTensor.create(value, new long[]{2, 3});
-        IntegerTensor notAllTheSame = allTheSame.duplicate().setValue(otherValue, 1, 1);
+        IntegerTensor notAllTheSame = allTheSame.duplicate();
+        notAllTheSame.setValue(otherValue, 1, 1);
 
         assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
@@ -740,7 +741,7 @@ public class Nd4jIntegerTensorTest {
         assertEquals(IntegerTensor.create(2, 4, 3, 5).reshape(1, 2, 2), IntegerTensor.stack(2, x, y));
     }
 
-     @Test
+    @Test
     public void canStackIfDimensionIsNegative() {
         IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
         IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
