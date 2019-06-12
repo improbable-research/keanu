@@ -108,17 +108,12 @@ public class TensorShapeValidation {
     }
 
     public static boolean isBroadcastable(long[] left, long[] right) {
-
-        int lowestRank = Math.min(left.length, right.length);
-        for (int i = 1; i <= lowestRank; i++) {
-            final long lDim = left[left.length - i];
-            final long rDim = right[right.length - i];
-            if (lDim != rDim && lDim != 1 && rDim != 1) {
-                return false;
-            }
+        try {
+            TensorShape.getBroadcastResultShape(left, right);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
-
-        return true;
     }
 
     /**
