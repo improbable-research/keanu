@@ -39,7 +39,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
  * <p>
  * More complex cases are also acceptable and use broadcasting semantics.
  * <p>
- * If the number of categories is defined by k, then the shape of p is (a...b, k) where a..b represents any shape of
+ * If the number of categories is defined by k, then the shape of p is (a...b, k) where a...b represents any shape of
  * any rank. For the p as a vector case, a...b is rank 0 and would be just a shape (k). Given that p has a shape of
  * (a...b, k) then n can have any shape that is broadcastable with a...b. The resulting shape would be the broadcasted
  * n shape with a...b and end in k.

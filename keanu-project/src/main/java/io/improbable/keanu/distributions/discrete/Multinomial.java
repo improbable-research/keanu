@@ -15,6 +15,12 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
 
 public class Multinomial implements DiscreteDistribution {
 
+    private static double allowedProbabilityError = 1e-3;
+
+    public static void setAllowedProbabilityError(double allowedProbabilityError) {
+        Multinomial.allowedProbabilityError = allowedProbabilityError;
+    }
+
     private final IntegerTensor n;
     private final DoubleTensor p;
     private final int k;
@@ -129,7 +135,7 @@ public class Multinomial implements DiscreteDistribution {
 
         final DoubleTensor pSum = p.sum(-1);
         final boolean pSumValidated = pSum.equalsWithinEpsilon(
-            DoubleTensor.create(1.0, pSum.getShape()), 1e-3
+            DoubleTensor.create(1.0, pSum.getShape()), allowedProbabilityError
         );
         if (!pSumValidated) {
             throw new IllegalArgumentException(
