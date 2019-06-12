@@ -16,7 +16,7 @@ public class BroadcastBinaryDoubleOperations {
     @Param({"TIMES", "DIVIDE"})
     public BinaryOperation operation;
 
-    @Param({"1x1,2x10", "2x10,1x1", "1x10,2x10", "2x10,1x10", "2x2x2,2x2", "2x2,2x2x2"})
+    @Param({"1x1,2x10", "2x10,1x1", "1x10,2x10", "2x10,1x10", "2x2x2,2x2", "2x2,2x2x2", "20x200,20x20x200"})
     public String dims;
 
     @Param({"JVM", "ND4J"})
