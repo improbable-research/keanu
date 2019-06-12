@@ -21,6 +21,9 @@ import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.getShapeIndices;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
+import static io.improbable.keanu.tensor.bool.BroadcastableBooleanOperations.AND;
+import static io.improbable.keanu.tensor.bool.BroadcastableBooleanOperations.OR;
+import static io.improbable.keanu.tensor.bool.BroadcastableBooleanOperations.XOR;
 import static java.util.Arrays.copyOf;
 
 public class JVMBooleanTensor implements BooleanTensor {
@@ -33,13 +36,13 @@ public class JVMBooleanTensor implements BooleanTensor {
      * @param buffer tensor buffer used c ordering
      * @param shape  desired shape of tensor
      */
-    JVMBooleanTensor(boolean[] buffer, long[] shape) {
+    private JVMBooleanTensor(boolean[] buffer, long[] shape) {
         this.buffer = buffer;
         this.shape = shape;
         this.stride = getRowFirstStride(shape);
     }
 
-    JVMBooleanTensor(boolean[] buffer, long[] shape, long[] stride) {
+    private JVMBooleanTensor(boolean[] buffer, long[] shape, long[] stride) {
         this.buffer = buffer;
         this.shape = shape;
         this.stride = stride;
@@ -48,7 +51,7 @@ public class JVMBooleanTensor implements BooleanTensor {
     /**
      * @param constant constant boolean value to fill shape
      */
-    JVMBooleanTensor(boolean constant) {
+    private JVMBooleanTensor(boolean constant) {
         this.buffer = new boolean[]{constant};
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
@@ -246,17 +249,17 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor andInPlace(BooleanTensor that) {
-        return binaryBooleanOpWithAutoBroadcast(that, (l, r) -> l && r, true);
+        return binaryBooleanOpWithAutoBroadcast(that, AND, true);
     }
 
     @Override
     public BooleanTensor orInPlace(BooleanTensor that) {
-        return binaryBooleanOpWithAutoBroadcast(that, (l, r) -> l || r, true);
+        return binaryBooleanOpWithAutoBroadcast(that, OR, true);
     }
 
     @Override
     public BooleanTensor xorInPlace(BooleanTensor that) {
-        return binaryBooleanOpWithAutoBroadcast(that, (l, r) -> l ^ r, true);
+        return binaryBooleanOpWithAutoBroadcast(that, XOR, true);
     }
 
     @Override

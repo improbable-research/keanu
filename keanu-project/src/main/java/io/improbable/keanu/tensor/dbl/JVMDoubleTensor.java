@@ -53,19 +53,19 @@ public class JVMDoubleTensor extends DoubleTensor {
     private long[] stride;
     private double[] buffer;
 
-    JVMDoubleTensor(double value) {
+    private JVMDoubleTensor(double value) {
         this.shape = new long[0];
         this.stride = new long[0];
         this.buffer = new double[]{value};
     }
 
-    JVMDoubleTensor(double[] data, long[] shape) {
+    private JVMDoubleTensor(double[] data, long[] shape) {
         this.shape = shape;
         this.stride = getRowFirstStride(shape);
         this.buffer = data;
     }
 
-    JVMDoubleTensor(double[] data, long[] shape, long[] stride) {
+    private JVMDoubleTensor(double[] data, long[] shape, long[] stride) {
         this.shape = shape;
         this.stride = stride;
         this.buffer = data;
