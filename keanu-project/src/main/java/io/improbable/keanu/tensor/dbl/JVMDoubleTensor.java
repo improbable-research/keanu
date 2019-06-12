@@ -13,7 +13,6 @@ import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.FastMath;
-import org.nd4j.linalg.api.shape.Shape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1472,7 +1471,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         long[] paddedRightShape = getShapeOrPadToRank(rightShape, resultRank);
         long[] paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
 
-        long[] resultShape = Shape.broadcastOutputShape(paddedLeftShape, paddedRightShape);
+        long[] resultShape = TensorShape.getBroadcastResultShape(paddedLeftShape, paddedRightShape);
         boolean resultShapeIsLeftSideShape = Arrays.equals(resultShape, paddedLeftShape);
 
         final double[] outputBuffer;

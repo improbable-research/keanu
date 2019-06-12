@@ -8,6 +8,15 @@
 
 * Fixed an error where a space was present in one of the dependencies, which broke some build systems fetching dependencies.
 
+- Fixed issues with MultinomialVertex. The issues with it before were:
+    - It was extremely strict on checking that p summed to 1.0
+    - It disallowed scalar n. This is probably the most common use case.
+    - It didn't support the usual batch sampling nor batch logProb (see MultinomialVertex.java for docs)
+
+- MultinomialVertex Functional changes:
+    - The shape of p expected k to be the far left dimension. It is now the far right in order to allow for broadcasting semantics.
+    - n and p parameter validation was semi-controllable but is now completely toggleable with `vertex.setValidationEnabled(true);`
+
 ### Python
 
 * Faster tensor creation in Python

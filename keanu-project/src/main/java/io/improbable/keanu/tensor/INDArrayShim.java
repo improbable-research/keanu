@@ -3,9 +3,7 @@ package io.improbable.keanu.tensor;
 import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.BaseTransformOp;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
@@ -20,8 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 
 /**
  * This class provides shim methods for the ND4J INDArray class.
@@ -81,9 +77,23 @@ public class INDArrayShim {
     private static INDArray applyBroadcastOperation(INDArray left,
                                                     INDArray right,
                                                     QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp) {
-        List<Integer> broadcastDimensions = getBroadcastDimensions(left.shape(), right.shape());
-        INDArray result = Nd4j.create(Shape.broadcastOutputShape(left.shape(), right.shape()));
-        return baseBroadcastOp.apply(left, right, result, broadcastDimensions);
+
+        INDArray leftPadded = left;
+        INDArray rightPadded = right;
+
+        int maxRank = Math.max(left.rank(), right.rank());
+
+        if (left.rank() != maxRank) {
+            leftPadded = left.reshape(TensorShape.shapeToDesiredRankByPrependingOnes(left.shape(), maxRank));
+        }
+
+        if (right.rank() != maxRank) {
+            rightPadded = right.reshape(TensorShape.shapeToDesiredRankByPrependingOnes(right.shape(), maxRank));
+        }
+
+        List<Integer> broadcastDimensions = getBroadcastDimensions(leftPadded.shape(), rightPadded.shape());
+        INDArray result = Nd4j.create(Shape.broadcastOutputShape(leftPadded.shape(), rightPadded.shape()));
+        return baseBroadcastOp.apply(leftPadded, rightPadded, result, broadcastDimensions);
     }
 
     public static INDArray muli(INDArray left, INDArray right) {
@@ -186,46 +196,40 @@ public class INDArrayShim {
         Result apply(First one, Second two, Third three, Fourth four);
     }
 
-    private static INDArray executeNd4jTransformOpWithPreservedScalarTensorShape(INDArray mask, INDArray right, DataBuffer.Type bufferType, QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> baseTransformOpConstructor) {
-        if (mask.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
-            if (mask.length() == 1) {
-                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
-                Nd4j.getExecutioner().exec(
-                    baseTransformOpConstructor.apply(mask, right, mask, mask.length())
-                );
-            } else {
-                Nd4j.getExecutioner().exec(
-                    baseTransformOpConstructor.apply(mask,
-                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
-                        mask,
-                        mask.length()
-                    )
-                );
-            }
-            return mask.reshape(resultShape);
-        } else {
+    public static INDArray getGreaterThanMask(INDArray mask, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(mask, right, (l, r) -> {
             Nd4j.getExecutioner().exec(
-                baseTransformOpConstructor.apply(mask, right, mask, mask.length())
+                new OldGreaterThan(l, r, l, l.length())
             );
-            return mask;
-        }
+            return l;
+        });
     }
 
-    public static INDArray getGreaterThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldGreaterThan::new);
+    public static INDArray getGreaterThanOrEqualToMask(INDArray mask, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(mask, right, (l, r) -> {
+            Nd4j.getExecutioner().exec(
+                new OldGreaterThanOrEqual(l, r, l, l.length())
+            );
+            return l;
+        });
     }
 
-    public static INDArray getGreaterThanOrEqualToMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldGreaterThanOrEqual::new);
+    public static INDArray getLessThanMask(INDArray mask, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(mask, right, (l, r) -> {
+            Nd4j.getExecutioner().exec(
+                new OldLessThan(l, r, l, l.length())
+            );
+            return l;
+        });
     }
 
-    public static INDArray getLessThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldLessThan::new);
-    }
-
-    public static INDArray getLessThanOrEqualToMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldLessThanOrEqual::new);
+    public static INDArray getLessThanOrEqualToMask(INDArray mask, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(mask, right, (l, r) -> {
+            Nd4j.getExecutioner().exec(
+                new OldLessThanOrEqual(l, r, l, l.length())
+            );
+            return l;
+        });
     }
 
     private static boolean shapeAIsSmallerThanShapeB(long[] shapeA, long[] shapeB) {
