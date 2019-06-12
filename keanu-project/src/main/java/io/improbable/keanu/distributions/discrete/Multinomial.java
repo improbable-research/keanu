@@ -2,6 +2,7 @@ package io.improbable.keanu.distributions.discrete;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.TensorShape;
@@ -15,7 +16,8 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
 
 public class Multinomial implements DiscreteDistribution {
 
-    private static double allowedProbabilityError = 1e-3;
+    public static final double DEFAULT_ALLOWED_PROBABILITY_ERROR = 1e-3;
+    private static double allowedProbabilityError = DEFAULT_ALLOWED_PROBABILITY_ERROR;
 
     public static void setAllowedProbabilityError(double allowedProbabilityError) {
         Multinomial.allowedProbabilityError = allowedProbabilityError;
@@ -152,7 +154,9 @@ public class Multinomial implements DiscreteDistribution {
     }
 
     private static void validateX(IntegerTensor x, IntegerTensor n, DoubleTensor p) {
-        final boolean xRangeValidated = x.greaterThanOrEqual(0).allTrue() && x.lessThanOrEqual(n).allTrue();
+        final boolean xRangeValidated = x.greaterThanOrEqual(0).allTrue() &&
+            x.lessThanOrEqual(n.reshape(Longs.concat(n.getShape(), new long[]{1}))).allTrue();
+
         if (!xRangeValidated) {
             throw new IllegalArgumentException("x must be >= 0 and <= n");
         }

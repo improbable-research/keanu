@@ -123,10 +123,10 @@ public class MultinomialVertexTest {
     public void doesAllowSampleWithShapeThatIsBroadcastableWithVertexShape() {
         IntegerTensor n = IntegerTensor.create(100, 200, 300, 400);
         DoubleTensor p = DoubleTensor.create(new double[]{
-            0.1, 0.25,
-            0.2, 0.25,
-            0.3, 0.25,
-            0.4, 0.25
+            0.1, 0.9,
+            0.2, 0.8,
+            0.3, 0.7,
+            0.4, 0.6
         }, 4, 2);
 
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
@@ -219,6 +219,28 @@ public class MultinomialVertexTest {
 
         assertThat(samples, hasShape(10));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
+    }
+
+    @Test
+    public void itWorksWithAlmostOneProbabilityAsDefinedByTheUser() {
+
+        int n = 100;
+        DoubleTensor p = DoubleTensor.create(0.1, new long[]{10});
+        Double pSum = p.sum();
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Probabilities must sum to 1 but summed to [" + pSum + "]");
+
+        assertThat(pSum, not(equalTo(1.0)));
+
+        Multinomial.setAllowedProbabilityError(0.0);
+        try {
+            MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+            multinomialVertex.setValidationEnabled(true);
+            multinomialVertex.sample();
+        } finally {
+            Multinomial.setAllowedProbabilityError(Multinomial.DEFAULT_ALLOWED_PROBABILITY_ERROR);
+        }
     }
 
     @Test

@@ -71,7 +71,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
         this.p = p;
         this.n = n;
-        this.validationEnabled = false;
+        this.validationEnabled = true;
 
         setParents(p, n);
     }
