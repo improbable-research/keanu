@@ -80,7 +80,7 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public long[] getStride() {
-        return stride;
+        return Arrays.copyOf(stride, stride.length);
     }
 
     @Override
