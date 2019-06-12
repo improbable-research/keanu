@@ -76,8 +76,8 @@ public class Multinomial implements DiscreteDistribution {
         int[] samples = new int[k * sampleCount];
 
         for (int i = 0; i < sampleCount; i++) {
-            int pIndex = i * k;
-            drawNTimes(flatN[i], random, samples, pIndex, flatP, pIndex, k);
+            int positionByK = i * k;
+            drawNTimes(flatN[i], random, samples, positionByK, flatP, positionByK, k);
         }
 
         return IntegerTensor.create(samples, shape);
