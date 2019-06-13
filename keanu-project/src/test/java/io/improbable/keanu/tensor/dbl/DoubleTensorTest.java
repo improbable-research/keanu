@@ -1578,5 +1578,24 @@ public class DoubleTensorTest {
         lengthOne.tensorMultiply(matrix, new int[]{0}, new int[]{3});
     }
 
+    @Test
+    public void canCumSumOnMatrix() {
+        DoubleTensor a = DoubleTensor.create(1, 2, 3, 4, 5, 6, 7, 8, 9).reshape(3, 3);
+        DoubleTensor expected0 = DoubleTensor.create(1, 2, 3, 5, 7, 9, 12, 15, 18).reshape(3, 3);
+        DoubleTensor expected1 = DoubleTensor.create(1, 3, 6, 4, 9, 15, 7, 15, 24).reshape(3, 3);
+
+        assertThat(a.cumSum(0), valuesAndShapesMatch(expected0));
+        assertThat(a.cumSum(1), valuesAndShapesMatch(expected1));
+        assertThat(a.cumSum(-1), valuesAndShapesMatch(expected1));
+    }
+
+    @Test
+    public void canCumSumOnVector() {
+        DoubleTensor a = DoubleTensor.create(1, 2, 3);
+        DoubleTensor expected0 = DoubleTensor.create(1, 3, 6);
+
+        assertThat(a.cumSum(0), valuesAndShapesMatch(expected0));
+    }
+
 
 }

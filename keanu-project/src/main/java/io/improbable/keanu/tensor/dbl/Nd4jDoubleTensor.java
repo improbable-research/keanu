@@ -171,6 +171,17 @@ public class Nd4jDoubleTensor extends DoubleTensor {
         return new Nd4jDoubleTensor(INDArrayShim.sum(tensor, overDimensions));
     }
 
+    @Override
+    public DoubleTensor cumSum(int dimension) {
+        return duplicate().cumSumInPlace(dimension);
+    }
+
+    @Override
+    public DoubleTensor cumSumInPlace(int dimension) {
+        tensor.cumsumi(dimension);
+        return this;
+    }
+
     public Double sum() {
         return tensor.sumNumber().doubleValue();
     }

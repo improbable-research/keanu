@@ -25,10 +25,12 @@ import java.util.function.Function;
 import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
+import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
 import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
+import static io.improbable.keanu.tensor.TensorShape.getSummationResultShape;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
@@ -282,20 +284,33 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         overDimensions = TensorShape.getAbsoluteDimensions(this.shape.length, overDimensions);
 
-        long[] resultShape = TensorShape.getSummationResultShape(shape, overDimensions);
+        long[] resultShape = getSummationResultShape(shape, overDimensions);
         long[] resultStride = getRowFirstStride(resultShape);
-        double[] newBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
+        double[] newBuffer = new double[TensorShape.getLengthAsInt(resultShape)];
 
         for (int i = 0; i < buffer.length; i++) {
 
             long[] shapeIndices = ArrayUtils.removeAll(TensorShape.getShapeIndices(shape, stride, i), overDimensions);
 
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, shapeIndices));
+            int j = Ints.checkedCast(getFlatIndex(resultShape, resultStride, shapeIndices));
 
             newBuffer[j] += buffer[i];
         }
 
         return new JVMDoubleTensor(newBuffer, resultShape);
+    }
+
+    @Override
+    public DoubleTensor cumSum(int requestedDimension) {
+        return duplicate().cumSumInPlace(requestedDimension);
+    }
+
+    @Override
+    public DoubleTensor cumSumInPlace(int requestedDimension) {
+        int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + getRank();
+
+
+        return null;
     }
 
     @Override
@@ -848,7 +863,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
             long[] shapeIndices = ArrayUtils.insert(dimension, TensorShape.getShapeIndices(resultShape, resultStride, i), index);
 
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(shape, stride, shapeIndices));
+            int j = Ints.checkedCast(getFlatIndex(shape, stride, shapeIndices));
 
             newBuffer[i] = buffer[j];
         }

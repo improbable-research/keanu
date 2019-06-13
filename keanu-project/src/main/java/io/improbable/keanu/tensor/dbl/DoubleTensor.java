@@ -143,6 +143,10 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
 
     public abstract DoubleTensor sum(int... overDimensions);
 
+    public abstract DoubleTensor cumSum(int dimension);
+
+    public abstract DoubleTensor cumSumInPlace(int dimension);
+
     //New tensor Ops and transforms
 
     public abstract DoubleTensor reciprocal();
