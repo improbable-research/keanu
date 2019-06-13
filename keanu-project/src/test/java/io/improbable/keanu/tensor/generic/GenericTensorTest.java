@@ -226,4 +226,27 @@ public class GenericTensorTest {
         assertArrayEquals(actualByColumn.asFlatArray(), expectedByColumn.asFlatArray());
     }
 
+    @Test
+    public void canBroadcastToShape() {
+        GenericTensor<String> a = GenericTensor.create(
+            "a", "b", "c"
+        ).reshape(3);
+
+        GenericTensor<String> expectedByRow = GenericTensor.create(
+            "a", "b", "c",
+            "a", "b", "c",
+            "a", "b", "c"
+        ).reshape(3, 3);
+
+        assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expectedByRow));
+
+        GenericTensor<String> expectedByColumn = GenericTensor.create(
+            "a", "a", "a",
+            "b", "b", "b",
+            "c", "c", "c"
+        ).reshape(3, 3);
+
+        assertThat(a.reshape(3, 1).broadcast(3, 3), valuesAndShapesMatch(expectedByColumn));
+    }
+
 }

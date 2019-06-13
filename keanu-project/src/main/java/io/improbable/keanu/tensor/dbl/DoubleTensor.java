@@ -132,6 +132,9 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
     @Override
     public abstract DoubleTensor reshape(long... newShape);
 
+    @Override
+    public abstract DoubleTensor broadcast(long... toShape);
+
     public abstract DoubleTensor permute(int... rearrange);
 
     @Override

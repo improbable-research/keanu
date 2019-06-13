@@ -44,8 +44,9 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     /**
      * Creates an IntegerTensor from a long[]. Will throw an exception if any value in the long[] cannot be represented as an integer
+     *
      * @param values long[] of values
-     * @param shape shape of the tensor
+     * @param shape  shape of the tensor
      * @return a new IntegerTensor
      */
     static IntegerTensor create(long[] values, long... shape) {
@@ -55,6 +56,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     /**
      * Creates an IntegerTensor from a long[]. Will throw an exception if any value in the long[] cannot be represented as an integer
+     *
      * @param values long[] of values
      * @return a new IntegerTensor
      */
@@ -160,6 +162,9 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     @Override
     IntegerTensor permute(int... rearrange);
+
+    @Override
+    IntegerTensor broadcast(long... toShape);
 
     @Override
     IntegerTensor duplicate();

@@ -49,8 +49,8 @@ public class JVMTensorBroadcast {
             } else {
 
                 return broadcastBinaryOp(
-                    leftBuffer, leftShape, leftBufferLength,
-                    rightBuffer, rightShape, rightBufferLength,
+                    leftBuffer, leftShape, leftStride, leftBufferLength,
+                    rightBuffer, rightShape, rightStride, rightBufferLength,
                     op, inPlace
                 );
             }
@@ -197,21 +197,13 @@ public class JVMTensorBroadcast {
         }
     }
 
-    private static ResultWrapper broadcastBinaryOp(Object leftBuffer, long[] leftShape, int leftBufferLength,
-                                                   Object rightBuffer, long[] rightShape, int rightBufferLength,
+    private static ResultWrapper broadcastBinaryOp(Object leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
+                                                   Object rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
                                                    BiFunction op,
                                                    boolean inPlace) {
 
-        //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
-        final int resultRank = Math.max(leftShape.length, rightShape.length);
-        final long[] paddedLeftShape = TensorShape.shapeToDesiredRankByPrependingOnes(leftShape, resultRank);
-        final long[] paddedLeftStride = TensorShape.getRowFirstStride(paddedLeftShape);
-
-        final long[] paddedRightShape = TensorShape.shapeToDesiredRankByPrependingOnes(rightShape, resultRank);
-        final long[] paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
-
-        final long[] resultShape = Shape.broadcastOutputShape(paddedLeftShape, paddedRightShape);
-        final boolean resultShapeIsLeftSideShape = Arrays.equals(resultShape, paddedLeftShape);
+        final long[] resultShape = Shape.broadcastOutputShape(leftShape, rightShape);
+        final boolean resultShapeIsLeftSideShape = Arrays.equals(resultShape, leftShape);
 
         final Object outputBuffer;
         final long[] outputStride;
@@ -219,28 +211,28 @@ public class JVMTensorBroadcast {
         if (resultShapeIsLeftSideShape) {
 
             outputBuffer = inPlace ? leftBuffer : arrayLikeWithLength(leftBuffer, leftBufferLength);
-            outputStride = paddedLeftStride;
+            outputStride = leftStride;
 
             //e.g. [2, 2] * [1, 2]
             broadcastFromRightAllTypes(
-                leftBuffer, paddedLeftStride, rightBuffer,
-                paddedRightShape, paddedRightStride,
+                leftBuffer, leftStride, rightBuffer,
+                rightShape, rightStride,
                 outputBuffer, op
             );
 
         } else {
 
-            final boolean resultShapeIsRightSideShape = Arrays.equals(resultShape, paddedRightShape);
+            final boolean resultShapeIsRightSideShape = Arrays.equals(resultShape, rightShape);
 
             if (resultShapeIsRightSideShape) {
 
                 outputBuffer = arrayLikeWithLength(rightBuffer, rightBufferLength);
-                outputStride = paddedRightStride;
+                outputStride = rightStride;
 
                 //e.g. [2] / [2, 2]
                 broadcastFromLeftAllTypes(
-                    leftBuffer, paddedLeftShape, paddedLeftStride,
-                    rightBuffer, paddedRightStride,
+                    leftBuffer, leftShape, leftStride,
+                    rightBuffer, rightStride,
                     outputBuffer, op
                 );
 
@@ -251,8 +243,8 @@ public class JVMTensorBroadcast {
 
                 //e.g. [2, 2, 1] * [1, 2, 2]
                 broadcastFromLeftAndRightAllTypes(
-                    leftBuffer, paddedLeftShape, paddedLeftStride,
-                    rightBuffer, paddedRightShape, paddedRightStride,
+                    leftBuffer, leftShape, leftStride,
+                    rightBuffer, rightShape, rightStride,
                     outputBuffer, outputStride, op
                 );
             }
@@ -377,6 +369,38 @@ public class JVMTensorBroadcast {
         }
     }
 
+    public static void broadcast(double[] buffer, long[] shape, long[] stride,
+                                 double[] outputBuffer, long[] outputStride) {
+
+        for (int i = 0; i < outputBuffer.length; i++) {
+
+            int j = getBroadcastedFlatIndex(i, outputStride, shape, stride);
+
+            outputBuffer[i] = buffer[j];
+        }
+    }
+
+    public static void broadcast(boolean[] buffer, long[] shape, long[] stride,
+                                 boolean[] outputBuffer, long[] outputStride) {
+
+        for (int i = 0; i < outputBuffer.length; i++) {
+
+            int j = getBroadcastedFlatIndex(i, outputStride, shape, stride);
+
+            outputBuffer[i] = buffer[j];
+        }
+    }
+
+    public static void broadcast(Object[] buffer, long[] shape, long[] stride,
+                                 Object[] outputBuffer, long[] outputShape, long[] outputStride) {
+
+        for (int i = 0; i < outputBuffer.length; i++) {
+
+            int j = getBroadcastedFlatIndex(i, outputStride, shape, stride);
+
+            outputBuffer[i] = buffer[j];
+        }
+    }
 
     private static void broadcastFromLeft(double[] leftBuffer, long[] leftShape, long[] leftStride,
                                           double[] rightBuffer, long[] rightStride,

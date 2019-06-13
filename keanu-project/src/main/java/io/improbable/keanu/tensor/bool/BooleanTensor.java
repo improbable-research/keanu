@@ -78,6 +78,9 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
     BooleanTensor permute(int... rearrange);
 
     @Override
+    BooleanTensor broadcast(long... toShape);
+
+    @Override
     BooleanTensor duplicate();
 
     BooleanTensor and(BooleanTensor that);

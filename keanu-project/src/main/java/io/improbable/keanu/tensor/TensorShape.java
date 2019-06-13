@@ -413,16 +413,20 @@ public class TensorShape {
 
     public static int getBroadcastedFlatIndex(int fromFlatIndex, long[] fromStride, long[] toShape, long[] toStride) {
 
-        final long[] fromShapeIndex = new long[fromStride.length];
-        final long[] toShapeIndex = new long[fromShapeIndex.length];
+        long fromShapeIndex;
+        long toShapeIndex;
         int remainder = fromFlatIndex;
         int toFlatIndex = 0;
+        int rankDiff = fromStride.length - toStride.length;
 
         for (int i = 0; i < fromStride.length; i++) {
-            fromShapeIndex[i] = remainder / fromStride[i];
-            remainder -= fromShapeIndex[i] * fromStride[i];
-            toShapeIndex[i] = fromShapeIndex[i] % toShape[i];
-            toFlatIndex += toStride[i] * toShapeIndex[i];
+            fromShapeIndex = remainder / fromStride[i];
+            remainder -= fromShapeIndex * fromStride[i];
+
+            if (i >= rankDiff) {
+                toShapeIndex = fromShapeIndex % toShape[i - rankDiff];
+                toFlatIndex += toStride[i - rankDiff] * toShapeIndex;
+            }
         }
 
         return toFlatIndex;

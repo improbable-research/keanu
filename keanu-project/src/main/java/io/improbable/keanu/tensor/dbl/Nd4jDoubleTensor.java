@@ -146,6 +146,11 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
+    public DoubleTensor broadcast(long... toShape) {
+        return new Nd4jDoubleTensor(tensor.broadcast(toShape));
+    }
+
+    @Override
     public DoubleTensor permute(int... rearrange) {
         return new Nd4jDoubleTensor(tensor.permute(rearrange));
     }

@@ -110,6 +110,17 @@ public class JVMBooleanTensor implements BooleanTensor {
         return new JVMBooleanTensor(newBuffer, resultShape);
     }
 
+    @Override
+    public BooleanTensor broadcast(long... toShape) {
+        int outputLength = TensorShape.getLengthAsInt(toShape);
+        long[] outputStride = TensorShape.getRowFirstStride(toShape);
+        boolean[] outputBuffer = new boolean[outputLength];
+
+        JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
+
+        return new JVMBooleanTensor(outputBuffer, toShape, outputStride);
+    }
+
     public static BooleanTensor concat(int dimension, BooleanTensor... toConcat) {
 
         long[] concatShape = TensorShape.getConcatResultShape(dimension, toConcat);

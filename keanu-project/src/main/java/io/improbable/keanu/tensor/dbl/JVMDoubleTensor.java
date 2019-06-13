@@ -187,6 +187,18 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
+    public DoubleTensor broadcast(long... toShape) {
+
+        int outputLength = TensorShape.getLengthAsInt(toShape);
+        long[] outputStride = TensorShape.getRowFirstStride(toShape);
+        double[] outputBuffer = new double[outputLength];
+
+        JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
+
+        return new JVMDoubleTensor(outputBuffer, toShape, outputStride);
+    }
+
+    @Override
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof DoubleTensor) {
             if (isScalar()) {

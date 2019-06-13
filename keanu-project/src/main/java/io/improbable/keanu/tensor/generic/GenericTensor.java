@@ -224,6 +224,17 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
+    public Tensor<T> broadcast(long... toShape) {
+        int outputLength = TensorShape.getLengthAsInt(toShape);
+        long[] outputStride = TensorShape.getRowFirstStride(toShape);
+        Object[] outputBuffer = new Object[outputLength];
+
+        JVMTensorBroadcast.broadcast(data, shape, stride, outputBuffer, toShape, outputStride);
+
+        return new GenericTensor<>((T[]) outputBuffer, toShape, outputStride);
+    }
+
+    @Override
     public GenericTensor<T> slice(int dimension, long index) {
         T[] flat = asFlatArray();
         List<T> tadded = new ArrayList<>();

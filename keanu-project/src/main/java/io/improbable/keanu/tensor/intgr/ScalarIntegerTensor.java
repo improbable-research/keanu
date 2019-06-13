@@ -95,6 +95,14 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor broadcast(long... toShape) {
+        int bufferLength = TensorShape.getLengthAsInt(toShape);
+        int[] buffer = new int[bufferLength];
+        Arrays.fill(buffer, value);
+        return IntegerTensor.create(buffer, toShape);
+    }
+
+    @Override
     public IntegerTensor diag() {
         return duplicate();
     }

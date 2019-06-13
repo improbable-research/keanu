@@ -103,6 +103,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor broadcast(long... toShape) {
+        return new Nd4jIntegerTensor(tensor.broadcast(toShape));
+    }
+
+    @Override
     public IntegerTensor diag() {
         return new Nd4jIntegerTensor(Nd4j.diag(tensor));
     }

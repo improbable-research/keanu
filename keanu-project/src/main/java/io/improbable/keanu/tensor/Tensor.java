@@ -131,6 +131,8 @@ public interface Tensor<T> {
 
     Tensor<T> permute(int... rearrange);
 
+    Tensor<T> broadcast(long... toShape);
+
     FlattenedView<T> getFlattenedView();
 
     interface FlattenedView<T> {
