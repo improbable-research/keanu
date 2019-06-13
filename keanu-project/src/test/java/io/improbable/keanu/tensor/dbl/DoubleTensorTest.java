@@ -1579,6 +1579,21 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canCumSumOnRank3() {
+        DoubleTensor a = DoubleTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 2, 2);
+        DoubleTensor expected0 = DoubleTensor.create(1, 2, 3, 4, 6, 8, 10, 12).reshape(2, 2, 2);
+        DoubleTensor expected1 = DoubleTensor.create(1, 2, 4, 6, 5, 6, 12, 14).reshape(2, 2, 2);
+        DoubleTensor expected2 = DoubleTensor.create(1, 3, 3, 7, 5, 11, 7, 15).reshape(2, 2, 2);
+
+        assertThat(a.cumSum(0), valuesAndShapesMatch(expected0));
+        assertThat(a.cumSum(1), valuesAndShapesMatch(expected1));
+        assertThat(a.cumSum(2), valuesAndShapesMatch(expected2));
+        assertThat(a.cumSum(-1), valuesAndShapesMatch(expected2));
+        assertThat(a.cumSum(-2), valuesAndShapesMatch(expected1));
+        assertThat(a.cumSum(-3), valuesAndShapesMatch(expected0));
+    }
+
+    @Test
     public void canCumSumOnMatrix() {
         DoubleTensor a = DoubleTensor.create(1, 2, 3, 4, 5, 6, 7, 8, 9).reshape(3, 3);
         DoubleTensor expected0 = DoubleTensor.create(1, 2, 3, 5, 7, 9, 12, 15, 18).reshape(3, 3);
@@ -1587,6 +1602,7 @@ public class DoubleTensorTest {
         assertThat(a.cumSum(0), valuesAndShapesMatch(expected0));
         assertThat(a.cumSum(1), valuesAndShapesMatch(expected1));
         assertThat(a.cumSum(-1), valuesAndShapesMatch(expected1));
+        assertThat(a.cumSum(-2), valuesAndShapesMatch(expected0));
     }
 
     @Test
@@ -1595,6 +1611,12 @@ public class DoubleTensorTest {
         DoubleTensor expected0 = DoubleTensor.create(1, 3, 6);
 
         assertThat(a.cumSum(0), valuesAndShapesMatch(expected0));
+        assertThat(a.cumSum(-1), valuesAndShapesMatch(expected0));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfCumSumOnInvalidDimension(){
+        DoubleTensor.scalar(2).cumSum(0);
     }
 
 

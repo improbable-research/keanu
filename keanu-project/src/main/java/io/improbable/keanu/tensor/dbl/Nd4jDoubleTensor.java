@@ -177,7 +177,9 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor cumSumInPlace(int dimension) {
+    public DoubleTensor cumSumInPlace(int requestedDimension) {
+        int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + tensor.rank();
+        TensorShapeValidation.checkDimensionExistsInShape(dimension, tensor.shape());
         tensor.cumsumi(dimension);
         return this;
     }

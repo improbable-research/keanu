@@ -24,6 +24,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
+import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
@@ -31,6 +32,7 @@ import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.getSummationResultShape;
+import static io.improbable.keanu.tensor.TensorShape.incrementIndexByShape;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
@@ -307,10 +309,27 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor cumSumInPlace(int requestedDimension) {
-        int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + getRank();
 
+        int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + shape.length;
+        TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
+        long[] index = new long[shape.length];
+        int[] dimensionOrder = ArrayUtils.remove(dimensionRange(0, shape.length), dimension);
 
-        return null;
+        do {
+
+            double sum = 0.0;
+            for (int i = 0; i < shape[dimension]; i++) {
+
+                index[dimension] = i;
+
+                int j = Ints.checkedCast(getFlatIndex(shape, stride, index));
+                buffer[j] += sum;
+                sum = buffer[j];
+            }
+
+        } while (incrementIndexByShape(shape, index, dimensionOrder));
+
+        return this;
     }
 
     @Override

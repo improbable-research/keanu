@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TensorShapeTest {
 
@@ -69,4 +71,51 @@ public class TensorShapeTest {
             assertEquals(i, tensor.getValue(indexOfi), 1e-10);
         }
     }
+
+    @Test
+    public void canIncrementIndexForSingleDimensionOfMatrix() {
+        long[] shape = new long[]{2, 3};
+
+        long[][] expected1 = new long[][]{
+            new long[]{0, 1},
+            new long[]{0, 2}
+        };
+
+        assertIndexIncrementResults(shape, new long[]{0, 0}, new int[]{1}, expected1);
+
+        long[][] expected2 = new long[][]{
+            new long[]{1, 0}
+        };
+
+        assertIndexIncrementResults(shape, new long[]{0, 0}, new int[]{0}, expected2);
+    }
+
+    @Test
+    public void canIncrementIndexForRank3() {
+        long[] shape = new long[]{2, 3, 3};
+        long[] index = new long[]{0, 0, 2};
+        int[] dimensionOrder = new int[]{1, 0};
+
+        long[][] expected = new long[][]{
+            new long[]{0, 1, 2},
+            new long[]{0, 2, 2},
+            new long[]{1, 0, 2},
+            new long[]{1, 1, 2},
+            new long[]{1, 2, 2}
+        };
+
+        assertIndexIncrementResults(shape, index, dimensionOrder, expected);
+    }
+
+    private void assertIndexIncrementResults(long[] shape, long[] index, int[] dimensionOrder, long[][] expected) {
+        for (int i = 0; i < expected.length; i++) {
+            boolean result = TensorShape.incrementIndexByShape(shape, index, dimensionOrder);
+            assertArrayEquals(index, expected[i]);
+            assertTrue(result);
+        }
+
+        assertFalse(TensorShape.incrementIndexByShape(shape, index, dimensionOrder));
+    }
+
+
 }
