@@ -419,4 +419,20 @@ public class JVMBooleanTensorTest {
         Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expected));
     }
 
+    @Test
+    public void canDiagFromVector() {
+        BooleanTensor expected = BooleanTensor.create(new boolean[]{true, false, false, false, true, false, false, false, false}, 3, 3);
+        BooleanTensor actual = BooleanTensor.create(true, true, false).diag();
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canDiagFromMatrix() {
+        BooleanTensor actual = BooleanTensor.create(new boolean[]{true, false, false, false, true, false, false, false, false}, 3, 3).diag();
+        BooleanTensor expected = BooleanTensor.create(true, true, false);
+
+        Assert.assertEquals(expected, actual);
+    }
+
 }

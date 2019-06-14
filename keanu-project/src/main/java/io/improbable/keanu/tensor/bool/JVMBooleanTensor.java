@@ -361,6 +361,31 @@ public class JVMBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public BooleanTensor diag() {
+        boolean[] newBuffer;
+        long[] newShape;
+        if (getRank() == 1) {
+            int n = buffer.length;
+            newBuffer = new boolean[Ints.checkedCast((long) n * (long) n)];
+            for (int i = 0; i < n; i++) {
+                newBuffer[i * n + i] = buffer[i];
+            }
+            newShape = new long[]{n, n};
+        } else if (getRank() == 2 && shape[0] == shape[1]) {
+            int n = Ints.checkedCast(shape[0]);
+            newBuffer = new boolean[n];
+            for (int i = 0; i < n; i++) {
+                newBuffer[i] = buffer[i * n + i];
+            }
+            newShape = new long[]{n};
+        } else {
+            throw new IllegalArgumentException("Diag is only valid for vectors or square matrices");
+        }
+
+        return new JVMBooleanTensor(newBuffer, newShape);
+    }
+
+    @Override
     public int getRank() {
         return shape.length;
     }

@@ -267,13 +267,28 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor diag() {
-        int n = buffer.length;
-        double[] newBuffer = new double[Ints.checkedCast((long) n * n)];
-        for (int i = 0; i < n; i++) {
-            newBuffer[i * n + i] = buffer[i];
+
+        double[] newBuffer;
+        long[] newShape;
+        if (getRank() == 1) {
+            int n = buffer.length;
+            newBuffer = new double[Ints.checkedCast((long) n * (long) n)];
+            for (int i = 0; i < n; i++) {
+                newBuffer[i * n + i] = buffer[i];
+            }
+            newShape = new long[]{n, n};
+        } else if (getRank() == 2 && shape[0] == shape[1]) {
+            int n = Ints.checkedCast(shape[0]);
+            newBuffer = new double[n];
+            for (int i = 0; i < n; i++) {
+                newBuffer[i] = buffer[i * n + i];
+            }
+            newShape = new long[]{n};
+        } else {
+            throw new IllegalArgumentException("Diag is only valid for vectors or square matrices");
         }
 
-        return new JVMDoubleTensor(newBuffer, new long[]{n, n});
+        return new JVMDoubleTensor(newBuffer, newShape);
     }
 
     @Override

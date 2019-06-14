@@ -148,9 +148,9 @@ public class DifferentiatorTest {
         DoubleTensor BValue = B.getValue();
 
         DoubleTensor expecteddHdA = AValue.reciprocal().plus(AValue.cos().div(AValue.sin())).times(predicateTrueMask)
-            .plus(BValue.times(predicateFalseMask)).reshape(1, 4).diag().reshape(2, 2, 2, 2);
+            .plus(BValue.times(predicateFalseMask)).reshape(4).diag().reshape(2, 2, 2, 2);
 
-        DoubleTensor expecteddHdB = BValue.reciprocal().times(predicateTrueMask).plus(AValue.plus(1).times(predicateFalseMask)).reshape(1, 4).diag().reshape(2, 2, 2, 2);
+        DoubleTensor expecteddHdB = BValue.reciprocal().times(predicateTrueMask).plus(AValue.plus(1).times(predicateFalseMask)).reshape(4).diag().reshape(2, 2, 2, 2);
 
         assertEquals(expecteddHdA, dHdA);
         assertEquals(expecteddHdB, dHdB);

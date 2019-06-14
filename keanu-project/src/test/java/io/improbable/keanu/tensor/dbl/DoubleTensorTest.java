@@ -133,13 +133,20 @@ public class DoubleTensorTest {
     }
 
     @Test
-    public void canDiag() {
+    public void canDiagFromVector() {
         DoubleTensor expected = DoubleTensor.create(new double[]{1, 0, 0, 0, 2, 0, 0, 0, 3}, 3, 3);
         DoubleTensor actual = DoubleTensor.create(1, 2, 3).diag();
 
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void canDiagFromMatrix() {
+        DoubleTensor actual = DoubleTensor.create(new double[]{1, 0, 0, 0, 2, 0, 0, 0, 3}, 3, 3).diag();
+        DoubleTensor expected = DoubleTensor.create(1, 2, 3);
+
+        assertEquals(expected, actual);
+    }
 
     @Test
     public void canInverseEyeMatrix() {

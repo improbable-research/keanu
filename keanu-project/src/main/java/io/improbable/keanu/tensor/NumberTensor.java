@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 import java.util.function.Function;
 
-public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> extends Tensor<N>, NumberOperators<T> {
+public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> extends Tensor<N>, NumberOperators<T> {
 
     N sum();
 
@@ -15,18 +15,14 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
 
     IntegerTensor toInteger();
 
-    T diag();
-
-    T transpose();
-
     T sum(int... overDimensions);
-    
+
     // New tensor Ops and transforms
-    
+
     T matrixMultiply(T value);
 
     T tensorMultiply(T value, int[] dimLeft, int[] dimsRight);
-    
+
     T abs();
 
     /**
@@ -40,7 +36,7 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
      * </pre>
      *
      * @return A scalar tensor with the index of the largest value. If there are multiple largest values, it will be
-     *         the first index.
+     * the first index.
      */
     int argMax();
 
@@ -58,8 +54,8 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
      *
      * @param axis The axis (dimension) to find the largest values in
      * @return A tensor where each value is the location of the maximum value in the vector at that location in the
-     *         specified dimension in the original tensor. If there are multiple largest values in this vector, it will
-     *         be the first index.
+     * specified dimension in the original tensor. If there are multiple largest values in this vector, it will
+     * be the first index.
      * @see <a href="https://www.geeksforgeeks.org/numpy-argmax-python/">An article about argmax over an axis in numpy</a>
      */
     IntegerTensor argMax(int axis);

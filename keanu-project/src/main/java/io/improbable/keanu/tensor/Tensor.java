@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor;
 
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
@@ -120,6 +121,16 @@ public interface Tensor<T> {
     Tensor<T> slice(int dimension, long index);
 
     Tensor<T> take(long... index);
+
+    Tensor<T> diag();
+
+    default Tensor<T> transpose() {
+        Preconditions.checkArgument(
+            getRank() == 2,
+            "Can only transpose rank 2. Use permute(...) for higher rank transpose."
+        );
+        return permute(1, 0);
+    }
 
     double[] asFlatDoubleArray();
 

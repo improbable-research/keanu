@@ -249,4 +249,20 @@ public class GenericTensorTest {
         assertThat(a.reshape(3, 1).broadcast(3, 3), valuesAndShapesMatch(expectedByColumn));
     }
 
+    @Test
+    public void canDiagFromVector() {
+        GenericTensor<String> expected = GenericTensor.create(new String[]{"1", null, null, null, "5", null, null, null, "9"}).reshape(3, 3);
+        GenericTensor<String> actual = GenericTensor.create("1", "5", "9").diag();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canDiagFromMatrix() {
+        GenericTensor<String> actual = GenericTensor.create(new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"}).reshape(3, 3).diag();
+        GenericTensor<String> expected = GenericTensor.create("1", "5", "9");
+
+        assertEquals(expected, actual);
+    }
+
 }
