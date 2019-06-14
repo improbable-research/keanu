@@ -165,6 +165,17 @@ public class GenericTensorTest {
     }
 
     @Test
+    public void canConvertGenericTypeByApply() {
+        GenericTensor<Double> a = GenericTensor.create(1., 2., 3.);
+        GenericTensor<Double> b = GenericTensor.create(4., 5., 6.);
+
+        GenericTensor<String> actual = a.apply(b, (l, r) -> (l + r) + "");
+        GenericTensor<String> expected = GenericTensor.create("5.0", "7.0", "9.0");
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
     public void canApplyMultiplyWithBroadcast() {
         GenericTensor<Double> a = GenericTensor.create(
             1., 2., 3.,

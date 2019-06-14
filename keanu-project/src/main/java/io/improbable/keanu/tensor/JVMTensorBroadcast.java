@@ -13,19 +13,19 @@ import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 public class JVMTensorBroadcast {
 
     @AllArgsConstructor
-    public static class ResultWrapper {
-        public final Object outputBuffer;
+    public static class ResultWrapper<T> {
+        public final T outputBuffer;
         public final long[] outputShape;
         public final long[] outputStride;
     }
 
-    public static ResultWrapper broadcastIfNeeded(Object leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
-                                                  Object rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
-                                                  BiFunction op,
-                                                  boolean inPlace) {
+    public static <T> ResultWrapper<T> broadcastIfNeeded(T leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
+                                                         T rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
+                                                         BiFunction op,
+                                                         boolean inPlace) {
         final boolean needsBroadcast = !Arrays.equals(leftShape, rightShape);
 
-        Object outputBuffer;
+        T outputBuffer;
         long[] outputShape;
         long[] outputStride;
 
@@ -63,16 +63,16 @@ public class JVMTensorBroadcast {
             elementwiseBinaryOpAllTypes(leftBuffer, rightBuffer, op, outputBuffer);
         }
 
-        return new ResultWrapper(outputBuffer, outputShape, outputStride);
+        return new ResultWrapper<>(outputBuffer, outputShape, outputStride);
     }
 
-    private static Object arrayLikeWithLength(Object likeThis, int length) {
+    private static <T> T arrayLikeWithLength(T likeThis, int length) {
         if (likeThis instanceof double[]) {
-            return new double[length];
+            return (T) (new double[length]);
         } else if (likeThis instanceof boolean[]) {
-            return new boolean[length];
+            return (T) (new boolean[length]);
         } else if (likeThis instanceof Object[]) {
-            return new Object[length];
+            return (T) (new Object[length]);
         } else {
             throw new IllegalArgumentException("Cannot create array like " + likeThis.getClass().getSimpleName());
         }
@@ -197,15 +197,15 @@ public class JVMTensorBroadcast {
         }
     }
 
-    private static ResultWrapper broadcastBinaryOp(Object leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
-                                                   Object rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
-                                                   BiFunction op,
-                                                   boolean inPlace) {
+    private static <T> ResultWrapper<T> broadcastBinaryOp(T leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
+                                                          T rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
+                                                          BiFunction op,
+                                                          boolean inPlace) {
 
         final long[] resultShape = Shape.broadcastOutputShape(leftShape, rightShape);
         final boolean resultShapeIsLeftSideShape = Arrays.equals(resultShape, leftShape);
 
-        final Object outputBuffer;
+        final T outputBuffer;
         final long[] outputStride;
 
         if (resultShapeIsLeftSideShape) {
@@ -250,7 +250,7 @@ public class JVMTensorBroadcast {
             }
         }
 
-        return new ResultWrapper(outputBuffer, resultShape, outputStride);
+        return new ResultWrapper<>(outputBuffer, resultShape, outputStride);
     }
 
     /**
@@ -392,7 +392,7 @@ public class JVMTensorBroadcast {
     }
 
     public static void broadcast(Object[] buffer, long[] shape, long[] stride,
-                                 Object[] outputBuffer, long[] outputShape, long[] outputStride) {
+                                 Object[] outputBuffer, long[] outputStride) {
 
         for (int i = 0; i < outputBuffer.length; i++) {
 

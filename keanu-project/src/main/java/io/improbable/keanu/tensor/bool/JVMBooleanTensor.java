@@ -307,20 +307,20 @@ public class JVMBooleanTensor implements BooleanTensor {
         final boolean[] rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
+        final JVMTensorBroadcast.ResultWrapper<boolean[]> result = broadcastIfNeeded(
             buffer, shape, stride, buffer.length,
             rightBuffer, rightShape, right.getStride(), rightBuffer.length,
             op, inPlace
         );
 
         if (inPlace) {
-            this.buffer = (boolean[]) result.outputBuffer;
+            this.buffer = result.outputBuffer;
             this.shape = result.outputShape;
             this.stride = result.outputStride;
 
             return this;
         } else {
-            return new JVMBooleanTensor((boolean[]) result.outputBuffer, result.outputShape, result.outputStride);
+            return new JVMBooleanTensor(result.outputBuffer, result.outputShape, result.outputStride);
         }
     }
 

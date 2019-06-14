@@ -230,7 +230,7 @@ public class GenericTensor<T> implements Tensor<T> {
         long[] outputStride = TensorShape.getRowFirstStride(toShape);
         Object[] outputBuffer = new Object[outputLength];
 
-        JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, toShape, outputStride);
+        JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
 
         return new GenericTensor<>((T[]) outputBuffer, toShape, outputStride);
     }
@@ -290,7 +290,7 @@ public class GenericTensor<T> implements Tensor<T> {
         final T[] rightBuffer = right.asFlatArray();
         final long[] rightShape = right.getShape();
 
-        final JVMTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
+        final JVMTensorBroadcast.ResultWrapper<T[]> result = broadcastIfNeeded(
             buffer, shape, stride, buffer.length,
             rightBuffer, rightShape, right.getStride(), rightBuffer.length,
             op, false
