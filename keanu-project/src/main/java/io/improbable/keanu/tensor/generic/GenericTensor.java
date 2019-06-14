@@ -228,11 +228,11 @@ public class GenericTensor<T> implements Tensor<T> {
     public Tensor<T> broadcast(long... toShape) {
         int outputLength = TensorShape.getLengthAsInt(toShape);
         long[] outputStride = TensorShape.getRowFirstStride(toShape);
-        Object[] outputBuffer = new Object[outputLength];
+        T[] outputBuffer = (T[]) (new Object[outputLength]);
 
         JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
 
-        return new GenericTensor<>((T[]) outputBuffer, toShape, outputStride);
+        return new GenericTensor<>(outputBuffer, toShape, outputStride);
     }
 
     @Override

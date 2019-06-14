@@ -391,8 +391,8 @@ public class JVMTensorBroadcast {
         }
     }
 
-    public static void broadcast(Object[] buffer, long[] shape, long[] stride,
-                                 Object[] outputBuffer, long[] outputStride) {
+    public static <T> void broadcast(T[] buffer, long[] shape, long[] stride,
+                                     T[] outputBuffer, long[] outputStride) {
 
         for (int i = 0; i < outputBuffer.length; i++) {
 
