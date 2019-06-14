@@ -26,12 +26,9 @@ public class AutoDiffBroadcast {
             long[] resultShape = TensorShape.concat(targetOfShape, wrtShape);
             long[] upRankedPartialShape = shapeToDesiredRankByPrependingOnes(partial.get().getShape(), resultShape.length);
 
-            //#USEBROADCAST
-            DoubleTensor correctedPartial = DoubleTensor
-                .zeros(resultShape)
-                .plusInPlace(
-                    partial.get().reshape(upRankedPartialShape)
-                );
+            DoubleTensor correctedPartial = partial.get()
+                .reshape(upRankedPartialShape)
+                .broadcast(resultShape);
 
             return new PartialDerivative(correctedPartial);
         } else {
