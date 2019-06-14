@@ -57,6 +57,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
             resultShape.length
         );
 
+        //#USEBROADCAST
         DoubleTensor broadcastedPartial = DoubleTensor
             .zeros(resultShape)
             .plus(reshapedPartial);

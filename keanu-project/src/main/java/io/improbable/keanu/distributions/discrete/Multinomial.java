@@ -64,11 +64,13 @@ public class Multinomial implements DiscreteDistribution {
 
         long[] sampleBatchShape = TensorShape.selectDimensions(0, shape.length - 1, shape);
 
+        //#USEBROADCAST
         IntegerTensor broadcastedN = n.plus(IntegerTensor.zeros(sampleBatchShape));
         long[] broadcastResultShape = TensorShape.getBroadcastResultShape(
             TensorShape.concat(broadcastedN.getShape(), new long[]{1}), p.getShape()
         );
 
+        //#USEBROADCAST
         DoubleTensor broadcastedP = p.plus(DoubleTensor.zeros(broadcastResultShape));
 
         double[] flatP = broadcastedP.asFlatDoubleArray();

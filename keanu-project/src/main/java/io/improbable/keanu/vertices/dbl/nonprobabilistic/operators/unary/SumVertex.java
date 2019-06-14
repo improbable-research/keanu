@@ -81,6 +81,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
             inputVertex.getShape()
         );
 
+        //#USEBROADCAST
         DoubleTensor broadcastedPartial = DoubleTensor
             .zeros(resultShape)
             .plus(partialDueToSummationShapeChange);

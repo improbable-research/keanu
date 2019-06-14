@@ -26,6 +26,7 @@ public class AutoDiffBroadcast {
             long[] resultShape = TensorShape.concat(targetOfShape, wrtShape);
             long[] upRankedPartialShape = shapeToDesiredRankByPrependingOnes(partial.get().getShape(), resultShape.length);
 
+            //#USEBROADCAST
             DoubleTensor correctedPartial = DoubleTensor
                 .zeros(resultShape)
                 .plusInPlace(
