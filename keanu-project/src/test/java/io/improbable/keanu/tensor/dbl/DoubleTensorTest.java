@@ -1269,22 +1269,22 @@ public class DoubleTensorTest {
 
     @Test
     public void canSliceRank2() {
-        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, 3, 3);
         DoubleTensor slice = x.slice(1, 0);
-        assertArrayEquals(new double[]{1, 3}, slice.asFlatDoubleArray(), 1e-10);
+        assertThat(slice, valuesAndShapesMatch(DoubleTensor.create(1, 4, 7)));
     }
 
     @Test
     public void doesDownRankOnSliceRank1ToScalar() {
-        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4).reshape(4);
+        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4);
         TensorTestHelper.doesDownRankOnSliceRank1ToScalar(x);
     }
 
     @Test
     public void canSliceRank1() {
-        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4).reshape(4);
+        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4);
         DoubleTensor slice = x.slice(0, 1);
-        assertArrayEquals(new double[]{2}, slice.asFlatDoubleArray(), 1e-10);
+        assertThat(slice, valuesAndShapesMatch(DoubleTensor.scalar(2)));
     }
 
     @Test

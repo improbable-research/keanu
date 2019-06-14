@@ -1,18 +1,19 @@
 package io.improbable.keanu.tensor.generic;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
+import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
@@ -236,17 +237,21 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public GenericTensor<T> slice(int dimension, long index) {
-        T[] flat = asFlatArray();
-        List<T> tadded = new ArrayList<>();
-        for (int i = 0; i < flat.length; i++) {
-            long[] indicesOfCurrent = TensorShape.getShapeIndices(shape, stride, i);
-            if (indicesOfCurrent[dimension] == index) {
-                tadded.add(getValue(indicesOfCurrent));
-            }
+        Preconditions.checkArgument(dimension < shape.length && index < shape[dimension]);
+        long[] resultShape = ArrayUtils.remove(shape, dimension);
+        long[] resultStride = getRowFirstStride(resultShape);
+        T[] newBuffer = (T[]) new Object[Ints.checkedCast(TensorShape.getLength(resultShape))];
+
+        for (int i = 0; i < newBuffer.length; i++) {
+
+            long[] shapeIndices = ArrayUtils.insert(dimension, TensorShape.getShapeIndices(resultShape, resultStride, i), index);
+
+            int j = Ints.checkedCast(getFlatIndex(shape, stride, shapeIndices));
+
+            newBuffer[i] = data[j];
         }
-        long[] taddedShape = Arrays.copyOf(shape, shape.length);
-        taddedShape[dimension] = 1;
-        return new GenericTensor(tadded.toArray(), taddedShape);
+
+        return new GenericTensor<>(newBuffer, resultShape);
     }
 
     @Override

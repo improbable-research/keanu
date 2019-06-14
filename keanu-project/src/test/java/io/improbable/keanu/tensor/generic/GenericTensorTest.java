@@ -111,11 +111,11 @@ public class GenericTensorTest {
         );
 
         Tensor<Something> taddedSomethingRow = somethingTensor.slice(0, 1);
-        assertArrayEquals(new long[]{1, 3}, taddedSomethingRow.getShape());
+        assertArrayEquals(new long[]{3}, taddedSomethingRow.getShape());
         assertArrayEquals(new Something[]{Something.C, Something.D, Something.B}, taddedSomethingRow.asFlatArray());
 
         Tensor<Something> taddedSomethingColumn = somethingTensor.slice(1, 1);
-        assertArrayEquals(new long[]{3, 1}, taddedSomethingColumn.getShape());
+        assertArrayEquals(new long[]{3}, taddedSomethingColumn.getShape());
         assertArrayEquals(new Something[]{Something.B, Something.D, Something.A}, taddedSomethingColumn.asFlatArray());
     }
 
