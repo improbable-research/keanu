@@ -1,7 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
-import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.FloatingPointTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 
-public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
+public abstract class DoubleTensor implements FloatingPointTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
     private static DoubleTensorFactory factory = new JVMDoubleTensorFactory();
 

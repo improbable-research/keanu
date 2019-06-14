@@ -2,7 +2,7 @@ package io.improbable.keanu.tensor.intgr;
 
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.kotlin.IntegerOperators;
-import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.FixedPointTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -14,13 +14,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
-public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
-
-    IntegerTensor ZERO_SCALAR = scalar(0);
-
-    IntegerTensor ONE_SCALAR = scalar(1);
-
-    IntegerTensor TWO_SCALAR = scalar(2);
+public interface IntegerTensor extends FixedPointTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
     static IntegerTensor create(int value, long[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
