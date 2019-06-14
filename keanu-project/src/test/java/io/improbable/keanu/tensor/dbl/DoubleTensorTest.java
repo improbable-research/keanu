@@ -16,6 +16,7 @@ import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.util.FastMath;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -1615,9 +1616,44 @@ public class DoubleTensorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void throwsIfCumSumOnInvalidDimension(){
+    public void throwsIfCumSumOnInvalidDimension() {
         DoubleTensor.scalar(2).cumSum(0);
     }
 
+    @Test
+    public void canBroadcastToShape() {
+        DoubleTensor a = DoubleTensor.create(
+            1, 2, 3
+        ).reshape(3);
+
+        DoubleTensor expectedByRow = DoubleTensor.create(
+            1, 2, 3,
+            1, 2, 3,
+            1, 2, 3
+        ).reshape(3, 3);
+
+        Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expectedByRow));
+
+        DoubleTensor expectedByColumn = DoubleTensor.create(
+            1, 1, 1,
+            2, 2, 2,
+            3, 3, 3
+        ).reshape(3, 3);
+
+        Assert.assertThat(a.reshape(3, 1).broadcast(3, 3), valuesAndShapesMatch(expectedByColumn));
+    }
+
+    @Test
+    public void canBroadcastScalarToShape() {
+        DoubleTensor a = DoubleTensor.scalar(2);
+
+        DoubleTensor expected = DoubleTensor.create(
+            2, 2, 2,
+            2, 2, 2,
+            2, 2, 2
+        ).reshape(3, 3);
+
+        Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expected));
+    }
 
 }

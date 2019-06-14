@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -380,6 +381,42 @@ public class JVMBooleanTensorTest {
         assertThat(a.take(1, 0), valuesAndShapesMatch(BooleanTensor.scalar(true)));
         assertThat(a.take(1, 1), valuesAndShapesMatch(BooleanTensor.scalar(false)));
         assertThat(a.take(1, 2), valuesAndShapesMatch(BooleanTensor.scalar(true)));
+    }
+
+    @Test
+    public void canBroadcastToShape() {
+        BooleanTensor a = BooleanTensor.create(
+            true, false, true
+        ).reshape(3);
+
+        BooleanTensor expectedByRow = BooleanTensor.create(
+            true, false, true,
+            true, false, true,
+            true, false, true
+        ).reshape(3, 3);
+
+        Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expectedByRow));
+
+        BooleanTensor expectedByColumn = BooleanTensor.create(
+            true, true, true,
+            false, false, false,
+            true, true, true
+        ).reshape(3, 3);
+
+        Assert.assertThat(a.reshape(3, 1).broadcast(3, 3), valuesAndShapesMatch(expectedByColumn));
+    }
+
+    @Test
+    public void canBroadcastScalarToShape() {
+        BooleanTensor a = BooleanTensor.scalar(true);
+
+        BooleanTensor expected = BooleanTensor.create(
+            true, true, true,
+            true, true, true,
+            true, true, true
+        ).reshape(3, 3);
+
+        Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expected));
     }
 
 }

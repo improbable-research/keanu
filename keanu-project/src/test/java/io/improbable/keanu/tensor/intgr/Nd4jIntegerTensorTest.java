@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 import junit.framework.TestCase;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -772,6 +773,29 @@ public class Nd4jIntegerTensorTest {
 
         IntegerTensor concat = IntegerTensor.concat(0, x, y);
         assertEquals(IntegerTensor.create(2, 3, 4, 5, 6), concat);
+    }
+
+    @Test
+    public void canBroadcastToShape() {
+        IntegerTensor a = IntegerTensor.create(
+            1, 2, 3
+        ).reshape(3);
+
+        IntegerTensor expectedByRow = IntegerTensor.create(
+            1, 2, 3,
+            1, 2, 3,
+            1, 2, 3
+        ).reshape(3, 3);
+
+        Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expectedByRow));
+
+        IntegerTensor expectedByColumn = IntegerTensor.create(
+            1, 1, 1,
+            2, 2, 2,
+            3, 3, 3
+        ).reshape(3, 3);
+
+        Assert.assertThat(a.reshape(3, 1).broadcast(3, 3), valuesAndShapesMatch(expectedByColumn));
     }
 
 

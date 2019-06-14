@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.intgr;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
@@ -65,5 +66,18 @@ public class ScalarIntegerTensorTest {
     public void doesKeepRankOnLTEq() {
         IntegerTensor value = IntegerTensor.scalar(1).reshape(1, 1, 1);
         assertEquals(3, value.lessThanOrEqual(2).getRank());
+    }
+
+    @Test
+    public void canBroadcastScalarToShape() {
+        IntegerTensor a = IntegerTensor.scalar(2);
+
+        IntegerTensor expected = IntegerTensor.create(
+            2, 2, 2,
+            2, 2, 2,
+            2, 2, 2
+        ).reshape(3, 3);
+
+        Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expected));
     }
 }
