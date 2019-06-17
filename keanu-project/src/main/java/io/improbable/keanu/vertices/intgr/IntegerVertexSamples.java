@@ -27,7 +27,7 @@ public class IntegerVertexSamples extends Samples<IntegerTensor> {
         return this.samples.stream()
             .reduce(IntegerTensor.zeros(shape), IntegerTensor::plusInPlace)
             .toDouble()
-            .divInPlace(samples.size());
+            .divInPlace((double) samples.size());
     }
 
     public Integer getScalarMode() {

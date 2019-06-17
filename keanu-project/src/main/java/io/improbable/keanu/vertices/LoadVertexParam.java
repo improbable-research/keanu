@@ -10,5 +10,6 @@ import java.lang.annotation.Target;
 public @interface LoadVertexParam {
 
     boolean isNullable() default false;
+
     String value();
 }

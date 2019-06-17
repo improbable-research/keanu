@@ -26,7 +26,7 @@ public class If {
             this.predicate = predicate;
         }
 
-        public <T> IfThenElseBuilder<T> then(Vertex<? extends Tensor<T>> thn) {
+        public <T, TENSOR extends Tensor<T, TENSOR>> IfThenElseBuilder<T, TENSOR> then(Vertex<TENSOR> thn) {
             return new IfThenElseBuilder<>(predicate, thn);
         }
 
@@ -55,18 +55,18 @@ public class If {
         }
     }
 
-    public static class IfThenElseBuilder<T> {
+    public static class IfThenElseBuilder<T, TENSOR extends Tensor<T, TENSOR>> {
 
         private final BooleanVertex predicate;
-        private final Vertex<? extends Tensor<T>> thn;
+        private final Vertex<TENSOR> thn;
 
         public IfThenElseBuilder(BooleanVertex predicate,
-                                 Vertex<? extends Tensor<T>> thn) {
+                                 Vertex<TENSOR> thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
 
-        public IfVertex<T> orElse(Vertex<? extends Tensor<T>> els) {
+        public IfVertex<T, TENSOR> orElse(Vertex<TENSOR> els) {
             return new IfVertex<>(predicate, thn, els);
         }
     }

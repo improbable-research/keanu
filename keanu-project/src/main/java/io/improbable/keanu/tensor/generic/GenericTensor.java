@@ -19,7 +19,7 @@ import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static java.util.Arrays.copyOf;
 
-public class GenericTensor<T> implements Tensor<T> {
+public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
 
     private T[] buffer;
     private long[] shape;
@@ -225,7 +225,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public Tensor<T> broadcast(long... toShape) {
+    public GenericTensor<T> broadcast(long... toShape) {
         int outputLength = TensorShape.getLengthAsInt(toShape);
         long[] outputStride = TensorShape.getRowFirstStride(toShape);
         T[] outputBuffer = (T[]) (new Object[outputLength]);
@@ -285,7 +285,7 @@ public class GenericTensor<T> implements Tensor<T> {
         return new GenericTensor<>(newBuffer, newShape);
     }
 
-    public <R> GenericTensor<R> apply(Tensor<T> right,
+    public <R> GenericTensor<R> apply(Tensor<T, ?> right,
                                       BiFunction<T, T, R> op) {
         final T[] rightBuffer = right.asFlatArray();
         final long[] rightShape = right.getShape();

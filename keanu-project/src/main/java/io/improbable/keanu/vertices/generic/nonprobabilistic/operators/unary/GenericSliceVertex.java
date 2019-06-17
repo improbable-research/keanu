@@ -7,9 +7,10 @@ import io.improbable.keanu.vertices.Vertex;
 
 import static io.improbable.keanu.tensor.TensorShape.removeDimension;
 
-public class GenericSliceVertex<T> extends GenericTensorUnaryOpVertex<T, T> {
+public class GenericSliceVertex<T, TENSOR extends Tensor<T, TENSOR>> extends GenericTensorUnaryOpVertex<T, TENSOR, T, TENSOR> {
 
     private static final String DIMENSION_NAME = "dimension";
+
     private static final String INDEX_NAME = "index";
 
     private final int dimension;
@@ -22,7 +23,7 @@ public class GenericSliceVertex<T> extends GenericTensorUnaryOpVertex<T, T> {
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
-    public GenericSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<Tensor<T>> inputVertex,
+    public GenericSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<TENSOR> inputVertex,
                               @LoadVertexParam(DIMENSION_NAME) int dimension,
                               @LoadVertexParam(INDEX_NAME) int index) {
         super(removeDimension(dimension, inputVertex.getShape()), inputVertex);
@@ -30,7 +31,7 @@ public class GenericSliceVertex<T> extends GenericTensorUnaryOpVertex<T, T> {
         this.index = index;
     }
 
-    protected Tensor<T> op(Tensor<T> input) {
+    protected TENSOR op(TENSOR input) {
         return input.slice(dimension, index);
     }
 

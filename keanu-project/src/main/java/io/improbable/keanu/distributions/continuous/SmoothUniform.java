@@ -52,11 +52,12 @@ public class SmoothUniform implements ContinuousDistribution {
      * @param xMin          min value from body
      * @param xMax          max value from body
      * @param edgeSharpness sharpness as a percentage of the body width
-     * @return       a new ContinuousDistribution object
+     * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
         return new SmoothUniform(xMin, xMax, edgeSharpness);
     }
+
     private SmoothUniform(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
         this.xMin = xMin;
         this.xMax = xMax;
@@ -194,11 +195,11 @@ public class SmoothUniform implements ContinuousDistribution {
     private static DoubleTensor dShoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {
         final DoubleTensor A = getCubeCoefficient(Sw, Bw);
         final DoubleTensor B = getSquareCoefficient(Sw, Bw);
-        return A.timesInPlace(3).timesInPlace(x.pow(2)).plusInPlace(B.timesInPlace(x).timesInPlace(2));
+        return A.timesInPlace(3.0).timesInPlace(x.pow(2)).plusInPlace(B.timesInPlace(x).timesInPlace(2.0));
     }
 
     private static DoubleTensor getCubeCoefficient(DoubleTensor Sw, DoubleTensor Bw) {
-        return (Sw.pow(3).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(-2);
+        return (Sw.pow(3).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(-2.0);
     }
 
     private static DoubleVertex getCubeCoefficientVertex(DoubleVertex Sw, DoubleVertex Bw) {
@@ -206,7 +207,7 @@ public class SmoothUniform implements ContinuousDistribution {
     }
 
     private static DoubleTensor getSquareCoefficient(DoubleTensor Sw, DoubleTensor Bw) {
-        return (Sw.pow(2).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(3);
+        return (Sw.pow(2).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(3.0);
     }
 
     private static DoubleVertex getSquareCoefficientVertex(DoubleVertex Sw, DoubleVertex Bw) {

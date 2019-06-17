@@ -9,7 +9,7 @@ public class IntegerPowerVertex extends IntegerBinaryOpVertex {
     /**
      * Raises one vertex to the power of another
      *
-     * @param left the base vertex
+     * @param left  the base vertex
      * @param right the exponent vertex
      */
     @ExportVertexToPythonBindings

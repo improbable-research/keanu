@@ -36,6 +36,7 @@ public class ParticleFilter {
 
     /**
      * Creates a {@link ParticleFilterBuilder} by retrieving connected graph from the vertex
+     *
      * @param vertex vertex to retrieve connected graph from
      * @return this
      */
@@ -45,7 +46,9 @@ public class ParticleFilter {
 
     public static ParticleFilterBuilder ofGraph(Collection<? extends Vertex> vertices) {
         return new ParticleFilterBuilder(vertices);
-    };
+    }
+
+    ;
 
     public ParticleFilter(Collection<? extends Vertex> vertices,
                           int numParticles,
@@ -91,8 +94,8 @@ public class ParticleFilter {
     }
 
     private List<Particle> updateParticles(Vertex<?> nextObservedVertex,
-                                                  Set<Vertex> vertexDeps,
-                                                  List<Particle> particles) {
+                                           Set<Vertex> vertexDeps,
+                                           List<Particle> particles) {
 
         List<Particle> updatedParticles = sampleAndCopy(particles, numParticles);
         addObservedVertexToParticles(updatedParticles, nextObservedVertex, vertexDeps);
@@ -120,8 +123,8 @@ public class ParticleFilter {
     }
 
     private void addObservedVertexToParticles(List<Particle> particles,
-                                                     Vertex<?> observedVertex,
-                                                     Set<Vertex> vertexDependencies) {
+                                              Vertex<?> observedVertex,
+                                              Set<Vertex> vertexDependencies) {
 
         for (Particle particle : particles) {
             particle.addObservedVertex(observedVertex);

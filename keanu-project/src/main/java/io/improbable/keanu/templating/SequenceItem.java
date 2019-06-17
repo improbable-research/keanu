@@ -132,6 +132,7 @@ public class SequenceItem implements VertexDictionary {
     /**
      * This method creates a {@link ProxyVertex} and adds it to the sequence item
      * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     *
      * @param label the label of the corresponding vertex from the previous item.
      * @return a newly created {@link ProxyVertex}
      */
@@ -142,6 +143,7 @@ public class SequenceItem implements VertexDictionary {
     /**
      * This method creates a {@link ProxyVertex} and adds it to the sequence item
      * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     *
      * @param label the label of the corresponding vertex from the previous item.
      * @param shape the shape of the corresponding vertex from the previous item.
      * @return a newly created {@link ProxyVertex}
@@ -153,6 +155,7 @@ public class SequenceItem implements VertexDictionary {
     /**
      * This method creates a {@link ProxyVertex} and adds it to the sequence item
      * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     *
      * @param label the label of the corresponding vertex from the previous item.
      * @return a newly created {@link ProxyVertex}
      */
@@ -163,6 +166,7 @@ public class SequenceItem implements VertexDictionary {
     /**
      * This method creates a {@link ProxyVertex} and adds it to the sequence item
      * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     *
      * @param label the label of the corresponding vertex from the previous item.
      * @param shape the shape of the corresponding vertex from the previous item.
      * @return a newly created {@link ProxyVertex}
@@ -174,6 +178,7 @@ public class SequenceItem implements VertexDictionary {
     /**
      * This method creates a {@link ProxyVertex} and adds it to the sequence item
      * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     *
      * @param label the label of the corresponding vertex from the previous item.
      * @return a newly created {@link ProxyVertex}
      */
@@ -184,6 +189,7 @@ public class SequenceItem implements VertexDictionary {
     /**
      * This method creates a {@link ProxyVertex} and adds it to the sequence item
      * It also adds this vertex to the sequence item to represent the vertex with this label in the previous sequence item.
+     *
      * @param label the label of the corresponding vertex from the previous item.
      * @param shape the shape of the corresponding vertex from the previous item.
      * @return a newly created {@link ProxyVertex}
@@ -205,6 +211,7 @@ public class SequenceItem implements VertexDictionary {
 
     /**
      * Tries to retrieve a SequenceItem index from a vertex label of a vertex in a sequence
+     *
      * @param label label of the vertex being parsed.
      * @return empty if the vertex is not in a SequenceItem. Otherwise returns index of the vertex in the sequence item.
      */
@@ -226,6 +233,7 @@ public class SequenceItem implements VertexDictionary {
 
     /**
      * Tries to get the unique sequence name from a vertex label
+     *
      * @param label the label of a vertex in a sequence
      * @return will return empty if the label cannot be parsed as a label of a vertex from a sequence with a name.
      */
@@ -237,8 +245,10 @@ public class SequenceItem implements VertexDictionary {
         }
         return Optional.empty();
     }
+
     /**
      * Tries to get the unique sequence hash from a vertex label
+     *
      * @param label the label of a vertex in a sequence
      * @return will return empty if the label cannot be parsed as a label of a vertex from a sequence
      */

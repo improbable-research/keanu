@@ -18,9 +18,9 @@ public interface PosteriorSamplingAlgorithm {
     }
 
     /**
-     * @param model                     a model containing latent variables
-     * @param variablesToSampleFrom     the variables to include in the returned samples
-     * @param sampleCount               the number of samples to take
+     * @param model                 a model containing latent variables
+     * @param variablesToSampleFrom the variables to include in the returned samples
+     * @param sampleCount           the number of samples to take
      * @return samples for each variable
      */
     NetworkSamples getPosteriorSamples(ProbabilisticModel model,

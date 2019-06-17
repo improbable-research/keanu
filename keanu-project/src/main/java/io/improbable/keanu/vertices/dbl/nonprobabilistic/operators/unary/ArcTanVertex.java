@@ -33,7 +33,7 @@ public class ArcTanVertex extends DoubleUnaryOpVertex implements Differentiable 
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
         DoubleTensor value = inputVertex.getValue();
 
-        DoubleTensor dArcTan = value.pow(2).plusInPlace(1).reciprocalInPlace();
+        DoubleTensor dArcTan = value.pow(2.0).plusInPlace(1.0).reciprocalInPlace();
         return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcTan);
     }
 
@@ -42,7 +42,7 @@ public class ArcTanVertex extends DoubleUnaryOpVertex implements Differentiable 
         DoubleTensor inputValue = inputVertex.getValue();
 
         //dArcTandx = 1 / (1 + x^2)
-        DoubleTensor dSelfWrtInput = inputValue.pow(2).plusInPlace(1).reciprocalInPlace();
+        DoubleTensor dSelfWrtInput = inputValue.pow(2.0).plusInPlace(1.0).reciprocalInPlace();
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput));

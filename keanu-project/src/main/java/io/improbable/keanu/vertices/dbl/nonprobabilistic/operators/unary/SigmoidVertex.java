@@ -26,7 +26,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex implements Differentiable
 
     @Override
     protected DoubleTensor op(DoubleTensor value) {
-        return value.unaryMinus().expInPlace().plusInPlace(1).reciprocalInPlace();
+        return value.unaryMinus().expInPlace().plusInPlace(1.0).reciprocalInPlace();
     }
 
     @Override
@@ -34,7 +34,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex implements Differentiable
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
         DoubleTensor x = inputVertex.getValue();
         DoubleTensor xExp = x.exp();
-        DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2));
+        DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2.0));
         return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dxdfx);
     }
 

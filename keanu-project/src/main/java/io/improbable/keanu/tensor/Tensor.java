@@ -11,9 +11,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Arrays;
 import java.util.List;
 
-public interface Tensor<T> {
+public interface Tensor<N, T extends Tensor<N, T>> {
 
-    static <DATA, TENSOR extends Tensor<DATA>> TENSOR scalar(DATA data) {
+    static <DATA, TENSOR extends Tensor<DATA, TENSOR>> TENSOR scalar(DATA data) {
         if (data instanceof Double) {
             return (TENSOR) DoubleTensor.scalar(((Double) data).doubleValue());
         } else if (data instanceof Integer) {
@@ -25,7 +25,7 @@ public interface Tensor<T> {
         }
     }
 
-    static <DATA, TENSOR extends Tensor<DATA>> TENSOR createFilled(DATA data, long[] shape) {
+    static <DATA, TENSOR extends Tensor<DATA, TENSOR>> TENSOR createFilled(DATA data, long[] shape) {
         if (data instanceof Double) {
             return (TENSOR) DoubleTensor.create(((Double) data).doubleValue(), shape);
         } else if (data instanceof Integer) {
@@ -37,7 +37,7 @@ public interface Tensor<T> {
         }
     }
 
-    static <DATA, TENSOR extends Tensor<DATA>> TENSOR create(DATA[] data, long[] shape) {
+    static <DATA, TENSOR extends Tensor<DATA, TENSOR>> TENSOR create(DATA[] data, long[] shape) {
         if (data instanceof Double[]) {
             return (TENSOR) DoubleTensor.create(ArrayUtils.toPrimitive((Double[]) data), shape);
         } else if (data instanceof Integer[]) {
@@ -93,7 +93,7 @@ public interface Tensor<T> {
 
     long getLength();
 
-    default T getValue(long... index) {
+    default N getValue(long... index) {
         if (index.length == 1) {
             return getFlattenedView().get(index[0]);
         } else {
@@ -101,7 +101,7 @@ public interface Tensor<T> {
         }
     }
 
-    default void setValue(T value, long... index) {
+    default void setValue(N value, long... index) {
         if (index.length == 1) {
             getFlattenedView().set(index[0], value);
         } else {
@@ -109,22 +109,22 @@ public interface Tensor<T> {
         }
     }
 
-    default T scalar() {
+    default N scalar() {
         if (this.getLength() > 1) {
             throw new IllegalArgumentException("Not a scalar");
         }
         return getValue(0);
     }
 
-    Tensor<T> duplicate();
+    T duplicate();
 
-    Tensor<T> slice(int dimension, long index);
+    T slice(int dimension, long index);
 
-    Tensor<T> take(long... index);
+    T take(long... index);
 
-    Tensor<T> diag();
+    T diag();
 
-    default Tensor<T> transpose() {
+    default T transpose() {
         Preconditions.checkArgument(
             getRank() == 2,
             "Can only transpose rank 2. Use permute(...) for higher rank transpose."
@@ -136,28 +136,28 @@ public interface Tensor<T> {
 
     int[] asFlatIntegerArray();
 
-    T[] asFlatArray();
+    N[] asFlatArray();
 
-    Tensor<T> reshape(long... newShape);
+    T reshape(long... newShape);
 
-    Tensor<T> permute(int... rearrange);
+    T permute(int... rearrange);
 
-    Tensor<T> broadcast(long... toShape);
+    T broadcast(long... toShape);
 
-    FlattenedView<T> getFlattenedView();
+    FlattenedView<N> getFlattenedView();
 
-    interface FlattenedView<T> {
+    interface FlattenedView<N> {
 
         long size();
 
-        T get(long index);
+        N get(long index);
 
-        T getOrScalar(long index);
+        N getOrScalar(long index);
 
-        void set(long index, T value);
+        void set(long index, N value);
     }
 
-    default List<T> asFlatList() {
+    default List<N> asFlatList() {
         return Arrays.asList(asFlatArray());
     }
 
@@ -200,6 +200,6 @@ public interface Tensor<T> {
         return elementwiseEquals(this, that);
     }
 
-    BooleanTensor elementwiseEquals(T value);
+    BooleanTensor elementwiseEquals(N value);
 
 }

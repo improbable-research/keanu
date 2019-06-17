@@ -34,7 +34,7 @@ public class GenericTensorTest {
     @Test
     public void canGetRandomAccessValue() {
 
-        Tensor<Something> somethingTensor = GenericTensor.create(
+        GenericTensor<Something> somethingTensor = GenericTensor.create(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,
@@ -86,7 +86,7 @@ public class GenericTensorTest {
     @Test
     public void canTake() {
 
-        Tensor<Something> somethingTensor = GenericTensor.create(
+        GenericTensor<Something> somethingTensor = GenericTensor.create(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,
@@ -101,7 +101,7 @@ public class GenericTensorTest {
     @Test
     public void canSliceRankTwoTensor() {
 
-        Tensor<Something> somethingTensor = GenericTensor.create(
+        GenericTensor<Something> somethingTensor = GenericTensor.create(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,
@@ -110,11 +110,11 @@ public class GenericTensorTest {
             new long[]{3, 3}
         );
 
-        Tensor<Something> taddedSomethingRow = somethingTensor.slice(0, 1);
+        GenericTensor<Something> taddedSomethingRow = somethingTensor.slice(0, 1);
         assertArrayEquals(new long[]{3}, taddedSomethingRow.getShape());
         assertArrayEquals(new Something[]{Something.C, Something.D, Something.B}, taddedSomethingRow.asFlatArray());
 
-        Tensor<Something> taddedSomethingColumn = somethingTensor.slice(1, 1);
+        GenericTensor<Something> taddedSomethingColumn = somethingTensor.slice(1, 1);
         assertArrayEquals(new long[]{3}, taddedSomethingColumn.getShape());
         assertArrayEquals(new Something[]{Something.B, Something.D, Something.A}, taddedSomethingColumn.asFlatArray());
     }

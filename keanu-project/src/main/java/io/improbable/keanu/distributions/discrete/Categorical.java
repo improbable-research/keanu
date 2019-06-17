@@ -12,12 +12,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Categorical<CATEGORY> implements Distribution<Tensor<CATEGORY>> {
+public class Categorical<CATEGORY, TENSOR extends Tensor<CATEGORY, TENSOR>> implements Distribution<TENSOR> {
 
     private final Map<CATEGORY, DoubleTensor> selectableValues;
     private final List<CATEGORY> categoryOrder;
 
-    public static <CAT> Categorical<CAT> withParameters(Map<CAT, DoubleTensor> selectableValues) {
+    public static <CAT, TENSOR extends Tensor<CAT, TENSOR>> Categorical<CAT, TENSOR> withParameters(Map<CAT, DoubleTensor> selectableValues) {
         return new Categorical<>(selectableValues);
     }
 
@@ -26,7 +26,7 @@ public class Categorical<CATEGORY> implements Distribution<Tensor<CATEGORY>> {
         this.categoryOrder = new ArrayList<>(this.selectableValues.keySet());
     }
 
-    public Tensor<CATEGORY> sample(long[] shape, KeanuRandom random) {
+    public TENSOR sample(long[] shape, KeanuRandom random) {
 
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(shape);
 
@@ -34,7 +34,7 @@ public class Categorical<CATEGORY> implements Distribution<Tensor<CATEGORY>> {
         DoubleTensor sum = DoubleTensor.zeros(shape);
 
         CATEGORY lastValue = categoryOrder.get(categoryOrder.size() - 1);
-        Tensor<CATEGORY> sample = Tensor.createFilled(lastValue, shape);
+        TENSOR sample = Tensor.createFilled(lastValue, shape);
         BooleanTensor sampleValuesSetSoFar = BooleanTensor.falses(shape);
 
         for (CATEGORY category : categoryOrder) {
@@ -56,7 +56,7 @@ public class Categorical<CATEGORY> implements Distribution<Tensor<CATEGORY>> {
         return sample;
     }
 
-    public DoubleTensor logProb(Tensor<CATEGORY> x) {
+    public DoubleTensor logProb(TENSOR x) {
 
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(x.getShape());
 

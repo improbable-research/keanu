@@ -30,7 +30,7 @@ public class Triangular implements ContinuousDistribution {
             "center must be between xMin and xMax. c: " + c + " xMin: " + xMin + " xMax: " + xMax);
 
         final DoubleTensor p = random.nextDouble(shape);
-        final DoubleTensor q = p.unaryMinus().plusInPlace(1);
+        final DoubleTensor q = p.unaryMinus().plusInPlace(1.0);
         final DoubleTensor range = xMax.minus(xMin);
 
         final DoubleTensor conditional = (c.minus(xMin)).divInPlace(xMax.minus(xMin));

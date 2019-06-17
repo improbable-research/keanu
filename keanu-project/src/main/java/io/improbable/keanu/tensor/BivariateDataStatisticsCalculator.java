@@ -46,6 +46,7 @@ public class BivariateDataStatisticsCalculator {
      * Calculate the estimate of the gradient
      * The regression coefficients (gradient and intercept) can be treated as random variables and estimated from the data.
      * From https://www2.isye.gatech.edu/~yxie77/isye2028/lecture12.pdf
+     *
      * @return the estimate of the gradient
      */
     public double estimatedGradient() {
@@ -56,6 +57,7 @@ public class BivariateDataStatisticsCalculator {
      * Calculate the estimate of the intercept
      * The regression coefficients (gradient and intercept) can be treated as random variables and estimated from the data.
      * From https://www2.isye.gatech.edu/~yxie77/isye2028/lecture12.pdf
+     *
      * @return the estimate of the intercept
      */
     public double estimatedIntercept() {
@@ -64,6 +66,7 @@ public class BivariateDataStatisticsCalculator {
 
     /**
      * Calculate the MSE (mean squared error) which is an unbiased estimate of the variance of Y
+     *
      * @return The MSE
      */
     public double meanSquaredError() {
@@ -76,6 +79,7 @@ public class BivariateDataStatisticsCalculator {
     /**
      * Calculate the standard error, which is the unbiased estimate of the standard deviation of the gradient
      * From https://www2.isye.gatech.edu/~yxie77/isye2028/lecture12.pdf
+     *
      * @return The standard error
      */
     public double standardErrorForGradient() {
@@ -85,6 +89,7 @@ public class BivariateDataStatisticsCalculator {
     /**
      * Calculate the standard error, which is the unbiased estimate of the standard deviation of the intercept
      * From https://www2.isye.gatech.edu/~yxie77/isye2028/lecture12.pdf
+     *
      * @return The standard error
      */
     public double standardErrorForIntercept() {

@@ -230,7 +230,7 @@ public class JVMBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public <T, TENSOR extends Tensor<T>> TENSOR where(TENSOR trueValue, TENSOR falseValue) {
+    public <T, TENSOR extends Tensor<T, TENSOR>> TENSOR where(TENSOR trueValue, TENSOR falseValue) {
         if (trueValue instanceof DoubleTensor && falseValue instanceof DoubleTensor) {
             return (TENSOR) doubleWhere((DoubleTensor) trueValue, (DoubleTensor) falseValue);
         } else if (trueValue instanceof IntegerTensor && falseValue instanceof IntegerTensor) {

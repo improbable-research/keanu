@@ -7,15 +7,29 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 import java.util.function.Function;
 
-public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> extends Tensor<N>, NumberOperators<T> {
-
-    N sum();
+public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> extends Tensor<N, T>, NumberOperators<T> {
 
     DoubleTensor toDouble();
 
     IntegerTensor toInteger();
 
+    N sum();
+
     T sum(int... overDimensions);
+
+    T cumSum(int dimension);
+
+    T cumSumInPlace(int dimension);
+
+    N product();
+
+    T clamp(T min, T max);
+
+    boolean equalsWithinEpsilon(T other, N epsilon);
+
+    N max();
+
+    N min();
 
     // New tensor Ops and transforms
 

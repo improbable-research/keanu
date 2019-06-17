@@ -77,7 +77,7 @@ public class Beta implements ContinuousDistribution {
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1);
+        final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1.0);
         final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).digammaInPlace();
         final DoubleTensor alphaMinusOneDivX = x.reciprocal().timesInPlace(alpha.minus(1));
 

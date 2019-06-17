@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 public @interface SaveVertexParam {
 
     boolean isNullable() default false;
+
     String value();
 
 

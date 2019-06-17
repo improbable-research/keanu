@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -390,8 +391,8 @@ public class KeanuCompiledGraphTest {
         selectableValues.put(TestEnum.A, ConstantVertex.of(0.1, 0.5, 0.8, 0.2));
         selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
 
-        CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
-        GenericTakeVertex<TestEnum> C = A.take(1);
+        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> A = new CategoricalVertex<>(selectableValues);
+        GenericTakeVertex<TestEnum, GenericTensor<TestEnum>> C = A.take(1);
 
         assertCompiledIsSameAsVertexEvaluation(A, C);
     }
@@ -403,8 +404,8 @@ public class KeanuCompiledGraphTest {
         selectableValues.put(TestEnum.A, ConstantVertex.of(0.1, 0.5, 0.8, 0.2));
         selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
 
-        CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
-        GenericSliceVertex<TestEnum> C = A.slice(0, 1);
+        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> A = new CategoricalVertex<>(selectableValues);
+        GenericSliceVertex<TestEnum, GenericTensor<TestEnum>> C = A.slice(0, 1);
 
         assertCompiledIsSameAsVertexEvaluation(A, C);
     }
@@ -417,10 +418,10 @@ public class KeanuCompiledGraphTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
 
         BernoulliVertex predicate = new BernoulliVertex(new long[]{4}, 0.5);
-        CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
-        CategoricalVertex<TestEnum> B = new CategoricalVertex<>(selectableValues);
+        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> A = new CategoricalVertex<>(selectableValues);
+        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> B = new CategoricalVertex<>(selectableValues);
 
-        IfVertex<TestEnum> D = new IfVertex<>(predicate, A, B);
+        IfVertex<TestEnum, GenericTensor<TestEnum>> D = new IfVertex<>(predicate, A, B);
 
         assertCompiledIsSameAsVertexEvaluation(A, B, predicate, D);
     }

@@ -1196,7 +1196,7 @@ public class DoubleTensorTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, 1e-8);
 
-        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(x -> x > 0., TensorValidationPolicy.changeValueTo(1e-8));
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(x -> x > 0., (TensorValidationPolicy<Double, DoubleTensor>) TensorValidationPolicy.changeValueTo(1e-8));
         DoubleTensor actual = validator.validate(containsZero);
         assertThat(actual, equalTo(expectedResult));
     }
@@ -1208,7 +1208,7 @@ public class DoubleTensorTest {
         DoubleTensor one = DoubleTensor.scalar(1.);
         DoubleTensor notZero = DoubleTensor.scalar(1e-8);
         Function<Double, Boolean> checkFunction = x -> x > 0.;
-        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(checkFunction, TensorValidationPolicy.changeValueTo(1e-8));
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(checkFunction, (TensorValidationPolicy<Double, DoubleTensor>)TensorValidationPolicy.changeValueTo(1e-8));
         tensor1 = validator.validate(tensor1);
         tensor2 = validator.validate(tensor2);
         assertThat(tensor1, equalTo(notZero));
@@ -1523,25 +1523,25 @@ public class DoubleTensorTest {
     @Test
     public void doesKeepRankOnGTEq() {
         DoubleTensor value = DoubleTensor.create(new double[]{1}, 1, 1, 1);
-        assertEquals(3, value.greaterThanOrEqual(2).getRank());
+        assertEquals(3, value.greaterThanOrEqual(2.0).getRank());
     }
 
     @Test
     public void doesKeepRankOnGT() {
         DoubleTensor value = DoubleTensor.create(new double[]{1}, 1, 1, 1);
-        assertEquals(3, value.greaterThan(2).getRank());
+        assertEquals(3, value.greaterThan(2.0).getRank());
     }
 
     @Test
     public void doesKeepRankOnLT() {
         DoubleTensor value = DoubleTensor.create(new double[]{1}, 1, 1, 1);
-        assertEquals(3, value.lessThan(2).getRank());
+        assertEquals(3, value.lessThan(2.0).getRank());
     }
 
     @Test
     public void doesKeepRankOnLTEq() {
         DoubleTensor value = DoubleTensor.create(new double[]{1}, 1, 1, 1);
-        assertEquals(3, value.lessThanOrEqual(2).getRank());
+        assertEquals(3, value.lessThanOrEqual(2.0).getRank());
     }
 
     @Test

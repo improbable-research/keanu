@@ -56,9 +56,9 @@ public class Cauchy implements ContinuousDistribution {
     @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor xMinusLocation = x.minus(location);
-        final DoubleTensor xMinusLocationPow2 = xMinusLocation.pow(2);
+        final DoubleTensor xMinusLocationPow2 = xMinusLocation.pow(2.0);
         final DoubleTensor scalePow2 = scale.pow(2);
-        final DoubleTensor locationTimesXTimes2 = location.times(x).timesInPlace(2);
+        final DoubleTensor locationTimesXTimes2 = location.times(x).timesInPlace(2.0);
 
         final DoubleTensor dLogPdlocation = xMinusLocation.times(2).divInPlace(scalePow2.plus(xMinusLocationPow2));
         final DoubleTensor dLogPdscale = xMinusLocationPow2.minus(scalePow2).divInPlace(scale.times(xMinusLocationPow2.plus(scalePow2)));

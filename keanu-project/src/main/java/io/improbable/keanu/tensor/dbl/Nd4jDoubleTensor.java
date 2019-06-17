@@ -213,12 +213,12 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double max() {
+    public Double max() {
         return tensor.maxNumber().doubleValue();
     }
 
     @Override
-    public double min() {
+    public Double min() {
         return tensor.minNumber().doubleValue();
     }
 
@@ -236,17 +236,17 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double average() {
+    public Double average() {
         return tensor.sumNumber().doubleValue() / tensor.length();
     }
 
     @Override
-    public double standardDeviation() {
+    public Double standardDeviation() {
         return tensor.stdNumber().doubleValue();
     }
 
     @Override
-    public boolean equalsWithinEpsilon(DoubleTensor o, double epsilon) {
+    public boolean equalsWithinEpsilon(DoubleTensor o, Double epsilon) {
         if (this == o) return true;
 
         if (o instanceof Nd4jDoubleTensor) {
@@ -286,7 +286,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor replaceNaN(double value) {
+    public DoubleTensor replaceNaN(Double value) {
         return duplicate().replaceNaNInPlace(value);
     }
 
@@ -316,17 +316,17 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor minus(double value) {
+    public DoubleTensor minus(Double value) {
         return duplicate().minusInPlace(value);
     }
 
     @Override
-    public DoubleTensor plus(double value) {
+    public DoubleTensor plus(Double value) {
         return duplicate().plusInPlace(value);
     }
 
     @Override
-    public DoubleTensor times(double value) {
+    public DoubleTensor times(Double value) {
         return duplicate().timesInPlace(value);
     }
 
@@ -343,7 +343,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor div(double value) {
+    public DoubleTensor div(Double value) {
         return duplicate().divInPlace(value);
     }
 
@@ -353,7 +353,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor pow(double exponent) {
+    public DoubleTensor pow(Double exponent) {
         return duplicate().powInPlace(exponent);
     }
 
@@ -403,7 +403,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor atan2(double y) {
+    public DoubleTensor atan2(Double y) {
         return duplicate().atan2InPlace(y);
     }
 
@@ -493,25 +493,25 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor minusInPlace(double value) {
+    public DoubleTensor minusInPlace(Double value) {
         tensor.subi(value);
         return this;
     }
 
     @Override
-    public DoubleTensor plusInPlace(double value) {
+    public DoubleTensor plusInPlace(Double value) {
         tensor.addi(value);
         return this;
     }
 
     @Override
-    public DoubleTensor timesInPlace(double value) {
+    public DoubleTensor timesInPlace(Double value) {
         tensor.muli(value);
         return this;
     }
 
     @Override
-    public DoubleTensor divInPlace(double value) {
+    public DoubleTensor divInPlace(Double value) {
         tensor.divi(value);
         return this;
     }
@@ -528,7 +528,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor powInPlace(double exponent) {
+    public DoubleTensor powInPlace(Double exponent) {
         Transforms.pow(tensor, exponent, false);
         return this;
     }
@@ -598,7 +598,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor atan2InPlace(double y) {
+    public DoubleTensor atan2InPlace(Double y) {
         return atan2InPlace(DoubleTensor.create(y, this.tensor.shape()));
     }
 
@@ -867,7 +867,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setAllInPlace(double value) {
+    public DoubleTensor setAllInPlace(Double value) {
         this.tensor.assign(value);
         return this;
     }
@@ -902,7 +902,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double determinant() {
+    public Double determinant() {
         INDArray dup = tensor.dup();
         double[][] asMatrix = dup.toDoubleMatrix();
         RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
@@ -910,7 +910,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double product() {
+    public Double product() {
         return tensor.prod().getDouble(0);
     }
 
@@ -987,12 +987,12 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     // Comparisons
 
     @Override
-    public BooleanTensor lessThan(double value) {
+    public BooleanTensor lessThan(Double value) {
         return fromMask(tensor.lt(value), copyOf(getShape(), getRank()));
     }
 
     @Override
-    public BooleanTensor lessThanOrEqual(double value) {
+    public BooleanTensor lessThanOrEqual(Double value) {
         return fromMask(tensor.lte(value), copyOf(getShape(), getRank()));
     }
 
@@ -1027,12 +1027,12 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public BooleanTensor greaterThan(double value) {
+    public BooleanTensor greaterThan(Double value) {
         return fromMask(tensor.gt(value), copyOf(getShape(), getRank()));
     }
 
     @Override
-    public BooleanTensor greaterThanOrEqual(double value) {
+    public BooleanTensor greaterThanOrEqual(Double value) {
         return fromMask(tensor.gte(value), copyOf(getShape(), getRank()));
     }
 
@@ -1042,7 +1042,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor replaceNaNInPlace(double value) {
+    public DoubleTensor replaceNaNInPlace(Double value) {
         Nd4j.getExecutioner().exec(new ReplaceNans(tensor, value));
         return this;
     }

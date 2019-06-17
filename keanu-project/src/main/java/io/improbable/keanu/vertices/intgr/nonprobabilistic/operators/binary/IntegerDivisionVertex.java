@@ -12,7 +12,7 @@ public class IntegerDivisionVertex extends IntegerBinaryOpVertex {
     /**
      * Divides one vertex by another
      *
-     * @param left a vertex to be divided
+     * @param left  a vertex to be divided
      * @param right a vertex to divide by
      */
     @ExportVertexToPythonBindings

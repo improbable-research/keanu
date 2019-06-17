@@ -55,11 +55,11 @@ public class VertexMatchers {
     }
 
 
-    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasValue(DATATYPE... values) {
+    public static <DATATYPE, TENSOR extends Tensor<DATATYPE, TENSOR>> Matcher<Vertex<TENSOR>> hasValue(DATATYPE... values) {
         return hasValue(Arrays.stream(values).map(v -> equalTo(v)).collect(Collectors.toList()));
     }
 
-    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasValue(List<Matcher<DATATYPE>> valueMatcher) {
+    public static <DATATYPE, TENSOR extends Tensor<DATATYPE, TENSOR>> Matcher<Vertex<TENSOR>> hasValue(List<Matcher<DATATYPE>> valueMatcher) {
         return new TypeSafeDiagnosingMatcher<Vertex<TENSOR>>() {
             @Override
             protected boolean matchesSafely(Vertex<TENSOR> vertex, Description description) {
@@ -74,7 +74,7 @@ public class VertexMatchers {
         };
     }
 
-    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasValue(TENSOR tensor) {
+    public static <DATATYPE, TENSOR extends Tensor<DATATYPE, TENSOR>> Matcher<Vertex<TENSOR>> hasValue(TENSOR tensor) {
         return hasValue(TensorMatchers.valuesAndShapesMatch(tensor));
     }
 

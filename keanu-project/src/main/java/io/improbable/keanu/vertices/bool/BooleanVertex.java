@@ -86,9 +86,13 @@ public abstract class BooleanVertex extends Vertex<BooleanTensor> implements Boo
         return new NotBinaryVertex(vertex);
     }
 
-    public AssertVertex assertTrue() { return new AssertVertex(this); }
+    public AssertVertex assertTrue() {
+        return new AssertVertex(this);
+    }
 
-    public AssertVertex assertTrue(String errorMessage) { return new AssertVertex(this, errorMessage); }
+    public AssertVertex assertTrue(String errorMessage) {
+        return new AssertVertex(this, errorMessage);
+    }
 
     public BooleanVertex equalTo(BooleanVertex rhs) {
         return new EqualsVertex<>(this, rhs);

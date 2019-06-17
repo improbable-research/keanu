@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.bool;
 
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -117,18 +116,18 @@ public class JVMBooleanTensorTest {
     @Test
     public void doesWhereWithNonScalarTensors() {
 
-        Tensor<Something> trueCase = GenericTensor.create(
+        GenericTensor<Something> trueCase = GenericTensor.create(
             new Something[]{Something.A, Something.B, Something.C, Something.D},
             new long[]{2, 2}
         );
 
-        Tensor<Something> falseCase = GenericTensor.create(
+        GenericTensor<Something> falseCase = GenericTensor.create(
             new Something[]{Something.D, Something.C, Something.C, Something.A},
             new long[]{2, 2}
         );
 
         BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
-        Tensor<Something> result = matrixA.where(trueCase, falseCase);
+        GenericTensor<Something> result = matrixA.where(trueCase, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.C, Something.A},
             result.asFlatArray()
@@ -140,10 +139,10 @@ public class JVMBooleanTensorTest {
 
         BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
 
-        Tensor<Something> trueCase = GenericTensor.scalar(Something.A);
-        Tensor<Something> falseCase = GenericTensor.scalar(Something.C);
+        GenericTensor<Something> trueCase = GenericTensor.scalar(Something.A);
+        GenericTensor<Something> falseCase = GenericTensor.scalar(Something.C);
 
-        Tensor<Something> result = matrixA.where(trueCase, falseCase);
+        GenericTensor<Something> result = matrixA.where(trueCase, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.A, Something.C},
             result.asFlatArray()

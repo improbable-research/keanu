@@ -17,14 +17,14 @@ public class TensorMatchers {
     private TensorMatchers() {
     }
 
-    public static <T> Matcher<Tensor<T>> hasShape(long... shape) {
+    public static <T> Matcher<Tensor<T, ?>> hasShape(long... shape) {
         return hasShape(equalTo(shape));
     }
 
-    public static <T> Matcher<Tensor<T>> hasShape(Matcher<long[]> shapeMatcher) {
-        return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
+    public static <T> Matcher<Tensor<T, ?>> hasShape(Matcher<long[]> shapeMatcher) {
+        return new TypeSafeDiagnosingMatcher<Tensor<T, ?>>() {
             @Override
-            protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
+            protected boolean matchesSafely(Tensor<T, ?> item, Description mismatchDescription) {
                 mismatchDescription.appendValue(item.getShape());
                 return shapeMatcher.matches(item.getShape());
             }
@@ -36,14 +36,14 @@ public class TensorMatchers {
         };
     }
 
-    public static <T> Matcher<Tensor<T>> isScalarWithValue(T value) {
+    public static <T> Matcher<Tensor<T, ?>> isScalarWithValue(T value) {
         return isScalarWithValue(equalTo(value));
     }
 
-    public static <T> Matcher<Tensor<T>> isScalarWithValue(Matcher<T> value) {
-        return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
+    public static <T> Matcher<Tensor<T, ?>> isScalarWithValue(Matcher<T> value) {
+        return new TypeSafeDiagnosingMatcher<Tensor<T, ?>>() {
             @Override
-            protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
+            protected boolean matchesSafely(Tensor<T, ?> item, Description mismatchDescription) {
                 mismatchDescription.appendValue(item);
                 return item.isScalar() && value.matches(item.getValue(0));
             }
@@ -55,14 +55,14 @@ public class TensorMatchers {
         };
     }
 
-    public static <T> Matcher<Tensor<T>> hasValue(T... values) {
+    public static <T> Matcher<Tensor<T, ?>> hasValue(T... values) {
         return hasValue(Arrays.stream(values).map(v -> equalTo(v)).collect(Collectors.toList()));
     }
 
-    public static <T> Matcher<Tensor<T>> hasValue(List<Matcher<T>> valueMatchers) {
-        return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
+    public static <T> Matcher<Tensor<T, ?>> hasValue(List<Matcher<T>> valueMatchers) {
+        return new TypeSafeDiagnosingMatcher<Tensor<T, ?>>() {
             @Override
-            protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
+            protected boolean matchesSafely(Tensor<T, ?> item, Description mismatchDescription) {
                 mismatchDescription.appendText("Tensor");
                 T[] itemArray = item.asFlatArray();
                 if (itemArray.length != valueMatchers.size()) {
@@ -91,18 +91,18 @@ public class TensorMatchers {
         };
     }
 
-    public static <T> Matcher<Tensor<T>> valuesAndShapesMatch(Tensor<T> tensor) {
+    public static <T> Matcher<Tensor<T, ?>> valuesAndShapesMatch(Tensor<T, ?> tensor) {
         return both(TensorMatchers.valuesMatch(tensor)).and(hasShape(tensor.getShape()));
     }
 
-    public static Matcher<Tensor<Double>> valuesWithinEpsilonAndShapesMatch(Tensor<Double> tensor, double epsilon) {
+    public static Matcher<Tensor<Double, ?>> valuesWithinEpsilonAndShapesMatch(Tensor<Double, ?> tensor, double epsilon) {
         return both(TensorMatchers.allCloseTo(epsilon, tensor)).and(hasShape(tensor.getShape()));
     }
 
-    public static <T> Matcher<Tensor<T>> allValues(Matcher<T> valueMatcher) {
-        return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
+    public static <T> Matcher<Tensor<T, ?>> allValues(Matcher<T> valueMatcher) {
+        return new TypeSafeDiagnosingMatcher<Tensor<T, ?>>() {
             @Override
-            protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
+            protected boolean matchesSafely(Tensor<T, ?> item, Description mismatchDescription) {
                 mismatchDescription.appendText("Tensor");
                 Tensor.FlattenedView<T> itemFlattened = item.getFlattenedView();
 
@@ -141,11 +141,11 @@ public class TensorMatchers {
         };
     }
 
-    public static <T> Matcher<Tensor<T>> valuesMatch(Tensor<T> other) {
+    public static <T> Matcher<Tensor<T, ?>> valuesMatch(Tensor<T, ?> other) {
         return hasValue(other.asFlatArray());
     }
 
-    public static Matcher<Tensor<Double>> allCloseTo(double epsilon, Tensor<Double> other) {
+    public static Matcher<Tensor<Double, ?>> allCloseTo(double epsilon, Tensor<Double, ?> other) {
         return hasValue(other.asFlatList().stream().map(v -> closeTo(v, epsilon)).collect(Collectors.toList()));
     }
 }

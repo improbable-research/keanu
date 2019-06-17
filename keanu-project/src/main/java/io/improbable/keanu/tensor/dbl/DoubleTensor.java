@@ -130,124 +130,14 @@ public abstract class DoubleTensor implements FloatingPointTensor<Double, Double
     }
 
     @Override
-    public abstract DoubleTensor reshape(long... newShape);
-
-    @Override
-    public abstract DoubleTensor broadcast(long... toShape);
-
-    public abstract DoubleTensor permute(int... rearrange);
-
-    @Override
-    public abstract DoubleTensor duplicate();
-
-    public abstract DoubleTensor diag();
-
-    public abstract DoubleTensor transpose();
-
-    public abstract DoubleTensor sum(int... overDimensions);
-
-    public abstract DoubleTensor cumSum(int dimension);
-
-    public abstract DoubleTensor cumSumInPlace(int dimension);
-
-    //New tensor Ops and transforms
-
-    public abstract DoubleTensor reciprocal();
-
-    public abstract DoubleTensor minus(double value);
-
-    public DoubleTensor reverseMinus(double value) {
+    public DoubleTensor reverseMinus(Double value) {
         return DoubleTensor.scalar(value).minus(this);
     }
 
-    public abstract DoubleTensor plus(double value);
-
-    public abstract DoubleTensor times(double value);
-
-    public abstract DoubleTensor div(double value);
-
-    public DoubleTensor reverseDiv(double value) {
+    @Override
+    public DoubleTensor reverseDiv(Double value) {
         return DoubleTensor.scalar(value).div(this);
     }
-
-    public abstract DoubleTensor matrixMultiply(DoubleTensor value);
-
-    public abstract DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight);
-
-    public abstract DoubleTensor pow(DoubleTensor exponent);
-
-    public abstract DoubleTensor pow(double exponent);
-
-    public abstract DoubleTensor sqrt();
-
-    public abstract DoubleTensor log();
-
-    public abstract DoubleTensor safeLogTimes(DoubleTensor y);
-
-    public abstract DoubleTensor logGamma();
-
-    public abstract DoubleTensor digamma();
-
-    public abstract DoubleTensor sin();
-
-    public abstract DoubleTensor cos();
-
-    public abstract DoubleTensor tan();
-
-    public abstract DoubleTensor atan();
-
-    public abstract DoubleTensor atan2(double y);
-
-    public abstract DoubleTensor atan2(DoubleTensor y);
-
-    public abstract DoubleTensor asin();
-
-    public abstract DoubleTensor acos();
-
-    public abstract DoubleTensor exp();
-
-    public abstract DoubleTensor matrixInverse();
-
-    public abstract double max();
-
-    public abstract double min();
-
-    public abstract double average();
-
-    public abstract double standardDeviation();
-
-    public abstract boolean equalsWithinEpsilon(DoubleTensor other, double epsilon);
-
-    public abstract DoubleTensor standardize();
-
-    public abstract DoubleTensor replaceNaN(double value);
-
-    public abstract DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
-
-    public abstract DoubleTensor ceil();
-
-    public abstract DoubleTensor floor();
-
-    /**
-     * @return The tensor with the elements rounded half up
-     * e.g. 1.5 is 2
-     * e.g. -2.5 is -3
-     */
-    public abstract DoubleTensor round();
-
-    public abstract DoubleTensor sigmoid();
-
-    public abstract DoubleTensor choleskyDecomposition();
-
-    public abstract double determinant();
-
-    public abstract double product();
-
-    @Override
-    public abstract DoubleTensor slice(int dimension, long index);
-
-    @Override
-    public abstract DoubleTensor take(long... index);
 
     public abstract List<DoubleTensor> split(int dimension, long... splitAtIndices);
 
@@ -263,23 +153,29 @@ public abstract class DoubleTensor implements FloatingPointTensor<Double, Double
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
+    public abstract DoubleTensor minusInPlace(Double value);
+
+    public abstract DoubleTensor plusInPlace(Double value);
+
+    public abstract DoubleTensor timesInPlace(Double value);
+
+    public abstract DoubleTensor divInPlace(Double value);
+
+    public abstract DoubleTensor powInPlace(Double exponent);
+
+    public abstract DoubleTensor atan2InPlace(Double y);
+
+    public abstract DoubleTensor replaceNaNInPlace(Double value);
+
+    public abstract DoubleTensor setAllInPlace(Double value);
+
+    public abstract DoubleTensor safeLogTimesInPlace(DoubleTensor y);
+
     public abstract DoubleTensor reciprocalInPlace();
-
-    public abstract DoubleTensor minusInPlace(double value);
-
-    public abstract DoubleTensor plusInPlace(double value);
-
-    public abstract DoubleTensor timesInPlace(double value);
-
-    public abstract DoubleTensor divInPlace(double value);
-
-    public abstract DoubleTensor powInPlace(double exponent);
 
     public abstract DoubleTensor sqrtInPlace();
 
     public abstract DoubleTensor logInPlace();
-
-    public abstract DoubleTensor safeLogTimesInPlace(DoubleTensor y);
 
     public abstract DoubleTensor logGammaInPlace();
 
@@ -292,8 +188,6 @@ public abstract class DoubleTensor implements FloatingPointTensor<Double, Double
     public abstract DoubleTensor tanInPlace();
 
     public abstract DoubleTensor atanInPlace();
-
-    public abstract DoubleTensor atan2InPlace(double y);
 
     public abstract DoubleTensor atan2InPlace(DoubleTensor y);
 
@@ -319,23 +213,56 @@ public abstract class DoubleTensor implements FloatingPointTensor<Double, Double
 
     public abstract DoubleTensor standardizeInPlace();
 
-    public abstract DoubleTensor replaceNaNInPlace(double value);
-
-    public abstract DoubleTensor setAllInPlace(double value);
-
     // Comparisons
-    public abstract BooleanTensor lessThan(double value);
 
-    public abstract BooleanTensor lessThanOrEqual(double value);
+    public abstract BooleanTensor lessThan(Double value);
 
-    public abstract BooleanTensor greaterThan(double value);
+    public abstract BooleanTensor lessThanOrEqual(Double value);
 
-    public abstract BooleanTensor greaterThanOrEqual(double value);
+    public abstract BooleanTensor greaterThan(Double value);
+
+    public abstract BooleanTensor greaterThanOrEqual(Double value);
 
     public abstract BooleanTensor notNaN();
 
     public BooleanTensor isNaN() {
         return notNaN().not();
+    }
+
+    // Kotlin unboxes to the primitive but does not match the Java
+    @Override
+    public DoubleTensor plus(double value) {
+        return plus((Double) value);
+    }
+
+    @Override
+    public DoubleTensor minus(double value) {
+        return minus((Double) value);
+    }
+
+    @Override
+    public DoubleTensor reverseMinus(double value) {
+        return reverseMinus((Double) value);
+    }
+
+    @Override
+    public DoubleTensor times(double value) {
+        return times((Double) value);
+    }
+
+    @Override
+    public DoubleTensor div(double value) {
+        return div((Double) value);
+    }
+
+    @Override
+    public DoubleTensor reverseDiv(double value) {
+        return reverseDiv((Double) value);
+    }
+
+    @Override
+    public DoubleTensor pow(double exponent) {
+        return pow((Double) exponent);
     }
 
 }

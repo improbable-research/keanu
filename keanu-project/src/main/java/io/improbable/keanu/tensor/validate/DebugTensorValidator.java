@@ -3,7 +3,7 @@ package io.improbable.keanu.tensor.validate;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
-public class DebugTensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValidator<DATATYPE, TENSOR> {
+public class DebugTensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE, TENSOR>> implements TensorValidator<DATATYPE, TENSOR> {
     private final TensorValidator<DATATYPE, TENSOR> delegate;
     private boolean debugMode = false;
 

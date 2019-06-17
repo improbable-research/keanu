@@ -25,7 +25,7 @@ public class BooleanConcatenationVertex extends BooleanVertex implements NonProb
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
      * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param operands     the input vertices to concatenate
+     * @param operands  the input vertices to concatenate
      */
     public BooleanConcatenationVertex(int dimension, BooleanVertex... operands) {
         super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, operands)));

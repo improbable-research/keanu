@@ -13,13 +13,13 @@ import java.util.Map;
 
 public class IntegerCPTVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor>, NonSaveableVertex {
 
-    private final List<Vertex<? extends Tensor<?>>> inputs;
+    private final List<Vertex<? extends Tensor<?, ?>>> inputs;
     private final Map<CPTCondition, IntegerVertex> conditions;
     private final IntegerVertex defaultResult;
 
-    public IntegerCPTVertex(List<Vertex<? extends Tensor<?>>> inputs,
-                           Map<CPTCondition, IntegerVertex> conditions,
-                           IntegerVertex defaultResult) {
+    public IntegerCPTVertex(List<Vertex<? extends Tensor<?, ?>>> inputs,
+                            Map<CPTCondition, IntegerVertex> conditions,
+                            IntegerVertex defaultResult) {
         super(defaultResult.getShape());
         this.inputs = inputs;
         this.conditions = conditions;

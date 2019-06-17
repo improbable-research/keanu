@@ -17,9 +17,9 @@ public class Logistic implements ContinuousDistribution {
     private final DoubleTensor s;
 
     /**
-     * @param mu     location parameter (any real number)
-     * @param s      scale parameter (b greater than 0)
-     * @return       a new ContinuousDistribution object
+     * @param mu location parameter (any real number)
+     * @param s  scale parameter (b greater than 0)
+     * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor s) {
         return new Logistic(mu, s);
@@ -32,7 +32,7 @@ public class Logistic implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        return random.nextDouble(shape).reciprocalInPlace().minusInPlace(1).logInPlace().timesInPlace(mu.minus(s));
+        return random.nextDouble(shape).reciprocalInPlace().minusInPlace(1.0).logInPlace().timesInPlace(mu.minus(s));
     }
 
     @Override

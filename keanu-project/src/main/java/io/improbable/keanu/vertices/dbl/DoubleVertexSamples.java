@@ -18,16 +18,16 @@ public class DoubleVertexSamples extends Samples<DoubleTensor> {
     public DoubleTensor getAverages() {
         return this.samples.stream()
             .reduce(DoubleTensor.zeros(sampleShape), DoubleTensor::plusInPlace)
-            .divInPlace(samples.size());
+            .divInPlace((double) samples.size());
     }
 
     public DoubleTensor getVariances() {
         DoubleTensor sumOfSquares = this.samples.stream()
             .reduce(DoubleTensor.zeros(sampleShape), (l, r) -> l.plusInPlace(r.pow(2)));
         return sumOfSquares
-            .divInPlace(samples.size())
+            .divInPlace((double) samples.size())
             .minusInPlace(getAverages().pow(2))
-            .timesInPlace(samples.size())
+            .timesInPlace((double) samples.size())
             .divInPlace(samples.size() - 1.);
     }
 

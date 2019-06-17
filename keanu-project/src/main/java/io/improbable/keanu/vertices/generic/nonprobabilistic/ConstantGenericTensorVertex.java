@@ -5,14 +5,14 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 
-public class ConstantGenericTensorVertex<T> extends GenericTensorVertex<T> implements NonProbabilistic<Tensor<T>>, NonSaveableVertex {
+public class ConstantGenericTensorVertex<T, TENSOR extends Tensor<T, TENSOR>> extends GenericTensorVertex<T, TENSOR> implements NonProbabilistic<TENSOR>, NonSaveableVertex {
 
-    public ConstantGenericTensorVertex(Tensor<T> value) {
+    public ConstantGenericTensorVertex(TENSOR value) {
         setValue(value);
     }
 
     @Override
-    public Tensor<T> calculate() {
+    public TENSOR calculate() {
         return getValue();
     }
 }

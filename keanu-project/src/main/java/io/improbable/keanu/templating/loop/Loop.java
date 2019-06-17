@@ -26,24 +26,24 @@ import java.util.Map;
  * "V" is the output of the loop
  * "L" indicates if it's still looping. This is used to detect the error case in which the loop was too short to complete.
  * <p>
- *       cond true base
- *           \ |   |  \
- *            AND  | iterate
- *             |\  |  /|
- *             | \ | / |
- *       cond  |  IF   |
- *           \ |   |\  |
- *            AND  | iterate
- *             |\  |  /|
- *             | \ | / |
- *       cond  |  IF   |
- *           \ |   |\  |
- *            AND  | iterate
- *             |\  |  /
- *             | \ | /
- *             |  IF
- *             |   |
- *             L   V
+ * cond true base
+ * \ |   |  \
+ * AND  | iterate
+ * |\  |  /|
+ * | \ | / |
+ * cond  |  IF   |
+ * \ |   |\  |
+ * AND  | iterate
+ * |\  |  /|
+ * | \ | / |
+ * cond  |  IF   |
+ * \ |   |\  |
+ * AND  | iterate
+ * |\  |  /
+ * | \ | /
+ * |  IF
+ * |   |
+ * L   V
  */
 @Slf4j
 public class Loop {
@@ -58,7 +58,7 @@ public class Loop {
     /**
      * package-private because it is intended to be created by the LoopBuilder
      *
-     * @param sequence                     the set of sequence, one for each iteration in the loop
+     * @param sequence                   the set of sequence, one for each iteration in the loop
      * @param throwWhenMaxCountIsReached optionally disable throwing and log a warning instead
      */
     Loop(Sequence sequence, boolean throwWhenMaxCountIsReached) {

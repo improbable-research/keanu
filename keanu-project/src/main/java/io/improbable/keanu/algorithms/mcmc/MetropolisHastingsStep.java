@@ -23,10 +23,10 @@ public class MetropolisHastingsStep {
     private final KeanuRandom random;
 
     /**
-     * @param proposalDistribution        The proposal distribution
-     * @param rejectionStrategy           What to do when a proposal is rejected.
-     *                                    Options include {@link RollbackAndCascadeOnRejection} and {@link RollBackToCachedValuesOnRejection}.
-     * @param random                      Source of randomness
+     * @param proposalDistribution The proposal distribution
+     * @param rejectionStrategy    What to do when a proposal is rejected.
+     *                             Options include {@link RollbackAndCascadeOnRejection} and {@link RollBackToCachedValuesOnRejection}.
+     * @param random               Source of randomness
      */
     MetropolisHastingsStep(ProbabilisticModel model,
                            ProposalDistribution proposalDistribution,

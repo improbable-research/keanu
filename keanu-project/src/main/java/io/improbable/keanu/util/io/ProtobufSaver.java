@@ -159,9 +159,9 @@ public class ProtobufSaver implements NetworkSaver {
     }
 
     private SavedBayesNet.NamedParam getTypedParam(String paramName, Object param) {
-        if (Vertex.class.isAssignableFrom(param.getClass()))  {
-            return getParam(paramName, (Vertex)param);
-        } else if (DoubleTensor.class.isAssignableFrom(param.getClass())){
+        if (Vertex.class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, (Vertex) param);
+        } else if (DoubleTensor.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, builder -> builder.setDoubleTensorParam(getTensor((DoubleTensor) param)));
         } else if (IntegerTensor.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, builder -> builder.setIntTensorParam(getTensor((IntegerTensor) param)));
@@ -189,7 +189,7 @@ public class ProtobufSaver implements NetworkSaver {
     }
 
     private SavedBayesNet.NamedParam getParam(String paramName,
-                                                   Consumer<SavedBayesNet.NamedParam.Builder> valueSetter) {
+                                              Consumer<SavedBayesNet.NamedParam.Builder> valueSetter) {
         SavedBayesNet.NamedParam.Builder paramBuilder = SavedBayesNet.NamedParam.newBuilder();
 
         paramBuilder.setName(paramName);

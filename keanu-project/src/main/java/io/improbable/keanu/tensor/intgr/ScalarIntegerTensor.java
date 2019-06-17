@@ -120,6 +120,31 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor cumSum(int dimension) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor cumSumInPlace(int dimension) {
+        return null;
+    }
+
+    @Override
+    public Integer product() {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor clamp(IntegerTensor min, IntegerTensor max) {
+        return null;
+    }
+
+    @Override
+    public boolean equalsWithinEpsilon(IntegerTensor other, Integer epsilon) {
+        return false;
+    }
+
+    @Override
     public IntegerTensor minus(int that) {
         return duplicate().minusInPlace(that);
     }
@@ -446,12 +471,12 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public int min() {
+    public Integer min() {
         return value;
     }
 
     @Override
-    public int max() {
+    public Integer max() {
         return value;
     }
 

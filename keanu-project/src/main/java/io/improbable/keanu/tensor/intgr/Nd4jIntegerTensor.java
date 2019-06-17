@@ -123,6 +123,31 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor cumSum(int dimension) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor cumSumInPlace(int dimension) {
+        return null;
+    }
+
+    @Override
+    public Integer product() {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor clamp(IntegerTensor min, IntegerTensor max) {
+        return null;
+    }
+
+    @Override
+    public boolean equalsWithinEpsilon(IntegerTensor other, Integer epsilon) {
+        return false;
+    }
+
+    @Override
     public IntegerTensor minus(int value) {
         return duplicate().minusInPlace(value);
     }
@@ -498,12 +523,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public int min() {
+    public Integer min() {
         return tensor.minNumber().intValue();
     }
 
     @Override
-    public int max() {
+    public Integer max() {
         return tensor.maxNumber().intValue();
     }
 

@@ -396,7 +396,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double determinant() {
+    public Double determinant() {
 
         final int m = Ints.checkedCast(shape[0]);
         final int n = Ints.checkedCast(shape[1]);
@@ -408,7 +408,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         if (factorizationResult < 0) {
             throw new IllegalStateException("Matrix factorization failed");
         } else if (factorizationResult > 0) {
-            return 0;
+            return 0.0;
         }
 
         //credit: https://stackoverflow.com/questions/47315471/compute-determinant-from-lu-decomposition-in-lapack
@@ -658,7 +658,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public BooleanTensor lessThan(double value) {
+    public BooleanTensor lessThan(Double value) {
         boolean[] newBuffer = new boolean[buffer.length];
 
         for (int i = 0; i < buffer.length; i++) {
@@ -669,7 +669,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public BooleanTensor lessThanOrEqual(double value) {
+    public BooleanTensor lessThanOrEqual(Double value) {
         boolean[] newBuffer = new boolean[buffer.length];
 
         for (int i = 0; i < buffer.length; i++) {
@@ -680,7 +680,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public BooleanTensor greaterThan(double value) {
+    public BooleanTensor greaterThan(Double value) {
         boolean[] newBuffer = new boolean[buffer.length];
 
         for (int i = 0; i < buffer.length; i++) {
@@ -691,7 +691,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public BooleanTensor greaterThanOrEqual(double value) {
+    public BooleanTensor greaterThanOrEqual(Double value) {
         boolean[] newBuffer = new boolean[buffer.length];
 
         for (int i = 0; i < buffer.length; i++) {
@@ -712,7 +712,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor powInPlace(double exponent) {
+    public DoubleTensor powInPlace(Double exponent) {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] = FastMath.pow(buffer[i], exponent);
         }
@@ -720,7 +720,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor pow(double exponent) {
+    public DoubleTensor pow(Double exponent) {
         return duplicate().powInPlace(exponent);
     }
 
@@ -770,12 +770,12 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor atan2(double y) {
+    public DoubleTensor atan2(Double y) {
         return this.duplicate().atan2InPlace(y);
     }
 
     @Override
-    public DoubleTensor atan2InPlace(double y) {
+    public DoubleTensor atan2InPlace(Double y) {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] = FastMath.atan2(y, buffer[i]);
         }
@@ -808,12 +808,12 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double average() {
+    public Double average() {
         return sum() / buffer.length;
     }
 
     @Override
-    public double standardDeviation() {
+    public Double standardDeviation() {
 
         SummaryStatistics stats = new SummaryStatistics();
         for (int i = 0; i < buffer.length; i++) {
@@ -824,7 +824,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public boolean equalsWithinEpsilon(DoubleTensor other, double epsilon) {
+    public boolean equalsWithinEpsilon(DoubleTensor other, Double epsilon) {
         if (!Arrays.equals(shape, other.getShape())) {
             return false;
         }
@@ -846,7 +846,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor replaceNaN(double value) {
+    public DoubleTensor replaceNaN(Double value) {
         return duplicate().replaceNaNInPlace(value);
     }
 
@@ -890,7 +890,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double product() {
+    public Double product() {
         double result = 1.0;
         for (int i = 0; i < buffer.length; i++) {
             result *= buffer[i];
@@ -1163,7 +1163,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double min() {
+    public Double min() {
         double result = Double.MAX_VALUE;
         for (int i = 0; i < buffer.length; i++) {
             result = Math.min(result, buffer[i]);
@@ -1177,7 +1177,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double max() {
+    public Double max() {
         double result = -Double.MAX_VALUE;
         for (int i = 0; i < buffer.length; i++) {
             result = Math.max(result, buffer[i]);
@@ -1232,7 +1232,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor replaceNaNInPlace(double value) {
+    public DoubleTensor replaceNaNInPlace(Double value) {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] = Double.isNaN(buffer[i]) ? value : buffer[i];
         }
@@ -1240,7 +1240,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setAllInPlace(double value) {
+    public DoubleTensor setAllInPlace(Double value) {
         Arrays.fill(buffer, value);
 
         return this;
@@ -1258,7 +1258,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor minusInPlace(double value) {
+    public DoubleTensor minusInPlace(Double value) {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] -= value;
         }
@@ -1266,7 +1266,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor minus(double value) {
+    public DoubleTensor minus(Double value) {
         return duplicate().minusInPlace(value);
     }
 
@@ -1281,7 +1281,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor plusInPlace(double value) {
+    public DoubleTensor plusInPlace(Double value) {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] += value;
         }
@@ -1289,7 +1289,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor plus(double value) {
+    public DoubleTensor plus(Double value) {
         return duplicate().plusInPlace(value);
     }
 
@@ -1304,7 +1304,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor timesInPlace(double value) {
+    public DoubleTensor timesInPlace(Double value) {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] *= value;
         }
@@ -1312,7 +1312,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor times(double value) {
+    public DoubleTensor times(Double value) {
         return duplicate().timesInPlace(value);
     }
 
@@ -1327,7 +1327,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor divInPlace(double value) {
+    public DoubleTensor divInPlace(Double value) {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] /= value;
         }
@@ -1335,7 +1335,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor div(double value) {
+    public DoubleTensor div(Double value) {
         return duplicate().divInPlace(value);
     }
 

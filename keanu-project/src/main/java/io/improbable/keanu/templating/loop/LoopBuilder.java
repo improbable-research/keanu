@@ -54,7 +54,7 @@ public class LoopBuilder {
     /**
      * An optional method to add custom mappings
      *
-     * @param proxyLabel  the label assigned to the ProxyVertex in frame t
+     * @param proxyLabel        the label assigned to the ProxyVertex in frame t
      * @param proxysParentLabel the label assigned to a Vertex in frame t-1 which will become the ProxyVertex's parent
      * @return self
      */

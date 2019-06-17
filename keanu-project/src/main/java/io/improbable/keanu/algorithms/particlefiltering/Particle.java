@@ -34,7 +34,7 @@ public class Particle {
         return ((DoubleTensor) latentVertices.get(vertex)).scalar();
     }
 
-    public <T> T getValueOfVertex(Vertex<T> vertex){
+    public <T> T getValueOfVertex(Vertex<T> vertex) {
         return (T) latentVertices.get(vertex);
     }
 

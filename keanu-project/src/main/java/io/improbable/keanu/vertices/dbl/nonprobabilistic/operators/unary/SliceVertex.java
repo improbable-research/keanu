@@ -65,8 +65,8 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
         int dimensionsInOf = tensor.getRank() - dimensionsInWrt;
         int sliceDimension = dimension + dimensionsInOf;
         long[] targetShape = TensorShape.concat(
-          TensorShape.selectDimensions(0, dimensionsInOf, tensor.getShape()),
-          inputVertex.getShape()
+            TensorShape.selectDimensions(0, dimensionsInOf, tensor.getShape()),
+            inputVertex.getShape()
         );
         long indicesBefore = index;
         long indicesAfter = targetShape[sliceDimension] - index - 1;

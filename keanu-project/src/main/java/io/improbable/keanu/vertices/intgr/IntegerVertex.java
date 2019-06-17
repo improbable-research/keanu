@@ -185,7 +185,9 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new EqualsVertex<>(this, rhs);
     }
 
-    public DoubleVertex toDouble() { return new CastToDoubleVertex(this); }
+    public DoubleVertex toDouble() {
+        return new CastToDoubleVertex(this);
+    }
 
     public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);

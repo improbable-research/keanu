@@ -647,7 +647,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor containsMinusOne = IntegerTensor.create(1, 0, -1);
         IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
 
-        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatFixesElementwise(x -> x >= 0, TensorValidationPolicy.changeValueTo(0));
+        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatFixesElementwise(x -> x >= 0, (TensorValidationPolicy<Integer, IntegerTensor>) TensorValidationPolicy.changeValueTo(0));
         containsMinusOne = validator.validate(containsMinusOne);
         assertThat(containsMinusOne, equalTo(expectedResult));
     }

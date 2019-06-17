@@ -8,7 +8,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
-public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<BooleanTensor> {
+public interface BooleanTensor extends Tensor<Boolean, BooleanTensor>, BooleanOperators<BooleanTensor> {
 
     static BooleanTensor create(boolean value, long[] shape) {
         return JVMBooleanTensor.create(value, shape);
@@ -108,7 +108,7 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
 
     BooleanTensor booleanWhere(BooleanTensor trueValue, BooleanTensor falseValue);
 
-    <T, TENSOR extends Tensor<T>> TENSOR where(TENSOR trueValue, TENSOR falseValue);
+    <T, TENSOR extends Tensor<T, TENSOR>> TENSOR where(TENSOR trueValue, TENSOR falseValue);
 
     BooleanTensor andInPlace(BooleanTensor that);
 

@@ -12,7 +12,7 @@ public class IntegerDifferenceVertex extends IntegerBinaryOpVertex {
     /**
      * Subtracts one vertex from another
      *
-     * @param left the vertex to be subtracted from
+     * @param left  the vertex to be subtracted from
      * @param right the vertex to subtract
      */
     @ExportVertexToPythonBindings

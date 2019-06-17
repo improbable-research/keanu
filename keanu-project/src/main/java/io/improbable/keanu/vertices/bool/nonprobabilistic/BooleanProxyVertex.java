@@ -31,7 +31,7 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
     }
 
     @ExportVertexToPythonBindings
-    public BooleanProxyVertex(long[] shape,VertexLabel label) {
+    public BooleanProxyVertex(long[] shape, VertexLabel label) {
         super(shape);
         setLabel(label);
     }
@@ -68,7 +68,7 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
         setParents(newParent);
     }
 
-    @SaveVertexParam(value=PARENT_NAME, isNullable = true)
+    @SaveVertexParam(value = PARENT_NAME, isNullable = true)
     public BooleanVertex getParent() {
         return (BooleanVertex) Iterables.getOnlyElement(getParents(), null);
     }

@@ -108,7 +108,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     }
 
     @Override
-    public <U, T extends Tensor<U>> T getModelOutputValue(VertexLabel label) {
+    public <U, T extends Tensor<U, T>> T getModelOutputValue(VertexLabel label) {
         return (T) outputs.get(label).getValue();
     }
 

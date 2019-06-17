@@ -251,8 +251,8 @@ public interface IntegerTensor extends FixedPointTensor<Integer, IntegerTensor>,
 
     IntegerTensor maxInPlace(IntegerTensor max);
 
-    int min();
+    Integer min();
 
-    int max();
+    Integer max();
 
 }
