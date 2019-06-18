@@ -230,12 +230,6 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> ex
 
     BooleanTensor greaterThanOrEqual(N value);
 
-    BooleanTensor notNaN();
-
-    default BooleanTensor isNaN() {
-        return notNaN().not();
-    }
-
     T getGreaterThanMask(T greaterThanThis);
 
     T getGreaterThanOrEqualToMask(T greaterThanThis);

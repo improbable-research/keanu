@@ -464,36 +464,31 @@ public class JVMBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public FlattenedView<Boolean> getFlattenedView() {
-        return new JVMBooleanFlattenedView(buffer);
-    }
-
-    @Override
     public BooleanTensor elementwiseEquals(Boolean value) {
         return Tensor.elementwiseEquals(this, BooleanTensor.create(value, this.getShape()));
     }
 
-    private static class JVMBooleanFlattenedView implements FlattenedView<Boolean> {
+    @Override
+    public FlattenedView<Boolean> getFlattenedView() {
+        return new JVMBooleanFlattenedView();
+    }
 
-        private boolean[] data;
 
-        public JVMBooleanFlattenedView(boolean[] data) {
-            this.data = data;
-        }
+    private class JVMBooleanFlattenedView implements FlattenedView<Boolean> {
 
         @Override
         public long size() {
-            return data.length;
+            return buffer.length;
         }
 
         @Override
         public Boolean get(long index) {
-            return data[Ints.checkedCast(index)];
+            return buffer[Ints.checkedCast(index)];
         }
 
         @Override
         public Boolean getOrScalar(long index) {
-            if (data.length == 1) {
+            if (buffer.length == 1) {
                 return get(0);
             } else {
                 return get(index);
@@ -502,7 +497,7 @@ public class JVMBooleanTensor implements BooleanTensor {
 
         @Override
         public void set(long index, Boolean value) {
-            data[Ints.checkedCast(index)] = value;
+            buffer[Ints.checkedCast(index)] = value;
         }
 
     }

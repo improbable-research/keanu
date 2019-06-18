@@ -124,23 +124,14 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor cumSum(int dimension) {
-        return null;
-    }
-
-    @Override
     public IntegerTensor cumSumInPlace(int dimension) {
-        return null;
+        tensor.cumsumi(dimension);
+        return this;
     }
 
     @Override
     public Integer product() {
-        return null;
-    }
-
-    @Override
-    public IntegerTensor clamp(IntegerTensor min, IntegerTensor max) {
-        return null;
+        return tensor.prodNumber().intValue();
     }
 
     @Override
@@ -317,12 +308,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public Integer average() {
-        return null;
+        return (int) (tensor.sumNumber().doubleValue() / tensor.length());
     }
 
     @Override
     public Integer standardDeviation() {
-        return null;
+        return tensor.stdNumber().intValue();
     }
 
     @Override
@@ -339,18 +330,15 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor reverseMinus(IntegerTensor value) {
-        return null;
-    }
-
-    @Override
     public IntegerTensor reverseMinusInPlace(IntegerTensor value) {
-        return null;
+        tensor.rsubi(unsafeGetNd4J(value));
+        return this;
     }
 
     @Override
     public IntegerTensor reverseMinusInPlace(Integer value) {
-        return null;
+        tensor.rsubi(value);
+        return this;
     }
 
     @Override
@@ -395,17 +383,14 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor reverseDivInPlace(Integer value) {
-        return null;
-    }
-
-    @Override
-    public IntegerTensor reverseDiv(IntegerTensor value) {
-        return null;
+        tensor.rdivi(value);
+        return this;
     }
 
     @Override
     public IntegerTensor reverseDivInPlace(IntegerTensor value) {
-        return null;
+        tensor.rdivi(unsafeGetNd4J(value));
+        return this;
     }
 
     @Override
@@ -431,12 +416,8 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor setAllInPlace(Integer value) {
-        return null;
-    }
-
-    @Override
-    public IntegerTensor safeLogTimes(IntegerTensor y) {
-        return null;
+        tensor = TypedINDArrayFactory.valueArrayOf(getShape(), value, BUFFER_TYPE);
+        return this;
     }
 
     @Override
@@ -491,11 +472,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     @Override
     public BooleanTensor greaterThanOrEqual(Integer value) {
         return fromMask(tensor.gte(value), copyOf(getShape(), getRank()));
-    }
-
-    @Override
-    public BooleanTensor notNaN() {
-        return null;
     }
 
     @Override
@@ -610,11 +586,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public FlattenedView<Integer> getFlattenedView() {
-        return new Nd4jIntegerFlattenedView(tensor);
-    }
-
-    @Override
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof IntegerTensor) {
             if (this.isScalar()) {
@@ -648,7 +619,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public List<IntegerTensor> split(int dimension, long... splitAtIndices) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -706,13 +677,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return ArrayUtils.toObject(asFlatIntegerArray());
     }
 
-    private static class Nd4jIntegerFlattenedView implements FlattenedView<Integer> {
+    @Override
+    public FlattenedView<Integer> getFlattenedView() {
+        return new Nd4jIntegerFlattenedView();
+    }
 
-        INDArray tensor;
-
-        public Nd4jIntegerFlattenedView(INDArray tensor) {
-            this.tensor = tensor;
-        }
+    private class Nd4jIntegerFlattenedView implements FlattenedView<Integer> {
 
         @Override
         public long size() {

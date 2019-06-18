@@ -1122,11 +1122,6 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public FlattenedView<Double> getFlattenedView() {
-        return new Nd4jDoubleFlattenedView(tensor);
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
@@ -1189,13 +1184,12 @@ public class Nd4jDoubleTensor extends DoubleTensor {
         return ArrayUtils.toObject(asFlatDoubleArray());
     }
 
-    private static class Nd4jDoubleFlattenedView implements FlattenedView<Double> {
+    @Override
+    public FlattenedView<Double> getFlattenedView() {
+        return new Nd4jDoubleFlattenedView();
+    }
 
-        INDArray tensor;
-
-        public Nd4jDoubleFlattenedView(INDArray tensor) {
-            this.tensor = tensor;
-        }
+    private class Nd4jDoubleFlattenedView implements FlattenedView<Double> {
 
         @Override
         public long size() {

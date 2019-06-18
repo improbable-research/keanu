@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 public interface FloatingPointTensor<N extends Number, T extends FloatingPointTensor<N, T>> extends NumberTensor<N, T>, DoubleOperators<T> {
 
@@ -9,6 +10,12 @@ public interface FloatingPointTensor<N extends Number, T extends FloatingPointTe
     }
 
     T replaceNaNInPlace(N value);
+
+    BooleanTensor notNaN();
+
+    default BooleanTensor isNaN() {
+        return notNaN().not();
+    }
 
     default T reciprocal() {
         return duplicate().reciprocalInPlace();

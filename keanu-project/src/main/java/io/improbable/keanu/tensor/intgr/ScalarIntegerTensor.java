@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import com.google.common.base.Preconditions;
 import com.google.common.math.IntMath;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -383,12 +384,13 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor setAllInPlace(Integer value) {
-        return null;
+        this.value = value;
+        return this;
     }
 
     @Override
     public IntegerTensor safeLogTimesInPlace(IntegerTensor y) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -432,11 +434,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public BooleanTensor notNaN() {
-        return null;
-    }
-
-    @Override
     public IntegerTensor minInPlace(IntegerTensor min) {
         if (min.isLengthOne()) {
             long[] newShape = calculateShapeForLengthOneBroadcast(shape, min.getShape());
@@ -448,7 +445,8 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor clampInPlace(IntegerTensor min, IntegerTensor max) {
-        return null;
+        Preconditions.checkArgument(min.isScalar() && max.isScalar());
+        return new ScalarIntegerTensor(Math.max(Math.min(value, max.scalar()), min.scalar()), shape);
     }
 
     @Override
