@@ -1,95 +1,138 @@
 package io.improbable.keanu.tensor;
 
-public interface FloatingPointTensor<N extends Number, T extends FloatingPointTensor<N, T>> extends NumberTensor<N, T> {
+import io.improbable.keanu.kotlin.DoubleOperators;
 
+public interface FloatingPointTensor<N extends Number, T extends FloatingPointTensor<N, T>> extends NumberTensor<N, T>, DoubleOperators<T> {
 
-    //New tensor Ops and transforms
+    default T replaceNaN(N value) {
+        return duplicate().replaceNaNInPlace(value);
+    }
 
-    T reciprocal();
+    T replaceNaNInPlace(N value);
 
-    T minus(N value);
+    default T reciprocal() {
+        return duplicate().reciprocalInPlace();
+    }
 
-    T reverseMinus(N value);
+    T reciprocalInPlace();
 
-    T plus(N value);
+    default T sqrt() {
+        return duplicate().sqrtInPlace();
+    }
 
-    T times(N value);
+    T sqrtInPlace();
 
-    T div(N value);
+    default T log() {
+        return duplicate().logInPlace();
+    }
 
-    T powInPlace(N exponent);
+    T logInPlace();
 
-    T divInPlace(N value);
+    default T logGamma() {
+        return duplicate().logGammaInPlace();
+    }
 
-    T timesInPlace(N value);
+    T logGammaInPlace();
 
-    T plusInPlace(N value);
+    default T digamma() {
+        return duplicate().digammaInPlace();
+    }
 
-    T minusInPlace(N value);
+    T digammaInPlace();
 
-    T reverseDiv(N value);
+    default T sin() {
+        return duplicate().sinInPlace();
+    }
 
-    T matrixMultiply(T value);
+    T sinInPlace();
 
-    T tensorMultiply(T value, int[] dimsLeft, int[] dimsRight);
+    default T cos() {
+        return duplicate().cosInPlace();
+    }
 
-    T pow(T exponent);
+    T cosInPlace();
 
-    T pow(N exponent);
+    default T tan() {
+        return duplicate().tanInPlace();
+    }
 
-    T sqrt();
+    T tanInPlace();
 
-    T log();
+    default T atan() {
+        return duplicate().atanInPlace();
+    }
 
-    T safeLogTimes(T y);
+    T atanInPlace();
 
-    T logGamma();
+    default T atan2(N y) {
+        return duplicate().atan2InPlace(y);
+    }
 
-    T digamma();
+    T atan2InPlace(N y);
 
-    T sin();
+    default T atan2(T y) {
+        return duplicate().atan2InPlace(y);
+    }
 
-    T cos();
+    T atan2InPlace(T y);
 
-    T tan();
+    default T asin() {
+        return duplicate().asinInPlace();
+    }
 
-    T atan();
+    T asinInPlace();
 
-    T atan2(N y);
+    default T acos() {
+        return duplicate().acosInPlace();
+    }
 
-    T atan2(T y);
+    T acosInPlace();
 
-    T asin();
+    default T exp() {
+        return duplicate().expInPlace();
+    }
 
-    T acos();
-
-    T exp();
+    T expInPlace();
 
     T matrixInverse();
 
-    N average();
+    default T ceil() {
+        return duplicate().ceilInPlace();
+    }
 
-    N standardDeviation();
+    T ceilInPlace();
 
-    T standardize();
+    default T floor() {
+        return duplicate().floorInPlace();
+    }
 
-    T replaceNaN(N value);
-
-    T ceil();
-
-    T floor();
+    T floorInPlace();
 
     /**
      * @return The tensor with the elements rounded half up
      * e.g. 1.5 is 2
      * e.g. -2.5 is -3
      */
-    T round();
 
-    T sigmoid();
+    default T round() {
+        return duplicate().roundInPlace();
+    }
+
+    T roundInPlace();
+
+    default T sigmoid() {
+        return duplicate().sigmoidInPlace();
+    }
+
+    T sigmoidInPlace();
 
     T choleskyDecomposition();
 
     N determinant();
 
+    default T standardize() {
+        return duplicate().standardizeInPlace();
+    }
+
+    T standardizeInPlace();
 }

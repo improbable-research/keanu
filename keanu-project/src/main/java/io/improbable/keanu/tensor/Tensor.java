@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -121,6 +122,18 @@ public interface Tensor<N, T extends Tensor<N, T>> {
     T slice(int dimension, long index);
 
     T take(long... index);
+
+    List<T> split(int dimension, long... splitAtIndices);
+
+    default List<T> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {
+        List<T> slicedTensors = new ArrayList<>();
+
+        for (long i = indexStart; i < indexEnd; i++) {
+            slicedTensors.add(slice(dimension, i));
+        }
+
+        return slicedTensors;
+    }
 
     T diag();
 

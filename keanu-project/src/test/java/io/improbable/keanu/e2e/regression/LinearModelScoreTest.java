@@ -27,7 +27,7 @@ public class LinearModelScoreTest {
     public void coefficientOfDeterminationIs1ForSameData() {
         UniformVertex generator = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
         DoubleTensor sample = generator.sample();
-        assertThat( ModelScoring.coefficientOfDetermination(sample, sample), closeTo(1, 1e-8));
+        assertThat(ModelScoring.coefficientOfDetermination(sample, sample), closeTo(1, 1e-8));
     }
 
     @Test

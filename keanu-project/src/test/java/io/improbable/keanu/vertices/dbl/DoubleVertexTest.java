@@ -149,7 +149,7 @@ public class DoubleVertexTest {
         DoubleTensor result = matricesMultiplied.lazyEval();
         DoubleTensor expectedResult = DoubleTensor.create(
             new double[]{
-                 9., 12., 15.,
+                9., 12., 15.,
                 19., 26., 33.,
                 29., 40., 51.
             }, 3, 3);

@@ -44,8 +44,8 @@ public class GeometricVertexTest {
     @Test
     public void logProbIsCorrectVector() {
         double p = 0.8;
-        int[] values = new int[] {3, 5, 15};
-        GeometricVertex myVertex = new GeometricVertex(new long[] {values.length}, p);
+        int[] values = new int[]{3, 5, 15};
+        GeometricVertex myVertex = new GeometricVertex(new long[]{values.length}, p);
 
         double calculatedP = myVertex.logPmf(values);
         double expectedP = 0.0;
@@ -60,8 +60,8 @@ public class GeometricVertexTest {
     @Test
     public void logProbGraphIsCorrectVector() {
         DoubleVertex p = ConstantVertex.of(0.8);
-        int[] values = new int[] {3, 5, 15};
-        GeometricVertex myVertex = new GeometricVertex(new long[] {values.length}, p);
+        int[] values = new int[]{3, 5, 15};
+        GeometricVertex myVertex = new GeometricVertex(new long[]{values.length}, p);
         LogProbGraph logProbGraph = myVertex.logProbGraph();
 
         LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
@@ -138,7 +138,7 @@ public class GeometricVertexTest {
     public void meanAndStandardDeviationMatchExpected() {
         double p = 0.1;
 
-        GeometricVertex myVertex = new GeometricVertex(new long[] {1, 200000}, p);
+        GeometricVertex myVertex = new GeometricVertex(new long[]{1, 200000}, p);
         IntegerTensor samples = myVertex.sample();
 
         double expectedMean = 1 / p;
@@ -154,7 +154,7 @@ public class GeometricVertexTest {
     public void samplesMatchPMF() {
         double p = 0.2;
 
-        GeometricVertex myVertex = new GeometricVertex(new long[] {1, 100000}, p);
+        GeometricVertex myVertex = new GeometricVertex(new long[]{1, 100000}, p);
         IntegerTensor samples = myVertex.sample();
 
         for (int i = 1; i < 100; i++) {
@@ -166,7 +166,7 @@ public class GeometricVertexTest {
         double expectedProportion = Math.exp(vertex.logPmf(n));
         double actualProportion = samples.asFlatList().stream()
             .filter(x -> x == n)
-            .count() / (double)samples.getLength();
+            .count() / (double) samples.getLength();
 
         assertEquals(expectedProportion, actualProportion, 5e-3);
     }

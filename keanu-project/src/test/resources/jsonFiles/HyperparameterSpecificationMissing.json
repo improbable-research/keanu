@@ -1,40 +1,57 @@
 {
     "graph": {
-        "vertices": [{
-            "id": {
-                "id": "[0]"
+        "vertices": [
+            {
+                "id": {
+                    "id": "[0]"
+                },
+                "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
+                "parameters": [
+                    {
+                        "name": "constant",
+                        "doubleTensorParam": {
+                            "values": [
+                                0.0
+                            ]
+                        }
+                    }
+                ]
             },
-            "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
-            "parameters": [{
-                "name": "constant",
-                "doubleTensorParam": {
-                    "values": [0.0]
-                }
-            }]
-        }, {
-            "id": {
-                "id": "[1]"
-            },
-            "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
-            "parameters": [{
-                "name": "constant",
-                "doubleTensorParam": {
-                    "shape": ["2"],
-                    "values": [3.0, 4.0]
-                }
-            }]
-        }, {
-            "id": {
-                "id": "[2]"
-            },
-            "label": "GaussianVertex",
-            "vertexType": "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex",
-            "parameters": [{
-                "name": "sigma",
-                "parentVertex": {
+            {
+                "id": {
                     "id": "[1]"
-                }
-            }]
-        }]
+                },
+                "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
+                "parameters": [
+                    {
+                        "name": "constant",
+                        "doubleTensorParam": {
+                            "shape": [
+                                "2"
+                            ],
+                            "values": [
+                                3.0,
+                                4.0
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                "id": {
+                    "id": "[2]"
+                },
+                "label": "GaussianVertex",
+                "vertexType": "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex",
+                "parameters": [
+                    {
+                        "name": "sigma",
+                        "parentVertex": {
+                            "id": "[1]"
+                        }
+                    }
+                ]
+            }
+        ]
     }
 }

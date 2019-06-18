@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,6 +67,7 @@ public class IntegerScalarTensorShapePreservationTest {
             resultShapeMatchesBroadcastShape(result, t1, t2);
         }
     }
+
     @Test
     public void tensorGetGreaterThanMaskPreservesShape() {
         checkOperationPreservesShape(IntegerTensor::getGreaterThanMask);
@@ -92,15 +94,15 @@ public class IntegerScalarTensorShapePreservationTest {
 
     @Test
     public void tensorMaxPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::max);
-        checkOperationPreservesShape(IntegerTensor::maxInPlace);
+        checkOperationPreservesShape(NumberTensor::max);
+        checkOperationPreservesShape(NumberTensor::maxInPlace);
 
     }
 
     @Test
     public void tensorMinPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::min);
-        checkOperationPreservesShape(IntegerTensor::minInPlace);
+        checkOperationPreservesShape(NumberTensor::min);
+        checkOperationPreservesShape(NumberTensor::minInPlace);
 
     }
 
@@ -141,6 +143,7 @@ public class IntegerScalarTensorShapePreservationTest {
             }
         }
     }
+
     private static void resultShapeMatchesBroadcastShape(Tensor result, Tensor input1, Tensor input2) {
         long[] broadcastShape = Shape.broadcastOutputShape(input1.getShape(), input2.getShape());
         long[] resultShape = result.getShape();

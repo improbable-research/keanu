@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import org.junit.Before;
 import org.junit.Test;
@@ -99,14 +100,14 @@ public class DoubleScalarTensorShapePreservationTest {
 
     @Test
     public void tensorMaxPreservesShape() {
-        checkOperationPreservesShape(DoubleTensor::max);
+        checkOperationPreservesShape(NumberTensor::max);
         checkOperationPreservesShape(DoubleTensor::maxInPlace);
 
     }
 
     @Test
     public void tensorMinPreservesShape() {
-        checkOperationPreservesShape(DoubleTensor::min);
+        checkOperationPreservesShape(NumberTensor::min);
         checkOperationPreservesShape(DoubleTensor::minInPlace);
 
     }

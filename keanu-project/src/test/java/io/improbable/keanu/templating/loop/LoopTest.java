@@ -46,7 +46,7 @@ public class LoopTest {
     }
 
     @Test
-    public void thereIsADefaultMaxLength(){
+    public void thereIsADefaultMaxLength() {
         Loop loop = Loop
             .withInitialConditions(startValue)
             .iterateWhile(alwaysTrue)
@@ -77,7 +77,7 @@ public class LoopTest {
     }
 
     @Test
-    public void youCanOverrideTheDefaultMaxLength(){
+    public void youCanOverrideTheDefaultMaxLength() {
         int customMaxCount = 5;
         Loop loop = Loop
             .withInitialConditions(startValue)
@@ -88,7 +88,7 @@ public class LoopTest {
     }
 
     @Test
-    public void itThrowsIfYouPassInMultipleOutputVertices(){
+    public void itThrowsIfYouPassInMultipleOutputVertices() {
         expectedException.expect(LoopConstructionException.class);
         expectedException.expectMessage("Duplicate label found in base case");
         Loop.withInitialConditions(ConstantVertex.of(0.).setLabel(Loop.VALUE_OUT_LABEL), ConstantVertex.of(1.).setLabel(Loop.VALUE_OUT_LABEL))

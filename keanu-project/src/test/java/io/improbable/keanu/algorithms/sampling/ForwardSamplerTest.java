@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 public class ForwardSamplerTest {
 
     @Rule
-    public ExpectedException thrown= ExpectedException.none();
+    public ExpectedException thrown = ExpectedException.none();
 
     private KeanuRandom random;
 

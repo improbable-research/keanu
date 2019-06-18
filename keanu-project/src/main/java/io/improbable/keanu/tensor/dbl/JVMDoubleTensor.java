@@ -42,6 +42,7 @@ import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.GT_MA
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LTE_MASK;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LT_MASK;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.MUL;
+import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.RSUB;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.SUB;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
@@ -330,11 +331,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor cumSum(int requestedDimension) {
-        return duplicate().cumSumInPlace(requestedDimension);
-    }
-
-    @Override
     public DoubleTensor cumSumInPlace(int requestedDimension) {
 
         int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + shape.length;
@@ -357,11 +353,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         } while (incrementIndexByShape(shape, index, dimensionOrder));
 
         return this;
-    }
-
-    @Override
-    public DoubleTensor reciprocal() {
-        return duplicate().reciprocalInPlace();
     }
 
     @Override
@@ -480,11 +471,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor abs() {
-        return this.duplicate().absInPlace();
-    }
-
-    @Override
     public int argMax() {
 
         double max = -Double.MAX_VALUE;
@@ -528,16 +514,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         return IntegerTensor.create(maxIndex, ArrayUtils.remove(shape, axis));
-    }
-
-    @Override
-    public DoubleTensor apply(Function<Double, Double> function) {
-        return this.duplicate().applyInPlace(function);
-    }
-
-    @Override
-    public DoubleTensor unaryMinus() {
-        return this.duplicate().unaryMinusInPlace();
     }
 
     @Override
@@ -707,71 +683,11 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor pow(DoubleTensor exponent) {
-        return duplicate().powInPlace(exponent);
-    }
-
-    @Override
     public DoubleTensor powInPlace(Double exponent) {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] = FastMath.pow(buffer[i], exponent);
         }
         return this;
-    }
-
-    @Override
-    public DoubleTensor pow(Double exponent) {
-        return duplicate().powInPlace(exponent);
-    }
-
-    @Override
-    public DoubleTensor sqrt() {
-        return duplicate().sqrtInPlace();
-    }
-
-    @Override
-    public DoubleTensor log() {
-        return duplicate().logInPlace();
-    }
-
-    @Override
-    public DoubleTensor safeLogTimes(DoubleTensor y) {
-        return duplicate().safeLogTimesInPlace(y);
-    }
-
-    @Override
-    public DoubleTensor logGamma() {
-        return duplicate().logGammaInPlace();
-    }
-
-    @Override
-    public DoubleTensor digamma() {
-        return duplicate().digammaInPlace();
-    }
-
-    @Override
-    public DoubleTensor sin() {
-        return duplicate().sinInPlace();
-    }
-
-    @Override
-    public DoubleTensor cos() {
-        return duplicate().cosInPlace();
-    }
-
-    @Override
-    public DoubleTensor tan() {
-        return duplicate().tanInPlace();
-    }
-
-    @Override
-    public DoubleTensor atan() {
-        return this.duplicate().atanInPlace();
-    }
-
-    @Override
-    public DoubleTensor atan2(Double y) {
-        return this.duplicate().atan2InPlace(y);
     }
 
     @Override
@@ -785,26 +701,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor atan2InPlace(DoubleTensor y) {
         return broadcastableBinaryDoubleOpInPlace((left, right) -> FastMath.atan2(right, left), y);
-    }
-
-    @Override
-    public DoubleTensor atan2(DoubleTensor y) {
-        return this.duplicate().atan2InPlace(y);
-    }
-
-    @Override
-    public DoubleTensor asin() {
-        return this.duplicate().asinInPlace();
-    }
-
-    @Override
-    public DoubleTensor acos() {
-        return this.duplicate().acosInPlace();
-    }
-
-    @Override
-    public DoubleTensor exp() {
-        return duplicate().expInPlace();
     }
 
     @Override
@@ -838,44 +734,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         return true;
-    }
-
-    @Override
-    public DoubleTensor standardize() {
-        return this.duplicate().standardizeInPlace();
-    }
-
-    @Override
-    public DoubleTensor replaceNaN(Double value) {
-        return duplicate().replaceNaNInPlace(value);
-    }
-
-    @Override
-    public DoubleTensor clamp(DoubleTensor min, DoubleTensor max) {
-        return duplicate().clampInPlace(min, max);
-    }
-
-    @Override
-    public DoubleTensor ceil() {
-        return this.duplicate().ceilInPlace();
-    }
-
-    @Override
-    public DoubleTensor floor() {
-        return duplicate().floorInPlace();
-    }
-
-    @Override
-    /**
-     * Round half up as used in ND4j
-     */
-    public DoubleTensor round() {
-        return duplicate().roundInPlace();
-    }
-
-    @Override
-    public DoubleTensor sigmoid() {
-        return this.duplicate().sigmoidInPlace();
     }
 
     @Override
@@ -1266,18 +1124,21 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor minus(Double value) {
-        return duplicate().minusInPlace(value);
-    }
-
-    @Override
     public DoubleTensor minusInPlace(DoubleTensor that) {
         return broadcastableBinaryDoubleOpInPlace(SUB, that);
     }
 
     @Override
-    public DoubleTensor minus(DoubleTensor that) {
-        return duplicate().minusInPlace(that);
+    public DoubleTensor reverseMinusInPlace(DoubleTensor value) {
+        return broadcastableBinaryDoubleOpInPlace(RSUB, value);
+    }
+
+    @Override
+    public DoubleTensor reverseMinusInPlace(Double value) {
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = value - buffer[i];
+        }
+        return this;
     }
 
     @Override
@@ -1289,18 +1150,8 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor plus(Double value) {
-        return duplicate().plusInPlace(value);
-    }
-
-    @Override
     public DoubleTensor plusInPlace(DoubleTensor that) {
         return broadcastableBinaryDoubleOpInPlace(ADD, that);
-    }
-
-    @Override
-    public DoubleTensor plus(DoubleTensor that) {
-        return duplicate().plusInPlace(that);
     }
 
     @Override
@@ -1312,18 +1163,8 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor times(Double value) {
-        return duplicate().timesInPlace(value);
-    }
-
-    @Override
     public DoubleTensor timesInPlace(DoubleTensor that) {
         return broadcastableBinaryDoubleOpInPlace(MUL, that);
-    }
-
-    @Override
-    public DoubleTensor times(DoubleTensor that) {
-        return duplicate().timesInPlace(that);
     }
 
     @Override
@@ -1335,18 +1176,18 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor div(Double value) {
-        return duplicate().divInPlace(value);
-    }
-
-    @Override
     public DoubleTensor divInPlace(DoubleTensor that) {
         return broadcastableBinaryDoubleOpInPlace(DIV, that);
     }
 
     @Override
-    public DoubleTensor div(DoubleTensor that) {
-        return duplicate().divInPlace(that);
+    public DoubleTensor reverseDivInPlace(Double value) {
+        return null;
+    }
+
+    @Override
+    public DoubleTensor reverseDivInPlace(DoubleTensor value) {
+        return null;
     }
 
     private DoubleTensor broadcastableBinaryDoubleOp(BiFunction<Double, Double, Double> op, DoubleTensor that) {
@@ -1417,7 +1258,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         public Double getOrScalar(long index) {
             return buffer[0];
         }
-
     }
 
     @Override

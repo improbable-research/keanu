@@ -28,12 +28,12 @@ public class SimpleWeatherModel {
         this.inputToModel = inputToModel;
 
         humidityReader = mock(BufferedReader.class);
-        when(humidityReader .readLine()).thenAnswer(
+        when(humidityReader.readLine()).thenAnswer(
             invocation -> String.valueOf(blackBoxHumidityModel(this.inputToModel.getValue().scalar()))
         );
 
         rainReader = mock(BufferedReader.class);
-        when(rainReader .readLine()).thenAnswer(
+        when(rainReader.readLine()).thenAnswer(
             invocation -> String.valueOf(blackBoxRainModel(this.inputToModel.getValue().scalar()))
         );
 
@@ -43,7 +43,7 @@ public class SimpleWeatherModel {
         );
 
         isSunnyReader = mock(BufferedReader.class);
-        when(isSunnyReader .readLine()).thenAnswer(
+        when(isSunnyReader.readLine()).thenAnswer(
             invocation -> String.valueOf(blackBoxIsSunnyModel(this.inputToModel.getValue().scalar()))
         );
     }

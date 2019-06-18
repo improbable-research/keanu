@@ -47,7 +47,7 @@ public class DiabetesLinearRegression {
         optimizer.maxLikelihood();
 
         assertThat(weight.getValue().scalar(), closeTo(938.2378, 0.01));
-        assertThat(b.getValue().scalar(),closeTo(152.9189, 0.01));
+        assertThat(b.getValue().scalar(), closeTo(152.9189, 0.01));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class DiabetesLinearRegression {
         linearRegressionModel.fit();
 
         assertThat(linearRegressionModel.getWeightVertex().getValue().scalar(), closeTo(938.2378, 0.5));
-        assertThat(linearRegressionModel.getInterceptVertex().getValue().scalar(), closeTo(152.9189,0.5));
+        assertThat(linearRegressionModel.getInterceptVertex().getValue().scalar(), closeTo(152.9189, 0.5));
     }
 
     @Test

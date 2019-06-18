@@ -83,7 +83,7 @@ public class TestGraphGenerator {
             this.onOp = onOp;
         }
 
-        public SumVertex(@LoadVertexParam("left")DoubleVertex left, @LoadVertexParam("right")DoubleVertex right) {
+        public SumVertex(@LoadVertexParam("left") DoubleVertex left, @LoadVertexParam("right") DoubleVertex right) {
             super(left, right);
             this.opCount = new AtomicInteger();
             this.autoDiffCount = new AtomicInteger();

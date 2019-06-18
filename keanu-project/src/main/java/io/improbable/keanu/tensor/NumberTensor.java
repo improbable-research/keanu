@@ -17,27 +17,139 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> ex
 
     T sum(int... overDimensions);
 
-    T cumSum(int dimension);
+    default T cumSum(int requestedDimension) {
+        return duplicate().cumSumInPlace(requestedDimension);
+    }
 
     T cumSumInPlace(int dimension);
 
     N product();
 
-    T clamp(T min, T max);
-
-    boolean equalsWithinEpsilon(T other, N epsilon);
-
     N max();
+
+    default T max(T max) {
+        return duplicate().maxInPlace(max);
+    }
+
+    T maxInPlace(T max);
 
     N min();
 
-    // New tensor Ops and transforms
+    default T min(T min) {
+        return duplicate().minInPlace(min);
+    }
+
+    T minInPlace(T min);
+
+    default T clamp(T min, T max) {
+        return duplicate().clampInPlace(min, max);
+    }
+
+    T clampInPlace(T min, T max);
 
     T matrixMultiply(T value);
 
     T tensorMultiply(T value, int[] dimLeft, int[] dimsRight);
 
-    T abs();
+    default T abs() {
+        return duplicate().absInPlace();
+    }
+
+    T absInPlace();
+
+    default T minus(N value) {
+        return duplicate().minusInPlace(value);
+    }
+
+    T minusInPlace(N value);
+
+    default T minus(T that) {
+        return duplicate().minusInPlace(that);
+    }
+
+    T minusInPlace(T that);
+
+    default T reverseMinus(T value) {
+        return duplicate().reverseMinusInPlace(value);
+    }
+
+    T reverseMinusInPlace(T value);
+
+    default T reverseMinus(N value) {
+        return duplicate().reverseMinusInPlace(value);
+    }
+
+    T reverseMinusInPlace(N value);
+
+    default T plus(N value) {
+        return duplicate().plusInPlace(value);
+    }
+
+    T plusInPlace(N value);
+
+    default T plus(T that) {
+        return duplicate().plusInPlace(that);
+    }
+
+    T plusInPlace(T that);
+
+    default T unaryMinus() {
+        return duplicate().unaryMinusInPlace();
+    }
+
+    T unaryMinusInPlace();
+
+    default T times(N value) {
+        return duplicate().timesInPlace(value);
+    }
+
+    T timesInPlace(N value);
+
+    default T times(T that) {
+        return duplicate().timesInPlace(that);
+    }
+
+    T timesInPlace(T that);
+
+    default T div(N value) {
+        return duplicate().divInPlace(value);
+    }
+
+    T divInPlace(N value);
+
+    default T div(T value) {
+        return duplicate().divInPlace(value);
+    }
+
+    T divInPlace(T that);
+
+    default T reverseDiv(N value) {
+        return duplicate().reverseDivInPlace(value);
+    }
+
+    T reverseDivInPlace(N value);
+
+    default T reverseDiv(T value) {
+        return duplicate().reverseDivInPlace(value);
+    }
+
+    T reverseDivInPlace(T value);
+
+    default T pow(T exponent) {
+        return duplicate().powInPlace(exponent);
+    }
+
+    T powInPlace(T exponent);
+
+    default T pow(N exponent) {
+        return duplicate().powInPlace(exponent);
+    }
+
+    T powInPlace(N exponent);
+
+    N average();
+
+    N standardDeviation();
 
     /**
      * Find the index into the flattened array of the tensor of the largest value, e.g.
@@ -74,39 +186,29 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> ex
      */
     IntegerTensor argMax(int axis);
 
-    T getGreaterThanMask(T greaterThanThis);
-
-    T getGreaterThanOrEqualToMask(T greaterThanThis);
-
-    T getLessThanMask(T lessThanThis);
-
-    T getLessThanOrEqualToMask(T lessThanThis);
+    default T setWithMask(T mask, N value) {
+        return duplicate().setWithMaskInPlace(mask, value);
+    }
 
     T setWithMaskInPlace(T mask, N value);
 
-    T setWithMask(T mask, N value);
-
-    T apply(Function<N, N> function);
-
-    // In Place
-
-    T minusInPlace(T that);
-
-    T plusInPlace(T that);
-
-    T timesInPlace(T that);
-
-    T divInPlace(T that);
-
-    T powInPlace(T exponent);
-
-    T unaryMinusInPlace();
-
-    T absInPlace();
+    default T apply(Function<N, N> function) {
+        return duplicate().applyInPlace(function);
+    }
 
     T applyInPlace(Function<N, N> function);
 
+    T setAllInPlace(N value);
+
+    default T safeLogTimes(T y) {
+        return duplicate().safeLogTimesInPlace(y);
+    }
+
+    T safeLogTimesInPlace(T y);
+
     // Comparisons
+
+    boolean equalsWithinEpsilon(T other, N epsilon);
 
     BooleanTensor lessThan(T value);
 
@@ -115,4 +217,26 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> ex
     BooleanTensor greaterThan(T value);
 
     BooleanTensor greaterThanOrEqual(T value);
+
+    BooleanTensor lessThan(N value);
+
+    BooleanTensor lessThanOrEqual(N value);
+
+    BooleanTensor greaterThan(N value);
+
+    BooleanTensor greaterThanOrEqual(N value);
+
+    BooleanTensor notNaN();
+
+    default BooleanTensor isNaN() {
+        return notNaN().not();
+    }
+
+    T getGreaterThanMask(T greaterThanThis);
+
+    T getGreaterThanOrEqualToMask(T greaterThanThis);
+
+    T getLessThanMask(T lessThanThis);
+
+    T getLessThanOrEqualToMask(T lessThanThis);
 }

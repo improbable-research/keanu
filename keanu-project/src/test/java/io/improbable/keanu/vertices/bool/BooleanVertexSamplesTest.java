@@ -20,7 +20,7 @@ public class BooleanVertexSamplesTest {
     public void canGetSamplesAsTensor() {
         BooleanTensor samplesAsTensor = samples.asTensor();
         BooleanTensor expectedTensor = BooleanTensor.create(
-            new boolean[] {true, false, true, false},
+            new boolean[]{true, false, true, false},
             2, 1, 2
         );
 

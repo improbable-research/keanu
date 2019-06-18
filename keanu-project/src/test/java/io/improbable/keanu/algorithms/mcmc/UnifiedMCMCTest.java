@@ -15,7 +15,7 @@ public class UnifiedMCMCTest {
     @Test
     public void checkMHIsRunForNonDifferentiableNetwork() {
         GaussianVertex gaussianA = new GaussianVertex(5., 1.);
-        FloorVertex nonDiffable =  new FloorVertex(gaussianA);
+        FloorVertex nonDiffable = new FloorVertex(gaussianA);
         GaussianVertex postNonDiffLatent = new GaussianVertex(nonDiffable, 1.);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(postNonDiffLatent.getConnectedGraph());
 

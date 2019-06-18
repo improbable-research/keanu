@@ -10,6 +10,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
@@ -358,6 +359,11 @@ public class JVMBooleanTensor implements BooleanTensor {
     @Override
     public BooleanTensor take(long... index) {
         return new JVMBooleanTensor(getValue(index));
+    }
+
+    @Override
+    public List<BooleanTensor> split(int dimension, long... splitAtIndices) {
+        return null;
     }
 
     @Override

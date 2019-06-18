@@ -25,7 +25,7 @@ public class LogVertexTest {
     public void calculatesDerivativeOScalarLog() {
         calculatesDerivativeOfScalar(
             0.5,
-            1./0.5,
+            1. / 0.5,
             DoubleVertex::log
         );
     }
@@ -43,7 +43,7 @@ public class LogVertexTest {
     public void calculatesDerivativeOfMatrixElementWiselog() {
         calculatesDerivativeOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
-            toDiagonalArray(new double[]{1/0.1, 1/0.2, 1/0.3, 1/0.4}),
+            toDiagonalArray(new double[]{1 / 0.1, 1 / 0.2, 1 / 0.3, 1 / 0.4}),
             DoubleVertex::log
         );
     }

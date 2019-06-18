@@ -9,6 +9,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
@@ -257,6 +258,11 @@ public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
     @Override
     public GenericTensor<T> take(long... index) {
         return scalar(getValue(index));
+    }
+
+    @Override
+    public List<GenericTensor<T>> split(int dimension, long... splitAtIndices) {
+        return null;
     }
 
     @Override

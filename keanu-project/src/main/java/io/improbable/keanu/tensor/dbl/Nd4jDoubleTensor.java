@@ -650,6 +650,18 @@ public class Nd4jDoubleTensor extends DoubleTensor {
         return this;
     }
 
+    @Override
+    public DoubleTensor reverseMinusInPlace(DoubleTensor value) {
+        tensor.rsubi(unsafeGetNd4J(value));
+        return this;
+    }
+
+    @Override
+    public DoubleTensor reverseMinusInPlace(Double value) {
+        tensor.rsubi(value);
+        return this;
+    }
+
     /**
      * @param that Right operand.
      * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
@@ -707,6 +719,18 @@ public class Nd4jDoubleTensor extends DoubleTensor {
                 return new Nd4jDoubleTensor(result);
             }
         }
+        return this;
+    }
+
+    @Override
+    public DoubleTensor reverseDivInPlace(Double value) {
+        tensor.rdivi(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor reverseDivInPlace(DoubleTensor value) {
+        tensor.rdivi(unsafeGetNd4J(value));
         return this;
     }
 

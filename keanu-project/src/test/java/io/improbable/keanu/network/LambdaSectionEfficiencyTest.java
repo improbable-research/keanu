@@ -28,13 +28,13 @@ public class LambdaSectionEfficiencyTest {
         MutableInt callsToPredicate = new MutableInt(0);
 
         Set<Vertex> verticesDepthFirst = Propagation.getVertices(A, (v) -> {
-            callsToNext.increment();
-            return v.getChildren();
-        },  (v) -> v.isProbabilistic() || v.isObserved(),
+                callsToNext.increment();
+                return v.getChildren();
+            }, (v) -> v.isProbabilistic() || v.isObserved(),
             (v) -> {
-            callsToPredicate.increment();
-            return true;
-        });
+                callsToPredicate.increment();
+                return true;
+            });
 
         assertEquals(4, verticesDepthFirst.size());
         assertThat(verticesDepthFirst, containsInAnyOrder(A, sinA, APlusSinA, C));
@@ -56,14 +56,14 @@ public class LambdaSectionEfficiencyTest {
         MutableInt callsToPredicate = new MutableInt(0);
 
         Set<Vertex> verticesDepthFirst = Propagation.getVertices(Arrays.asList(A, B, C), (v) -> {
-            callsToNext.increment();
-            return v.getChildren();
+                callsToNext.increment();
+                return v.getChildren();
             },
             (v) -> v.isProbabilistic() || v.isObserved(),
             (v) -> {
-            callsToPredicate.increment();
-            return true;
-        });
+                callsToPredicate.increment();
+                return true;
+            });
 
         assertEquals(6, verticesDepthFirst.size());
         assertThat(verticesDepthFirst, containsInAnyOrder(A, B, BSin, BCos, C, D));

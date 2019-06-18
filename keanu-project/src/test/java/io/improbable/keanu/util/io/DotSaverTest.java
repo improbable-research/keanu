@@ -50,8 +50,8 @@ public class DotSaverTest {
         complexResultVertex = ((new GammaVertex(0, 1))
             .lessThan(new ConstantIntegerVertex(-1)))
             .or((new GaussianVertex(0, 1))
-            .plus(new ConstantDoubleVertex(5))
-            .equalTo(new ConstantDoubleVertex(10)));
+                .plus(new ConstantDoubleVertex(5))
+                .equalTo(new ConstantDoubleVertex(10)));
         BayesianNetwork complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
         complexNetDotSaver = new DotSaver(complexNet);
     }
@@ -83,7 +83,7 @@ public class DotSaverTest {
 
     @Test
     public void dotVertexLabelsAreSetCorrectly() throws IOException {
-        int[] intValues = new int[] {1,2,3};
+        int[] intValues = new int[]{1, 2, 3};
         ConstantIntegerVertex constantIntVertex = new ConstantIntegerVertex(intValues);
         ConstantIntegerVertex constantIntVertex2 = new ConstantIntegerVertex(2);
         IntegerMultiplicationVertex multiplicationVertex = new IntegerMultiplicationVertex(constantIntVertex, constantIntVertex2);
@@ -152,7 +152,7 @@ public class DotSaverTest {
 
         BayesianNetwork disconnectedBayesNet = new BayesianNetwork(Arrays.asList(v1, v2, gamma1, gaussian1, v3, v4, gamma2, gaussian2));
         DotSaver dotSaver = new DotSaver(disconnectedBayesNet);
-        dotSaver.save(outputWriter,true);
+        dotSaver.save(outputWriter, true);
         String expectedOutputWithValues = readFileToString(OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
     }

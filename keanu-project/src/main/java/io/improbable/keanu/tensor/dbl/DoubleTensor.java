@@ -1,17 +1,11 @@
 package io.improbable.keanu.tensor.dbl;
 
-import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.FloatingPointTensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
-
-public abstract class DoubleTensor implements FloatingPointTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
+public abstract class DoubleTensor implements FloatingPointTensor<Double, DoubleTensor> {
 
     private static DoubleTensorFactory factory = new JVMDoubleTensorFactory();
 
@@ -137,96 +131,6 @@ public abstract class DoubleTensor implements FloatingPointTensor<Double, Double
     @Override
     public DoubleTensor reverseDiv(Double value) {
         return DoubleTensor.scalar(value).div(this);
-    }
-
-    public abstract List<DoubleTensor> split(int dimension, long... splitAtIndices);
-
-    public List<DoubleTensor> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {
-        List<DoubleTensor> slicedTensors = new ArrayList<>();
-
-        for (long i = indexStart; i < indexEnd; i++) {
-            slicedTensors.add(slice(dimension, i));
-        }
-
-        return slicedTensors;
-    }
-
-    //In place Ops and Transforms. These mutate the source vertex (i.e. this).
-
-    public abstract DoubleTensor minusInPlace(Double value);
-
-    public abstract DoubleTensor plusInPlace(Double value);
-
-    public abstract DoubleTensor timesInPlace(Double value);
-
-    public abstract DoubleTensor divInPlace(Double value);
-
-    public abstract DoubleTensor powInPlace(Double exponent);
-
-    public abstract DoubleTensor atan2InPlace(Double y);
-
-    public abstract DoubleTensor replaceNaNInPlace(Double value);
-
-    public abstract DoubleTensor setAllInPlace(Double value);
-
-    public abstract DoubleTensor safeLogTimesInPlace(DoubleTensor y);
-
-    public abstract DoubleTensor reciprocalInPlace();
-
-    public abstract DoubleTensor sqrtInPlace();
-
-    public abstract DoubleTensor logInPlace();
-
-    public abstract DoubleTensor logGammaInPlace();
-
-    public abstract DoubleTensor digammaInPlace();
-
-    public abstract DoubleTensor sinInPlace();
-
-    public abstract DoubleTensor cosInPlace();
-
-    public abstract DoubleTensor tanInPlace();
-
-    public abstract DoubleTensor atanInPlace();
-
-    public abstract DoubleTensor atan2InPlace(DoubleTensor y);
-
-    public abstract DoubleTensor asinInPlace();
-
-    public abstract DoubleTensor acosInPlace();
-
-    public abstract DoubleTensor expInPlace();
-
-    public abstract DoubleTensor minInPlace(DoubleTensor min);
-
-    public abstract DoubleTensor maxInPlace(DoubleTensor max);
-
-    public abstract DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
-
-    public abstract DoubleTensor ceilInPlace();
-
-    public abstract DoubleTensor floorInPlace();
-
-    public abstract DoubleTensor roundInPlace();
-
-    public abstract DoubleTensor sigmoidInPlace();
-
-    public abstract DoubleTensor standardizeInPlace();
-
-    // Comparisons
-
-    public abstract BooleanTensor lessThan(Double value);
-
-    public abstract BooleanTensor lessThanOrEqual(Double value);
-
-    public abstract BooleanTensor greaterThan(Double value);
-
-    public abstract BooleanTensor greaterThanOrEqual(Double value);
-
-    public abstract BooleanTensor notNaN();
-
-    public BooleanTensor isNaN() {
-        return notNaN().not();
     }
 
     // Kotlin unboxes to the primitive but does not match the Java

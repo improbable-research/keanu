@@ -1208,7 +1208,7 @@ public class DoubleTensorTest {
         DoubleTensor one = DoubleTensor.scalar(1.);
         DoubleTensor notZero = DoubleTensor.scalar(1e-8);
         Function<Double, Boolean> checkFunction = x -> x > 0.;
-        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(checkFunction, (TensorValidationPolicy<Double, DoubleTensor>)TensorValidationPolicy.changeValueTo(1e-8));
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(checkFunction, (TensorValidationPolicy<Double, DoubleTensor>) TensorValidationPolicy.changeValueTo(1e-8));
         tensor1 = validator.validate(tensor1);
         tensor2 = validator.validate(tensor2);
         assertThat(tensor1, equalTo(notZero));

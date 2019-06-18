@@ -23,6 +23,7 @@ import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.google.common.primitives.Ints.checkedCast;
@@ -143,23 +144,13 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor clampInPlace(IntegerTensor min, IntegerTensor max) {
+        return null;
+    }
+
+    @Override
     public boolean equalsWithinEpsilon(IntegerTensor other, Integer epsilon) {
         return false;
-    }
-
-    @Override
-    public IntegerTensor minus(int value) {
-        return duplicate().minusInPlace(value);
-    }
-
-    @Override
-    public IntegerTensor plus(int value) {
-        return duplicate().plusInPlace(value);
-    }
-
-    @Override
-    public IntegerTensor times(int value) {
-        return duplicate().timesInPlace(value);
     }
 
     @Override
@@ -172,56 +163,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight) {
         INDArray tensorMmulResult = Nd4j.tensorMmul(tensor, unsafeGetNd4J(value), new int[][]{dimLeft, dimsRight});
         return new Nd4jIntegerTensor(tensorMmulResult);
-    }
-
-    @Override
-    public IntegerTensor div(int value) {
-        return duplicate().divInPlace(value);
-    }
-
-    @Override
-    public IntegerTensor pow(IntegerTensor exponent) {
-        return duplicate().powInPlace(exponent);
-    }
-
-    @Override
-    public IntegerTensor pow(int exponent) {
-        return duplicate().powInPlace(exponent);
-    }
-
-    @Override
-    public IntegerTensor minus(IntegerTensor that) {
-        return duplicate().minusInPlace(that);
-    }
-
-    @Override
-    public IntegerTensor plus(IntegerTensor that) {
-        return duplicate().plusInPlace(that);
-    }
-
-    @Override
-    public IntegerTensor times(IntegerTensor that) {
-        return duplicate().timesInPlace(that);
-    }
-
-    @Override
-    public IntegerTensor div(IntegerTensor that) {
-        return duplicate().divInPlace(that);
-    }
-
-    @Override
-    public IntegerTensor unaryMinus() {
-        return duplicate().unaryMinusInPlace();
-    }
-
-    @Override
-    public IntegerTensor abs() {
-        return duplicate().absInPlace();
-    }
-
-    @Override
-    public IntegerTensor setWithMask(IntegerTensor mask, Integer value) {
-        return duplicate().setWithMaskInPlace(mask, value);
     }
 
     @Override
@@ -333,30 +274,25 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor apply(Function<Integer, Integer> function) {
-        return duplicate().applyInPlace(function);
-    }
-
-    @Override
-    public IntegerTensor minusInPlace(int value) {
+    public IntegerTensor minusInPlace(Integer value) {
         tensor.subi(value);
         return this;
     }
 
     @Override
-    public IntegerTensor plusInPlace(int value) {
+    public IntegerTensor plusInPlace(Integer value) {
         tensor.addi(value);
         return this;
     }
 
     @Override
-    public IntegerTensor timesInPlace(int value) {
+    public IntegerTensor timesInPlace(Integer value) {
         tensor.muli(value);
         return this;
     }
 
     @Override
-    public IntegerTensor divInPlace(int value) {
+    public IntegerTensor divInPlace(Integer value) {
         tensor.divi(value);
         INDArrayExtensions.castToInteger(tensor, false);
         return this;
@@ -374,9 +310,19 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor powInPlace(int exponent) {
+    public IntegerTensor powInPlace(Integer exponent) {
         Transforms.pow(tensor, exponent, false);
         return this;
+    }
+
+    @Override
+    public Integer average() {
+        return null;
+    }
+
+    @Override
+    public Integer standardDeviation() {
+        return null;
     }
 
     @Override
@@ -390,6 +336,21 @@ public class Nd4jIntegerTensor implements IntegerTensor {
             }
         }
         return this;
+    }
+
+    @Override
+    public IntegerTensor reverseMinus(IntegerTensor value) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor reverseMinusInPlace(IntegerTensor value) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor reverseMinusInPlace(Integer value) {
+        return null;
     }
 
     @Override
@@ -433,6 +394,21 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor reverseDivInPlace(Integer value) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor reverseDiv(IntegerTensor value) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor reverseDivInPlace(IntegerTensor value) {
+        return null;
+    }
+
+    @Override
     public IntegerTensor unaryMinusInPlace() {
         tensor.negi();
         return this;
@@ -454,12 +430,27 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public BooleanTensor lessThan(int value) {
+    public IntegerTensor setAllInPlace(Integer value) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor safeLogTimes(IntegerTensor y) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor safeLogTimesInPlace(IntegerTensor y) {
+        return null;
+    }
+
+    @Override
+    public BooleanTensor lessThan(Integer value) {
         return fromMask(tensor.lt(value), copyOf(getShape(), getRank()));
     }
 
     @Override
-    public BooleanTensor lessThanOrEqual(int value) {
+    public BooleanTensor lessThanOrEqual(Integer value) {
         return fromMask(tensor.lte(value), copyOf(getShape(), getRank()));
     }
 
@@ -493,13 +484,18 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public BooleanTensor greaterThan(int value) {
+    public BooleanTensor greaterThan(Integer value) {
         return fromMask(tensor.gt(value), copyOf(getShape(), getRank()));
     }
 
     @Override
-    public BooleanTensor greaterThanOrEqual(int value) {
+    public BooleanTensor greaterThanOrEqual(Integer value) {
         return fromMask(tensor.gte(value), copyOf(getShape(), getRank()));
+    }
+
+    @Override
+    public BooleanTensor notNaN() {
+        return null;
     }
 
     @Override
@@ -648,6 +644,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     @Override
     public IntegerTensor take(long... index) {
         return scalar(getValue(index));
+    }
+
+    @Override
+    public List<IntegerTensor> split(int dimension, long... splitAtIndices) {
+        return null;
     }
 
     @Override

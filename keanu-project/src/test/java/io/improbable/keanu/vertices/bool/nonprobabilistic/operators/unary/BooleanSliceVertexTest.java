@@ -14,7 +14,7 @@ public class BooleanSliceVertexTest {
 
     @Before
     public void setup() {
-       matrixA = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, true, false, false, true, true}, 2, 3));
+        matrixA = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, true, false, false, true, true}, 2, 3));
     }
 
     @Test

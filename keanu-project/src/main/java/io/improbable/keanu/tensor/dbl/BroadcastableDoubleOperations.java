@@ -18,6 +18,13 @@ public enum BroadcastableDoubleOperations implements BiFunction<Double, Double, 
         }
     },
 
+    RSUB {
+        @Override
+        public Double apply(Double left, Double right) {
+            return right - left;
+        }
+    },
+
     MUL {
         @Override
         public Double apply(Double left, Double right) {

@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
