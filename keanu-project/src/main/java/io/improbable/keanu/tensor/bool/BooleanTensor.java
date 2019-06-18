@@ -71,21 +71,41 @@ public interface BooleanTensor extends Tensor<Boolean, BooleanTensor>, BooleanOp
         return JVMBooleanTensor.concat(dimension, toConcat);
     }
 
-    BooleanTensor and(BooleanTensor that);
+    default BooleanTensor and(BooleanTensor that) {
+        return duplicate().andInPlace(that);
+    }
+
+    BooleanTensor andInPlace(BooleanTensor that);
 
     default BooleanTensor and(boolean that) {
-        return this.and(BooleanTensor.scalar(that));
+        return duplicate().andInPlace(that);
     }
 
-    BooleanTensor or(BooleanTensor that);
+    BooleanTensor andInPlace(boolean that);
+
+    default BooleanTensor or(BooleanTensor that) {
+        return duplicate().orInPlace(that);
+    }
+
+    BooleanTensor orInPlace(BooleanTensor that);
 
     default BooleanTensor or(boolean that) {
-        return this.or(BooleanTensor.scalar(that));
+        return duplicate().orInPlace(that);
     }
 
-    BooleanTensor xor(BooleanTensor that);
+    BooleanTensor orInPlace(boolean that);
 
-    BooleanTensor not();
+    default BooleanTensor xor(BooleanTensor that) {
+        return duplicate().xorInPlace(that);
+    }
+
+    BooleanTensor xorInPlace(BooleanTensor that);
+
+    default BooleanTensor not() {
+        return duplicate().notInPlace();
+    }
+
+    BooleanTensor notInPlace();
 
     DoubleTensor doubleWhere(DoubleTensor trueValue, DoubleTensor falseValue);
 
@@ -95,17 +115,13 @@ public interface BooleanTensor extends Tensor<Boolean, BooleanTensor>, BooleanOp
 
     <T, TENSOR extends Tensor<T, TENSOR>> TENSOR where(TENSOR trueValue, TENSOR falseValue);
 
-    BooleanTensor andInPlace(BooleanTensor that);
-
-    BooleanTensor orInPlace(BooleanTensor that);
-
-    BooleanTensor xorInPlace(BooleanTensor that);
-
-    BooleanTensor notInPlace();
-
     boolean allTrue();
 
     boolean allFalse();
+
+    boolean anyTrue();
+
+    boolean anyFalse();
 
     DoubleTensor toDoubleMask();
 
@@ -114,12 +130,6 @@ public interface BooleanTensor extends Tensor<Boolean, BooleanTensor>, BooleanOp
     double[] asFlatDoubleArray();
 
     int[] asFlatIntegerArray();
-
-    @Override
-    BooleanTensor slice(int dimension, long index);
-
-    @Override
-    BooleanTensor take(long... index);
 
     boolean[] asFlatBooleanArray();
 

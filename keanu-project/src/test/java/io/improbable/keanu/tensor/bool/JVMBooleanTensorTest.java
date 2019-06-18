@@ -161,6 +161,17 @@ public class JVMBooleanTensorTest {
         assertTrue(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse());
     }
 
+    @Test
+    public void doesAnyTrue() {
+        assertTrue(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).anyTrue());
+        assertFalse(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).anyTrue());
+    }
+
+    @Test
+    public void doesAnyFalse() {
+        assertTrue(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).anyTrue());
+        assertFalse(BooleanTensor.create(new boolean[]{true, true, true, true}, new long[]{2, 2}).anyFalse());
+    }
 
     @Test
     public void canElementwiseEqualsAScalarValue() {

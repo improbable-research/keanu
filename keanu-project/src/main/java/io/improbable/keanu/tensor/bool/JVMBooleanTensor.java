@@ -172,26 +172,6 @@ public class JVMBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor and(BooleanTensor that) {
-        return duplicate().andInPlace(that);
-    }
-
-    @Override
-    public BooleanTensor or(BooleanTensor that) {
-        return duplicate().orInPlace(that);
-    }
-
-    @Override
-    public BooleanTensor xor(BooleanTensor that) {
-        return duplicate().xorInPlace(that);
-    }
-
-    @Override
-    public BooleanTensor not() {
-        return duplicate().notInPlace();
-    }
-
-    @Override
     public DoubleTensor doubleWhere(DoubleTensor trueValue, DoubleTensor falseValue) {
         double[] trueValues = trueValue.asFlatDoubleArray();
         double[] falseValues = falseValue.asFlatDoubleArray();
@@ -265,8 +245,24 @@ public class JVMBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public BooleanTensor andInPlace(boolean that) {
+        if (!that) {
+            Arrays.fill(buffer, false);
+        }
+        return this;
+    }
+
+    @Override
     public BooleanTensor orInPlace(BooleanTensor that) {
         return binaryBooleanOpWithAutoBroadcast(that, OR, true);
+    }
+
+    @Override
+    public BooleanTensor orInPlace(boolean that) {
+        if (that) {
+            Arrays.fill(buffer, true);
+        }
+        return this;
     }
 
     @Override
@@ -300,6 +296,16 @@ public class JVMBooleanTensor implements BooleanTensor {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean anyTrue() {
+        return !allFalse();
+    }
+
+    @Override
+    public boolean anyFalse() {
+        return !allTrue();
     }
 
     private BooleanTensor binaryBooleanOpWithAutoBroadcast(BooleanTensor right,
