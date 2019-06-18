@@ -7,6 +7,7 @@ import org.junit.Test;
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 public class ScalarIntegerTensorTest {
@@ -43,6 +44,14 @@ public class ScalarIntegerTensorTest {
         assertThat(result, hasValue(true, false, false));
     }
 
+    @Test
+    public void canMod() {
+        IntegerTensor value = IntegerTensor.scalar(4);
+
+        assertThat(value.mod(3).scalar(), equalTo(1));
+        assertThat(value.mod(2).scalar(), equalTo(0));
+        assertThat(value.mod(4).scalar(), equalTo(0));
+    }
 
     @Test
     public void doesKeepRankOnGTEq() {

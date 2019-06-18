@@ -798,5 +798,14 @@ public class Nd4jIntegerTensorTest {
         Assert.assertThat(a.reshape(3, 1).broadcast(3, 3), valuesAndShapesMatch(expectedByColumn));
     }
 
+    @Test
+    public void canMod() {
+        IntegerTensor value = IntegerTensor.create(4, 5);
+
+        assertThat(value.mod(3), equalTo(IntegerTensor.create(1, 2)));
+        assertThat(value.mod(2), equalTo(IntegerTensor.create(0, 1)));
+        assertThat(value.mod(4), equalTo(IntegerTensor.create(0, 1)));
+    }
+
 
 }
