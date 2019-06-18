@@ -42,12 +42,12 @@ public class MultiplexerVertexTest {
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup1 = new LinkedHashMap<>();
         optionGroup1.put(TestEnum.A, ConstantVertex.of(0.5));
         optionGroup1.put(TestEnum.B, ConstantVertex.of(0.5));
-        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select1 = new CategoricalVertex<>(optionGroup1);
+        CategoricalVertex<TestEnum> select1 = new CategoricalVertex<>(optionGroup1);
 
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup2 = new LinkedHashMap<>();
         optionGroup2.put(TestEnum.C, ConstantVertex.of(0.5));
         optionGroup2.put(TestEnum.D, ConstantVertex.of(0.5));
-        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select2 = new CategoricalVertex<>(optionGroup2);
+        CategoricalVertex<TestEnum> select2 = new CategoricalVertex<>(optionGroup2);
 
         MultiplexerVertex<GenericTensor<TestEnum>> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);
 

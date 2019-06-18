@@ -42,8 +42,8 @@ public class WeaponMaterialsTest {
 
     @Test
     public void testBooleanConditions() {
-        CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon = getWeaponPrior();
-        CategoricalVertex<Material, GenericTensor<Material>> material = getWeaponMaterialPrior();
+        CategoricalVertex<Weapon> weapon = getWeaponPrior();
+        CategoricalVertex<Material> material = getWeaponMaterialPrior();
         DoubleCPTVertex cpt = createCPTWithBooleanInputs(weapon, material);
 
         material.observe(GenericTensor.scalar(Material.WOOD));
@@ -54,8 +54,8 @@ public class WeaponMaterialsTest {
 
     @Test
     public void testEnumConditions() {
-        CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon = getWeaponPrior();
-        CategoricalVertex<Material, GenericTensor<Material>> material = getWeaponMaterialPrior();
+        CategoricalVertex<Weapon> weapon = getWeaponPrior();
+        CategoricalVertex<Material> material = getWeaponMaterialPrior();
         DoubleCPTVertex cpt = createCPTWithEnumInputs(weapon, material);
 
         material.observe(GenericTensor.scalar(Material.WOOD));
@@ -66,8 +66,8 @@ public class WeaponMaterialsTest {
 
     @Test
     public void testMixedConditions() {
-        CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon = getWeaponPrior();
-        CategoricalVertex<Material, GenericTensor<Material>> material = getWeaponMaterialPrior();
+        CategoricalVertex<Weapon> weapon = getWeaponPrior();
+        CategoricalVertex<Material> material = getWeaponMaterialPrior();
         DoubleCPTVertex cpt = createCPTWithMixedInputs(weapon, material);
 
         material.observe(GenericTensor.scalar(Material.WOOD));
@@ -76,7 +76,7 @@ public class WeaponMaterialsTest {
         Assert.assertEquals(1.0, weaponSampleProportion.get(Weapon.CLUB), 0.001);
     }
 
-    private CategoricalVertex<Weapon, GenericTensor<Weapon>> getWeaponPrior() {
+    private CategoricalVertex<Weapon> getWeaponPrior() {
         Map<Weapon, DoubleVertex> weaponPrior = new HashMap<>();
         weaponPrior.put(Weapon.POISON, ConstantVertex.of(0.25));
         weaponPrior.put(Weapon.SPANNER, ConstantVertex.of(0.25));
@@ -85,7 +85,7 @@ public class WeaponMaterialsTest {
         return new CategoricalVertex<>(weaponPrior);
     }
 
-    private CategoricalVertex<Material, GenericTensor<Material>> getWeaponMaterialPrior() {
+    private CategoricalVertex<Material> getWeaponMaterialPrior() {
         Map<Material, DoubleVertex> weaponMaterialPrior = new HashMap<>();
         weaponMaterialPrior.put(Material.IRON, ConstantVertex.of(0.2));
         weaponMaterialPrior.put(Material.WOOD, ConstantVertex.of(0.2));
@@ -95,8 +95,8 @@ public class WeaponMaterialsTest {
         return new CategoricalVertex<>(weaponMaterialPrior);
     }
 
-    private DoubleCPTVertex createCPTWithBooleanInputs(CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon,
-                                                       CategoricalVertex<Material, GenericTensor<Material>> material) {
+    private DoubleCPTVertex createCPTWithBooleanInputs(CategoricalVertex<Weapon> weapon,
+                                                       CategoricalVertex<Material> material) {
 
         BooleanVertex isPoison = new EqualsVertex<>(weapon, ConstantVertex.of(Weapon.POISON));
         BooleanVertex isSpanner = new EqualsVertex<>(weapon, ConstantVertex.of(Weapon.SPANNER));
@@ -126,8 +126,8 @@ public class WeaponMaterialsTest {
         return cpt;
     }
 
-    private DoubleCPTVertex createCPTWithEnumInputs(CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon,
-                                                    CategoricalVertex<Material, GenericTensor<Material>> material) {
+    private DoubleCPTVertex createCPTWithEnumInputs(CategoricalVertex<Weapon> weapon,
+                                                    CategoricalVertex<Material> material) {
 
         DoubleCPTVertex cpt = ConditionalProbabilityTable.of(weapon, material)
             .when(Weapon.POISON, Material.FUNNY_SMELL).then(1.0)
@@ -146,8 +146,8 @@ public class WeaponMaterialsTest {
         return cpt;
     }
 
-    private DoubleCPTVertex createCPTWithMixedInputs(CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon,
-                                                     CategoricalVertex<Material, GenericTensor<Material>> material) {
+    private DoubleCPTVertex createCPTWithMixedInputs(CategoricalVertex<Weapon> weapon,
+                                                     CategoricalVertex<Material> material) {
 
         BooleanVertex isPoison = new EqualsVertex<>(weapon, ConstantVertex.of(Weapon.POISON));
         BooleanVertex isSpanner = new EqualsVertex<>(weapon, ConstantVertex.of(Weapon.SPANNER));
@@ -171,8 +171,8 @@ public class WeaponMaterialsTest {
         return cpt;
     }
 
-    private NetworkSamples takeSamples(DoubleCPTVertex cpt, CategoricalVertex<Weapon, GenericTensor<Weapon>> weapon,
-                                       CategoricalVertex<Material, GenericTensor<Material>> material) {
+    private NetworkSamples takeSamples(DoubleCPTVertex cpt, CategoricalVertex<Weapon> weapon,
+                                       CategoricalVertex<Material> material) {
 
         BayesianNetwork bnet = new BayesianNetwork(cpt.getConnectedGraph());
         bnet.probeForNonZeroProbability(10000);
@@ -185,7 +185,7 @@ public class WeaponMaterialsTest {
     }
 
     private <T> Map<T, Double> calculateSampleProportions(NetworkSamples samples,
-                                                          CategoricalVertex<T, ?> inputCategorical) {
+                                                          CategoricalVertex<T> inputCategorical) {
 
         List<T> inputSamples = samples.get(inputCategorical).asList().stream()
             .map(s -> s.scalar()).collect(Collectors.toList());

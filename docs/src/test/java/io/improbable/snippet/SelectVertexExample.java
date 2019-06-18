@@ -1,6 +1,5 @@
 package io.improbable.snippet;
 
-import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
@@ -19,7 +18,7 @@ public class SelectVertexExample {
         A, B, C, D
     }
 
-    public CategoricalVertex<MyType, GenericTensor<MyType>> getSelectorForMyType() {
+    public CategoricalVertex<MyType> getSelectorForMyType() {
 
         LinkedHashMap<MyType, DoubleVertex> frequency = new LinkedHashMap<>();
         frequency.put(A, new ConstantDoubleVertex(0.25));
