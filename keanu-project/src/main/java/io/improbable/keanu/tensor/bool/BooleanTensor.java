@@ -71,21 +71,6 @@ public interface BooleanTensor extends Tensor<Boolean, BooleanTensor>, BooleanOp
         return JVMBooleanTensor.concat(dimension, toConcat);
     }
 
-    @Override
-    BooleanTensor reshape(long... newShape);
-
-    @Override
-    BooleanTensor permute(int... rearrange);
-
-    @Override
-    BooleanTensor diag();
-
-    @Override
-    BooleanTensor broadcast(long... toShape);
-
-    @Override
-    BooleanTensor duplicate();
-
     BooleanTensor and(BooleanTensor that);
 
     default BooleanTensor and(boolean that) {
@@ -125,6 +110,10 @@ public interface BooleanTensor extends Tensor<Boolean, BooleanTensor>, BooleanOp
     DoubleTensor toDoubleMask();
 
     IntegerTensor toIntegerMask();
+
+    double[] asFlatDoubleArray();
+
+    int[] asFlatIntegerArray();
 
     @Override
     BooleanTensor slice(int dimension, long index);

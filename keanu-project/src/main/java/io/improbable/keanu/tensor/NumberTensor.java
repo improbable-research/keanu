@@ -13,6 +13,10 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> ex
 
     IntegerTensor toInteger();
 
+    double[] asFlatDoubleArray();
+
+    int[] asFlatIntegerArray();
+
     N sum();
 
     T sum(int... overDimensions);

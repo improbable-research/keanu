@@ -168,32 +168,6 @@ public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
     }
 
     @Override
-    public double[] asFlatDoubleArray() {
-
-        assertIsNumber();
-
-        double[] doubles = new double[buffer.length];
-        for (int i = 0; i < doubles.length; i++) {
-            doubles[i] = ((Number) buffer[i]).doubleValue();
-        }
-
-        return doubles;
-    }
-
-    @Override
-    public int[] asFlatIntegerArray() {
-
-        assertIsNumber();
-
-        int[] integers = new int[buffer.length];
-        for (int i = 0; i < integers.length; i++) {
-            integers[i] = ((Number) buffer[i]).intValue();
-        }
-
-        return integers;
-    }
-
-    @Override
     public T[] asFlatArray() {
         return Arrays.copyOf(buffer, buffer.length);
     }

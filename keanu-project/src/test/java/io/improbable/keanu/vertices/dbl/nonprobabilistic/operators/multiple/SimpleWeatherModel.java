@@ -49,7 +49,7 @@ public class SimpleWeatherModel {
     }
 
     public void modelExecution(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        double temperature = inputs.get(new VertexLabel("Temperature")).getValue().asFlatDoubleArray()[0];
+        double temperature = (Double) inputs.get(new VertexLabel("Temperature")).getValue().asFlatArray()[0];
         try {
             double chanceOfRain = blackBoxRainModel(temperature);
             double humidity = blackBoxHumidityModel(temperature);

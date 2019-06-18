@@ -145,10 +145,6 @@ public interface Tensor<N, T extends Tensor<N, T>> {
         return permute(1, 0);
     }
 
-    double[] asFlatDoubleArray();
-
-    int[] asFlatIntegerArray();
-
     N[] asFlatArray();
 
     T reshape(long... newShape);

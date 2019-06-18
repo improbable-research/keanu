@@ -138,29 +138,16 @@ public class GenericTensorTest {
     }
 
     @Test
-    public void canGetFlatIntegers() {
+    public void canGetFlatArray() {
         GenericTensor<Integer> somethingTensor = GenericTensor.create(
             1, 2, 3,
             4, 5, 6,
             7, 8, 9
         ).reshape(3, 3);
 
-        int[] actual = somethingTensor.asFlatIntegerArray();
+        Integer[] actual = somethingTensor.asFlatArray();
 
-        assertArrayEquals(actual, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
-    }
-
-    @Test
-    public void canGetFlatDoubles() {
-        GenericTensor<Double> a = GenericTensor.create(
-            1., 2., 3.,
-            4., 5., 6.,
-            7., 8., 9.
-        ).reshape(3, 3);
-
-        double[] actual = a.asFlatDoubleArray();
-
-        assertArrayEquals(actual, new double[]{1., 2., 3., 4., 5., 6., 7., 8., 9.}, 1e-8);
+        assertArrayEquals(actual, new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
     }
 
     @Test

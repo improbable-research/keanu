@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.dbl;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -790,7 +791,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
             int[] rearrange = getPermutationForDimensionToDimensionZero(dimension, concatShape);
 
-            Tensor[] toConcatOnDimensionZero = new Tensor[toConcat.length];
+            NumberTensor[] toConcatOnDimensionZero = new NumberTensor[toConcat.length];
 
             for (int i = 0; i < toConcatOnDimensionZero.length; i++) {
                 toConcatOnDimensionZero[i] = toConcat[i].permute(rearrange);
@@ -806,7 +807,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
     }
 
-    private static JVMDoubleTensor concatOnDimensionZero(long[] concatShape, Tensor... toConcat) {
+    private static JVMDoubleTensor concatOnDimensionZero(long[] concatShape, NumberTensor... toConcat) {
 
         double[] concatBuffer = new double[TensorShape.getLengthAsInt(concatShape)];
         int bufferPosition = 0;
@@ -826,7 +827,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         return bufferCopy();
     }
 
-    private static double[] getRawBufferIfJVMTensor(Tensor tensor) {
+    private static double[] getRawBufferIfJVMTensor(NumberTensor tensor) {
         if (tensor instanceof JVMDoubleTensor) {
             return ((JVMDoubleTensor) tensor).buffer;
         } else {
