@@ -177,7 +177,7 @@ public class MultinomialVertexTest {
         DoubleTensor p = DoubleTensor.create(0.2, 0.8);
         MultinomialVertex multinomial = new MultinomialVertex(n, p);
         multinomial.setValidationEnabled(true);
-        multinomial.logProb(IntegerTensor.create(-1, 11).transpose());
+        multinomial.logProb(IntegerTensor.create(-1, 11));
     }
 
     @Test
@@ -191,7 +191,7 @@ public class MultinomialVertexTest {
         multinomial.setValidationEnabled(true);
         int[] state = new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE, 12};
         assertThat(state[0] + state[1] + state[2], equalTo(10));
-        multinomial.logProb(IntegerTensor.create(state).transpose());
+        multinomial.logProb(IntegerTensor.create(state));
     }
 
     @Test

@@ -565,6 +565,18 @@ public class ScalarIntegerTensor implements IntegerTensor {
             '}';
     }
 
+    @Override
+    public IntegerTensor modInPlace(Integer that) {
+        value = value % that;
+        return this;
+    }
+
+    @Override
+    public IntegerTensor modInPlace(IntegerTensor that) {
+        Preconditions.checkArgument(that.isScalar());
+        return modInPlace(that.scalar());
+    }
+
     private class SimpleIntegerFlattenedView implements FlattenedView<Integer> {
 
         @Override

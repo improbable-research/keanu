@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import lombok.AllArgsConstructor;
 import lombok.Value;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -20,7 +21,9 @@ import static io.improbable.keanu.tensor.TensorShape.getLength;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 @RunWith(Parameterized.class)
 public class BaseTensorTests {
@@ -54,15 +57,15 @@ public class BaseTensorTests {
         ));
 
         tensorImpls.add(new TensorImpl(
-            (shape) -> Nd4jIntegerTensor.create(1, shape), Nd4jIntegerTensor.class
+            (shape) -> Nd4jIntegerTensor.arange(0, (int) getLength(shape)).reshape(shape), Nd4jIntegerTensor.class
         ));
 
         tensorImpls.add(new TensorImpl(
-            (shape) -> JVMBooleanTensor.create(true, shape), JVMBooleanTensor.class
+            (shape) -> Nd4jIntegerTensor.arange(0, (int) getLength(shape)).reshape(shape).mod(2).greaterThan(0), JVMBooleanTensor.class
         ));
 
         tensorImpls.add(new TensorImpl(
-            (shape) -> GenericTensor.createFilled(1, shape), GenericTensor.class
+            (shape) -> GenericTensor.create(JVMDoubleTensor.arange(0, getLength(shape)).asFlatArray(), shape), GenericTensor.class
         ));
 
         return tensorImpls.stream()
@@ -94,7 +97,6 @@ public class BaseTensorTests {
         assertThat(factory.apply(new long[]{2, 2, 2, 2}).getShape(), equalTo(new long[]{2, 2, 2, 2}));
     }
 
-    //    long[] getStride();
     @Test
     public void lengthIsCalculatedCorrectly() {
         assertThat(factory.apply(new long[0]).getLength(), equalTo(1L));
@@ -104,40 +106,164 @@ public class BaseTensorTests {
         assertThat(factory.apply(new long[]{2, 2, 2, 2}).getLength(), equalTo(16L));
     }
 
-//     N getValue(long... index)
-//
-//     void setValue(N value, long... index)
-
     @Test
     public void getAndSetValueWorks() {
+        Tensor a = factory.apply(new long[]{2, 2});
 
+        Object v0 = a.getValue(0, 0);
+
+        assertThat(a.asFlatArray()[0], equalTo(v0));
+
+        Object v1 = a.getValue(0, 1);
+
+        assertNotEquals(v0, v1);
+
+        a.setValue(v1, 0, 0);
+
+        assertEquals(a.getValue(0, 0), a.getValue(0, 1));
     }
 
-//    N scalar()
-//
-//    T duplicate();
-//
-//    T slice(int dimension, long index);
-//
-//    T take(long... index);
+    @Test
+    public void canGetScalar() {
+        Tensor a = factory.apply(new long[0]);
+        Object scalarValue = a.scalar();
+        assertEquals(a.getValue(0), scalarValue);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfNotScalarOnScalar() {
+        Tensor a = factory.apply(new long[]{2, 2});
+        a.scalar();
+    }
+
+    @Test
+    public void canDuplicate() {
+        Tensor a = factory.apply(new long[]{2, 2});
+        Tensor b = a.duplicate();
+
+        b.setValue(b.getValue(0, 1), 0, 0);
+
+        assertEquals(b.getValue(0, 0), b.getValue(0, 1));
+        assertNotEquals(a.getValue(0, 0), a.getValue(0, 1));
+    }
+
+    @Test
+    public void doesDownRankOnSliceRank3To2() {
+        Tensor x = factory.apply(new long[]{2, 2, 2});
+        TensorTestHelper.doesDownRankOnSliceRank3To2(x);
+    }
+
+    @Test
+    public void doesDownRankOnSliceRank2To1() {
+        Tensor x = factory.apply(new long[]{2, 2});
+        TensorTestHelper.doesDownRankOnSliceRank2To1(x);
+    }
+
+    @Test
+    public void canSliceRank2() {
+        Tensor x = factory.apply(new long[]{3, 3});
+        Tensor slice = x.slice(1, 0);
+        assertThat(slice.getShape(), equalTo(new long[]{3}));
+        assertThat(
+            slice.asFlatArray(),
+            equalTo(
+                new Object[]{x.getValue(0, 0), x.getValue(1, 0), x.getValue(2, 0)})
+        );
+    }
+
+    @Test
+    public void doesDownRankOnSliceRank1ToScalar() {
+        Tensor x = factory.apply(new long[]{4});
+        TensorTestHelper.doesDownRankOnSliceRank1ToScalar(x);
+    }
+
+    @Test
+    public void canSliceRank1() {
+        Tensor x = factory.apply(new long[]{4});
+        Tensor slice = x.slice(0, 1);
+        assertThat(slice.getShape(), equalTo(new long[0]));
+        assertThat(
+            slice.asFlatArray(),
+            equalTo(
+                new Object[]{x.getValue(1)})
+        );
+    }
 
     @Test
     public void canTakeValue() {
         Tensor matrix = factory.apply(new long[]{2, 2});
         assertThat(matrix.getValue(0, 1), equalTo(matrix.take(0, 1).scalar()));
     }
-//
-//    List<T> split(int dimension, long... splitAtIndices);
-//
-//    List<T> sliceAlongDimension(int dimension, long indexStart, long indexEnd)
-//
-//    T diag();
-//
-//    T transpose()
-//
-//    N[] asFlatArray();
-//
-//    T reshape(long... newShape);
+
+    @Ignore
+    @Test
+    public void canSplit() {
+
+    }
+
+    @Ignore
+    @Test
+    public void canSliceAlongDimension() {
+
+    }
+
+    @Test
+    public void canDiag() {
+        Tensor x = factory.apply(new long[]{2});
+        Tensor xDiag = x.diag();
+
+        assertThat(xDiag.getShape(), equalTo(new long[]{2, 2}));
+        assertThat(xDiag.getValue(0, 0), equalTo(x.getValue(0)));
+        assertThat(xDiag.getValue(1, 1), equalTo(x.getValue(1)));
+
+        Tensor xUnDiag = xDiag.diag();
+        assertThat(xUnDiag.getShape(), equalTo(new long[]{2}));
+        assertThat(xUnDiag.getValue(0), equalTo(x.getValue(0)));
+        assertThat(xUnDiag.getValue(1), equalTo(x.getValue(1)));
+    }
+
+    @Test
+    public void permuteDoesCauseReshape() {
+        Tensor a = factory.apply(new long[]{2, 1, 3});
+        Tensor actual = a.permute(1, 0, 2);
+        assertThat(actual.getShape(), equalTo(new long[]{1, 2, 3}));
+    }
+
+    @Test
+    public void canPermuteUpperDimensions() {
+        Tensor a = factory.apply(new long[]{1, 2, 2, 2});
+
+        Tensor permuted = a.permute(0, 1, 3, 2);
+
+        Object expected = new Object[]{
+            a.getValue(0), a.getValue(2),
+            a.getValue(1), a.getValue(3),
+            a.getValue(4), a.getValue(6),
+            a.getValue(5), a.getValue(7),
+        };
+
+        assertThat(permuted.asFlatArray(), equalTo(expected));
+    }
+
+    @Test
+    public void canTransposeMatrix() {
+        Tensor a = factory.apply(new long[]{2, 2});
+
+        Tensor transposed = a.transpose();
+
+        Object expected = new Object[]{
+            a.getValue(0, 0), a.getValue(1, 0),
+            a.getValue(0, 1), a.getValue(1, 1),
+        };
+
+        assertThat(transposed.asFlatArray(), equalTo(expected));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotTransposeVector() {
+        Tensor a = factory.apply(new long[]{2});
+        a.transpose();
+    }
 
     @Test
     public void canReshape() {
@@ -150,20 +276,82 @@ public class BaseTensorTests {
         assertThat(a.getLength(), equalTo(4L));
     }
 
-//    T permute(int... rearrange);
-//
-//    T broadcast(long... toShape);
-//
-//    Tensor.FlattenedView<N> getFlattenedView();
-//
-//    List<N> asFlatList() {
-//        return Arrays.asList(asFlatArray());
-//    }
-//
-//    boolean isLengthOne() {
-//        return getLength() == 1;
-//    }
-//
+    @Test
+    public void canReshapeWithWildCardDim() {
+        Tensor a = factory.apply(new long[]{2, 3, 2});
+
+        assertThat(a.reshape(3, -1).getShape(), equalTo(new long[]{3, 4}));
+        assertThat(a.reshape(-1, 2).getShape(), equalTo(new long[]{6, 2}));
+    }
+
+    @Test
+    public void canBroadcastRowVectorToShape() {
+        Tensor a = factory.apply(new long[]{1, 2});
+
+        Tensor actual = a.broadcast(2, 2);
+
+        assertThat(actual.getShape(), equalTo(new long[]{2, 2}));
+        assertThat(actual.asFlatArray(), equalTo(
+            new Object[]{
+                a.getValue(0), a.getValue(1),
+                a.getValue(0), a.getValue(1)
+            })
+        );
+    }
+
+    @Test
+    public void canBroadcastColumnVectorToShape() {
+        Tensor a = factory.apply(new long[]{2, 1});
+
+        Tensor actual = a.broadcast(2, 2);
+
+        assertThat(actual.getShape(), equalTo(new long[]{2, 2}));
+        assertThat(actual.asFlatArray(), equalTo(
+            new Object[]{
+                a.getValue(0), a.getValue(0),
+                a.getValue(1), a.getValue(1)
+            })
+        );
+    }
+
+    @Test
+    public void canBroadcastScalarToShape() {
+        Tensor a = factory.apply(new long[0]);
+
+        Tensor actual = a.broadcast(2, 2);
+
+        assertThat(actual.getShape(), equalTo(new long[]{2, 2}));
+        assertThat(actual.asFlatArray(), equalTo(
+            new Object[]{
+                a.getValue(0), a.getValue(0),
+                a.getValue(0), a.getValue(0)
+            })
+        );
+    }
+
+    @Test
+    public void canGetValueFromFlattenedView() {
+        Tensor a = factory.apply(new long[]{2, 2});
+        Tensor.FlattenedView flattenedView = a.getFlattenedView();
+
+        assertThat(flattenedView.get(0), equalTo(a.getValue(0, 0)));
+        assertThat(flattenedView.get(3), equalTo(a.getValue(1, 1)));
+
+        flattenedView.set(0, flattenedView.get(1));
+
+        assertThat(flattenedView.get(0), equalTo(flattenedView.get(1)));
+        assertThat(flattenedView.get(0), equalTo(a.getValue(0, 0)));
+    }
+
+    @Test
+    public void canGetFlatList() {
+        Tensor a = factory.apply(new long[]{2, 2});
+
+        Object[] flatArray = a.asFlatArray();
+        Object[] flatList = a.asFlatList().toArray();
+
+        assertThat(flatArray, equalTo(flatList));
+    }
 
     @Test
     public void canDetectScalar() {
@@ -184,19 +372,5 @@ public class BaseTensorTests {
         assertFalse(factory.apply(new long[]{2}).isMatrix());
         assertTrue(factory.apply(new long[]{2, 2}).isMatrix());
     }
-
-//    default boolean hasSameShapeAs(Tensor that) {
-//        return hasSameShapeAs(that.getShape());
-//    }
-//
-//    default boolean hasSameShapeAs(long[] shape) {
-//        return Arrays.equals(this.getShape(), shape);
-//    }
-//
-//    default BooleanTensor elementwiseEquals(Tensor that) {
-//        return elementwiseEquals(this, that);
-//    }
-//
-//    BooleanTensor elementwiseEquals(N value);
 
 }

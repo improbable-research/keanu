@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
@@ -86,6 +87,16 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.zeros(shape, BUFFER_TYPE));
     }
 
+    public static Nd4jIntegerTensor arange(int start, int end) {
+        return new Nd4jIntegerTensor(TypedINDArrayFactory.arange(start, end, BUFFER_TYPE));
+    }
+
+    public static Nd4jDoubleTensor arange(int start, int end, int stepSize) {
+        int stepCount = (end - start) / stepSize;
+        INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount, BUFFER_TYPE).muli(stepSize).addi(start);
+        return new Nd4jDoubleTensor(arangeWithStep);
+    }
+
     static INDArray unsafeGetNd4J(IntegerTensor that) {
         if (that.isLengthOne()) {
             return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
@@ -115,6 +126,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor transpose() {
+        Preconditions.checkArgument(isMatrix(), "Cannot transpose rank " + getRank());
         return new Nd4jIntegerTensor(tensor.transpose());
     }
 
@@ -675,6 +687,18 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     @Override
     public Integer[] asFlatArray() {
         return ArrayUtils.toObject(asFlatIntegerArray());
+    }
+
+    @Override
+    public IntegerTensor modInPlace(Integer that) {
+        tensor.fmodi(that);
+        return this;
+    }
+
+    @Override
+    public IntegerTensor modInPlace(IntegerTensor that) {
+        tensor.fmodi(unsafeGetNd4J(that));
+        return this;
     }
 
     @Override

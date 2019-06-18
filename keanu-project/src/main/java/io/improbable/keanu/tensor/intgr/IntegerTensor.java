@@ -149,14 +149,6 @@ public interface IntegerTensor extends FixedPointTensor<Integer, IntegerTensor>,
         return a.duplicate().maxInPlace(b);
     }
 
-    default IntegerTensor reverseMinus(Integer that) {
-        return this.unaryMinus().plus(that);
-    }
-
-    default IntegerTensor reverseDiv(Integer that) {
-        return IntegerTensor.scalar(that).div(this);
-    }
-
     // Kotlin unboxes to the primitive but does not match the Java
     @Override
     default IntegerTensor plus(int value) {
