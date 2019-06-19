@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
@@ -46,6 +45,7 @@ import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LT_MA
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.MUL;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.RSUB;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.SUB;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotrf;
@@ -1145,14 +1145,15 @@ public class JVMDoubleTensor extends DoubleTensor {
         final JVMBuffer.PrimitiveDoubleWrapper rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMTensorBroadcast.ResultWrapper<double[]> result = broadcastIfNeeded(
-            buffer.asDoubleArray(), shape, stride, buffer.getLength(),
-            rightBuffer.asDoubleArray(), rightShape, right.getStride(), rightBuffer.getLength(),
+        final JVMDoubleTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
+            factory,
+            buffer, shape, stride, buffer.getLength(),
+            rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),
             op, inPlace
         );
 
         if (inPlace) {
-            this.buffer = new JVMBuffer.DoubleArrayWrapper(result.outputBuffer);
+            this.buffer = result.outputBuffer;
             this.shape = result.outputShape;
             this.stride = result.outputStride;
 
