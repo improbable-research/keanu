@@ -42,7 +42,6 @@ The following functions are on the todo list:
 - flip(m[, axis])	Reverse the order of elements in an array along the given axis.
 - fliplr(m)	Flip array in the left/right direction.
 - flipud(m)	Flip array in the up/down direction.
-- reshape(a, newshape[, order])	Gives a new shape to an array without changing its data.
 - roll(a, shift[, axis])	Roll array elements along a given axis.
 - rot90(m[, k, axes])	Rotate an array by 90 degrees in the plane specified by axes.
 
@@ -110,13 +109,8 @@ The following functions are on the todo list:
 ### Functions to add
 
 #### Arithmetic
-- add(x1, x2, /[, out, where, casting, order, …])	Add arguments element-wise.
 - positive(x, /[, out, where, casting, order, …])	Numerical positive, element-wise.
 - negative(x, /[, out, where, casting, order, …])	Numerical negative, element-wise.
-- multiply(x1, x2, /[, out, where, casting, …])	Multiply arguments element-wise.
-- divide(x1, x2, /[, out, where, casting, …])	Returns a true division of the inputs, element-wise.
-- power(x1, x2, /[, out, where, casting, …])	First array elements raised to powers from second array, element-wise.
-- subtract(x1, x2, /[, out, where, casting, …])	Subtract arguments, element-wise.
 - true_divide(x1, x2, /[, out, where, …])	Returns a true division of the inputs, element-wise.
 - floor_divide(x1, x2, /[, out, where, …])	Return the largest integer smaller or equal to the division of the inputs.
 - float_power(x1, x2, /[, out, where, …])	First array elements raised to powers from second array, element-wise.
@@ -130,15 +124,11 @@ The following functions are on the todo list:
 
 - convolve(a, v[, mode])	Returns the discrete, linear convolution of two one-dimensional sequences.
 - clip(a, a_min, a_max[, out])	Clip (limit) the values in an array.
-- sqrt(x, /[, out, where, casting, order, …])	Return the non-negative square-root of an array, element-wise.
 - cbrt(x, /[, out, where, casting, order, …])	Return the cube-root of an array, element-wise.
 - square(x, /[, out, where, casting, order, …])	Return the element-wise square of the input.
-- absolute(x, /[, out, where, casting, order, …])	Calculate the absolute value element-wise.
 - fabs(x, /[, out, where, casting, order, …])	Compute the absolute values element-wise.
 - sign(x, /[, out, where, casting, order, …])	Returns an element-wise indication of the sign of a number.
 - heaviside(x1, x2, /[, out, where, casting, …])	Compute the Heaviside step function.
-- maximum(x1, x2, /[, out, where, casting, …])	Element-wise maximum of array elements.
-- minimum(x1, x2, /[, out, where, casting, …])	Element-wise minimum of array elements.
 - fmax(x1, x2, /[, out, where, casting, …])	Element-wise maximum of array elements.
 - fmin(x1, x2, /[, out, where, casting, …])	Element-wise minimum of array elements.
 - nan_to_num(x[, copy])	Replace NaN with zero and infinity with large finite numbers.
@@ -254,8 +244,6 @@ Missing types:
 - round_(a[, decimals, out])	Round an array to the given number of decimals.
 - rint(x, /[, out, where, casting, order, …])	Round elements of the array to the nearest integer.
 - fix(x[, out])	Round to nearest integer towards zero.
-- floor(x, /[, out, where, casting, order, …])	Return the floor of the input, element-wise.
-- ceil(x, /[, out, where, casting, order, …])	Return the ceiling of the input, element-wise.
 - trunc(x, /[, out, where, casting, order, …])	Return the truncated value of the input, element-wise.
 
 #### Sum, Product, Differences
@@ -283,8 +271,6 @@ Missing types:
 - logaddexp2(x1, x2, /[, out, where, casting, …])	Logarithm of the sum of exponentiations of the inputs in base-2.
 
 #### Arithmetic
-
-- reciprocal(x, /[, out, where, casting, …])	Return the reciprocal of the argument, element-wise.
 
 #### Windowing
 
@@ -339,7 +325,5 @@ Missing types:
 ## BooleanTensor
 
 ### Functions to add
-
-- any(a[, axis, out, keepdims])	Test whether any array element along a given axis evaluates to True.
 
 
