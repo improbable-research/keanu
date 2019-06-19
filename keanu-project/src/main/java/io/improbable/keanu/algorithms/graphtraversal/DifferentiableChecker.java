@@ -28,29 +28,29 @@ import java.util.Set;
  * <p>
  * - Differentiable -
  * <p>
- * RV  RV
- * \  /
- * D    RV
- * \  /
- * RV(G)
+ *      RV  RV
+ *       \  /
+ *        D    RV
+ *         \  /
+ *         RV(G)
  * <p>
  * This graph is differentiable as traversing up each of the vertex's parent to the next RV is a differentiable path.
  * <p>
- * C    C
- * \  /
- * ND    RV
- * \  /
- * RV(G)
+ *      C    C
+ *       \  /
+ *        ND    RV
+ *         \  /
+ *         RV(G)
  * <p>
  * This graph is differentiable as the path that is non differentiable is constant valued.
  * <p>
  * - Not Differentiable -
  * <p>
- * RV  RV     - Both RV not observed
- * \  /
- * ND    RV
- * \  /
- * RV(G)
+ *      RV  RV     - Both RV not observed
+ *       \  /
+ *        ND    RV
+ *         \  /
+ *         RV(G)
  * <p>
  * This is not differentiable as there is a non differentiable path which does not have a constant value.
  * <p>

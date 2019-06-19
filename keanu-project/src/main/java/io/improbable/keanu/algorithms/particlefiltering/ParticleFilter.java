@@ -48,8 +48,6 @@ public class ParticleFilter {
         return new ParticleFilterBuilder(vertices);
     }
 
-    ;
-
     public ParticleFilter(Collection<? extends Vertex> vertices,
                           int numParticles,
                           int resamplingCycles,

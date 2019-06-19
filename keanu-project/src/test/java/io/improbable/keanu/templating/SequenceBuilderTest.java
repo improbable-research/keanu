@@ -239,10 +239,10 @@ public class SequenceBuilderTest {
     /**
      * This is a Hidden Markov Model -
      * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
-     * <p>
+     *
      * ...  -->  X[t-1]  -->  X[t]  --> ...
-     * |           |
-     * Y[t-1]       Y[t]
+     *             |           |
+     *           Y[t-1]       Y[t]
      */
     @Test
     public void youCanCreateATimeSeriesFromSequenceFromACount() {
@@ -283,10 +283,10 @@ public class SequenceBuilderTest {
     /**
      * This is a Hidden Markov Model -
      * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
-     * <p>
+     *
      * ...  -->  X[t-1]  -->  X[t]  --> ...
-     * |           |
-     * Y[t-1]       Y[t]
+     *             |           |
+     *           Y[t-1]       Y[t]
      */
     @Test
     public void youCanCreateATimeSeriesFromSequenceFromAnIterator() {

@@ -61,7 +61,6 @@ public class DoubleVertexSamplesTest {
         assertThat(variances, allCloseTo(1e-8, expectedValues));
     }
 
-
     @Test
     public void canGetSamplesAsTensor() {
         List<DoubleTensor> samplesAsList = samples.asList();
