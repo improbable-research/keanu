@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
