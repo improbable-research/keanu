@@ -4,19 +4,35 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.nd4j.linalg.api.shape.Shape;
 
+import java.util.Arrays;
 import java.util.function.BiFunction;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+@RunWith(Parameterized.class)
 public class DoubleScalarTensorShapePreservationTest {
+
+    @Parameterized.Parameters(name = "{index}: Test with {1}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
+            {new JVMDoubleTensorFactory(), "JVM DoubleTensor"},
+        });
+    }
 
     private static DoubleTensor doubleTensor;
     private static DoubleTensor lengthOneTensor;
     private static DoubleTensor scalarDoubleTensor;
     private static DoubleTensor[] tensors;
+
+    public DoubleScalarTensorShapePreservationTest(DoubleTensorFactory factory, String name) {
+        DoubleTensor.setFactory(factory);
+    }
 
     @Before
     public void setup() {
@@ -50,7 +66,12 @@ public class DoubleScalarTensorShapePreservationTest {
     public void tensorSubtractionPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::minus);
         checkOperationPreservesShape(DoubleTensor::minusInPlace);
+    }
 
+    @Test
+    public void tensorReverseSubtractionPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::reverseMinus);
+        checkOperationPreservesShape(DoubleTensor::reverseMinus);
     }
 
     @Test
@@ -83,64 +104,54 @@ public class DoubleScalarTensorShapePreservationTest {
     @Test
     public void tensorGetGreaterThanOrEqualToMaskPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::getGreaterThanOrEqualToMask);
-
     }
 
     @Test
     public void tensorGetLessThanMaskPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::getLessThanMask);
-
     }
 
     @Test
     public void tensorGetLessThanOrEqualToMaskPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::getLessThanOrEqualToMask);
-
     }
 
     @Test
     public void tensorMaxPreservesShape() {
         checkOperationPreservesShape(NumberTensor::max);
         checkOperationPreservesShape(DoubleTensor::maxInPlace);
-
     }
 
     @Test
     public void tensorMinPreservesShape() {
         checkOperationPreservesShape(NumberTensor::min);
         checkOperationPreservesShape(DoubleTensor::minInPlace);
-
     }
 
     @Test
     public void tensorLessThanPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::lessThan);
-
     }
 
     @Test
     public void tensorLessThanOrEqualPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::lessThanOrEqual);
-
     }
 
     @Test
     public void tensorGreaterThanPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::greaterThan);
-
     }
 
     @Test
     public void tensorGreaterThanOrEqualPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::greaterThanOrEqual);
-
     }
 
     @Test
     public void tensorElementwiseEqualsPreservesShape() {
         checkOperationPreservesShape((l, r) -> l.elementwiseEquals(r));
     }
-
 
     private void checkOperationPreservesShape(BiFunction<DoubleTensor, DoubleTensor, Tensor> operation) {
         for (DoubleTensor t1 : tensors) {

@@ -147,6 +147,16 @@ public class INDArrayShim {
             (l, r, result, dims) -> Broadcast.add(l, r, result, Ints.toArray(dims)));
     }
 
+    public static INDArray rsubi(INDArray left, INDArray right) {
+        return applyInlineOperation(
+            left, right,
+            a -> a,
+            INDArray::rsubi,
+            INDArray::subi,
+            (l, r, result, dims) -> Broadcast.rsub(l, r, result, Ints.toArray(dims)),
+            (l, r, result, dims) -> Broadcast.sub(l, r, result, Ints.toArray(dims)));
+    }
+
     private static INDArray applyScalarTensorOperationWithPreservedShape(INDArray tensor, INDArray scalarTensor, BiFunction<INDArray, INDArray, INDArray> operation) {
         INDArray result = operation.apply(tensor, scalarTensor.getScalar(0));
         long[] resultShape = Shape.broadcastOutputShape(tensor.shape(), scalarTensor.shape());
