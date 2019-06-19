@@ -10,10 +10,13 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Warmup;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,7 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 @State(Scope.Benchmark)
+@Warmup(iterations = 3, time = 1000, timeUnit = MILLISECONDS)
+@Measurement(iterations = 5, time = 1000, timeUnit = MILLISECONDS)
+@Fork(3)
 public class CompiledBackEnds {
 
     public enum Backend {
