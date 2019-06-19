@@ -71,11 +71,11 @@ public interface ConstantVertex {
         return new ConstantDoubleVertex(value);
     }
 
-    static <GENERIC> ConstantGenericTensorVertex<GENERIC, GenericTensor<GENERIC>> of(GENERIC value) {
+    static <GENERIC> ConstantGenericTensorVertex<GENERIC> of(GENERIC value) {
         return new ConstantGenericTensorVertex<>(GenericTensor.scalar(value));
     }
 
-    static <GENERIC> ConstantGenericTensorVertex<GENERIC, GenericTensor<GENERIC>> of(GENERIC[] values) {
+    static <GENERIC> ConstantGenericTensorVertex<GENERIC> of(GENERIC[] values) {
         return new ConstantGenericTensorVertex<>(GenericTensor.create(values));
     }
 }

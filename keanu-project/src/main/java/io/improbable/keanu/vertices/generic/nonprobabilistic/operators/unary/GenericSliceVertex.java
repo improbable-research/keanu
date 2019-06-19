@@ -1,13 +1,13 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 
 import static io.improbable.keanu.tensor.TensorShape.removeDimension;
 
-public class GenericSliceVertex<T, TENSOR extends Tensor<T, TENSOR>> extends GenericTensorUnaryOpVertex<T, TENSOR, T, TENSOR> {
+public class GenericSliceVertex<T> extends GenericTensorUnaryOpVertex<T, T> {
 
     private static final String DIMENSION_NAME = "dimension";
 
@@ -23,7 +23,7 @@ public class GenericSliceVertex<T, TENSOR extends Tensor<T, TENSOR>> extends Gen
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
-    public GenericSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<TENSOR> inputVertex,
+    public GenericSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<GenericTensor<T>> inputVertex,
                               @LoadVertexParam(DIMENSION_NAME) int dimension,
                               @LoadVertexParam(INDEX_NAME) int index) {
         super(removeDimension(dimension, inputVertex.getShape()), inputVertex);
@@ -31,7 +31,7 @@ public class GenericSliceVertex<T, TENSOR extends Tensor<T, TENSOR>> extends Gen
         this.index = index;
     }
 
-    protected TENSOR op(TENSOR input) {
+    protected GenericTensor<T> op(GenericTensor<T> input) {
         return input.slice(dimension, index);
     }
 

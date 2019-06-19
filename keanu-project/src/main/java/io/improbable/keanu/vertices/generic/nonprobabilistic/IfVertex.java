@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -10,19 +10,19 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 
-public class IfVertex<T, TENSOR extends Tensor<T, TENSOR>> extends GenericTensorVertex<T, TENSOR> implements NonProbabilistic<TENSOR> {
+public class IfVertex<T> extends GenericTensorVertex<T> implements NonProbabilistic<GenericTensor<T>> {
 
     private final static String PREDICATE_NAME = "predicate";
     private final static String THEN_NAME = "then";
     private final static String ELSE_NAME = "else";
 
     private final BooleanVertex predicate;
-    private final Vertex<TENSOR> thn;
-    private final Vertex<TENSOR> els;
+    private final Vertex<GenericTensor<T>> thn;
+    private final Vertex<GenericTensor<T>> els;
 
     public IfVertex(@LoadVertexParam(PREDICATE_NAME) BooleanVertex predicate,
-                    @LoadVertexParam(THEN_NAME) Vertex<TENSOR> thn,
-                    @LoadVertexParam(ELSE_NAME) Vertex<TENSOR> els) {
+                    @LoadVertexParam(THEN_NAME) Vertex<GenericTensor<T>> thn,
+                    @LoadVertexParam(ELSE_NAME) Vertex<GenericTensor<T>> els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;
@@ -30,12 +30,12 @@ public class IfVertex<T, TENSOR extends Tensor<T, TENSOR>> extends GenericTensor
         setParents(predicate, thn, els);
     }
 
-    private TENSOR op(BooleanTensor predicate, TENSOR thn, TENSOR els) {
+    private GenericTensor<T> op(BooleanTensor predicate, GenericTensor<T> thn, GenericTensor<T> els) {
         return predicate.where(thn, els);
     }
 
     @Override
-    public TENSOR calculate() {
+    public GenericTensor<T> calculate() {
         return op(predicate.getValue(), thn.getValue(), els.getValue());
     }
 
@@ -45,12 +45,12 @@ public class IfVertex<T, TENSOR extends Tensor<T, TENSOR>> extends GenericTensor
     }
 
     @SaveVertexParam(THEN_NAME)
-    public Vertex<? extends Tensor<T, TENSOR>> getThn() {
+    public Vertex<GenericTensor<T>> getThn() {
         return thn;
     }
 
     @SaveVertexParam(ELSE_NAME)
-    public Vertex<? extends Tensor<T, TENSOR>> getEls() {
+    public Vertex<GenericTensor<T>> getEls() {
         return els;
     }
 }

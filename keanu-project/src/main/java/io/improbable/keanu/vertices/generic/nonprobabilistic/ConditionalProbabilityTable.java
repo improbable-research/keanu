@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -54,8 +55,8 @@ public class ConditionalProbabilityTable {
             this.inputs = inputs;
         }
 
-        public <T, TENSOR extends Tensor<T, TENSOR>> CPTBuilder<T, TENSOR> then(Vertex<TENSOR> thn) {
-            Map<CPTCondition, Vertex<TENSOR>> conditions = new HashMap<>();
+        public <T> CPTBuilder<T> then(Vertex<GenericTensor<T>> thn) {
+            Map<CPTCondition, Vertex<GenericTensor<T>>> conditions = new HashMap<>();
             conditions.put(condition, thn);
             return new CPTBuilder<>(inputs, conditions);
         }
@@ -226,37 +227,37 @@ public class ConditionalProbabilityTable {
         }
     }
 
-    public static class CPTBuilder<T, TENSOR extends Tensor<T, TENSOR>> {
+    public static class CPTBuilder<T> {
         private final List<Vertex<? extends Tensor<?, ?>>> inputs;
-        private final Map<CPTCondition, Vertex<TENSOR>> conditions;
+        private final Map<CPTCondition, Vertex<GenericTensor<T>>> conditions;
 
-        public CPTBuilder(List<Vertex<? extends Tensor<?, ?>>> inputs, Map<CPTCondition, Vertex<TENSOR>> conditions) {
+        public CPTBuilder(List<Vertex<? extends Tensor<?, ?>>> inputs, Map<CPTCondition, Vertex<GenericTensor<T>>> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
 
-        public CPTWhenBuilder<T, TENSOR> when(Object... condition) {
+        public CPTWhenBuilder<T> when(Object... condition) {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
             return new CPTWhenBuilder<>(new CPTCondition(ImmutableList.copyOf(condition)), this);
         }
 
-        public CPTVertex<T, TENSOR> orDefault(Vertex<TENSOR> defaultResult) {
+        public CPTVertex<T> orDefault(Vertex<GenericTensor<T>> defaultResult) {
             return new CPTVertex<>(inputs, conditions, defaultResult);
         }
 
-        public static class CPTWhenBuilder<T, TENSOR extends Tensor<T, TENSOR>> {
+        public static class CPTWhenBuilder<T> {
 
             private final CPTCondition condition;
-            private final CPTBuilder<T, TENSOR> builder;
+            private final CPTBuilder<T> builder;
 
-            private CPTWhenBuilder(CPTCondition condition, CPTBuilder<T, TENSOR> builder) {
+            private CPTWhenBuilder(CPTCondition condition, CPTBuilder<T> builder) {
                 this.condition = condition;
                 this.builder = builder;
             }
 
-            public CPTBuilder<T, TENSOR> then(Vertex<TENSOR> thn) {
+            public CPTBuilder<T> then(Vertex<GenericTensor<T>> thn) {
                 builder.conditions.put(condition, thn);
                 return builder;
             }

@@ -392,7 +392,7 @@ public class KeanuCompiledGraphTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
 
         CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
-        GenericTakeVertex<TestEnum, GenericTensor<TestEnum>> C = A.take(1);
+        GenericTakeVertex<TestEnum> C = A.take(1);
 
         assertCompiledIsSameAsVertexEvaluation(A, C);
     }
@@ -405,7 +405,7 @@ public class KeanuCompiledGraphTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
 
         CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
-        GenericSliceVertex<TestEnum, GenericTensor<TestEnum>> C = A.slice(0, 1);
+        GenericSliceVertex<TestEnum> C = A.slice(0, 1);
 
         assertCompiledIsSameAsVertexEvaluation(A, C);
     }
@@ -421,7 +421,7 @@ public class KeanuCompiledGraphTest {
         CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
         CategoricalVertex<TestEnum> B = new CategoricalVertex<>(selectableValues);
 
-        IfVertex<TestEnum, GenericTensor<TestEnum>> D = new IfVertex<>(predicate, A, B);
+        IfVertex<TestEnum> D = new IfVertex<>(predicate, A, B);
 
         assertCompiledIsSameAsVertexEvaluation(A, B, predicate, D);
     }
