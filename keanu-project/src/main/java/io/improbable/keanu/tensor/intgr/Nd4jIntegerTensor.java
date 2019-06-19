@@ -26,6 +26,7 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.google.common.primitives.Ints.checkedCast;
 import static java.util.Arrays.copyOf;
@@ -631,7 +632,13 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public List<IntegerTensor> split(int dimension, long... splitAtIndices) {
-        throw new UnsupportedOperationException();
+
+        List<INDArray> splitINDArrays = INDArrayExtensions.split(tensor, dimension, splitAtIndices);
+
+        return splitINDArrays.stream()
+            .map(Nd4jIntegerTensor::new)
+            .collect(Collectors.toList());
+
     }
 
     @Override

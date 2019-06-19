@@ -7,7 +7,6 @@ import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import lombok.AllArgsConstructor;
 import lombok.Value;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -195,16 +194,38 @@ public class BaseTensorTests {
         assertThat(matrix.getValue(0, 1), equalTo(matrix.take(0, 1).scalar()));
     }
 
-    @Ignore
     @Test
     public void canSplit() {
+        Tensor a = factory.apply(new long[]{2, 2, 2});
 
+        List<Tensor> split = a.split(0, 1, 2);
+
+        assertThat(
+            split.get(0).asFlatArray(),
+            equalTo(a.slice(0, 0).asFlatArray())
+        );
+
+        assertThat(
+            split.get(1).asFlatArray(),
+            equalTo(a.slice(0, 1).asFlatArray())
+        );
     }
 
-    @Ignore
     @Test
     public void canSliceAlongDimension() {
+        Tensor a = factory.apply(new long[]{2, 2, 2});
 
+        List<Tensor> slices = a.sliceAlongDimension(0, 0, 2);
+
+        assertThat(
+            slices.get(0).asFlatArray(),
+            equalTo(a.slice(0, 0).asFlatArray())
+        );
+
+        assertThat(
+            slices.get(1).asFlatArray(),
+            equalTo(a.slice(0, 1).asFlatArray())
+        );
     }
 
     @Test

@@ -120,7 +120,6 @@ public interface FloatingPointTensor<N extends Number, T extends FloatingPointTe
      * e.g. 1.5 is 2
      * e.g. -2.5 is -3
      */
-
     default T round() {
         return duplicate().roundInPlace();
     }

@@ -25,19 +25,16 @@ import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.INDArrayIndex;
-import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.google.common.primitives.Ints.checkedCast;
-import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 import static java.util.Arrays.copyOf;
 
@@ -974,38 +971,11 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     @Override
     public List<DoubleTensor> split(int dimension, long... splitAtIndices) {
 
-        long[] shape = getShape();
-        dimension = getAbsoluteDimension(dimension, getRank());
+        List<INDArray> splitINDArrays = INDArrayExtensions.split(tensor, dimension, splitAtIndices);
 
-        if (dimension < 0 || dimension >= shape.length) {
-            throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
-        }
-
-        Nd4j.getCompressor().autoDecompress(tensor);
-
-        List<DoubleTensor> splits = new ArrayList<>();
-        long previousSplitIndex = 0;
-        for (int i = 0; i < splitAtIndices.length; i++) {
-
-            INDArrayIndex[] indices = new INDArrayIndex[tensor.rank()];
-
-            if (previousSplitIndex == splitAtIndices[i]) {
-                throw new IllegalArgumentException("Invalid index to split on " + splitAtIndices[i] + " at dimension " + dimension + " for tensor of shape " + Arrays.toString(shape));
-            }
-
-            indices[dimension] = NDArrayIndex.interval(previousSplitIndex, splitAtIndices[i]);
-            previousSplitIndex = splitAtIndices[i];
-
-            for (int j = 0; j < tensor.rank(); j++) {
-                if (j != dimension) {
-                    indices[j] = NDArrayIndex.all();
-                }
-            }
-
-            splits.add(new Nd4jDoubleTensor(tensor.get(indices)));
-        }
-
-        return splits;
+        return splitINDArrays.stream()
+            .map(Nd4jDoubleTensor::new)
+            .collect(Collectors.toList());
     }
 
     // Comparisons

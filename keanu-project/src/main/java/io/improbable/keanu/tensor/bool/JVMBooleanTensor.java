@@ -9,12 +9,14 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
 import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
@@ -369,7 +371,47 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public List<BooleanTensor> split(int dimension, long... splitAtIndices) {
-        return null;
+        dimension = getAbsoluteDimension(dimension, getRank());
+
+        if (dimension < 0 || dimension >= shape.length) {
+            throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
+        }
+
+        int[] moveDimToZero = TensorShape.slideDimension(dimension, 0, shape.length);
+        int[] moveZeroToDim = TensorShape.slideDimension(0, dimension, shape.length);
+
+        JVMBooleanTensor permutedTensor = (JVMBooleanTensor) this.permute(moveDimToZero);
+
+        boolean[] rawBuffer = permutedTensor.buffer;
+
+        List<BooleanTensor> splitTensor = new ArrayList<>();
+
+        long previousSplitAtIndex = 0;
+        int rawBufferPosition = 0;
+        for (long splitAtIndex : splitAtIndices) {
+
+            long[] subTensorShape = getShape();
+            long subTensorLengthInDimension = splitAtIndex - previousSplitAtIndex;
+
+            if (subTensorLengthInDimension > shape[dimension] || subTensorLengthInDimension <= 0) {
+                throw new IllegalArgumentException("Invalid index to split on " + splitAtIndex + " at " + dimension + " for tensor of shape " + Arrays.toString(shape));
+            }
+
+            subTensorShape[dimension] = subTensorLengthInDimension;
+            int subTensorLength = Ints.checkedCast(TensorShape.getLength(subTensorShape));
+
+            boolean[] buffer = new boolean[subTensorLength];
+            System.arraycopy(rawBuffer, rawBufferPosition, buffer, 0, buffer.length);
+
+            long[] subTensorPermutedShape = getPermutedIndices(subTensorShape, moveDimToZero);
+            BooleanTensor subTensor = BooleanTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
+            splitTensor.add(subTensor);
+
+            previousSplitAtIndex = splitAtIndex;
+            rawBufferPosition += buffer.length;
+        }
+
+        return splitTensor;
     }
 
     @Override
