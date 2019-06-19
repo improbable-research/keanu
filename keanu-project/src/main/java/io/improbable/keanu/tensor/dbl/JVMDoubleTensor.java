@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.JVMBuffer;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -55,26 +56,36 @@ import static org.bytedeco.javacpp.openblas.cblas_dgemm;
 
 public class JVMDoubleTensor extends DoubleTensor {
 
+    private static final JVMBuffer.DoubleArrayWrapperFactory factory = new JVMBuffer.DoubleArrayWrapperFactory();
+
     private long[] shape;
     private long[] stride;
-    private double[] buffer;
+    private JVMBuffer.PrimitiveDoubleWrapper buffer;
+
+    private JVMDoubleTensor(JVMBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
+        this.shape = shape;
+        this.stride = stride;
+        this.buffer = buffer;
+    }
+
+    private JVMDoubleTensor(JVMBuffer.PrimitiveDoubleWrapper buffer, long[] shape) {
+        this.shape = shape;
+        this.stride = getRowFirstStride(shape);
+        this.buffer = buffer;
+    }
+
+    private JVMDoubleTensor(double[] data, long[] shape, long[] stride) {
+        this(new JVMBuffer.DoubleArrayWrapper(data), shape, stride);
+    }
+
+    private JVMDoubleTensor(double[] data, long[] shape) {
+        this(new JVMBuffer.DoubleArrayWrapper(data), shape);
+    }
 
     private JVMDoubleTensor(double value) {
         this.shape = new long[0];
         this.stride = new long[0];
-        this.buffer = new double[]{value};
-    }
-
-    private JVMDoubleTensor(double[] data, long[] shape) {
-        this.shape = shape;
-        this.stride = getRowFirstStride(shape);
-        this.buffer = data;
-    }
-
-    private JVMDoubleTensor(double[] data, long[] shape, long[] stride) {
-        this.shape = shape;
-        this.stride = stride;
-        this.buffer = data;
+        this.buffer = new JVMBuffer.DoubleWrapper(value);
     }
 
     public static JVMDoubleTensor scalar(double scalarValue) {
@@ -147,18 +158,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         return new JVMDoubleTensor(buffer, new long[]{buffer.length});
     }
 
-    private double[] bufferCopy() {
-        return copyOf(buffer, buffer.length);
-    }
-
-    private int[] bufferAsInteger() {
-        int[] intBuffer = new int[buffer.length];
-        for (int i = 0; i < buffer.length; i++) {
-            intBuffer[i] = (int) buffer[i];
-        }
-        return intBuffer;
-    }
-
     private long[] shapeCopy() {
         return copyOf(shape, shape.length);
     }
@@ -180,22 +179,21 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public long getLength() {
-        return buffer.length;
+        return buffer.getLength();
     }
 
     @Override
     public DoubleTensor reshape(long... newShape) {
-        return new JVMDoubleTensor(bufferCopy(), getReshapeAllowingWildcard(shape, buffer.length, newShape));
+        return new JVMDoubleTensor(buffer.copy(), getReshapeAllowingWildcard(shape, buffer.getLength(), newShape));
     }
 
     @Override
     public DoubleTensor broadcast(long... toShape) {
-
         int outputLength = TensorShape.getLengthAsInt(toShape);
         long[] outputStride = TensorShape.getRowFirstStride(toShape);
         double[] outputBuffer = new double[outputLength];
 
-        JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
+        JVMTensorBroadcast.broadcast(buffer.asDoubleArray(), shape, stride, outputBuffer, outputStride);
 
         return new JVMDoubleTensor(outputBuffer, toShape, outputStride);
     }
@@ -221,10 +219,10 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public BooleanTensor elementwiseEquals(Double value) {
-        boolean[] newBuffer = new boolean[buffer.length];
+        boolean[] newBuffer = new boolean[buffer.getLength()];
 
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = value == buffer[i];
+        for (int i = 0; i < buffer.getLength(); i++) {
+            newBuffer[i] = value == buffer.get(i).doubleValue();
         }
 
         return BooleanTensor.create(newBuffer, shapeCopy());
@@ -235,9 +233,9 @@ public class JVMDoubleTensor extends DoubleTensor {
         Preconditions.checkArgument(rearrange.length == shape.length);
         long[] resultShape = getPermutedIndices(shape, rearrange);
         long[] resultStride = getRowFirstStride(resultShape);
-        double[] newBuffer = new double[buffer.length];
+        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.create(buffer.getLength());
 
-        for (int flatIndex = 0; flatIndex < buffer.length; flatIndex++) {
+        for (int flatIndex = 0; flatIndex < buffer.getLength(); flatIndex++) {
 
             int permutedFlatIndex = convertFromFlatIndexToPermutedFlatIndex(
                 flatIndex,
@@ -246,7 +244,7 @@ public class JVMDoubleTensor extends DoubleTensor {
                 rearrange
             );
 
-            newBuffer[permutedFlatIndex] = buffer[flatIndex];
+            newBuffer.set(buffer.get(flatIndex), permutedFlatIndex);
         }
 
         return new JVMDoubleTensor(newBuffer, resultShape);
@@ -254,7 +252,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor duplicate() {
-        return new JVMDoubleTensor(bufferCopy(), shapeCopy());
+        return new JVMDoubleTensor(buffer.copy(), shapeCopy());
     }
 
     @Override
@@ -264,26 +262,27 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public IntegerTensor toInteger() {
-        return IntegerTensor.create(bufferAsInteger(), shapeCopy());
+        return IntegerTensor.create(buffer.asIntegerArray(), shapeCopy());
     }
 
     @Override
     public DoubleTensor diag() {
 
-        double[] newBuffer;
+        JVMBuffer.PrimitiveDoubleWrapper newBuffer;
         long[] newShape;
         if (getRank() == 1) {
-            int n = buffer.length;
-            newBuffer = new double[Ints.checkedCast((long) n * (long) n)];
+            int n = buffer.getLength();
+            newBuffer = factory.create(Ints.checkedCast((long) n * (long) n));
+            ;
             for (int i = 0; i < n; i++) {
-                newBuffer[i * n + i] = buffer[i];
+                newBuffer.set(buffer.get(i), i * n + i);
             }
             newShape = new long[]{n, n};
         } else if (getRank() == 2 && shape[0] == shape[1]) {
             int n = Ints.checkedCast(shape[0]);
-            newBuffer = new double[n];
+            newBuffer = factory.create(n);
             for (int i = 0; i < n; i++) {
-                newBuffer[i] = buffer[i * n + i];
+                newBuffer.set(buffer.get(i * n + i), i);
             }
             newShape = new long[]{n};
         } else {
@@ -304,8 +303,8 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public Double sum() {
         double result = 0;
-        for (int i = 0; i < buffer.length; i++) {
-            result += buffer[i];
+        for (int i = 0; i < buffer.getLength(); i++) {
+            result += buffer.get(i);
         }
         return result;
     }
@@ -317,15 +316,15 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         long[] resultShape = getSummationResultShape(shape, overDimensions);
         long[] resultStride = getRowFirstStride(resultShape);
-        double[] newBuffer = new double[TensorShape.getLengthAsInt(resultShape)];
+        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.create(TensorShape.getLengthAsInt(resultShape));
 
-        for (int i = 0; i < buffer.length; i++) {
+        for (int i = 0; i < buffer.getLength(); i++) {
 
             long[] shapeIndices = ArrayUtils.removeAll(TensorShape.getShapeIndices(shape, stride, i), overDimensions);
 
             int j = Ints.checkedCast(getFlatIndex(resultShape, resultStride, shapeIndices));
 
-            newBuffer[j] += buffer[i];
+            newBuffer.set(newBuffer.get(j) + buffer.get(i), j);
         }
 
         return new JVMDoubleTensor(newBuffer, resultShape);
@@ -347,8 +346,8 @@ public class JVMDoubleTensor extends DoubleTensor {
                 index[dimension] = i;
 
                 int j = Ints.checkedCast(getFlatIndex(shape, stride, index));
-                buffer[j] += sum;
-                sum = buffer[j];
+                buffer.set(buffer.get(j) + sum, j);
+                sum = buffer.get(j);
             }
 
         } while (incrementIndexByShape(shape, index, dimensionOrder));
@@ -364,7 +363,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         int N = Ints.checkedCast(shape[0]);
-        double[] newBuffer = bufferCopy();
+        double[] newBuffer = buffer.copy().asDoubleArray();
 
         int result = dpotrf(KeanuLapack.Triangular.LOWER, N, newBuffer);
 
@@ -392,7 +391,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         final int m = Ints.checkedCast(shape[0]);
         final int n = Ints.checkedCast(shape[1]);
-        final double[] newBuffer = bufferCopy();
+        final double[] newBuffer = buffer.copy().asDoubleArray();
         final int[] ipiv = new int[newBuffer.length];
 
         final int factorizationResult = dgetrf(m, n, newBuffer, ipiv);
@@ -425,7 +424,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         final int m = Ints.checkedCast(shape[0]);
         final int n = Ints.checkedCast(shape[1]);
-        final double[] newBuffer = bufferCopy();
+        final double[] newBuffer = buffer.copy().asDoubleArray();
         final int[] ipiv = new int[newBuffer.length];
 
         final int factorizationResult = dgetrf(m, n, newBuffer, ipiv);
@@ -453,8 +452,8 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         //C = alpha*A*B + beta*C
         //(M,N) = (M,k)(k,N) + (M,N)
-        final double[] A = buffer;
-        final double[] B = getRawBufferIfJVMTensor(that);
+        final double[] A = buffer.asDoubleArray();
+        final double[] B = getRawBufferIfJVMTensor(that).asDoubleArray();
         final double[] C = new double[Ints.checkedCast(this.shape[0] * thatShape[1])];
 
         final int N = Ints.checkedCast(thatShape[1]);
@@ -476,9 +475,10 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         double max = -Double.MAX_VALUE;
         int argMax = 0;
-        for (int i = 0; i < buffer.length; i++) {
-            if (buffer[i] > max) {
-                max = buffer[i];
+        for (int i = 0; i < buffer.getLength(); i++) {
+            final double value = buffer.get(i);
+            if (value > max) {
+                max = value;
                 argMax = i;
             }
         }
@@ -496,19 +496,19 @@ public class JVMDoubleTensor extends DoubleTensor {
         int[] rearrange = getPermutationForDimensionToDimensionZero(axis, shape);
 
         JVMDoubleTensor permuted = (JVMDoubleTensor) permute(rearrange);
-        double[] permutedBuffer = permuted.buffer;
+        JVMBuffer.PrimitiveDoubleWrapper permutedBuffer = permuted.buffer;
 
-        int dimLength = (int) (buffer.length / shape[axis]);
+        int dimLength = (int) (buffer.getLength() / shape[axis]);
 
         double[] maxBuffer = new double[dimLength];
         int[] maxIndex = new int[dimLength];
 
-        for (int i = 0; i < permutedBuffer.length; i++) {
+        for (int i = 0; i < permutedBuffer.getLength(); i++) {
 
             final int bufferIndex = i % dimLength;
 
-            if (permutedBuffer[i] > maxBuffer[bufferIndex]) {
-                maxBuffer[bufferIndex] = permutedBuffer[i];
+            if (permutedBuffer.get(i) > maxBuffer[bufferIndex]) {
+                maxBuffer[bufferIndex] = permutedBuffer.get(i);
                 maxIndex[bufferIndex] = i / dimLength;
             }
 
@@ -519,29 +519,19 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor unaryMinusInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = -buffer[i];
-        }
-
+        applyInPlace((v) -> -v);
         return this;
     }
 
     @Override
     public DoubleTensor absInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = Math.abs(buffer[i]);
-        }
-
+        applyInPlace(Math::abs);
         return this;
     }
 
     @Override
     public DoubleTensor applyInPlace(Function<Double, Double> function) {
-
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = function.apply(buffer[i]);
-        }
-
+        buffer.apply(function);
         return this;
     }
 
@@ -569,11 +559,11 @@ public class JVMDoubleTensor extends DoubleTensor {
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
         checkMaskLengthMatches(mask);
 
-        double[] maskBuffer = getRawBufferIfJVMTensor(mask);
+        JVMBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
 
-        for (int i = 0; i < buffer.length; i++) {
-            if (maskBuffer[i] == 1.0) {
-                buffer[i] = value;
+        for (int i = 0; i < buffer.getLength(); i++) {
+            if (maskBuffer.get(i) == 1.0) {
+                buffer.set(value, i);
             }
         }
 
@@ -593,11 +583,11 @@ public class JVMDoubleTensor extends DoubleTensor {
     public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         checkShapesMatch(shape, mask.getShape());
 
-        double[] newBuffer = new double[buffer.length];
-        double[] maskBuffer = getRawBufferIfJVMTensor(mask);
+        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.create(buffer.getLength());
+        JVMBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
 
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = maskBuffer[i] == 1.0 ? value : buffer[i];
+        for (int i = 0; i < buffer.getLength(); i++) {
+            newBuffer.set(maskBuffer.get(i) == 1.0 ? value : buffer.get(i), i);
         }
 
         return new JVMDoubleTensor(newBuffer, shapeCopy());
@@ -624,11 +614,11 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     private BooleanTensor maskToBooleanTensor(DoubleTensor mask) {
-        double[] maskBuffer = getRawBufferIfJVMTensor(mask);
-        boolean[] boolBuffer = new boolean[maskBuffer.length];
+        JVMBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
+        boolean[] boolBuffer = new boolean[maskBuffer.getLength()];
 
-        for (int i = 0; i < maskBuffer.length; i++) {
-            boolBuffer[i] = maskBuffer[i] == 1.0;
+        for (int i = 0; i < maskBuffer.getLength(); i++) {
+            boolBuffer[i] = maskBuffer.get(i) == 1.0;
         }
 
         return BooleanTensor.create(boolBuffer, mask.getShape());
@@ -636,10 +626,10 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public BooleanTensor lessThan(Double value) {
-        boolean[] newBuffer = new boolean[buffer.length];
+        boolean[] newBuffer = new boolean[buffer.getLength()];
 
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] < value;
+        for (int i = 0; i < buffer.getLength(); i++) {
+            newBuffer[i] = buffer.get(i) < value;
         }
 
         return BooleanTensor.create(newBuffer, shapeCopy());
@@ -647,10 +637,10 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public BooleanTensor lessThanOrEqual(Double value) {
-        boolean[] newBuffer = new boolean[buffer.length];
+        boolean[] newBuffer = new boolean[buffer.getLength()];
 
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] <= value;
+        for (int i = 0; i < buffer.getLength(); i++) {
+            newBuffer[i] = buffer.get(i) <= value;
         }
 
         return BooleanTensor.create(newBuffer, shapeCopy());
@@ -658,10 +648,10 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public BooleanTensor greaterThan(Double value) {
-        boolean[] newBuffer = new boolean[buffer.length];
+        boolean[] newBuffer = new boolean[buffer.getLength()];
 
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] > value;
+        for (int i = 0; i < buffer.getLength(); i++) {
+            newBuffer[i] = buffer.get(i) > value;
         }
 
         return BooleanTensor.create(newBuffer, shapeCopy());
@@ -669,10 +659,10 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public BooleanTensor greaterThanOrEqual(Double value) {
-        boolean[] newBuffer = new boolean[buffer.length];
+        boolean[] newBuffer = new boolean[buffer.getLength()];
 
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] >= value;
+        for (int i = 0; i < buffer.getLength(); i++) {
+            newBuffer[i] = buffer.get(i) >= value;
         }
 
         return BooleanTensor.create(newBuffer, shapeCopy());
@@ -685,16 +675,16 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor powInPlace(Double exponent) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.pow(buffer[i], exponent);
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(FastMath.pow(buffer.get(i), exponent), i);
         }
         return this;
     }
 
     @Override
     public DoubleTensor atan2InPlace(Double y) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.atan2(y, buffer[i]);
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(FastMath.atan2(y, buffer.get(i)), i);
         }
         return this;
     }
@@ -706,15 +696,15 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public Double average() {
-        return sum() / buffer.length;
+        return sum() / buffer.getLength();
     }
 
     @Override
     public Double standardDeviation() {
 
         SummaryStatistics stats = new SummaryStatistics();
-        for (int i = 0; i < buffer.length; i++) {
-            stats.addValue(buffer[i]);
+        for (int i = 0; i < buffer.getLength(); i++) {
+            stats.addValue(buffer.get(i));
         }
 
         return stats.getStandardDeviation();
@@ -726,10 +716,10 @@ public class JVMDoubleTensor extends DoubleTensor {
             return false;
         }
 
-        double[] otherBuffer = getRawBufferIfJVMTensor(other);
+        JVMBuffer.PrimitiveDoubleWrapper otherBuffer = getRawBufferIfJVMTensor(other);
 
-        for (int i = 0; i < buffer.length; i++) {
-            if (Math.abs(buffer[i] - otherBuffer[i]) > epsilon) {
+        for (int i = 0; i < buffer.getLength(); i++) {
+            if (Math.abs(buffer.get(i) - otherBuffer.get(i)) > epsilon) {
                 return false;
             }
         }
@@ -737,22 +727,19 @@ public class JVMDoubleTensor extends DoubleTensor {
         return true;
     }
 
+    private static final Sigmoid sigmoid = new Sigmoid();
+
     @Override
     public DoubleTensor sigmoidInPlace() {
-
-        Sigmoid sigmoid = new Sigmoid();
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = sigmoid.value(buffer[i]);
-        }
-
+        buffer.apply(sigmoid::value);
         return this;
     }
 
     @Override
     public Double product() {
         double result = 1.0;
-        for (int i = 0; i < buffer.length; i++) {
-            result *= buffer[i];
+        for (int i = 0; i < buffer.getLength(); i++) {
+            result *= buffer.get(i);
         }
         return result;
     }
@@ -770,7 +757,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
             int j = Ints.checkedCast(getFlatIndex(shape, stride, shapeIndices));
 
-            newBuffer[i] = buffer[j];
+            newBuffer[i] = buffer.get(j);
         }
 
         return new JVMDoubleTensor(newBuffer, resultShape);
@@ -814,9 +801,9 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         for (int i = 0; i < toConcat.length; i++) {
 
-            double[] cBuffer = getRawBufferIfJVMTensor(toConcat[i]);
-            System.arraycopy(cBuffer, 0, concatBuffer, bufferPosition, cBuffer.length);
-            bufferPosition += cBuffer.length;
+            JVMBuffer.PrimitiveDoubleWrapper cBuffer = getRawBufferIfJVMTensor(toConcat[i]);
+            System.arraycopy(cBuffer.asDoubleArray(), 0, concatBuffer, bufferPosition, cBuffer.getLength());
+            bufferPosition += cBuffer.getLength();
         }
 
         return new JVMDoubleTensor(concatBuffer, concatShape);
@@ -824,27 +811,27 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public double[] asFlatDoubleArray() {
-        return bufferCopy();
+        return buffer.copy().asDoubleArray();
     }
 
-    private static double[] getRawBufferIfJVMTensor(NumberTensor tensor) {
+    private static JVMBuffer.PrimitiveDoubleWrapper getRawBufferIfJVMTensor(NumberTensor tensor) {
         if (tensor instanceof JVMDoubleTensor) {
             return ((JVMDoubleTensor) tensor).buffer;
         } else {
-            return tensor.asFlatDoubleArray();
+            return new JVMBuffer.DoubleArrayWrapper(tensor.asFlatDoubleArray());
         }
     }
 
     @Override
     public int[] asFlatIntegerArray() {
-        return bufferAsInteger();
+        return buffer.asIntegerArray();
     }
 
     @Override
     public Double[] asFlatArray() {
-        Double[] boxedBuffer = new Double[buffer.length];
-        for (int i = 0; i < buffer.length; i++) {
-            boxedBuffer[i] = buffer[i];
+        Double[] boxedBuffer = new Double[buffer.getLength()];
+        for (int i = 0; i < buffer.getLength(); i++) {
+            boxedBuffer[i] = buffer.get(i);
         }
         return boxedBuffer;
     }
@@ -862,7 +849,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         JVMDoubleTensor permutedTensor = (JVMDoubleTensor) this.permute(moveDimToZero);
 
-        double[] rawBuffer = permutedTensor.buffer;
+        JVMBuffer.PrimitiveDoubleWrapper rawBuffer = permutedTensor.buffer;
 
         List<DoubleTensor> splitTensor = new ArrayList<>();
 
@@ -881,7 +868,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             int subTensorLength = Ints.checkedCast(TensorShape.getLength(subTensorShape));
 
             double[] buffer = new double[subTensorLength];
-            System.arraycopy(rawBuffer, rawBufferPosition, buffer, 0, buffer.length);
+            System.arraycopy(rawBuffer.asDoubleArray(), rawBufferPosition, buffer, 0, buffer.length);
 
             long[] subTensorPermutedShape = getPermutedIndices(subTensorShape, moveDimToZero);
             DoubleTensor subTensor = DoubleTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
@@ -896,8 +883,8 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reciprocalInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = 1.0 / buffer[i];
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(1.0 / buffer.get(i), i);
         }
         return this;
     }
@@ -905,17 +892,13 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor sqrtInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.sqrt(buffer[i]);
-        }
+        buffer.apply(FastMath::sqrt);
         return this;
     }
 
     @Override
     public DoubleTensor logInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.log(buffer[i]);
-        }
+        buffer.apply(FastMath::log);
         return this;
     }
 
@@ -929,81 +912,63 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor logGammaInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = Gamma.logGamma(buffer[i]);
-        }
+        buffer.apply(Gamma::logGamma);
         return this;
     }
 
     @Override
     public DoubleTensor digammaInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = Gamma.digamma(buffer[i]);
-        }
+        buffer.apply(Gamma::digamma);
         return this;
     }
 
     @Override
     public DoubleTensor sinInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.sin(buffer[i]);
-        }
+        buffer.apply(FastMath::sin);
         return this;
     }
 
     @Override
     public DoubleTensor cosInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.cos(buffer[i]);
-        }
+        buffer.apply(FastMath::cos);
         return this;
     }
 
     @Override
     public DoubleTensor tanInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.tan(buffer[i]);
-        }
+        buffer.apply(FastMath::tan);
         return this;
     }
 
     @Override
     public DoubleTensor atanInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.atan(buffer[i]);
-        }
+        buffer.apply(FastMath::atan);
         return this;
     }
 
     @Override
     public DoubleTensor asinInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.asin(buffer[i]);
-        }
+        buffer.apply(FastMath::asin);
         return this;
     }
 
     @Override
     public DoubleTensor acosInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.acos(buffer[i]);
-        }
+        buffer.apply(FastMath::acos);
         return this;
     }
 
     @Override
     public DoubleTensor expInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.exp(buffer[i]);
-        }
+        buffer.apply(FastMath::exp);
         return this;
     }
 
     @Override
     public Double min() {
         double result = Double.MAX_VALUE;
-        for (int i = 0; i < buffer.length; i++) {
-            result = Math.min(result, buffer[i]);
+        for (int i = 0; i < buffer.getLength(); i++) {
+            result = Math.min(result, buffer.get(i));
         }
         return result;
     }
@@ -1016,8 +981,8 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public Double max() {
         double result = -Double.MAX_VALUE;
-        for (int i = 0; i < buffer.length; i++) {
-            result = Math.max(result, buffer[i]);
+        for (int i = 0; i < buffer.getLength(); i++) {
+            result = Math.max(result, buffer.get(i));
         }
         return result;
     }
@@ -1036,27 +1001,23 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor ceilInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.ceil(buffer[i]);
-        }
+        buffer.apply(FastMath::ceil);
         return this;
     }
 
     @Override
     public DoubleTensor floorInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.floor(buffer[i]);
-        }
+        buffer.apply(FastMath::floor);
         return this;
     }
 
     @Override
     public DoubleTensor roundInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            if (buffer[i] >= 0.0) {
-                buffer[i] = FastMath.floor(buffer[i] + 0.5);
+        for (int i = 0; i < buffer.getLength(); i++) {
+            if (buffer.get(i) >= 0.0) {
+                buffer.set(FastMath.floor(buffer.get(i) + 0.5), i);
             } else {
-                buffer[i] = FastMath.ceil(buffer[i] - 0.5);
+                buffer.set(FastMath.ceil(buffer.get(i) - 0.5), i);
             }
         }
 
@@ -1070,25 +1031,26 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor replaceNaNInPlace(Double value) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = Double.isNaN(buffer[i]) ? value : buffer[i];
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(Double.isNaN(buffer.get(i)) ? value : buffer.get(i), i);
         }
         return this;
     }
 
     @Override
     public DoubleTensor setAllInPlace(Double value) {
-        Arrays.fill(buffer, value);
-
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(value, i);
+        }
         return this;
     }
 
     @Override
     public BooleanTensor notNaN() {
-        boolean[] newBuffer = new boolean[buffer.length];
+        boolean[] newBuffer = new boolean[buffer.getLength()];
 
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = !Double.isNaN(buffer[i]);
+        for (int i = 0; i < buffer.getLength(); i++) {
+            newBuffer[i] = !Double.isNaN(buffer.get(i));
         }
 
         return BooleanTensor.create(newBuffer, shapeCopy());
@@ -1096,8 +1058,8 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor minusInPlace(Double value) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] -= value;
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(buffer.get(i) - value, i);
         }
         return this;
     }
@@ -1114,16 +1076,16 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reverseMinusInPlace(Double value) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = value - buffer[i];
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(value - buffer.get(i), i);
         }
         return this;
     }
 
     @Override
     public DoubleTensor plusInPlace(Double value) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] += value;
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(buffer.get(i) + value, i);
         }
         return this;
     }
@@ -1135,8 +1097,8 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor timesInPlace(Double value) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] *= value;
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(buffer.get(i) * value, i);
         }
         return this;
     }
@@ -1148,8 +1110,8 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor divInPlace(Double value) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] /= value;
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(buffer.get(i) / value, i);
         }
         return this;
     }
@@ -1180,17 +1142,17 @@ public class JVMDoubleTensor extends DoubleTensor {
     private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(DoubleTensor right,
                                                             BiFunction<Double, Double, Double> op,
                                                             boolean inPlace) {
-        final double[] rightBuffer = getRawBufferIfJVMTensor(right);
+        final JVMBuffer.PrimitiveDoubleWrapper rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
         final JVMTensorBroadcast.ResultWrapper<double[]> result = broadcastIfNeeded(
-            buffer, shape, stride, buffer.length,
-            rightBuffer, rightShape, right.getStride(), rightBuffer.length,
+            buffer.asDoubleArray(), shape, stride, buffer.getLength(),
+            rightBuffer.asDoubleArray(), rightShape, right.getStride(), rightBuffer.getLength(),
             op, inPlace
         );
 
         if (inPlace) {
-            this.buffer = result.outputBuffer;
+            this.buffer = new JVMBuffer.DoubleArrayWrapper(result.outputBuffer);
             this.shape = result.outputShape;
             this.stride = result.outputStride;
 
@@ -1202,7 +1164,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public FlattenedView<Double> getFlattenedView() {
-        if (buffer.length == 1) {
+        if (buffer.getLength() == 1) {
             return new ScalarJVMFlattenedView();
         } else {
             return new TensorJVMDoubleFlattenedView();
@@ -1211,15 +1173,15 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     private class JVMDoubleFlattenedView {
         public long size() {
-            return buffer.length;
+            return buffer.getLength();
         }
 
         public Double get(long index) {
-            return buffer[Ints.checkedCast(index)];
+            return buffer.get(Ints.checkedCast(index));
         }
 
         public void set(long index, Double value) {
-            buffer[Ints.checkedCast(index)] = value;
+            buffer.set(value, Ints.checkedCast(index));
         }
 
     }
@@ -1229,13 +1191,12 @@ public class JVMDoubleTensor extends DoubleTensor {
         public Double getOrScalar(long index) {
             return get(index);
         }
-
     }
 
     private class ScalarJVMFlattenedView extends JVMDoubleFlattenedView implements FlattenedView<Double> {
         @Override
         public Double getOrScalar(long index) {
-            return buffer[0];
+            return buffer.get(0);
         }
     }
 
@@ -1244,22 +1205,21 @@ public class JVMDoubleTensor extends DoubleTensor {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         JVMDoubleTensor that = (JVMDoubleTensor) o;
-        return Arrays.equals(shape, that.shape) &&
-            Arrays.equals(buffer, that.buffer);
+        return Arrays.equals(shape, that.shape) && buffer.equals(that.buffer);
     }
 
     @Override
     public String toString() {
         return "{" +
             "shape=" + Arrays.toString(shape) +
-            ", buffer=" + Arrays.toString(buffer) +
+            ", buffer=" + Arrays.toString(buffer.asDoubleArray()) +
             '}';
     }
 
     @Override
     public int hashCode() {
         int result = Arrays.hashCode(shape);
-        result = 31 * result + Arrays.hashCode(buffer);
+        result = 31 * result + buffer.hashCode();
         return result;
     }
 
