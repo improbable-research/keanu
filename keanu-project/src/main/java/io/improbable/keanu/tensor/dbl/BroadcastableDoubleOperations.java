@@ -39,6 +39,13 @@ public enum BroadcastableDoubleOperations implements BiFunction<Double, Double, 
         }
     },
 
+    RDIV {
+        @Override
+        public Double apply(Double left, Double right) {
+            return right / left;
+        }
+    },
+
     GT_MASK {
         @Override
         public Double apply(Double left, Double right) {

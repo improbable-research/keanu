@@ -43,6 +43,7 @@ import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.GT_MA
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LTE_MASK;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LT_MASK;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.MUL;
+import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.RDIV;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.RSUB;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.SUB;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
@@ -1161,12 +1162,15 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reverseDivInPlace(Double value) {
-        return null;
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = value / buffer[i];
+        }
+        return this;
     }
 
     @Override
-    public DoubleTensor reverseDivInPlace(DoubleTensor value) {
-        return null;
+    public DoubleTensor reverseDivInPlace(DoubleTensor that) {
+        return broadcastableBinaryDoubleOpInPlace(RDIV, that);
     }
 
     private DoubleTensor broadcastableBinaryDoubleOp(BiFunction<Double, Double, Double> op, DoubleTensor that) {

@@ -52,14 +52,18 @@ public class DoubleScalarTensorShapePreservationTest {
     public void tensorAdditionPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::plus);
         checkOperationPreservesShape(DoubleTensor::plusInPlace);
-
     }
 
     @Test
     public void tensorDivisionPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::div);
         checkOperationPreservesShape(DoubleTensor::divInPlace);
+    }
 
+    @Test
+    public void tensorReverseDivisionPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::reverseDiv);
+        checkOperationPreservesShape(DoubleTensor::reverseDivInPlace);
     }
 
     @Test

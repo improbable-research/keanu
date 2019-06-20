@@ -735,8 +735,17 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor reverseDivInPlace(DoubleTensor value) {
-        tensor.rdivi(unsafeGetNd4J(value));
+    public DoubleTensor reverseDivInPlace(DoubleTensor that) {
+        if (that.isScalar()) {
+            tensor.subi(that.scalar());
+        } else if (this.isScalar()) {
+            return this.minus(that);
+        } else {
+            INDArray result = INDArrayShim.rdivi(tensor, unsafeGetNd4J(that).dup());
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
+        }
         return this;
     }
 
