@@ -1124,8 +1124,8 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reverseDivInPlace(Double value) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = value / buffer[i];
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(value / buffer.get(i), i);
         }
         return this;
     }
