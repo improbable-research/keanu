@@ -125,12 +125,17 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     public static JVMDoubleTensor eye(long n) {
 
-        double[] buffer = new double[Ints.checkedCast(n * n)];
-        int nInt = Ints.checkedCast(n);
-        for (int i = 0; i < n; i++) {
-            buffer[i * nInt + i] = 1;
+        if (n == 1) {
+            return create(1.0, 1, 1);
+        } else {
+
+            double[] buffer = new double[Ints.checkedCast(n * n)];
+            int nInt = Ints.checkedCast(n);
+            for (int i = 0; i < n; i++) {
+                buffer[i * nInt + i] = 1;
+            }
+            return new JVMDoubleTensor(buffer, new long[]{n, n});
         }
-        return new JVMDoubleTensor(buffer, new long[]{n, n});
     }
 
     public static JVMDoubleTensor arange(double start, double end) {
