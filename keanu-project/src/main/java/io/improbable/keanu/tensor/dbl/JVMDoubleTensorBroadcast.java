@@ -36,14 +36,14 @@ public class JVMDoubleTensorBroadcast {
             //Short circuit for broadcast with scalars
             if (leftShape.length == 0) {
 
-                outputBuffer = factory.create(rightBufferLength);
+                outputBuffer = factory.createNew(rightBufferLength);
                 outputShape = Arrays.copyOf(rightShape, rightShape.length);
                 outputStride = Arrays.copyOf(rightStride, rightShape.length);
                 scalarLeft(leftBuffer.get(0), rightBuffer, outputBuffer, op);
 
             } else if (rightShape.length == 0) {
 
-                outputBuffer = inPlace ? leftBuffer : factory.create(leftBufferLength);
+                outputBuffer = inPlace ? leftBuffer : factory.createNew(leftBufferLength);
                 outputShape = Arrays.copyOf(leftShape, leftShape.length);
                 outputStride = Arrays.copyOf(leftStride, leftStride.length);
                 scalarRight(leftBuffer, rightBuffer.get(0), outputBuffer, op);
@@ -59,7 +59,7 @@ public class JVMDoubleTensorBroadcast {
             }
 
         } else {
-            outputBuffer = inPlace ? leftBuffer : factory.create(leftBufferLength);
+            outputBuffer = inPlace ? leftBuffer : factory.createNew(leftBufferLength);
             outputShape = Arrays.copyOf(leftShape, leftShape.length);
             outputStride = Arrays.copyOf(leftStride, leftStride.length);
 
@@ -109,8 +109,7 @@ public class JVMDoubleTensorBroadcast {
 
         if (resultShapeIsLeftSideShape) {
 
-            outputBuffer = inPlace ? leftBuffer : factory.create(leftBufferLength);
-            ;
+            outputBuffer = inPlace ? leftBuffer : factory.createNew(leftBufferLength);
             outputStride = leftStride;
 
             //e.g. [2, 2] * [1, 2]
@@ -126,7 +125,7 @@ public class JVMDoubleTensorBroadcast {
 
             if (resultShapeIsRightSideShape) {
 
-                outputBuffer = factory.create(rightBufferLength);
+                outputBuffer = factory.createNew(rightBufferLength);
                 outputStride = rightStride;
 
                 //e.g. [2] / [2, 2]
@@ -138,7 +137,7 @@ public class JVMDoubleTensorBroadcast {
 
             } else {
 
-                outputBuffer = factory.create(getLengthAsInt(resultShape));
+                outputBuffer = factory.createNew(getLengthAsInt(resultShape));
                 outputStride = getRowFirstStride(resultShape);
 
                 //e.g. [2, 2, 1] * [1, 2, 2]

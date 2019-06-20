@@ -228,17 +228,25 @@ public class JVMBuffer {
     }
 
     public interface ArrayWrapperFactory<D, T extends PrimitiveArrayWrapper<D>> {
-        T create(int size);
+        T createNew(int size);
     }
 
     public static final class DoubleArrayWrapperFactory implements ArrayWrapperFactory<Double, PrimitiveDoubleWrapper> {
 
         @Override
-        public PrimitiveDoubleWrapper create(final int size) {
+        public final PrimitiveDoubleWrapper createNew(final int size) {
             if (size == 1) {
                 return new DoubleWrapper(0);
             } else {
                 return new DoubleArrayWrapper(new double[size]);
+            }
+        }
+
+        public final PrimitiveDoubleWrapper create(double[] data) {
+            if (data.length == 1) {
+                return new DoubleWrapper(data[0]);
+            } else {
+                return new DoubleArrayWrapper(data);
             }
         }
     }
@@ -246,7 +254,7 @@ public class JVMBuffer {
     public static final class IntegerArrayWrapperFactory implements ArrayWrapperFactory<Integer, PrimitiveArrayWrapper<Integer>> {
 
         @Override
-        public PrimitiveArrayWrapper<Integer> create(final int size) {
+        public final PrimitiveArrayWrapper<Integer> createNew(final int size) {
             if (size == 1) {
                 return new IntegerWrapper(0);
             } else {

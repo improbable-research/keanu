@@ -76,11 +76,11 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     private JVMDoubleTensor(double[] data, long[] shape, long[] stride) {
-        this(new JVMBuffer.DoubleArrayWrapper(data), shape, stride);
+        this(factory.create(data), shape, stride);
     }
 
     private JVMDoubleTensor(double[] data, long[] shape) {
-        this(new JVMBuffer.DoubleArrayWrapper(data), shape);
+        this(factory.create(data), shape);
     }
 
     private JVMDoubleTensor(double value) {
@@ -101,14 +101,18 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     public static JVMDoubleTensor create(double value, long... shape) {
-        long length = TensorShape.getLength(shape);
-        double[] buffer = new double[Ints.checkedCast(length)];
+        final int length = TensorShape.getLengthAsInt(shape);
 
-        if (value != 0) {
-            Arrays.fill(buffer, value);
+        if (length > 1) {
+            final double[] buffer = new double[length];
+            if (value != 0) {
+                Arrays.fill(buffer, value);
+            }
+
+            return new JVMDoubleTensor(buffer, shape);
+        } else {
+            return new JVMDoubleTensor(new JVMBuffer.DoubleWrapper(value), shape);
         }
-
-        return new JVMDoubleTensor(buffer, shape);
     }
 
     public static JVMDoubleTensor ones(long... shape) {
@@ -234,7 +238,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         Preconditions.checkArgument(rearrange.length == shape.length);
         long[] resultShape = getPermutedIndices(shape, rearrange);
         long[] resultStride = getRowFirstStride(resultShape);
-        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.create(buffer.getLength());
+        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(buffer.getLength());
 
         for (int flatIndex = 0; flatIndex < buffer.getLength(); flatIndex++) {
 
@@ -273,7 +277,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         long[] newShape;
         if (getRank() == 1) {
             int n = buffer.getLength();
-            newBuffer = factory.create(Ints.checkedCast((long) n * (long) n));
+            newBuffer = factory.createNew(Ints.checkedCast((long) n * (long) n));
             ;
             for (int i = 0; i < n; i++) {
                 newBuffer.set(buffer.get(i), i * n + i);
@@ -281,7 +285,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             newShape = new long[]{n, n};
         } else if (getRank() == 2 && shape[0] == shape[1]) {
             int n = Ints.checkedCast(shape[0]);
-            newBuffer = factory.create(n);
+            newBuffer = factory.createNew(n);
             for (int i = 0; i < n; i++) {
                 newBuffer.set(buffer.get(i * n + i), i);
             }
@@ -317,7 +321,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         long[] resultShape = getSummationResultShape(shape, overDimensions);
         long[] resultStride = getRowFirstStride(resultShape);
-        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.create(TensorShape.getLengthAsInt(resultShape));
+        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(TensorShape.getLengthAsInt(resultShape));
 
         for (int i = 0; i < buffer.getLength(); i++) {
 
@@ -584,7 +588,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         checkShapesMatch(shape, mask.getShape());
 
-        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.create(buffer.getLength());
+        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(buffer.getLength());
         JVMBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
 
         for (int i = 0; i < buffer.getLength(); i++) {

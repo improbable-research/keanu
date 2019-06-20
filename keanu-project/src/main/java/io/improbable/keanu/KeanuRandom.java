@@ -48,7 +48,12 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextDouble(long[] shape) {
-        return DoubleTensor.create(nextDoubleBuffer(getLengthAsInt(shape)), shape);
+        final int length = getLengthAsInt(shape);
+        if (length > 1) {
+            return DoubleTensor.create(nextDoubleBuffer(length), shape);
+        } else {
+            return DoubleTensor.create(nextDouble(), shape);
+        }
     }
 
     public double nextDouble() {
@@ -68,7 +73,12 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGaussian(long[] shape) {
-        return DoubleTensor.create(nextGaussianBuffer(getLengthAsInt(shape)), shape);
+        final int length = getLengthAsInt(shape);
+        if (length > 1) {
+            return DoubleTensor.create(nextGaussianBuffer(length), shape);
+        } else {
+            return DoubleTensor.create(nextGaussian(), shape);
+        }
     }
 
     public DoubleTensor nextGaussian(long[] shape, DoubleTensor mu, DoubleTensor sigma) {
@@ -96,7 +106,12 @@ public class KeanuRandom {
     }
 
     public IntegerTensor nextInt(long[] shape) {
-        return IntegerTensor.create(nextIntBuffer(getLengthAsInt(shape)), shape);
+        final int length = getLengthAsInt(shape);
+        if (length > 1) {
+            return IntegerTensor.create(nextIntBuffer(length), shape);
+        } else {
+            return IntegerTensor.create(nextInt(), shape);
+        }
     }
 
     public IntegerTensor nextPoisson(long[] shape, DoubleTensor mu) {
