@@ -93,7 +93,7 @@ public class INDArrayShim {
                 if (Arrays.equals(resultShape, rightPadded.shape())) {
                     return applyBroadcastOperation(inverseOperand.apply(rightPadded), leftPadded, inverseBroadcastOp);
                 } else {
-                    return baseInlineOp.apply(leftPadded.broadcast(resultShape), rightPadded.broadcast(resultShape));
+                    return applyBroadcastOperation(leftPadded.broadcast(resultShape), rightPadded, baseBroadcastOp);
                 }
             }
         }
@@ -155,6 +155,16 @@ public class INDArrayShim {
             INDArray::subi,
             (l, r, result, dims) -> Broadcast.rsub(l, r, result, Ints.toArray(dims)),
             (l, r, result, dims) -> Broadcast.sub(l, r, result, Ints.toArray(dims)));
+    }
+
+    public static INDArray rdivi(INDArray left, INDArray right) {
+        return applyInlineOperation(
+            left, right,
+            a -> a,
+            INDArray::rdivi,
+            INDArray::divi,
+            (l, r, result, dims) -> Broadcast.rdiv(l, r, result, Ints.toArray(dims)),
+            (l, r, result, dims) -> Broadcast.div(l, r, result, Ints.toArray(dims)));
     }
 
     private static INDArray applyScalarTensorOperationWithPreservedShape(INDArray tensor, INDArray scalarTensor, BiFunction<INDArray, INDArray, INDArray> operation) {
