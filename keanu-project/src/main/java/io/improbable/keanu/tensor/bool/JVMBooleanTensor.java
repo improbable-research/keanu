@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.buffer.BooleanBuffer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -12,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
@@ -31,22 +33,36 @@ import static java.util.Arrays.copyOf;
 
 public class JVMBooleanTensor implements BooleanTensor {
 
-    private boolean[] buffer;
+    private static final BooleanBuffer.BooleanArrayWrapperFactory factory = new BooleanBuffer.BooleanArrayWrapperFactory();
+
+    private BooleanBuffer.PrimitiveBooleanWrapper buffer;
     private long[] shape;
     private long[] stride;
+
+    private JVMBooleanTensor(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
+        this.buffer = buffer;
+        this.shape = shape;
+        this.stride = stride;
+    }
+
+    private JVMBooleanTensor(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape) {
+        this.buffer = buffer;
+        this.shape = shape;
+        this.stride = getRowFirstStride(shape);
+    }
 
     /**
      * @param buffer tensor buffer used c ordering
      * @param shape  desired shape of tensor
      */
     private JVMBooleanTensor(boolean[] buffer, long[] shape) {
-        this.buffer = buffer;
+        this.buffer = factory.create(buffer);
         this.shape = shape;
         this.stride = getRowFirstStride(shape);
     }
 
     private JVMBooleanTensor(boolean[] buffer, long[] shape, long[] stride) {
-        this.buffer = buffer;
+        this.buffer = factory.create(buffer);
         this.shape = shape;
         this.stride = stride;
     }
@@ -55,7 +71,7 @@ public class JVMBooleanTensor implements BooleanTensor {
      * @param constant constant boolean value to fill shape
      */
     private JVMBooleanTensor(boolean constant) {
-        this.buffer = new boolean[]{constant};
+        this.buffer = new BooleanBuffer.BooleanWrapper(constant);
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
     }
@@ -82,13 +98,13 @@ public class JVMBooleanTensor implements BooleanTensor {
         return new JVMBooleanTensor(buffer, shape);
     }
 
-    private boolean[] bufferCopy() {
-        return copyOf(buffer, buffer.length);
+    private BooleanBuffer.PrimitiveBooleanWrapper bufferCopy() {
+        return buffer.copy();
     }
 
     @Override
     public BooleanTensor reshape(long... newShape) {
-        return new JVMBooleanTensor(bufferCopy(), getReshapeAllowingWildcard(shape, buffer.length, newShape));
+        return new JVMBooleanTensor(bufferCopy(), getReshapeAllowingWildcard(shape, buffer.getLength(), newShape));
     }
 
     @Override
@@ -96,9 +112,9 @@ public class JVMBooleanTensor implements BooleanTensor {
         Preconditions.checkArgument(rearrange.length == shape.length);
         long[] resultShape = getPermutedIndices(shape, rearrange);
         long[] resultStride = getRowFirstStride(resultShape);
-        boolean[] newBuffer = new boolean[buffer.length];
+        boolean[] newBuffer = new boolean[buffer.getLength()];
 
-        for (int flatIndex = 0; flatIndex < buffer.length; flatIndex++) {
+        for (int flatIndex = 0; flatIndex < buffer.getLength(); flatIndex++) {
 
             int permutedFlatIndex = convertFromFlatIndexToPermutedFlatIndex(
                 flatIndex,
@@ -107,7 +123,7 @@ public class JVMBooleanTensor implements BooleanTensor {
                 rearrange
             );
 
-            newBuffer[permutedFlatIndex] = buffer[flatIndex];
+            newBuffer[permutedFlatIndex] = buffer.get(flatIndex);
         }
 
         return new JVMBooleanTensor(newBuffer, resultShape);
@@ -117,7 +133,7 @@ public class JVMBooleanTensor implements BooleanTensor {
     public BooleanTensor broadcast(long... toShape) {
         int outputLength = TensorShape.getLengthAsInt(toShape);
         long[] outputStride = TensorShape.getRowFirstStride(toShape);
-        boolean[] outputBuffer = new boolean[outputLength];
+        BooleanBuffer.PrimitiveBooleanWrapper outputBuffer = factory.createNew(outputLength);
 
         JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
 
@@ -157,19 +173,19 @@ public class JVMBooleanTensor implements BooleanTensor {
 
         for (int i = 0; i < toConcat.length; i++) {
 
-            boolean[] cBuffer = getRawBufferIfJVMTensor(toConcat[i]);
-            System.arraycopy(cBuffer, 0, concatBuffer, bufferPosition, cBuffer.length);
-            bufferPosition += cBuffer.length;
+            BooleanBuffer.PrimitiveBooleanWrapper cBuffer = getRawBufferIfJVMTensor(toConcat[i]);
+            System.arraycopy(cBuffer.asBooleanArray(), 0, concatBuffer, bufferPosition, cBuffer.getLength());
+            bufferPosition += cBuffer.getLength();
         }
 
         return new JVMBooleanTensor(concatBuffer, concatShape);
     }
 
-    private static boolean[] getRawBufferIfJVMTensor(BooleanTensor tensor) {
+    private static BooleanBuffer.PrimitiveBooleanWrapper getRawBufferIfJVMTensor(BooleanTensor tensor) {
         if (tensor instanceof JVMBooleanTensor) {
             return ((JVMBooleanTensor) tensor).buffer;
         } else {
-            return tensor.asFlatBooleanArray();
+            return factory.create(tensor.asFlatBooleanArray());
         }
     }
 
@@ -178,9 +194,9 @@ public class JVMBooleanTensor implements BooleanTensor {
         double[] trueValues = trueValue.asFlatDoubleArray();
         double[] falseValues = falseValue.asFlatDoubleArray();
 
-        double[] result = new double[buffer.length];
+        double[] result = new double[buffer.getLength()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = buffer[i] ? getOrScalar(trueValues, i) : getOrScalar(falseValues, i);
+            result[i] = buffer.get(i) ? getOrScalar(trueValues, i) : getOrScalar(falseValues, i);
         }
 
         return DoubleTensor.create(result, copyOf(shape, shape.length));
@@ -191,9 +207,9 @@ public class JVMBooleanTensor implements BooleanTensor {
         FlattenedView<Integer> trueValuesFlattened = trueValue.getFlattenedView();
         FlattenedView<Integer> falseValuesFlattened = falseValue.getFlattenedView();
 
-        int[] result = new int[buffer.length];
+        int[] result = new int[buffer.getLength()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = buffer[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
         }
 
         return IntegerTensor.create(result, copyOf(shape, shape.length));
@@ -204,9 +220,9 @@ public class JVMBooleanTensor implements BooleanTensor {
         FlattenedView<Boolean> trueValuesFlattened = trueValue.getFlattenedView();
         FlattenedView<Boolean> falseValuesFlattened = falseValue.getFlattenedView();
 
-        boolean[] result = new boolean[buffer.length];
+        boolean[] result = new boolean[buffer.getLength()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = buffer[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
         }
 
         return BooleanTensor.create(result, copyOf(shape, shape.length));
@@ -224,9 +240,9 @@ public class JVMBooleanTensor implements BooleanTensor {
             FlattenedView<T> trueValuesFlattened = trueValue.getFlattenedView();
             FlattenedView<T> falseValuesFlattened = falseValue.getFlattenedView();
 
-            T[] result = (T[]) (new Object[buffer.length]);
+            T[] result = (T[]) (new Object[buffer.getLength()]);
             for (int i = 0; i < result.length; i++) {
-                result[i] = buffer[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+                result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
             }
 
             return Tensor.create(result, copyOf(shape, shape.length));
@@ -249,7 +265,7 @@ public class JVMBooleanTensor implements BooleanTensor {
     @Override
     public BooleanTensor andInPlace(boolean that) {
         if (!that) {
-            Arrays.fill(buffer, false);
+            buffer.applyRight((l, r) -> r, false);
         }
         return this;
     }
@@ -262,7 +278,7 @@ public class JVMBooleanTensor implements BooleanTensor {
     @Override
     public BooleanTensor orInPlace(boolean that) {
         if (that) {
-            Arrays.fill(buffer, true);
+            buffer.applyRight((l, r) -> r, true);
         }
         return this;
     }
@@ -274,16 +290,14 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor notInPlace() {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = !buffer[i];
-        }
+        buffer.apply(v -> !v);
         return this;
     }
 
     @Override
     public boolean allTrue() {
-        for (int i = 0; i < buffer.length; i++) {
-            if (!buffer[i]) {
+        for (int i = 0; i < buffer.getLength(); i++) {
+            if (!buffer.get(i)) {
                 return false;
             }
         }
@@ -292,8 +306,8 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public boolean allFalse() {
-        for (int i = 0; i < buffer.length; i++) {
-            if (buffer[i]) {
+        for (int i = 0; i < buffer.getLength(); i++) {
+            if (buffer.get(i)) {
                 return false;
             }
         }
@@ -313,12 +327,12 @@ public class JVMBooleanTensor implements BooleanTensor {
     private BooleanTensor binaryBooleanOpWithAutoBroadcast(BooleanTensor right,
                                                            BiFunction<Boolean, Boolean, Boolean> op,
                                                            boolean inPlace) {
-        final boolean[] rightBuffer = getRawBufferIfJVMTensor(right);
+        final BooleanBuffer.PrimitiveBooleanWrapper rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMTensorBroadcast.ResultWrapper<boolean[]> result = broadcastIfNeeded(
-            buffer, shape, stride, buffer.length,
-            rightBuffer, rightShape, right.getStride(), rightBuffer.length,
+        final JVMTensorBroadcast.ResultWrapper<Boolean, BooleanBuffer.PrimitiveBooleanWrapper> result = broadcastIfNeeded(
+            factory, buffer, shape, stride, buffer.getLength(),
+            rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),
             op, inPlace
         );
 
@@ -358,7 +372,7 @@ public class JVMBooleanTensor implements BooleanTensor {
 
             int j = Ints.checkedCast(getFlatIndex(shape, stride, shapeIndices));
 
-            newBuffer[i] = buffer[j];
+            newBuffer[i] = buffer.get(j);
         }
 
         return new JVMBooleanTensor(newBuffer, resultShape);
@@ -382,7 +396,7 @@ public class JVMBooleanTensor implements BooleanTensor {
 
         JVMBooleanTensor permutedTensor = (JVMBooleanTensor) this.permute(moveDimToZero);
 
-        boolean[] rawBuffer = permutedTensor.buffer;
+        BooleanBuffer.PrimitiveBooleanWrapper rawBuffer = permutedTensor.buffer;
 
         List<BooleanTensor> splitTensor = new ArrayList<>();
 
@@ -401,7 +415,7 @@ public class JVMBooleanTensor implements BooleanTensor {
             int subTensorLength = Ints.checkedCast(TensorShape.getLength(subTensorShape));
 
             boolean[] buffer = new boolean[subTensorLength];
-            System.arraycopy(rawBuffer, rawBufferPosition, buffer, 0, buffer.length);
+            System.arraycopy(rawBuffer.asBooleanArray(), rawBufferPosition, buffer, 0, buffer.length);
 
             long[] subTensorPermutedShape = getPermutedIndices(subTensorShape, moveDimToZero);
             BooleanTensor subTensor = BooleanTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
@@ -419,17 +433,17 @@ public class JVMBooleanTensor implements BooleanTensor {
         boolean[] newBuffer;
         long[] newShape;
         if (getRank() == 1) {
-            int n = buffer.length;
+            int n = buffer.getLength();
             newBuffer = new boolean[Ints.checkedCast((long) n * (long) n)];
             for (int i = 0; i < n; i++) {
-                newBuffer[i * n + i] = buffer[i];
+                newBuffer[i * n + i] = buffer.get(i);
             }
             newShape = new long[]{n, n};
         } else if (getRank() == 2 && shape[0] == shape[1]) {
             int n = Ints.checkedCast(shape[0]);
             newBuffer = new boolean[n];
             for (int i = 0; i < n; i++) {
-                newBuffer[i] = buffer[i * n + i];
+                newBuffer[i] = buffer.get(i * n + i);
             }
             newShape = new long[]{n};
         } else {
@@ -456,12 +470,12 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public long getLength() {
-        return buffer.length;
+        return buffer.getLength();
     }
 
     @Override
     public BooleanTensor duplicate() {
-        return new JVMBooleanTensor(copyOf(buffer, buffer.length), copyOf(shape, shape.length), copyOf(stride, stride.length));
+        return new JVMBooleanTensor(buffer.copy(), copyOf(shape, shape.length), copyOf(stride, stride.length));
     }
 
     @Override
@@ -482,7 +496,7 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public int hashCode() {
-        int result = Arrays.hashCode(buffer);
+        int result = Objects.hash(buffer);
         result = 31 * result + Arrays.hashCode(shape);
         return result;
     }
@@ -491,12 +505,12 @@ public class JVMBooleanTensor implements BooleanTensor {
     public String toString() {
 
         StringBuilder dataString = new StringBuilder();
-        if (buffer.length > 20) {
-            dataString.append(Arrays.toString(Arrays.copyOfRange(buffer, 0, 10)));
+        if (buffer.getLength() > 20) {
+            dataString.append(Arrays.toString(Arrays.copyOfRange(buffer.asBooleanArray(), 0, 10)));
             dataString.append("...");
-            dataString.append(Arrays.toString(Arrays.copyOfRange(buffer, buffer.length - 10, buffer.length)));
+            dataString.append(Arrays.toString(Arrays.copyOfRange(buffer.asBooleanArray(), buffer.getLength() - 10, buffer.getLength())));
         } else {
-            dataString.append(Arrays.toString(buffer));
+            dataString.append(Arrays.toString(buffer.asBooleanArray()));
         }
 
         return "{\n" +
@@ -520,17 +534,17 @@ public class JVMBooleanTensor implements BooleanTensor {
 
         @Override
         public long size() {
-            return buffer.length;
+            return buffer.getLength();
         }
 
         @Override
         public Boolean get(long index) {
-            return buffer[Ints.checkedCast(index)];
+            return buffer.get(Ints.checkedCast(index));
         }
 
         @Override
         public Boolean getOrScalar(long index) {
-            if (buffer.length == 1) {
+            if (buffer.getLength() == 1) {
                 return get(0);
             } else {
                 return get(index);
@@ -539,39 +553,29 @@ public class JVMBooleanTensor implements BooleanTensor {
 
         @Override
         public void set(long index, Boolean value) {
-            buffer[Ints.checkedCast(index)] = value;
+            buffer.set(value, Ints.checkedCast(index));
         }
 
     }
 
     @Override
     public double[] asFlatDoubleArray() {
-        double[] doubles = new double[buffer.length];
-        for (int i = 0; i < doubles.length; i++) {
-            doubles[i] = buffer[i] ? 1.0 : 0.0;
-        }
-
-        return doubles;
+        return buffer.asDoubleArray();
     }
 
     @Override
     public int[] asFlatIntegerArray() {
-        int[] integers = new int[buffer.length];
-        for (int i = 0; i < integers.length; i++) {
-            integers[i] = buffer[i] ? 1 : 0;
-        }
-
-        return integers;
+        return buffer.asIntegerArray();
     }
 
     @Override
     public Boolean[] asFlatArray() {
-        return ArrayUtils.toObject(buffer);
+        return ArrayUtils.toObject(asFlatBooleanArray());
     }
 
     @Override
     public boolean[] asFlatBooleanArray() {
-        return copyOf(buffer, buffer.length);
+        return buffer.copy().asBooleanArray();
     }
 
 }

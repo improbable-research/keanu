@@ -8,7 +8,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.buffer.JVMBuffer;
+import io.improbable.keanu.tensor.buffer.DoubleBuffer;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
@@ -46,7 +47,6 @@ import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.MUL;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.RDIV;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.RSUB;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.SUB;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotrf;
@@ -57,19 +57,19 @@ import static org.bytedeco.javacpp.openblas.cblas_dgemm;
 
 public class JVMDoubleTensor extends DoubleTensor {
 
-    private static final JVMBuffer.DoubleArrayWrapperFactory factory = new JVMBuffer.DoubleArrayWrapperFactory();
+    private static final DoubleBuffer.DoubleArrayWrapperFactory factory = new DoubleBuffer.DoubleArrayWrapperFactory();
 
     private long[] shape;
     private long[] stride;
-    private JVMBuffer.PrimitiveDoubleWrapper buffer;
+    private DoubleBuffer.PrimitiveDoubleWrapper buffer;
 
-    private JVMDoubleTensor(JVMBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
+    private JVMDoubleTensor(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
         this.shape = shape;
         this.stride = stride;
         this.buffer = buffer;
     }
 
-    private JVMDoubleTensor(JVMBuffer.PrimitiveDoubleWrapper buffer, long[] shape) {
+    private JVMDoubleTensor(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape) {
         this.shape = shape;
         this.stride = getRowFirstStride(shape);
         this.buffer = buffer;
@@ -86,7 +86,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     private JVMDoubleTensor(double value) {
         this.shape = new long[0];
         this.stride = new long[0];
-        this.buffer = new JVMBuffer.DoubleWrapper(value);
+        this.buffer = new DoubleBuffer.DoubleWrapper(value);
     }
 
     public static JVMDoubleTensor scalar(double scalarValue) {
@@ -111,7 +111,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
             return new JVMDoubleTensor(buffer, shape);
         } else {
-            return new JVMDoubleTensor(new JVMBuffer.DoubleWrapper(value), shape);
+            return new JVMDoubleTensor(new DoubleBuffer.DoubleWrapper(value), shape);
         }
     }
 
@@ -201,9 +201,9 @@ public class JVMDoubleTensor extends DoubleTensor {
     public DoubleTensor broadcast(long... toShape) {
         int outputLength = TensorShape.getLengthAsInt(toShape);
         long[] outputStride = TensorShape.getRowFirstStride(toShape);
-        double[] outputBuffer = new double[outputLength];
+        DoubleBuffer.PrimitiveDoubleWrapper outputBuffer = factory.createNew(outputLength);
 
-        JVMTensorBroadcast.broadcast(buffer.asDoubleArray(), shape, stride, outputBuffer, outputStride);
+        JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
 
         return new JVMDoubleTensor(outputBuffer, toShape, outputStride);
     }
@@ -243,7 +243,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         Preconditions.checkArgument(rearrange.length == shape.length);
         long[] resultShape = getPermutedIndices(shape, rearrange);
         long[] resultStride = getRowFirstStride(resultShape);
-        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(buffer.getLength());
+        DoubleBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(buffer.getLength());
 
         for (int flatIndex = 0; flatIndex < buffer.getLength(); flatIndex++) {
 
@@ -278,7 +278,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor diag() {
 
-        JVMBuffer.PrimitiveDoubleWrapper newBuffer;
+        DoubleBuffer.PrimitiveDoubleWrapper newBuffer;
         long[] newShape;
         if (getRank() == 1) {
             int n = buffer.getLength();
@@ -322,7 +322,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         long[] resultShape = getSummationResultShape(shape, overDimensions);
         long[] resultStride = getRowFirstStride(resultShape);
-        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(TensorShape.getLengthAsInt(resultShape));
+        DoubleBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(TensorShape.getLengthAsInt(resultShape));
 
         for (int i = 0; i < buffer.getLength(); i++) {
 
@@ -502,7 +502,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         int[] rearrange = getPermutationForDimensionToDimensionZero(axis, shape);
 
         JVMDoubleTensor permuted = (JVMDoubleTensor) permute(rearrange);
-        JVMBuffer.PrimitiveDoubleWrapper permutedBuffer = permuted.buffer;
+        DoubleBuffer.PrimitiveDoubleWrapper permutedBuffer = permuted.buffer;
 
         int dimLength = (int) (buffer.getLength() / shape[axis]);
 
@@ -565,7 +565,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
         checkMaskLengthMatches(mask);
 
-        JVMBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
+        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
 
         for (int i = 0; i < buffer.getLength(); i++) {
             if (maskBuffer.get(i) == 1.0) {
@@ -589,8 +589,8 @@ public class JVMDoubleTensor extends DoubleTensor {
     public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         checkShapesMatch(shape, mask.getShape());
 
-        JVMBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(buffer.getLength());
-        JVMBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
+        DoubleBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(buffer.getLength());
+        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
 
         for (int i = 0; i < buffer.getLength(); i++) {
             newBuffer.set(maskBuffer.get(i) == 1.0 ? value : buffer.get(i), i);
@@ -620,7 +620,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     private BooleanTensor maskToBooleanTensor(DoubleTensor mask) {
-        JVMBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
+        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
         boolean[] boolBuffer = new boolean[maskBuffer.getLength()];
 
         for (int i = 0; i < maskBuffer.getLength(); i++) {
@@ -718,7 +718,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             return false;
         }
 
-        JVMBuffer.PrimitiveDoubleWrapper otherBuffer = getRawBufferIfJVMTensor(other);
+        DoubleBuffer.PrimitiveDoubleWrapper otherBuffer = getRawBufferIfJVMTensor(other);
 
         for (int i = 0; i < buffer.getLength(); i++) {
             if (Math.abs(buffer.get(i) - otherBuffer.get(i)) > epsilon) {
@@ -803,7 +803,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         for (int i = 0; i < toConcat.length; i++) {
 
-            JVMBuffer.PrimitiveDoubleWrapper cBuffer = getRawBufferIfJVMTensor(toConcat[i]);
+            DoubleBuffer.PrimitiveDoubleWrapper cBuffer = getRawBufferIfJVMTensor(toConcat[i]);
             System.arraycopy(cBuffer.asDoubleArray(), 0, concatBuffer, bufferPosition, cBuffer.getLength());
             bufferPosition += cBuffer.getLength();
         }
@@ -816,11 +816,11 @@ public class JVMDoubleTensor extends DoubleTensor {
         return buffer.copy().asDoubleArray();
     }
 
-    private static JVMBuffer.PrimitiveDoubleWrapper getRawBufferIfJVMTensor(NumberTensor tensor) {
+    private static DoubleBuffer.PrimitiveDoubleWrapper getRawBufferIfJVMTensor(NumberTensor tensor) {
         if (tensor instanceof JVMDoubleTensor) {
             return ((JVMDoubleTensor) tensor).buffer;
         } else {
-            return new JVMBuffer.DoubleArrayWrapper(tensor.asFlatDoubleArray());
+            return new DoubleBuffer.DoubleArrayWrapper(tensor.asFlatDoubleArray());
         }
     }
 
@@ -851,7 +851,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         JVMDoubleTensor permutedTensor = (JVMDoubleTensor) this.permute(moveDimToZero);
 
-        JVMBuffer.PrimitiveDoubleWrapper rawBuffer = permutedTensor.buffer;
+        DoubleBuffer.PrimitiveDoubleWrapper rawBuffer = permutedTensor.buffer;
 
         List<DoubleTensor> splitTensor = new ArrayList<>();
 
@@ -1133,10 +1133,10 @@ public class JVMDoubleTensor extends DoubleTensor {
     private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(DoubleTensor right,
                                                             BiFunction<Double, Double, Double> op,
                                                             boolean inPlace) {
-        final JVMBuffer.PrimitiveDoubleWrapper rightBuffer = getRawBufferIfJVMTensor(right);
+        final DoubleBuffer.PrimitiveDoubleWrapper rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMDoubleTensorBroadcast.ResultWrapper<Double, JVMBuffer.PrimitiveDoubleWrapper> result = broadcastIfNeeded(
+        final JVMTensorBroadcast.ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> result = broadcastIfNeeded(
             factory,
             buffer, shape, stride, buffer.getLength(),
             rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),
