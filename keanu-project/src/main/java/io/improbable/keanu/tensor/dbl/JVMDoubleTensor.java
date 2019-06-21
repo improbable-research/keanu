@@ -687,7 +687,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor atan2InPlace(Double y) {
-        buffer.applyLeft(FastMath::pow, y);
+        buffer.applyLeft(FastMath::atan2, y);
         return this;
     }
 
@@ -885,9 +885,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reciprocalInPlace() {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.apply((v) -> 1.0 / v);
-        }
+        buffer.apply((v) -> 1.0 / v);
         return this;
     }
 

@@ -451,6 +451,12 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canReciprocal() {
+        DoubleTensor a = DoubleTensor.create(2, 5);
+        assertThat(a.reciprocal(), valuesAndShapesMatch(DoubleTensor.create(1 / 2.0, 1 / 5.0)));
+    }
+
+    @Test
     public void canSetAllValues() {
         DoubleTensor rank5 = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
@@ -1405,6 +1411,14 @@ public class DoubleTensorTest {
         assertUnaryOperation(Math::acos, DoubleTensor::acosInPlace, tensorBetween0And1());
         assertUnaryOperation(Math::atan, DoubleTensor::atan, tensorBetween0And1());
         assertUnaryOperation(Math::atan, DoubleTensor::atanInPlace, tensorBetween0And1());
+    }
+
+    @Test
+    public void canAtan2() {
+        DoubleTensor a = DoubleTensor.create(0.5, 0.2);
+        DoubleTensor b = DoubleTensor.create(0.3, 0.4);
+        DoubleTensor expected = DoubleTensor.create(FastMath.atan2(0.3, 0.5), FastMath.atan2(0.4, 0.2));
+        assertThat(a.atan2(b), valuesAndShapesMatch(expected));
     }
 
     private DoubleTensor tensorBetween0And1() {

@@ -119,7 +119,7 @@ public class TensorShape {
      * @return converts from a flat index to a N dimensional index. Where N = the dimensionality of the shape.
      */
     public static long[] getShapeIndices(long[] shape, long[] stride, long flatIndex) {
-        Preconditions.checkArgument(flatIndex > 0, "Flat index must be >= 0 and less than the length of the shape");
+        Preconditions.checkArgument(flatIndex >= 0, "Flat index must be >= 0 and less than the length of the shape");
         long[] shapeIndices = new long[stride.length];
         long remainder = flatIndex;
         for (int i = 0; i < stride.length; i++) {
