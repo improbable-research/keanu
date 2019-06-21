@@ -51,7 +51,18 @@ public class TensorShapeTest {
     @Test
     public void canGetShapeIndices() {
         Assert.assertArrayEquals(new long[]{2, 2}, TensorShape.getShapeIndices(new long[]{5, 4}, new long[]{4, 1}, 10));
+        Assert.assertArrayEquals(new long[]{4, 3}, TensorShape.getShapeIndices(new long[]{5, 4}, new long[]{4, 1}, 19));
         Assert.assertArrayEquals(new long[]{1, 1, 1}, TensorShape.getShapeIndices(new long[]{3, 3, 3}, new long[]{9, 3, 1}, 13));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfFlatIndexOverflowsShape(){
+        long[] shapeIndices = TensorShape.getShapeIndices(new long[]{5, 4}, new long[]{4, 1}, 20);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfFlatIndexUnderflowsShape(){
+        long[] shapeIndices = TensorShape.getShapeIndices(new long[]{5, 4}, new long[]{4, 1}, -1);
     }
 
     @Test

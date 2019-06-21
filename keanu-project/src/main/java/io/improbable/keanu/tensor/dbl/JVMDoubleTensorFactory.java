@@ -1,22 +1,22 @@
 package io.improbable.keanu.tensor.dbl;
 
-import io.improbable.keanu.tensor.TensorShape;
+//import io.improbable.keanu.tensor.TensorShape;
 
 public class JVMDoubleTensorFactory implements DoubleTensorFactory {
 
     @Override
     public DoubleTensor create(double value, long[] shape) {
-        if (TensorShape.getLengthAsInt(shape) == 1) {
-            return new ScalarDoubleTensor(value, shape);
-        }
+//        if (TensorShape.getLengthAsInt(shape) == 1) {
+//            return new ScalarDoubleTensor(value, shape);
+//        }
         return JVMDoubleTensor.create(value, shape);
     }
 
     @Override
     public DoubleTensor create(double[] values, long[] shape) {
-        if (TensorShape.getLengthAsInt(shape) == 1) {
-            return new ScalarDoubleTensor(values[0], shape);
-        }
+//        if (TensorShape.getLengthAsInt(shape) == 1) {
+//            return new ScalarDoubleTensor(values[0], shape);
+//        }
         return JVMDoubleTensor.create(values, shape);
     }
 
@@ -27,25 +27,25 @@ public class JVMDoubleTensorFactory implements DoubleTensorFactory {
 
     @Override
     public DoubleTensor ones(long[] shape) {
-        if (TensorShape.getLengthAsInt(shape) == 1) {
-            return new ScalarDoubleTensor(1.0, shape);
-        }
+//        if (TensorShape.getLengthAsInt(shape) == 1) {
+//            return new ScalarDoubleTensor(1.0, shape);
+//        }
         return JVMDoubleTensor.ones(shape);
     }
 
     @Override
     public DoubleTensor zeros(long[] shape) {
-        if (TensorShape.getLengthAsInt(shape) == 1) {
-            return new ScalarDoubleTensor(0.0, shape);
-        }
+//        if (TensorShape.getLengthAsInt(shape) == 1) {
+//            return new ScalarDoubleTensor(0.0, shape);
+//        }
         return JVMDoubleTensor.zeros(shape);
     }
 
     @Override
     public DoubleTensor eye(long n) {
-        if (n == 0) {
-            return new ScalarDoubleTensor(1.0, new long[]{1, 1});
-        }
+//        if (n == 0) {
+//            return new ScalarDoubleTensor(1.0, new long[]{1, 1});
+//        }
         return JVMDoubleTensor.eye(n);
     }
 
@@ -66,7 +66,8 @@ public class JVMDoubleTensorFactory implements DoubleTensorFactory {
 
     @Override
     public DoubleTensor scalar(double scalarValue) {
-        return new ScalarDoubleTensor(scalarValue);
+//        return new ScalarDoubleTensor(scalarValue);
+        return JVMDoubleTensor.scalar(scalarValue);
     }
 
     @Override

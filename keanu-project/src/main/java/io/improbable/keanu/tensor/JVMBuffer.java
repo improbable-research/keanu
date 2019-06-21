@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class JVMBuffer {
@@ -25,6 +26,12 @@ public class JVMBuffer {
 
         @Override
         PrimitiveDoubleWrapper copy();
+
+        double sum();
+
+        void applyRight(BiFunction<Double, Double, Double> mapper, double rightArg);
+
+        void applyLeft(BiFunction<Double, Double, Double> mapper, double leftArg);
     }
 
     public static final class DoubleArrayWrapper implements PrimitiveDoubleWrapper {
@@ -53,6 +60,30 @@ public class JVMBuffer {
         @Override
         public PrimitiveDoubleWrapper copy() {
             return new DoubleArrayWrapper(Arrays.copyOf(array, array.length));
+        }
+
+        @Override
+        public double sum() {
+            double result = 0;
+            for (int i = 0; i < array.length; i++) {
+                result += array[i];
+            }
+            return result;
+
+        }
+
+        @Override
+        public void applyRight(BiFunction<Double, Double, Double> mapper, double rightArg) {
+            for (int i = 0; i < array.length; i++) {
+                array[i] = mapper.apply(array[i], rightArg);
+            }
+        }
+
+        @Override
+        public void applyLeft(BiFunction<Double, Double, Double> mapper, double leftArg) {
+            for (int i = 0; i < array.length; i++) {
+                array[i] = mapper.apply(leftArg, array[i]);
+            }
         }
 
         @Override
@@ -119,6 +150,21 @@ public class JVMBuffer {
         @Override
         public PrimitiveDoubleWrapper copy() {
             return new DoubleWrapper(value);
+        }
+
+        @Override
+        public double sum() {
+            return value;
+        }
+
+        @Override
+        public void applyRight(BiFunction<Double, Double, Double> mapper, double rightArg) {
+            value = mapper.apply(value, rightArg);
+        }
+
+        @Override
+        public void applyLeft(BiFunction<Double, Double, Double> mapper, double leftArg) {
+            value = mapper.apply(leftArg, value);
         }
 
         @Override

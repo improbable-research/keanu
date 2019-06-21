@@ -262,7 +262,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor duplicate() {
-        return new JVMDoubleTensor(buffer.copy(), shapeCopy());
+        return new JVMDoubleTensor(buffer.copy(), shapeCopy(), Arrays.copyOf(stride, stride.length));
     }
 
     @Override
@@ -312,11 +312,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public Double sum() {
-        double result = 0;
-        for (int i = 0; i < buffer.getLength(); i++) {
-            result += buffer.get(i);
-        }
-        return result;
+        return buffer.sum();
     }
 
     @Override
@@ -529,13 +525,13 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor unaryMinusInPlace() {
-        applyInPlace((v) -> -v);
+        buffer.apply((v) -> -v);
         return this;
     }
 
     @Override
     public DoubleTensor absInPlace() {
-        applyInPlace(Math::abs);
+        buffer.apply(Math::abs);
         return this;
     }
 
@@ -685,17 +681,13 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor powInPlace(Double exponent) {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(FastMath.pow(buffer.get(i), exponent), i);
-        }
+        buffer.applyRight(FastMath::pow, exponent);
         return this;
     }
 
     @Override
     public DoubleTensor atan2InPlace(Double y) {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(FastMath.atan2(y, buffer.get(i)), i);
-        }
+        buffer.applyLeft(FastMath::pow, y);
         return this;
     }
 
@@ -894,7 +886,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor reciprocalInPlace() {
         for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(1.0 / buffer.get(i), i);
+            buffer.apply((v) -> 1.0 / v);
         }
         return this;
     }
@@ -1068,9 +1060,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor minusInPlace(Double value) {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(buffer.get(i) - value, i);
-        }
+        buffer.applyRight(SUB, value);
         return this;
     }
 
@@ -1086,17 +1076,13 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reverseMinusInPlace(Double value) {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(value - buffer.get(i), i);
-        }
+        buffer.applyRight(RSUB, value);
         return this;
     }
 
     @Override
     public DoubleTensor plusInPlace(Double value) {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(buffer.get(i) + value, i);
-        }
+        buffer.applyRight(ADD, value);
         return this;
     }
 
@@ -1107,9 +1093,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor timesInPlace(Double value) {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(buffer.get(i) * value, i);
-        }
+        buffer.applyRight(MUL, value);
         return this;
     }
 
@@ -1120,9 +1104,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor divInPlace(Double value) {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(buffer.get(i) / value, i);
-        }
+        buffer.applyRight(DIV, value);
         return this;
     }
 
@@ -1133,9 +1115,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reverseDivInPlace(Double value) {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(value / buffer.get(i), i);
-        }
+        buffer.applyRight(RDIV, value);
         return this;
     }
 

@@ -44,8 +44,8 @@ public class JVMDoubleTensorBroadcast {
             } else if (rightShape.length == 0) {
 
                 outputBuffer = inPlace ? leftBuffer : factory.createNew(leftBufferLength);
-                outputShape = Arrays.copyOf(leftShape, leftShape.length);
-                outputStride = Arrays.copyOf(leftStride, leftStride.length);
+                outputShape = inPlace ? leftShape : Arrays.copyOf(leftShape, leftShape.length);
+                outputStride = inPlace ? leftStride : Arrays.copyOf(leftStride, leftStride.length);
                 scalarRight(leftBuffer, rightBuffer.get(0), outputBuffer, op);
 
             } else {
@@ -60,8 +60,8 @@ public class JVMDoubleTensorBroadcast {
 
         } else {
             outputBuffer = inPlace ? leftBuffer : factory.createNew(leftBufferLength);
-            outputShape = Arrays.copyOf(leftShape, leftShape.length);
-            outputStride = Arrays.copyOf(leftStride, leftStride.length);
+            outputShape = inPlace ? leftShape : Arrays.copyOf(leftShape, leftShape.length);
+            outputStride = inPlace ? leftStride : Arrays.copyOf(leftStride, leftStride.length);
 
             elementwiseBinaryOp(leftBuffer, rightBuffer, op, outputBuffer);
         }
