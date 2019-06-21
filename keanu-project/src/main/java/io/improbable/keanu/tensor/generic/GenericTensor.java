@@ -2,12 +2,12 @@ package io.improbable.keanu.tensor.generic;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.JVMTensor;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.buffer.GenericBuffer;
-import io.improbable.keanu.tensor.dbl.JVMDoubleTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
@@ -301,27 +301,9 @@ public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
     @Override
     public GenericTensor<T> diag() {
 
-        T[] newBuffer;
-        long[] newShape;
-        if (getRank() == 1) {
-            int n = buffer.getLength();
-            newBuffer = (T[]) (new Object[Ints.checkedCast((long) n * (long) n)]);
-            for (int i = 0; i < n; i++) {
-                newBuffer[i * n + i] = buffer.get(i);
-            }
-            newShape = new long[]{n, n};
-        } else if (getRank() == 2 && shape[0] == shape[1]) {
-            int n = Ints.checkedCast(shape[0]);
-            newBuffer = (T[]) (new Object[n]);
-            for (int i = 0; i < n; i++) {
-                newBuffer[i] = buffer.get(i * n + i);
-            }
-            newShape = new long[]{n};
-        } else {
-            throw new IllegalArgumentException("Diag is only valid for vectors or square matrices");
-        }
+        JVMTensorBroadcast.ResultWrapper<T, GenericBuffer.PrimitiveGenericWrapper<T>> result = JVMTensor.diag(getRank(), shape, buffer, factory);
 
-        return new GenericTensor<>(newBuffer, newShape);
+        return new GenericTensor<>(result.outputBuffer, result.outputShape, result.outputStride);
     }
 
     private static <T> GenericBuffer.PrimitiveGenericWrapper<T> getRawBufferIfJVMTensor(Tensor<T, ?> tensor) {

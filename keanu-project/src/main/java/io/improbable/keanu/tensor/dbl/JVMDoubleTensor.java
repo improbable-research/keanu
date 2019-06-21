@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.JVMTensor;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -278,28 +279,9 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor diag() {
 
-        DoubleBuffer.PrimitiveDoubleWrapper newBuffer;
-        long[] newShape;
-        if (getRank() == 1) {
-            int n = buffer.getLength();
-            newBuffer = factory.createNew(Ints.checkedCast((long) n * (long) n));
-            ;
-            for (int i = 0; i < n; i++) {
-                newBuffer.set(buffer.get(i), i * n + i);
-            }
-            newShape = new long[]{n, n};
-        } else if (getRank() == 2 && shape[0] == shape[1]) {
-            int n = Ints.checkedCast(shape[0]);
-            newBuffer = factory.createNew(n);
-            for (int i = 0; i < n; i++) {
-                newBuffer.set(buffer.get(i * n + i), i);
-            }
-            newShape = new long[]{n};
-        } else {
-            throw new IllegalArgumentException("Diag is only valid for vectors or square matrices");
-        }
+        JVMTensorBroadcast.ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> result = JVMTensor.diag(getRank(), shape, buffer, factory);
 
-        return new JVMDoubleTensor(newBuffer, newShape);
+        return new JVMDoubleTensor(result.outputBuffer, result.outputShape, result.outputStride);
     }
 
     @Override

@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.bool;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.JVMTensor;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -430,27 +431,10 @@ public class JVMBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor diag() {
-        boolean[] newBuffer;
-        long[] newShape;
-        if (getRank() == 1) {
-            int n = buffer.getLength();
-            newBuffer = new boolean[Ints.checkedCast((long) n * (long) n)];
-            for (int i = 0; i < n; i++) {
-                newBuffer[i * n + i] = buffer.get(i);
-            }
-            newShape = new long[]{n, n};
-        } else if (getRank() == 2 && shape[0] == shape[1]) {
-            int n = Ints.checkedCast(shape[0]);
-            newBuffer = new boolean[n];
-            for (int i = 0; i < n; i++) {
-                newBuffer[i] = buffer.get(i * n + i);
-            }
-            newShape = new long[]{n};
-        } else {
-            throw new IllegalArgumentException("Diag is only valid for vectors or square matrices");
-        }
 
-        return new JVMBooleanTensor(newBuffer, newShape);
+        JVMTensorBroadcast.ResultWrapper<Boolean, BooleanBuffer.PrimitiveBooleanWrapper> result = JVMTensor.diag(getRank(), shape, buffer, factory);
+
+        return new JVMBooleanTensor(result.outputBuffer, result.outputShape, result.outputStride);
     }
 
     @Override
