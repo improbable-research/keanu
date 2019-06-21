@@ -101,8 +101,6 @@ public interface FloatingPointTensor<N extends Number, T extends FloatingPointTe
 
     T expInPlace();
 
-    T matrixInverse();
-
     default T ceil() {
         return duplicate().ceilInPlace();
     }
@@ -135,6 +133,8 @@ public interface FloatingPointTensor<N extends Number, T extends FloatingPointTe
     T choleskyDecomposition();
 
     N determinant();
+
+    T matrixInverse();
 
     default T standardize() {
         return duplicate().standardizeInPlace();
