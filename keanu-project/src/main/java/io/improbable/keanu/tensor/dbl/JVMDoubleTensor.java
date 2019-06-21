@@ -2,13 +2,13 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.JVMBuffer;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
@@ -1136,7 +1136,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         final JVMBuffer.PrimitiveDoubleWrapper rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMDoubleTensorBroadcast.ResultWrapper result = broadcastIfNeeded(
+        final JVMDoubleTensorBroadcast.ResultWrapper<Double, JVMBuffer.PrimitiveDoubleWrapper> result = broadcastIfNeeded(
             factory,
             buffer, shape, stride, buffer.getLength(),
             rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),

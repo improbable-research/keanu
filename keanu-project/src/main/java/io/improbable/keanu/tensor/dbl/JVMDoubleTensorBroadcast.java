@@ -1,6 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
-import io.improbable.keanu.tensor.JVMBuffer;
+import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import lombok.AllArgsConstructor;
 import org.nd4j.linalg.api.shape.Shape;
 
@@ -14,20 +14,22 @@ import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 public class JVMDoubleTensorBroadcast {
 
     @AllArgsConstructor
-    public static class ResultWrapper {
-        public final JVMBuffer.PrimitiveDoubleWrapper outputBuffer;
+    public static class ResultWrapper<T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> {
+        public final B outputBuffer;
         public final long[] outputShape;
         public final long[] outputStride;
     }
 
-    public static ResultWrapper broadcastIfNeeded(JVMBuffer.DoubleArrayWrapperFactory factory,
-                                                  JVMBuffer.PrimitiveDoubleWrapper leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
-                                                  JVMBuffer.PrimitiveDoubleWrapper rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
-                                                  BiFunction<Double, Double, Double> op,
-                                                  boolean inPlace) {
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
+    ResultWrapper<T, B> broadcastIfNeeded(JVMBuffer.ArrayWrapperFactory<T, B> factory,
+                                          B leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
+                                          B rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
+                                          BiFunction<T, T, T> op,
+                                          boolean inPlace) {
+
         final boolean needsBroadcast = !Arrays.equals(leftShape, rightShape);
 
-        JVMBuffer.PrimitiveDoubleWrapper outputBuffer;
+        B outputBuffer;
         long[] outputShape;
         long[] outputStride;
 
@@ -66,45 +68,47 @@ public class JVMDoubleTensorBroadcast {
             elementwiseBinaryOp(leftBuffer, rightBuffer, op, outputBuffer);
         }
 
-        return new ResultWrapper(outputBuffer, outputShape, outputStride);
+        return new ResultWrapper<>(outputBuffer, outputShape, outputStride);
     }
 
-    private static void scalarLeft(Double left, JVMBuffer.PrimitiveDoubleWrapper rightBuffer,
-                                   JVMBuffer.PrimitiveDoubleWrapper outputBuffer,
-                                   BiFunction<Double, Double, Double> op) {
+    private static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> void scalarLeft(T left, B rightBuffer,
+                                                                                     B outputBuffer,
+                                                                                     BiFunction<T, T, T> op) {
         for (int i = 0; i < outputBuffer.getLength(); i++) {
             outputBuffer.set(op.apply(left, rightBuffer.get(i)), i);
         }
     }
 
 
-    private static void scalarRight(JVMBuffer.PrimitiveDoubleWrapper leftBuffer, Double right,
-                                    JVMBuffer.PrimitiveDoubleWrapper outputBuffer,
-                                    BiFunction<Double, Double, Double> op) {
+    private static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> void scalarRight(B leftBuffer, T right,
+                                                                                      B outputBuffer,
+                                                                                      BiFunction<T, T, T> op) {
         for (int i = 0; i < leftBuffer.getLength(); i++) {
             outputBuffer.set(op.apply(leftBuffer.get(i), right), i);
         }
     }
 
-    private static void elementwiseBinaryOp(JVMBuffer.PrimitiveDoubleWrapper leftBuffer, JVMBuffer.PrimitiveDoubleWrapper rightBuffer,
-                                            BiFunction<Double, Double, Double> op,
-                                            JVMBuffer.PrimitiveDoubleWrapper outputBuffer) {
+    private static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> void elementwiseBinaryOp(B leftBuffer,
+                                                                                              B rightBuffer,
+                                                                                              BiFunction<T, T, T> op,
+                                                                                              B outputBuffer) {
 
         for (int i = 0; i < outputBuffer.getLength(); i++) {
             outputBuffer.set(op.apply(leftBuffer.get(i), rightBuffer.get(i)), i);
         }
     }
 
-    private static ResultWrapper broadcastBinaryOp(JVMBuffer.DoubleArrayWrapperFactory factory,
-                                                   JVMBuffer.PrimitiveDoubleWrapper leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
-                                                   JVMBuffer.PrimitiveDoubleWrapper rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
-                                                   BiFunction op,
-                                                   boolean inPlace) {
+    private static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> ResultWrapper<T, B>
+    broadcastBinaryOp(JVMBuffer.ArrayWrapperFactory<T, B> factory,
+                      B leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
+                      B rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
+                      BiFunction<T, T, T> op,
+                      boolean inPlace) {
 
         final long[] resultShape = Shape.broadcastOutputShape(leftShape, rightShape);
         final boolean resultShapeIsLeftSideShape = Arrays.equals(resultShape, leftShape);
 
-        final JVMBuffer.PrimitiveDoubleWrapper outputBuffer;
+        final B outputBuffer;
         final long[] outputStride;
 
         if (resultShapeIsLeftSideShape) {
@@ -149,12 +153,12 @@ public class JVMDoubleTensorBroadcast {
             }
         }
 
-        return new ResultWrapper(outputBuffer, resultShape, outputStride);
+        return new ResultWrapper<>(outputBuffer, resultShape, outputStride);
     }
 
 
-    public static void broadcast(JVMBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride,
-                                 JVMBuffer.PrimitiveDoubleWrapper outputBuffer, long[] outputStride) {
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> void broadcast(B buffer, long[] shape, long[] stride,
+                                                                                   B outputBuffer, long[] outputStride) {
 
         for (int i = 0; i < outputBuffer.getLength(); i++) {
 
@@ -178,9 +182,9 @@ public class JVMDoubleTensorBroadcast {
      * @param op
      * @return
      */
-    private static void broadcastFromRight(JVMBuffer.PrimitiveDoubleWrapper leftBuffer, long[] leftStride,
-                                           JVMBuffer.PrimitiveDoubleWrapper rightBuffer, long[] rightShape, long[] rightStride,
-                                           JVMBuffer.PrimitiveDoubleWrapper outputBuffer, BiFunction<Double, Double, Double> op) {
+    private static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> void broadcastFromRight(B leftBuffer, long[] leftStride,
+                                                                                             B rightBuffer, long[] rightShape, long[] rightStride,
+                                                                                             B outputBuffer, BiFunction<T, T, T> op) {
         for (int i = 0; i < outputBuffer.getLength(); i++) {
 
             int j = getBroadcastedFlatIndex(i, leftStride, rightShape, rightStride);
@@ -202,9 +206,9 @@ public class JVMDoubleTensorBroadcast {
      * @param op
      * @return
      */
-    private static void broadcastFromLeft(JVMBuffer.PrimitiveDoubleWrapper leftBuffer, long[] leftShape, long[] leftStride,
-                                          JVMBuffer.PrimitiveDoubleWrapper rightBuffer, long[] rightStride,
-                                          JVMBuffer.PrimitiveDoubleWrapper outputBuffer, BiFunction<Double, Double, Double> op) {
+    private static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> void broadcastFromLeft(B leftBuffer, long[] leftShape, long[] leftStride,
+                                                                                            B rightBuffer, long[] rightStride,
+                                                                                            B outputBuffer, BiFunction<T, T, T> op) {
 
         for (int i = 0; i < outputBuffer.getLength(); i++) {
 
@@ -230,10 +234,10 @@ public class JVMDoubleTensorBroadcast {
      * @param op
      */
 
-    private static void broadcastFromLeftAndRight(JVMBuffer.PrimitiveDoubleWrapper leftBuffer, long[] leftShape, long[] leftStride,
-                                                  JVMBuffer.PrimitiveDoubleWrapper rightBuffer, long[] rightShape, long[] rightStride,
-                                                  JVMBuffer.PrimitiveDoubleWrapper outputBuffer, long[] outputStride,
-                                                  BiFunction<Double, Double, Double> op) {
+    private static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> void broadcastFromLeftAndRight(B leftBuffer, long[] leftShape, long[] leftStride,
+                                                                                                    B rightBuffer, long[] rightShape, long[] rightStride,
+                                                                                                    B outputBuffer, long[] outputStride,
+                                                                                                    BiFunction<T, T, T> op) {
 
         for (int i = 0; i < outputBuffer.getLength(); i++) {
 

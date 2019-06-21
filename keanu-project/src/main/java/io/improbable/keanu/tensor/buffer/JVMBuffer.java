@@ -1,6 +1,7 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.buffer;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -16,6 +17,10 @@ public class JVMBuffer {
         PrimitiveArrayWrapper<T> copy();
 
         void apply(Function<T, T> mapper);
+
+        void applyRight(BiFunction<T, T, T> mapper, T rightArg);
+
+        void applyLeft(BiFunction<T, T, T> mapper, T leftArg);
     }
 
     public interface PrimitiveDoubleWrapper extends PrimitiveArrayWrapper<Double> {
@@ -28,10 +33,6 @@ public class JVMBuffer {
         PrimitiveDoubleWrapper copy();
 
         double sum();
-
-        void applyRight(BiFunction<Double, Double, Double> mapper, double rightArg);
-
-        void applyLeft(BiFunction<Double, Double, Double> mapper, double leftArg);
     }
 
     public static final class DoubleArrayWrapper implements PrimitiveDoubleWrapper {
@@ -73,14 +74,14 @@ public class JVMBuffer {
         }
 
         @Override
-        public void applyRight(BiFunction<Double, Double, Double> mapper, double rightArg) {
+        public void applyRight(BiFunction<Double, Double, Double> mapper, Double rightArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i], rightArg);
             }
         }
 
         @Override
-        public void applyLeft(BiFunction<Double, Double, Double> mapper, double leftArg) {
+        public void applyLeft(BiFunction<Double, Double, Double> mapper, Double leftArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(leftArg, array[i]);
             }
@@ -124,27 +125,10 @@ public class JVMBuffer {
         }
     }
 
-    public static final class DoubleWrapper implements PrimitiveDoubleWrapper {
-
-        private double value;
+    public static final class DoubleWrapper extends SingleValueWrapper<Double> implements PrimitiveDoubleWrapper {
 
         public DoubleWrapper(final double value) {
-            this.value = value;
-        }
-
-        @Override
-        public Double get(final int index) {
-            return value;
-        }
-
-        @Override
-        public void set(final Double value, final int index) {
-            this.value = value;
-        }
-
-        @Override
-        public int getLength() {
-            return 1;
+            super(value);
         }
 
         @Override
@@ -158,102 +142,31 @@ public class JVMBuffer {
         }
 
         @Override
-        public void applyRight(BiFunction<Double, Double, Double> mapper, double rightArg) {
-            value = mapper.apply(value, rightArg);
-        }
-
-        @Override
-        public void applyLeft(BiFunction<Double, Double, Double> mapper, double leftArg) {
-            value = mapper.apply(leftArg, value);
-        }
-
-        @Override
-        public void apply(Function<Double, Double> mapper) {
-            value = mapper.apply(value);
-        }
-
-        @Override
         public int[] asIntegerArray() {
-            return new int[]{(int) value};
+            return new int[]{value.intValue()};
         }
 
         @Override
         public double[] asDoubleArray() {
             return new double[]{value};
         }
-
-        public boolean equals(final Object o) {
-            if (o == this) return true;
-            if (!(o instanceof PrimitiveDoubleWrapper)) return false;
-            final PrimitiveDoubleWrapper other = (PrimitiveDoubleWrapper) o;
-            if (other.getLength() != 1) return false;
-            if (Double.compare(this.value, other.get(0)) != 0) return false;
-            return true;
-        }
-
-        public int hashCode() {
-            final int PRIME = 59;
-            int result = 1;
-            final long $value = Double.doubleToLongBits(this.value);
-            result = result * PRIME + (int) ($value >>> 32 ^ $value);
-            return result;
-        }
     }
 
-    public interface PrimitiveIntegerWrapper extends PrimitiveArrayWrapper<Integer> {
-    }
+    public static abstract class SingleValueWrapper<T> implements PrimitiveArrayWrapper<T> {
 
-    public static final class IntegerArrayWrapper implements PrimitiveIntegerWrapper {
+        T value;
 
-        private final int[] array;
-
-        public IntegerArrayWrapper(final int[] array) {
-            this.array = array;
-        }
-
-        @Override
-        public Integer get(final int index) {
-            return array[index];
-        }
-
-        @Override
-        public void set(final Integer value, final int index) {
-            array[index] = value;
-        }
-
-        @Override
-        public int getLength() {
-            return array.length;
-        }
-
-        @Override
-        public PrimitiveArrayWrapper<Integer> copy() {
-            return new IntegerArrayWrapper(Arrays.copyOf(array, array.length));
-        }
-
-        @Override
-        public void apply(Function<Integer, Integer> mapper) {
-            for (int i = 0; i < array.length; i++) {
-                array[i] = mapper.apply(array[i]);
-            }
-        }
-    }
-
-    public static final class IntegerWrapper implements PrimitiveIntegerWrapper {
-
-        private int value;
-
-        public IntegerWrapper(final int value) {
+        public SingleValueWrapper(final T value) {
             this.value = value;
         }
 
         @Override
-        public Integer get(final int index) {
+        public T get(final int index) {
             return value;
         }
 
         @Override
-        public void set(final Integer value, final int index) {
+        public void set(final T value, final int index) {
             this.value = value;
         }
 
@@ -262,14 +175,34 @@ public class JVMBuffer {
             return 1;
         }
 
+        public abstract PrimitiveArrayWrapper<T> copy();
+
         @Override
-        public PrimitiveArrayWrapper<Integer> copy() {
-            return new IntegerWrapper(value);
+        public void apply(Function<T, T> mapper) {
+            value = mapper.apply(value);
         }
 
         @Override
-        public void apply(Function<Integer, Integer> mapper) {
-            value = mapper.apply(value);
+        public void applyRight(BiFunction<T, T, T> mapper, T rightArg) {
+            value = mapper.apply(value, rightArg);
+        }
+
+        @Override
+        public void applyLeft(BiFunction<T, T, T> mapper, T leftArg) {
+            value = mapper.apply(leftArg, value);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SingleValueWrapper<?> that = (SingleValueWrapper<?>) o;
+            return value.equals(that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
         }
     }
 
@@ -293,18 +226,6 @@ public class JVMBuffer {
                 return new DoubleWrapper(data[0]);
             } else {
                 return new DoubleArrayWrapper(data);
-            }
-        }
-    }
-
-    public static final class IntegerArrayWrapperFactory implements ArrayWrapperFactory<Integer, PrimitiveArrayWrapper<Integer>> {
-
-        @Override
-        public final PrimitiveArrayWrapper<Integer> createNew(final int size) {
-            if (size == 1) {
-                return new IntegerWrapper(0);
-            } else {
-                return new IntegerArrayWrapper(new int[size]);
             }
         }
     }
