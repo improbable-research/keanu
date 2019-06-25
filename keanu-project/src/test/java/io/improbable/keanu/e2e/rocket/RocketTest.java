@@ -54,7 +54,7 @@ public class RocketTest {
         net.probeForNonZeroProbability(1000);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
-        Stream<NetworkSample> networkSamples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
+        Stream<NetworkSample> networkSamples = MetropolisHastings.withDefaultConfig(random).generatePosteriorSamples(
             model,
             Arrays.asList(oRingFailure, residualFuel, alarm1FalsePositive)
         ).stream();

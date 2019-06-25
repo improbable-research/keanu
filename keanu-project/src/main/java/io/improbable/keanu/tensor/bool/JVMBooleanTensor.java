@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.JVMTensor;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
+import io.improbable.keanu.tensor.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.buffer.BooleanBuffer;
@@ -331,7 +332,7 @@ public class JVMBooleanTensor implements BooleanTensor {
         final BooleanBuffer.PrimitiveBooleanWrapper rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMTensorBroadcast.ResultWrapper<Boolean, BooleanBuffer.PrimitiveBooleanWrapper> result = broadcastIfNeeded(
+        final ResultWrapper<Boolean, BooleanBuffer.PrimitiveBooleanWrapper> result = broadcastIfNeeded(
             factory, buffer, shape, stride, buffer.getLength(),
             rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),
             op, inPlace
@@ -432,7 +433,7 @@ public class JVMBooleanTensor implements BooleanTensor {
     @Override
     public BooleanTensor diag() {
 
-        JVMTensorBroadcast.ResultWrapper<Boolean, BooleanBuffer.PrimitiveBooleanWrapper> result = JVMTensor.diag(getRank(), shape, buffer, factory);
+        ResultWrapper<Boolean, BooleanBuffer.PrimitiveBooleanWrapper> result = JVMTensor.diag(getRank(), shape, buffer, factory);
 
         return new JVMBooleanTensor(result.outputBuffer, result.outputShape, result.outputStride);
     }

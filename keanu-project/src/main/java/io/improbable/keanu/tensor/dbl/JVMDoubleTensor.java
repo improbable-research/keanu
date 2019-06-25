@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.JVMTensor;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -19,24 +20,19 @@ import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.FastMath;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
-import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
-import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
-import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.getSummationResultShape;
 import static io.improbable.keanu.tensor.TensorShape.incrementIndexByShape;
-import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.DIV;
@@ -74,6 +70,10 @@ public class JVMDoubleTensor extends DoubleTensor {
         this.shape = shape;
         this.stride = getRowFirstStride(shape);
         this.buffer = buffer;
+    }
+
+    private JVMDoubleTensor(ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> resultWrapper) {
+        this(resultWrapper.outputBuffer, resultWrapper.outputShape, resultWrapper.outputStride);
     }
 
     private JVMDoubleTensor(double[] data, long[] shape, long[] stride) {
@@ -241,24 +241,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor permute(int... rearrange) {
-        Preconditions.checkArgument(rearrange.length == shape.length);
-        long[] resultShape = getPermutedIndices(shape, rearrange);
-        long[] resultStride = getRowFirstStride(resultShape);
-        DoubleBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(buffer.getLength());
-
-        for (int flatIndex = 0; flatIndex < buffer.getLength(); flatIndex++) {
-
-            int permutedFlatIndex = convertFromFlatIndexToPermutedFlatIndex(
-                flatIndex,
-                shape, stride,
-                resultShape, resultStride,
-                rearrange
-            );
-
-            newBuffer.set(buffer.get(flatIndex), permutedFlatIndex);
-        }
-
-        return new JVMDoubleTensor(newBuffer, resultShape);
+        return new JVMDoubleTensor(JVMTensor.permute(factory, buffer, shape, stride, rearrange));
     }
 
     @Override
@@ -278,10 +261,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor diag() {
-
-        JVMTensorBroadcast.ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> result = JVMTensor.diag(getRank(), shape, buffer, factory);
-
-        return new JVMDoubleTensor(result.outputBuffer, result.outputShape, result.outputStride);
+        return new JVMDoubleTensor(JVMTensor.diag(getRank(), shape, buffer, factory));
     }
 
     @Override
@@ -476,33 +456,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public IntegerTensor argMax(int axis) {
-
-        if (axis >= shape.length) {
-            throw new IllegalArgumentException("Cannot take arg max of axis " + axis + " on a " + shape.length + " rank tensor.");
-        }
-
-        int[] rearrange = getPermutationForDimensionToDimensionZero(axis, shape);
-
-        JVMDoubleTensor permuted = (JVMDoubleTensor) permute(rearrange);
-        DoubleBuffer.PrimitiveDoubleWrapper permutedBuffer = permuted.buffer;
-
-        int dimLength = (int) (buffer.getLength() / shape[axis]);
-
-        double[] maxBuffer = new double[dimLength];
-        int[] maxIndex = new int[dimLength];
-
-        for (int i = 0; i < permutedBuffer.getLength(); i++) {
-
-            final int bufferIndex = i % dimLength;
-
-            if (permutedBuffer.get(i) > maxBuffer[bufferIndex]) {
-                maxBuffer[bufferIndex] = permutedBuffer.get(i);
-                maxIndex[bufferIndex] = i / dimLength;
-            }
-
-        }
-
-        return IntegerTensor.create(maxIndex, ArrayUtils.remove(shape, axis));
+        return JVMTensor.argCompare(factory, buffer, (l, r) -> l > r, shape, stride, axis);
     }
 
     @Override
@@ -730,21 +684,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor slice(int dimension, long index) {
-        Preconditions.checkArgument(dimension < shape.length && index < shape[dimension]);
-        long[] resultShape = ArrayUtils.remove(shape, dimension);
-        long[] resultStride = getRowFirstStride(resultShape);
-        double[] newBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
-
-        for (int i = 0; i < newBuffer.length; i++) {
-
-            long[] shapeIndices = ArrayUtils.insert(dimension, TensorShape.getShapeIndices(resultShape, resultStride, i), index);
-
-            int j = Ints.checkedCast(getFlatIndex(shape, stride, shapeIndices));
-
-            newBuffer[i] = buffer.get(j);
-        }
-
-        return new JVMDoubleTensor(newBuffer, resultShape);
+        return new JVMDoubleTensor(JVMTensor.slice(factory, buffer, shape, stride, dimension, index));
     }
 
     @Override
@@ -753,44 +693,12 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     public static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
-
-        long[] concatShape = TensorShape.getConcatResultShape(dimension, toConcat);
-
-        boolean shouldRearrange = dimension != 0;
-
-        if (shouldRearrange) {
-
-            int[] rearrange = getPermutationForDimensionToDimensionZero(dimension, concatShape);
-
-            NumberTensor[] toConcatOnDimensionZero = new NumberTensor[toConcat.length];
-
-            for (int i = 0; i < toConcatOnDimensionZero.length; i++) {
-                toConcatOnDimensionZero[i] = toConcat[i].permute(rearrange);
-            }
-
-            long[] permutedConcatShape = getPermutedIndices(concatShape, rearrange);
-            DoubleTensor concatOnDimZero = concatOnDimensionZero(permutedConcatShape, toConcatOnDimensionZero);
-
-            return concatOnDimZero.permute(invertedPermute(rearrange));
-        } else {
-
-            return concatOnDimensionZero(concatShape, toConcat);
-        }
-    }
-
-    private static JVMDoubleTensor concatOnDimensionZero(long[] concatShape, NumberTensor... toConcat) {
-
-        double[] concatBuffer = new double[TensorShape.getLengthAsInt(concatShape)];
-        int bufferPosition = 0;
-
-        for (int i = 0; i < toConcat.length; i++) {
-
-            DoubleBuffer.PrimitiveDoubleWrapper cBuffer = getRawBufferIfJVMTensor(toConcat[i]);
-            System.arraycopy(cBuffer.asDoubleArray(), 0, concatBuffer, bufferPosition, cBuffer.getLength());
-            bufferPosition += cBuffer.getLength();
-        }
-
-        return new JVMDoubleTensor(concatBuffer, concatShape);
+        return new JVMDoubleTensor(
+            JVMTensor.concat(factory, toConcat, dimension,
+                Arrays.stream(toConcat)
+                    .map(JVMDoubleTensor::getRawBufferIfJVMTensor)
+                    .collect(Collectors.toList())
+            ));
     }
 
     @Override
@@ -822,47 +730,9 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public List<DoubleTensor> split(int dimension, long... splitAtIndices) {
-        dimension = getAbsoluteDimension(dimension, getRank());
-
-        if (dimension < 0 || dimension >= shape.length) {
-            throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
-        }
-
-        int[] moveDimToZero = TensorShape.slideDimension(dimension, 0, shape.length);
-        int[] moveZeroToDim = TensorShape.slideDimension(0, dimension, shape.length);
-
-        JVMDoubleTensor permutedTensor = (JVMDoubleTensor) this.permute(moveDimToZero);
-
-        DoubleBuffer.PrimitiveDoubleWrapper rawBuffer = permutedTensor.buffer;
-
-        List<DoubleTensor> splitTensor = new ArrayList<>();
-
-        long previousSplitAtIndex = 0;
-        int rawBufferPosition = 0;
-        for (long splitAtIndex : splitAtIndices) {
-
-            long[] subTensorShape = shapeCopy();
-            long subTensorLengthInDimension = splitAtIndex - previousSplitAtIndex;
-
-            if (subTensorLengthInDimension > shape[dimension] || subTensorLengthInDimension <= 0) {
-                throw new IllegalArgumentException("Invalid index to split on " + splitAtIndex + " at " + dimension + " for tensor of shape " + Arrays.toString(shape));
-            }
-
-            subTensorShape[dimension] = subTensorLengthInDimension;
-            int subTensorLength = Ints.checkedCast(TensorShape.getLength(subTensorShape));
-
-            double[] buffer = new double[subTensorLength];
-            System.arraycopy(rawBuffer.asDoubleArray(), rawBufferPosition, buffer, 0, buffer.length);
-
-            long[] subTensorPermutedShape = getPermutedIndices(subTensorShape, moveDimToZero);
-            DoubleTensor subTensor = DoubleTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
-            splitTensor.add(subTensor);
-
-            previousSplitAtIndex = splitAtIndex;
-            rawBufferPosition += buffer.length;
-        }
-
-        return splitTensor;
+        return JVMTensor.split(factory, buffer, shape, stride, dimension, splitAtIndices).stream()
+            .map(JVMDoubleTensor::new)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -1118,7 +988,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         final DoubleBuffer.PrimitiveDoubleWrapper rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMTensorBroadcast.ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> result = broadcastIfNeeded(
+        final ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> result = broadcastIfNeeded(
             factory,
             buffer, shape, stride, buffer.getLength(),
             rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),
@@ -1132,7 +1002,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
             return this;
         } else {
-            return new JVMDoubleTensor(result.outputBuffer, result.outputShape, result.outputStride);
+            return new JVMDoubleTensor(result);
         }
     }
 

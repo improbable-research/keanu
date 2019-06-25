@@ -15,6 +15,8 @@ public class JVMBuffer {
 
         PrimitiveArrayWrapper<T> copy();
 
+        void copyFrom(PrimitiveArrayWrapper<T> src, int srcPos, int destPos, int length);
+
         void apply(Function<T, T> mapper);
 
         void applyRight(BiFunction<T, T, T> mapper, T rightArg);
@@ -46,6 +48,14 @@ public class JVMBuffer {
         }
 
         public abstract PrimitiveArrayWrapper<T> copy();
+
+        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<T> src, int srcPos, int destPos, int length) {
+            if (length == 1 && destPos == 0) {
+                value = src.get(srcPos);
+            } else if (length > 1 || length < 0 || destPos != 0) {
+                throw new IndexOutOfBoundsException();
+            }
+        }
 
         @Override
         public void apply(Function<T, T> mapper) {

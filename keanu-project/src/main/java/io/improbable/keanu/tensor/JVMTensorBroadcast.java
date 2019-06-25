@@ -1,7 +1,6 @@
 package io.improbable.keanu.tensor;
 
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
-import lombok.AllArgsConstructor;
 import org.nd4j.linalg.api.shape.Shape;
 
 import java.util.Arrays;
@@ -12,13 +11,6 @@ import static io.improbable.keanu.tensor.TensorShape.getLengthAsInt;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 
 public class JVMTensorBroadcast {
-
-    @AllArgsConstructor
-    public static class ResultWrapper<T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> {
-        public final B outputBuffer;
-        public final long[] outputShape;
-        public final long[] outputStride;
-    }
 
     public static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT>>
     ResultWrapper<OUT, OUTBUFFER> broadcastIfNeeded(JVMBuffer.ArrayWrapperFactory<OUT, OUTBUFFER> factory,

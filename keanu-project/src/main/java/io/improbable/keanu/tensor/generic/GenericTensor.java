@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.JVMTensor;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
+import io.improbable.keanu.tensor.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -301,7 +302,7 @@ public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
     @Override
     public GenericTensor<T> diag() {
 
-        JVMTensorBroadcast.ResultWrapper<T, GenericBuffer.PrimitiveGenericWrapper<T>> result = JVMTensor.diag(getRank(), shape, buffer, factory);
+        ResultWrapper<T, GenericBuffer.PrimitiveGenericWrapper<T>> result = JVMTensor.diag(getRank(), shape, buffer, factory);
 
         return new GenericTensor<>(result.outputBuffer, result.outputShape, result.outputStride);
     }
@@ -319,7 +320,7 @@ public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
         final GenericBuffer.PrimitiveGenericWrapper<T> rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final JVMTensorBroadcast.ResultWrapper<R, GenericBuffer.PrimitiveGenericWrapper<R>> result = broadcastIfNeeded(
+        final ResultWrapper<R, GenericBuffer.PrimitiveGenericWrapper<R>> result = broadcastIfNeeded(
             factory, buffer, shape, stride, buffer.getLength(),
             rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),
             op, false

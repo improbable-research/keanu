@@ -68,6 +68,17 @@ public class BooleanBuffer {
         }
 
         @Override
+        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<Boolean> src, int srcPos, int destPos, int length) {
+            if (src instanceof BooleanArrayWrapper) {
+                System.arraycopy(((BooleanArrayWrapper) src).array, srcPos, array, destPos, length);
+            } else {
+                for (int i = 0; i < length; i++) {
+                    array[destPos + i] = src.get(srcPos + i);
+                }
+            }
+        }
+
+        @Override
         public void applyRight(BiFunction<Boolean, Boolean, Boolean> mapper, Boolean rightArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i], rightArg);

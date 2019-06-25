@@ -63,6 +63,17 @@ public class GenericBuffer {
         }
 
         @Override
+        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<T> src, int srcPos, int destPos, int length) {
+            if (src instanceof GenericArrayWrapper) {
+                System.arraycopy(((GenericArrayWrapper) src).array, srcPos, array, destPos, length);
+            } else {
+                for (int i = 0; i < length; i++) {
+                    array[destPos + i] = src.get(srcPos + i);
+                }
+            }
+        }
+
+        @Override
         public T[] asArray() {
             return array;
         }

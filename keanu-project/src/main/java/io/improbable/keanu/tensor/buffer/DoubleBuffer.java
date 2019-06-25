@@ -67,6 +67,17 @@ public class DoubleBuffer {
         }
 
         @Override
+        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<Double> src, int srcPos, int destPos, int length) {
+            if (src instanceof DoubleArrayWrapper) {
+                System.arraycopy(((DoubleArrayWrapper) src).array, srcPos, array, destPos, length);
+            } else {
+                for (int i = 0; i < length; i++) {
+                    array[destPos + i] = src.get(srcPos + i);
+                }
+            }
+        }
+
+        @Override
         public double sum() {
             double result = 0;
             for (int i = 0; i < array.length; i++) {
