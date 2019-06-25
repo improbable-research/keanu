@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorFactories;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +32,7 @@ public class DoubleScalarTensorShapePreservationTest {
     private static DoubleTensor[] tensors;
 
     public DoubleScalarTensorShapePreservationTest(DoubleTensorFactory factory, String name) {
-        DoubleTensor.setFactory(factory);
+        TensorFactories.doubleTensorFactory = factory;
     }
 
     @Before

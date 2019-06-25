@@ -3,14 +3,15 @@ package io.improbable.keanu.tensor;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
+import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
@@ -20,8 +21,44 @@ import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.getShapeIndices;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
+import static java.util.Arrays.copyOf;
 
-public class JVMTensor {
+public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends JVMBuffer.PrimitiveArrayWrapper<T>> implements Tensor<T, TENSOR> {
+
+    protected B buffer;
+    protected long[] shape;
+    protected long[] stride;
+
+    protected JVMTensor(B buffer, long[] shape, long[] stride) {
+        this.buffer = buffer;
+        this.shape = shape;
+        this.stride = stride;
+    }
+
+    @Override
+    public int getRank() {
+        return shape.length;
+    }
+
+    @Override
+    public long[] getShape() {
+        return copyOf(shape, shape.length);
+    }
+
+    @Override
+    public long[] getStride() {
+        return copyOf(stride, stride.length);
+    }
+
+    @Override
+    public long getLength() {
+        return buffer.getLength();
+    }
+
+    @Override
+    public TENSOR diag() {
+        return createFromResultWrapper(diag(shape.length, shape, buffer, getFactory()));
+    }
 
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
     ResultWrapper<T, B> diag(int rank, long[] shape,
@@ -51,38 +88,9 @@ public class JVMTensor {
         return new ResultWrapper<>(newBuffer, newShape, TensorShape.getRowFirstStride(newShape));
     }
 
-    public static <T extends Number, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
-    IntegerTensor argCompare(JVMBuffer.ArrayWrapperFactory<T, B> factory,
-                             B buffer,
-                             BiFunction<T, T, Boolean> compareOp,
-                             long[] shape, long[] stride, int axis) {
-
-        if (axis >= shape.length) {
-            throw new IllegalArgumentException("Cannot take arg max of axis " + axis + " on a " + shape.length + " rank tensor.");
-        }
-
-        int[] rearrange = getPermutationForDimensionToDimensionZero(axis, shape);
-
-        B permutedBuffer = permute(factory, buffer, shape, stride, rearrange).outputBuffer;
-
-        int dimLength = (int) (buffer.getLength() / shape[axis]);
-
-        B maxBuffer = factory.createNew(dimLength);
-        int[] maxIndex = new int[dimLength];
-
-        for (int i = 0; i < permutedBuffer.getLength(); i++) {
-
-            final int bufferIndex = i % dimLength;
-            final T value = permutedBuffer.get(i);
-
-            if (compareOp.apply(value, maxBuffer.get(bufferIndex))) {
-                maxBuffer.set(value, bufferIndex);
-                maxIndex[bufferIndex] = i / dimLength;
-            }
-
-        }
-
-        return IntegerTensor.create(maxIndex, ArrayUtils.remove(shape, axis));
+    @Override
+    public TENSOR permute(int... rearrange) {
+        return createFromResultWrapper(permute(getFactory(), buffer, shape, stride, rearrange));
     }
 
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
@@ -109,6 +117,13 @@ public class JVMTensor {
         }
 
         return new ResultWrapper<>(newBuffer, resultShape, resultStride);
+    }
+
+    @Override
+    public List<TENSOR> split(int dimension, long... splitAtIndices) {
+        return split(getFactory(), buffer, shape, stride, dimension, splitAtIndices).stream()
+            .map(this::createFromResultWrapper)
+            .collect(Collectors.toList());
     }
 
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
@@ -156,6 +171,11 @@ public class JVMTensor {
         }
 
         return splitTensor;
+    }
+
+    @Override
+    public TENSOR slice(int dimension, long index) {
+        return createFromResultWrapper(slice(getFactory(), buffer, shape, stride, dimension, index));
     }
 
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
@@ -230,4 +250,26 @@ public class JVMTensor {
 
         return concatBuffer;
     }
+
+    protected TENSOR broadcastableBinaryOpWithAutoBroadcast(BiFunction<T, T, T> op,
+                                                            JVMTensor<T, TENSOR, B> right) {
+
+        final B rightBuffer = right.buffer;
+        final long[] rightShape = right.shape;
+
+        final ResultWrapper<T, B> result = broadcastIfNeeded(
+            getFactory(),
+            buffer, shape, stride, buffer.getLength(),
+            rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),
+            op, true
+        );
+
+        return setAsResultWrapper(result);
+    }
+
+    protected abstract TENSOR createFromResultWrapper(ResultWrapper<T, B> wrapper);
+
+    protected abstract TENSOR setAsResultWrapper(ResultWrapper<T, B> wrapper);
+
+    protected abstract JVMBuffer.ArrayWrapperFactory<T, B> getFactory();
 }

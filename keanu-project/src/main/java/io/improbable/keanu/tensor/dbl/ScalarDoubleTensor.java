@@ -22,7 +22,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.getTensorMultiply
 import static org.apache.commons.lang3.ArrayUtils.removeAll;
 
 
-public class ScalarDoubleTensor extends DoubleTensor {
+public class ScalarDoubleTensor implements DoubleTensor {
 
     private double value;
     private long[] shape;

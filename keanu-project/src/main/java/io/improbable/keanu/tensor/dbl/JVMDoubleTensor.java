@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.JVMFloatingPointTensor;
 import io.improbable.keanu.tensor.JVMTensor;
 import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.NumberTensor;
@@ -11,6 +12,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.buffer.DoubleBuffer;
+import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
@@ -21,12 +23,9 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.FastMath;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
@@ -52,24 +51,17 @@ import static org.bytedeco.javacpp.openblas.CblasNoTrans;
 import static org.bytedeco.javacpp.openblas.CblasRowMajor;
 import static org.bytedeco.javacpp.openblas.cblas_dgemm;
 
-public class JVMDoubleTensor extends DoubleTensor {
+public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor, DoubleBuffer.PrimitiveDoubleWrapper> implements DoubleTensor {
 
     private static final DoubleBuffer.DoubleArrayWrapperFactory factory = new DoubleBuffer.DoubleArrayWrapperFactory();
 
-    private long[] shape;
-    private long[] stride;
-    private DoubleBuffer.PrimitiveDoubleWrapper buffer;
 
     private JVMDoubleTensor(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
-        this.shape = shape;
-        this.stride = stride;
-        this.buffer = buffer;
+        super(buffer, shape, stride);
     }
 
     private JVMDoubleTensor(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape) {
-        this.shape = shape;
-        this.stride = getRowFirstStride(shape);
-        this.buffer = buffer;
+        super(buffer, shape, getRowFirstStride(shape));
     }
 
     private JVMDoubleTensor(ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> resultWrapper) {
@@ -85,9 +77,25 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     private JVMDoubleTensor(double value) {
-        this.shape = new long[0];
-        this.stride = new long[0];
-        this.buffer = new DoubleBuffer.DoubleWrapper(value);
+        super(new DoubleBuffer.DoubleWrapper(value), new long[0], new long[0]);
+    }
+
+    @Override
+    protected JVMDoubleTensor createFromResultWrapper(ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> resultWrapper) {
+        return new JVMDoubleTensor(resultWrapper);
+    }
+
+    @Override
+    protected DoubleTensor setAsResultWrapper(ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> wrapper) {
+        this.buffer = wrapper.outputBuffer;
+        this.shape = wrapper.outputShape;
+        this.stride = wrapper.outputStride;
+        return this;
+    }
+
+    @Override
+    protected JVMBuffer.ArrayWrapperFactory<Double, DoubleBuffer.PrimitiveDoubleWrapper> getFactory() {
+        return factory;
     }
 
     public static JVMDoubleTensor scalar(double scalarValue) {
@@ -174,26 +182,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public int getRank() {
-        return shape.length;
-    }
-
-    @Override
-    public long[] getShape() {
-        return shapeCopy();
-    }
-
-    @Override
-    public long[] getStride() {
-        return copyOf(stride, stride.length);
-    }
-
-    @Override
-    public long getLength() {
-        return buffer.getLength();
-    }
-
-    @Override
     public DoubleTensor reshape(long... newShape) {
         return new JVMDoubleTensor(buffer.copy(), getReshapeAllowingWildcard(shape, buffer.getLength(), newShape));
     }
@@ -217,8 +205,8 @@ public class JVMDoubleTensor extends DoubleTensor {
             } else if (that.isScalar()) {
                 return elementwiseEquals(((DoubleTensor) that).scalar());
             } else {
-                DoubleTensor equalsMask = broadcastableBinaryDoubleOp(
-                    (l, r) -> l.doubleValue() == r.doubleValue() ? 1.0 : 0.0, (DoubleTensor) that
+                DoubleTensor equalsMask = duplicate().broadcastableBinaryOpWithAutoBroadcast(
+                    (l, r) -> l.doubleValue() == r.doubleValue() ? 1.0 : 0.0, getAsJVMTensor((DoubleTensor) that)
                 );
 
                 return maskToBooleanTensor(equalsMask);
@@ -240,12 +228,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor permute(int... rearrange) {
-        return new JVMDoubleTensor(JVMTensor.permute(factory, buffer, shape, stride, rearrange));
-    }
-
-    @Override
-    public DoubleTensor duplicate() {
+    public JVMDoubleTensor duplicate() {
         return new JVMDoubleTensor(buffer.copy(), shapeCopy(), Arrays.copyOf(stride, stride.length));
     }
 
@@ -257,19 +240,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public IntegerTensor toInteger() {
         return IntegerTensor.create(buffer.asIntegerArray(), shapeCopy());
-    }
-
-    @Override
-    public DoubleTensor diag() {
-        return new JVMDoubleTensor(JVMTensor.diag(getRank(), shape, buffer, factory));
-    }
-
-    @Override
-    public DoubleTensor transpose() {
-        if (shape.length < 2) {
-            throw new IllegalArgumentException("Cannot transpose rank " + shape.length);
-        }
-        return permute(1, 0);
     }
 
     @Override
@@ -421,7 +391,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         //C = alpha*A*B + beta*C
         //(M,N) = (M,k)(k,N) + (M,N)
         final double[] A = buffer.asDoubleArray();
-        final double[] B = getRawBufferIfJVMTensor(that).asDoubleArray();
+        final double[] B = getAsJVMTensor(that).buffer.asDoubleArray();
         final double[] C = new double[Ints.checkedCast(this.shape[0] * thatShape[1])];
 
         final int N = Ints.checkedCast(thatShape[1]);
@@ -456,7 +426,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public IntegerTensor argMax(int axis) {
-        return JVMTensor.argCompare(factory, buffer, (l, r) -> l > r, shape, stride, axis);
+        return argCompare((l, r) -> l > r, axis);
     }
 
     @Override
@@ -479,29 +449,29 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
-        return broadcastableBinaryDoubleOp(GT_MASK, greaterThanThis);
+        return duplicate().broadcastableBinaryOpWithAutoBroadcast(GT_MASK, getAsJVMTensor(greaterThanThis));
     }
 
     @Override
     public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanThis) {
-        return broadcastableBinaryDoubleOp(GTE_MASK, greaterThanThis);
+        return duplicate().broadcastableBinaryOpWithAutoBroadcast(GTE_MASK, getAsJVMTensor(greaterThanThis));
     }
 
     @Override
     public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
-        return broadcastableBinaryDoubleOp(LT_MASK, lessThanThis);
+        return duplicate().broadcastableBinaryOpWithAutoBroadcast(LT_MASK, getAsJVMTensor(lessThanThis));
     }
 
     @Override
     public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis) {
-        return broadcastableBinaryDoubleOp(LTE_MASK, lessThanThis);
+        return duplicate().broadcastableBinaryOpWithAutoBroadcast(LTE_MASK, getAsJVMTensor(lessThanThis));
     }
 
     @Override
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
         checkMaskLengthMatches(mask);
 
-        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
+        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getAsJVMTensor(mask).buffer;
 
         for (int i = 0; i < buffer.getLength(); i++) {
             if (maskBuffer.get(i) == 1.0) {
@@ -526,7 +496,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         checkShapesMatch(shape, mask.getShape());
 
         DoubleBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(buffer.getLength());
-        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
+        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getAsJVMTensor(mask).buffer;
 
         for (int i = 0; i < buffer.getLength(); i++) {
             newBuffer.set(maskBuffer.get(i) == 1.0 ? value : buffer.get(i), i);
@@ -556,7 +526,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     private BooleanTensor maskToBooleanTensor(DoubleTensor mask) {
-        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getRawBufferIfJVMTensor(mask);
+        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getAsJVMTensor(mask).buffer;
         boolean[] boolBuffer = new boolean[maskBuffer.getLength()];
 
         for (int i = 0; i < maskBuffer.getLength(); i++) {
@@ -612,7 +582,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor powInPlace(DoubleTensor exponent) {
-        return broadcastableBinaryDoubleOpInPlace(FastMath::pow, exponent);
+        return broadcastableBinaryOpWithAutoBroadcast(FastMath::pow, getAsJVMTensor(exponent));
     }
 
     @Override
@@ -629,7 +599,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor atan2InPlace(DoubleTensor y) {
-        return broadcastableBinaryDoubleOpInPlace((left, right) -> FastMath.atan2(right, left), y);
+        return broadcastableBinaryOpWithAutoBroadcast((left, right) -> FastMath.atan2(right, left), getAsJVMTensor(y));
     }
 
     @Override
@@ -654,7 +624,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             return false;
         }
 
-        DoubleBuffer.PrimitiveDoubleWrapper otherBuffer = getRawBufferIfJVMTensor(other);
+        DoubleBuffer.PrimitiveDoubleWrapper otherBuffer = getAsJVMTensor(other).buffer;
 
         for (int i = 0; i < buffer.getLength(); i++) {
             if (Math.abs(buffer.get(i) - otherBuffer.get(i)) > epsilon) {
@@ -682,10 +652,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         return result;
     }
 
-    @Override
-    public DoubleTensor slice(int dimension, long index) {
-        return new JVMDoubleTensor(JVMTensor.slice(factory, buffer, shape, stride, dimension, index));
-    }
 
     @Override
     public DoubleTensor take(long... index) {
@@ -696,7 +662,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         return new JVMDoubleTensor(
             JVMTensor.concat(factory, toConcat, dimension,
                 Arrays.stream(toConcat)
-                    .map(JVMDoubleTensor::getRawBufferIfJVMTensor)
+                    .map(tensor -> getAsJVMTensor(tensor).buffer)
                     .collect(Collectors.toList())
             ));
     }
@@ -706,11 +672,11 @@ public class JVMDoubleTensor extends DoubleTensor {
         return buffer.copy().asDoubleArray();
     }
 
-    private static DoubleBuffer.PrimitiveDoubleWrapper getRawBufferIfJVMTensor(NumberTensor tensor) {
+    private static JVMDoubleTensor getAsJVMTensor(NumberTensor tensor) {
         if (tensor instanceof JVMDoubleTensor) {
-            return ((JVMDoubleTensor) tensor).buffer;
+            return ((JVMDoubleTensor) tensor);
         } else {
-            return new DoubleBuffer.DoubleArrayWrapper(tensor.asFlatDoubleArray());
+            return new JVMDoubleTensor(factory.create(tensor.asFlatDoubleArray()), tensor.getShape(), tensor.getStride());
         }
     }
 
@@ -729,18 +695,10 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public List<DoubleTensor> split(int dimension, long... splitAtIndices) {
-        return JVMTensor.split(factory, buffer, shape, stride, dimension, splitAtIndices).stream()
-            .map(JVMDoubleTensor::new)
-            .collect(Collectors.toList());
-    }
-
-    @Override
     public DoubleTensor reciprocalInPlace() {
         buffer.apply((v) -> 1.0 / v);
         return this;
     }
-
 
     @Override
     public DoubleTensor sqrtInPlace() {
@@ -827,7 +785,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor minInPlace(DoubleTensor that) {
-        return broadcastableBinaryDoubleOpInPlace(Math::min, that);
+        return broadcastableBinaryOpWithAutoBroadcast(Math::min, getAsJVMTensor(that));
     }
 
     @Override
@@ -841,7 +799,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor maxInPlace(DoubleTensor that) {
-        return broadcastableBinaryDoubleOpInPlace(Math::max, that);
+        return broadcastableBinaryOpWithAutoBroadcast(Math::max, getAsJVMTensor(that));
     }
 
     @Override
@@ -916,12 +874,12 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor minusInPlace(DoubleTensor that) {
-        return broadcastableBinaryDoubleOpInPlace(SUB, that);
+        return broadcastableBinaryOpWithAutoBroadcast(SUB, getAsJVMTensor(that));
     }
 
     @Override
-    public DoubleTensor reverseMinusInPlace(DoubleTensor value) {
-        return broadcastableBinaryDoubleOpInPlace(RSUB, value);
+    public DoubleTensor reverseMinusInPlace(DoubleTensor that) {
+        return broadcastableBinaryOpWithAutoBroadcast(RSUB, getAsJVMTensor(that));
     }
 
     @Override
@@ -938,7 +896,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor plusInPlace(DoubleTensor that) {
-        return broadcastableBinaryDoubleOpInPlace(ADD, that);
+        return broadcastableBinaryOpWithAutoBroadcast(ADD, getAsJVMTensor(that));
     }
 
     @Override
@@ -949,7 +907,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor timesInPlace(DoubleTensor that) {
-        return broadcastableBinaryDoubleOpInPlace(MUL, that);
+        return broadcastableBinaryOpWithAutoBroadcast(MUL, getAsJVMTensor(that));
     }
 
     @Override
@@ -960,7 +918,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor divInPlace(DoubleTensor that) {
-        return broadcastableBinaryDoubleOpInPlace(DIV, that);
+        return broadcastableBinaryOpWithAutoBroadcast(DIV, getAsJVMTensor(that));
     }
 
     @Override
@@ -971,39 +929,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reverseDivInPlace(DoubleTensor that) {
-        return broadcastableBinaryDoubleOpInPlace(RDIV, that);
-    }
-
-    private DoubleTensor broadcastableBinaryDoubleOp(BiFunction<Double, Double, Double> op, DoubleTensor that) {
-        return binaryDoubleOpWithAutoBroadcast(that, op, false);
-    }
-
-    private DoubleTensor broadcastableBinaryDoubleOpInPlace(BiFunction<Double, Double, Double> op, DoubleTensor that) {
-        return binaryDoubleOpWithAutoBroadcast(that, op, true);
-    }
-
-    private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(DoubleTensor right,
-                                                            BiFunction<Double, Double, Double> op,
-                                                            boolean inPlace) {
-        final DoubleBuffer.PrimitiveDoubleWrapper rightBuffer = getRawBufferIfJVMTensor(right);
-        final long[] rightShape = right.getShape();
-
-        final ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> result = broadcastIfNeeded(
-            factory,
-            buffer, shape, stride, buffer.getLength(),
-            rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),
-            op, inPlace
-        );
-
-        if (inPlace) {
-            this.buffer = result.outputBuffer;
-            this.shape = result.outputShape;
-            this.stride = result.outputStride;
-
-            return this;
-        } else {
-            return new JVMDoubleTensor(result);
-        }
+        return broadcastableBinaryOpWithAutoBroadcast(RDIV, getAsJVMTensor(that));
     }
 
     @Override

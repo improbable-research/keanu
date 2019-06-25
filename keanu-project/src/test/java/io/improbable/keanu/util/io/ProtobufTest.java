@@ -272,7 +272,7 @@ public class ProtobufTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Incorrect Parameter Type specified.  " +
             "Got: class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, " +
-            "Expected: class io.improbable.keanu.tensor.dbl.DoubleTensor");
+            "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
 
         SavedBayesNet.Vertex constantVertex = SavedBayesNet.Vertex.newBuilder()
             .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))

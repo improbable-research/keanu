@@ -1,45 +1,39 @@
 package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.tensor.FloatingPointTensor;
+import io.improbable.keanu.tensor.TensorFactories;
 import org.apache.commons.lang3.ArrayUtils;
 
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
-public abstract class DoubleTensor implements FloatingPointTensor<Double, DoubleTensor> {
+public interface DoubleTensor extends FloatingPointTensor<Double, DoubleTensor> {
 
-    private static DoubleTensorFactory factory = new JVMDoubleTensorFactory();
-
-    public static void setFactory(DoubleTensorFactory factory) {
-        DoubleTensor.factory = factory;
+    static DoubleTensor create(double value, long[] shape) {
+        return TensorFactories.doubleTensorFactory.create(value, shape);
     }
 
-    public static DoubleTensor create(double value, long[] shape) {
-        return factory.create(value, shape);
-
+    static DoubleTensor create(double[] values, long... shape) {
+        return TensorFactories.doubleTensorFactory.create(values, shape);
     }
 
-    public static DoubleTensor create(double[] values, long... shape) {
-        return factory.create(values, shape);
-    }
-
-    public static DoubleTensor create(double... values) {
+    static DoubleTensor create(double... values) {
         return create(values, values.length);
     }
 
-    public static DoubleTensor ones(long... shape) {
-        return factory.ones(shape);
+    static DoubleTensor ones(long... shape) {
+        return TensorFactories.doubleTensorFactory.ones(shape);
     }
 
-    public static DoubleTensor eye(long n) {
-        return factory.eye(n);
+    static DoubleTensor eye(long n) {
+        return TensorFactories.doubleTensorFactory.eye(n);
     }
 
-    public static DoubleTensor zeros(long... shape) {
-        return factory.zeros(shape);
+    static DoubleTensor zeros(long... shape) {
+        return TensorFactories.doubleTensorFactory.zeros(shape);
     }
 
-    public static DoubleTensor linspace(double start, double end, int numberOfPoints) {
-        return factory.linspace(start, end, numberOfPoints);
+    static DoubleTensor linspace(double start, double end, int numberOfPoints) {
+        return TensorFactories.doubleTensorFactory.linspace(start, end, numberOfPoints);
     }
 
     /**
@@ -47,8 +41,8 @@ public abstract class DoubleTensor implements FloatingPointTensor<Double, Double
      * @param end   end of range (exclusive)
      * @return a vector of numbers from start incrementing by one to end (exclusively)
      */
-    public static DoubleTensor arange(double start, double end) {
-        return factory.arange(start, end);
+    static DoubleTensor arange(double start, double end) {
+        return TensorFactories.doubleTensorFactory.arange(start, end);
     }
 
     /**
@@ -57,15 +51,15 @@ public abstract class DoubleTensor implements FloatingPointTensor<Double, Double
      * @param stepSize size of step from start to end
      * @return a vector of numbers starting at start and stepping to end (exclusively)
      */
-    public static DoubleTensor arange(double start, double end, double stepSize) {
-        return factory.arange(start, end, stepSize);
+    static DoubleTensor arange(double start, double end, double stepSize) {
+        return TensorFactories.doubleTensorFactory.arange(start, end, stepSize);
     }
 
-    public static DoubleTensor scalar(double scalarValue) {
-        return factory.scalar(scalarValue);
+    static DoubleTensor scalar(double scalarValue) {
+        return TensorFactories.doubleTensorFactory.scalar(scalarValue);
     }
 
-    public static DoubleTensor vector(double... values) {
+    static DoubleTensor vector(double... values) {
         return DoubleTensor.create(values, values.length);
     }
 
@@ -84,7 +78,7 @@ public abstract class DoubleTensor implements FloatingPointTensor<Double, Double
      * <p>
      * DoubleTensor.stack(-1, A, B, C) gives DoubleTensor.ones(4, 2, 3)
      */
-    public static DoubleTensor stack(int dimension, DoubleTensor... toStack) {
+    static DoubleTensor stack(int dimension, DoubleTensor... toStack) {
         long[] shape = toStack[0].getShape();
         int stackedRank = toStack[0].getRank() + 1;
         int absoluteDimension = getAbsoluteDimension(dimension, stackedRank);
@@ -98,7 +92,7 @@ public abstract class DoubleTensor implements FloatingPointTensor<Double, Double
         return concat(absoluteDimension, reshaped);
     }
 
-    public static DoubleTensor concat(DoubleTensor... toConcat) {
+    static DoubleTensor concat(DoubleTensor... toConcat) {
         return concat(0, toConcat);
     }
 
@@ -111,61 +105,51 @@ public abstract class DoubleTensor implements FloatingPointTensor<Double, Double
      * <p>
      * DoubleTensor.concat(0, A, B, C) gives DoubleTensor.ones(12, 2)
      */
-    public static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
-        return factory.concat(dimension, toConcat);
+    static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
+        return TensorFactories.doubleTensorFactory.concat(dimension, toConcat);
     }
 
-    public static DoubleTensor min(DoubleTensor a, DoubleTensor b) {
+    static DoubleTensor min(DoubleTensor a, DoubleTensor b) {
         return a.duplicate().minInPlace(b);
     }
 
-    public static DoubleTensor max(DoubleTensor a, DoubleTensor b) {
+    static DoubleTensor max(DoubleTensor a, DoubleTensor b) {
         return a.duplicate().maxInPlace(b);
-    }
-
-    @Override
-    public DoubleTensor reverseMinus(Double value) {
-        return DoubleTensor.scalar(value).minus(this);
-    }
-
-    @Override
-    public DoubleTensor reverseDiv(Double value) {
-        return DoubleTensor.scalar(value).div(this);
     }
 
     // Kotlin unboxes to the primitive but does not match the Java
     @Override
-    public DoubleTensor plus(double value) {
+    default DoubleTensor plus(double value) {
         return plus((Double) value);
     }
 
     @Override
-    public DoubleTensor minus(double value) {
+    default DoubleTensor minus(double value) {
         return minus((Double) value);
     }
 
     @Override
-    public DoubleTensor reverseMinus(double value) {
+    default DoubleTensor reverseMinus(double value) {
         return reverseMinus((Double) value);
     }
 
     @Override
-    public DoubleTensor times(double value) {
+    default DoubleTensor times(double value) {
         return times((Double) value);
     }
 
     @Override
-    public DoubleTensor div(double value) {
+    default DoubleTensor div(double value) {
         return div((Double) value);
     }
 
     @Override
-    public DoubleTensor reverseDiv(double value) {
+    default DoubleTensor reverseDiv(double value) {
         return reverseDiv((Double) value);
     }
 
     @Override
-    public DoubleTensor pow(double exponent) {
+    default DoubleTensor pow(double exponent) {
         return pow((Double) exponent);
     }
 

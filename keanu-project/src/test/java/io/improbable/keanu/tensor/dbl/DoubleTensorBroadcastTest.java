@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import io.improbable.keanu.tensor.TensorFactories;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -30,7 +31,7 @@ public class DoubleTensorBroadcastTest {
     }
 
     public DoubleTensorBroadcastTest(DoubleTensorFactory factory, String name) {
-        DoubleTensor.setFactory(factory);
+        TensorFactories.doubleTensorFactory = factory;
     }
 
     @Test

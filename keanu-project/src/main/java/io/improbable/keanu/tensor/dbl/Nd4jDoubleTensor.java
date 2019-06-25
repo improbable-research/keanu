@@ -42,7 +42,7 @@ import static java.util.Arrays.copyOf;
  * Class for representing n-dimensional arrays of doubles. This is
  * backed by Nd4j.
  */
-public class Nd4jDoubleTensor extends DoubleTensor {
+public class Nd4jDoubleTensor implements DoubleTensor {
 
     static {
         INDArrayShim.startNewThreadForNd4j();

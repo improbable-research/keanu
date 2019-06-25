@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.TensorFactories;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorTestHelper;
@@ -63,7 +64,7 @@ public class DoubleTensorTest {
 
     public DoubleTensorTest(DoubleTensorFactory factory, String name) {
 
-        DoubleTensor.setFactory(factory);
+        TensorFactories.doubleTensorFactory = factory;
 
         matrixA = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
         matrixB = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
