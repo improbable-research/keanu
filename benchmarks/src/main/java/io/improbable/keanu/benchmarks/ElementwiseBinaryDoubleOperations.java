@@ -1,5 +1,6 @@
 package io.improbable.keanu.benchmarks;
 
+import io.improbable.keanu.tensor.TensorFactories;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
@@ -32,7 +33,7 @@ public class ElementwiseBinaryDoubleOperations {
 
     @Setup
     public void setup() {
-        DoubleTensor.setFactory(impl.getFactory());
+        TensorFactories.doubleTensorFactory = impl.getFactory();
         left = DoubleTensor.arange(0, dimLength * dimLength).reshape(dimLength, dimLength);
         right = DoubleTensor.arange(dimLength * dimLength, 2 * dimLength * dimLength).reshape(dimLength, dimLength);
     }

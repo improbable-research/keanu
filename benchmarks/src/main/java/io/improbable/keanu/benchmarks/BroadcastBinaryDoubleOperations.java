@@ -1,6 +1,7 @@
 package io.improbable.keanu.benchmarks;
 
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.TensorFactories;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
@@ -36,7 +37,7 @@ public class BroadcastBinaryDoubleOperations {
     @Setup
     public void setup() {
 
-        DoubleTensor.setFactory(impl.getFactory());
+        TensorFactories.doubleTensorFactory = impl.getFactory();
 
         String[] dimTokens = dims.split(",");
 

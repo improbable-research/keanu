@@ -1,6 +1,7 @@
 package io.improbable.keanu.benchmarks;
 
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.TensorFactories;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
@@ -34,7 +35,7 @@ public class UnaryDoubleOperations {
 
     @Setup
     public void setup() {
-        DoubleTensor.setFactory(impl.getFactory());
+        TensorFactories.doubleTensorFactory = impl.getFactory();
         KeanuRandom random = new KeanuRandom(1);
         DoubleTensor A = random.nextDouble(new long[]{dimLength, dimLength});
 
