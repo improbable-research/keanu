@@ -25,10 +25,13 @@ public class BroadcastBinaryDoubleOperations {
     @Param({"TIMES", "DIVIDE"})
     public BinaryOperation operation;
 
-    @Param({"1x1,2x10", "2x10,1x1", "1x10,2x10", "2x10,1x10", "2x2x2,2x2", "2x2,2x2x2", "20x200,20x20x200"})
+    @Param({
+        ",2x100", "2x100,", "1x1,2x10", "2x10,1x1", "1x10,2x10", "2x10,1x10",
+        "2x2x2,2x2", "2x2,2x2x2", "20x200,20x20x200", "20x1x20,20x20x20"})
+
     public String dims;
 
-    @Param({"JVM", "ND4J"})
+    @Param({"JVM"})
     public DoubleTensorImpl impl;
 
     DoubleTensor left;
@@ -44,13 +47,20 @@ public class BroadcastBinaryDoubleOperations {
         String leftParam = dimTokens[0];
         String rightParam = dimTokens[1];
 
-        long[] leftShape = Arrays.stream(leftParam.split("x"))
-            .mapToLong(Long::parseLong)
-            .toArray();
+        long[] leftShape = new long[0];
+        long[] rightShape = new long[0];
 
-        long[] rightShape = Arrays.stream(rightParam.split("x"))
-            .mapToLong(Long::parseLong)
-            .toArray();
+        if (!leftParam.isEmpty()) {
+            leftShape = Arrays.stream(leftParam.split("x"))
+                .mapToLong(Long::parseLong)
+                .toArray();
+        }
+
+        if (!rightParam.isEmpty()) {
+            rightShape = Arrays.stream(rightParam.split("x"))
+                .mapToLong(Long::parseLong)
+                .toArray();
+        }
 
         left = KeanuRandom.getDefaultRandom().nextGaussian(leftShape);
         right = KeanuRandom.getDefaultRandom().nextGaussian(rightShape);

@@ -1,7 +1,6 @@
 package io.improbable.keanu.tensor;
 
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
-import org.nd4j.linalg.api.shape.Shape;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
@@ -101,7 +100,7 @@ public class JVMTensorBroadcast {
                                                     BiFunction<IN, IN, OUT> op,
                                                     boolean inPlace) {
 
-        final long[] resultShape = Shape.broadcastOutputShape(leftShape, rightShape);
+        final long[] resultShape = TensorShape.getBroadcastResultShape(leftShape, rightShape);
         final boolean resultShapeIsLeftSideShape = Arrays.equals(resultShape, leftShape);
 
         final OUTBUFFER outputBuffer;
@@ -114,8 +113,8 @@ public class JVMTensorBroadcast {
 
             //e.g. [2, 2] * [1, 2]
             broadcastFromRight(
-                leftBuffer, leftStride, rightBuffer,
-                rightShape, rightStride,
+                leftBuffer, leftShape, leftStride,
+                rightBuffer, rightShape, rightStride,
                 outputBuffer, op
             );
 
@@ -131,7 +130,7 @@ public class JVMTensorBroadcast {
                 //e.g. [2] / [2, 2]
                 broadcastFromLeft(
                     leftBuffer, leftShape, leftStride,
-                    rightBuffer, rightStride,
+                    rightBuffer, rightShape, rightStride,
                     outputBuffer, op
                 );
 
@@ -179,14 +178,42 @@ public class JVMTensorBroadcast {
      * @return
      */
     private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
-    void broadcastFromRight(INBUFFER leftBuffer, long[] leftStride,
+    void broadcastFromRight(INBUFFER leftBuffer, long[] leftShape, long[] leftStride,
                             INBUFFER rightBuffer, long[] rightShape, long[] rightStride,
                             OUTBUFFER outputBuffer, BiFunction<IN, IN, OUT> op) {
-        for (int i = 0; i < outputBuffer.getLength(); i++) {
 
-            int j = getBroadcastedFlatIndex(i, leftStride, rightShape, rightStride);
-            outputBuffer.set(op.apply(leftBuffer.get(i), rightBuffer.get(j)), i);
+
+        if (canQuickBroadcast(rightShape, leftShape)) {
+            for (int i = 0; i < outputBuffer.getLength(); i++) {
+
+                int j = i % rightBuffer.getLength();
+                outputBuffer.set(op.apply(leftBuffer.get(i), rightBuffer.get(j)), i);
+            }
+        } else {
+            for (int i = 0; i < outputBuffer.getLength(); i++) {
+
+                int j = getBroadcastedFlatIndex(i, leftStride, rightShape, rightStride);
+                outputBuffer.set(op.apply(leftBuffer.get(i), rightBuffer.get(j)), i);
+            }
         }
+
+    }
+
+    private static boolean canQuickBroadcast(long[] fromShape, long[] broadcastShape) {
+
+        boolean b = true;
+
+        for (int i = 1; i <= fromShape.length; i++) {
+            if (fromShape[fromShape.length - i] != broadcastShape[broadcastShape.length - i]) {
+                b = false;
+            } else {
+                if (!b) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -205,14 +232,23 @@ public class JVMTensorBroadcast {
      */
     private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     void broadcastFromLeft(INBUFFER leftBuffer, long[] leftShape, long[] leftStride,
-                           INBUFFER rightBuffer, long[] rightStride,
+                           INBUFFER rightBuffer, long[] rightShape, long[] rightStride,
                            OUTBUFFER outputBuffer, BiFunction<IN, IN, OUT> op) {
 
-        for (int i = 0; i < outputBuffer.getLength(); i++) {
 
-            int j = getBroadcastedFlatIndex(i, rightStride, leftShape, leftStride);
+        if (canQuickBroadcast(leftShape, rightShape)) {
+            for (int i = 0; i < outputBuffer.getLength(); i++) {
 
-            outputBuffer.set(op.apply(leftBuffer.get(j), rightBuffer.get(i)), i);
+                int j = i % leftBuffer.getLength();
+                outputBuffer.set(op.apply(leftBuffer.get(j), rightBuffer.get(i)), i);
+            }
+        } else {
+            for (int i = 0; i < outputBuffer.getLength(); i++) {
+
+                int j = getBroadcastedFlatIndex(i, rightStride, leftShape, leftStride);
+
+                outputBuffer.set(op.apply(leftBuffer.get(j), rightBuffer.get(i)), i);
+            }
         }
     }
 
