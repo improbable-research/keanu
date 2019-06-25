@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.JVMFloatingPointTensor;
 import io.improbable.keanu.tensor.JVMTensor;
-import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.getSummationResultShape;
 import static io.improbable.keanu.tensor.TensorShape.incrementIndexByShape;
@@ -81,15 +79,15 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    protected JVMDoubleTensor createFromResultWrapper(ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> resultWrapper) {
-        return new JVMDoubleTensor(resultWrapper);
+    protected DoubleTensor create(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
+        return new JVMDoubleTensor(buffer, shape, stride);
     }
 
     @Override
-    protected DoubleTensor setAsResultWrapper(ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> wrapper) {
-        this.buffer = wrapper.outputBuffer;
-        this.shape = wrapper.outputShape;
-        this.stride = wrapper.outputStride;
+    protected DoubleTensor set(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
+        this.buffer = buffer;
+        this.shape = shape;
+        this.stride = stride;
         return this;
     }
 
@@ -179,22 +177,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     private long[] shapeCopy() {
         return copyOf(shape, shape.length);
-    }
-
-    @Override
-    public DoubleTensor reshape(long... newShape) {
-        return new JVMDoubleTensor(buffer.copy(), getReshapeAllowingWildcard(shape, buffer.getLength(), newShape));
-    }
-
-    @Override
-    public DoubleTensor broadcast(long... toShape) {
-        int outputLength = TensorShape.getLengthAsInt(toShape);
-        long[] outputStride = TensorShape.getRowFirstStride(toShape);
-        DoubleBuffer.PrimitiveDoubleWrapper outputBuffer = factory.createNew(outputLength);
-
-        JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
-
-        return new JVMDoubleTensor(outputBuffer, toShape, outputStride);
     }
 
     @Override

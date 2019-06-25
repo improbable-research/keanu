@@ -12,7 +12,7 @@ import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 
 public class JVMTensorBroadcast {
 
-    public static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT>>
+    public static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     ResultWrapper<OUT, OUTBUFFER> broadcastIfNeeded(JVMBuffer.ArrayWrapperFactory<OUT, OUTBUFFER> factory,
                                                     INBUFFER leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
                                                     INBUFFER rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
@@ -63,7 +63,7 @@ public class JVMTensorBroadcast {
         return new ResultWrapper<>(outputBuffer, outputShape, outputStride);
     }
 
-    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT>>
+    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     void scalarLeft(IN left, INBUFFER rightBuffer,
                     OUTBUFFER outputBuffer,
                     BiFunction<IN, IN, OUT> op) {
@@ -74,7 +74,7 @@ public class JVMTensorBroadcast {
     }
 
 
-    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT>>
+    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     void scalarRight(INBUFFER leftBuffer, IN right,
                      OUTBUFFER outputBuffer,
                      BiFunction<IN, IN, OUT> op) {
@@ -83,7 +83,7 @@ public class JVMTensorBroadcast {
         }
     }
 
-    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT>>
+    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     void elementwiseBinaryOp(INBUFFER leftBuffer,
                              INBUFFER rightBuffer,
                              BiFunction<IN, IN, OUT> op,
@@ -94,7 +94,7 @@ public class JVMTensorBroadcast {
         }
     }
 
-    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT>>
+    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     ResultWrapper<OUT, OUTBUFFER> broadcastBinaryOp(JVMBuffer.ArrayWrapperFactory<OUT, OUTBUFFER> factory,
                                                     INBUFFER leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
                                                     INBUFFER rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
@@ -153,8 +153,8 @@ public class JVMTensorBroadcast {
     }
 
 
-    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>> void broadcast(B buffer, long[] shape, long[] stride,
-                                                                                   B outputBuffer, long[] outputStride) {
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>> void broadcast(B buffer, long[] shape, long[] stride,
+                                                                                      B outputBuffer, long[] outputStride) {
 
         for (int i = 0; i < outputBuffer.getLength(); i++) {
 
@@ -178,7 +178,7 @@ public class JVMTensorBroadcast {
      * @param op
      * @return
      */
-    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT>>
+    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     void broadcastFromRight(INBUFFER leftBuffer, long[] leftStride,
                             INBUFFER rightBuffer, long[] rightShape, long[] rightStride,
                             OUTBUFFER outputBuffer, BiFunction<IN, IN, OUT> op) {
@@ -203,7 +203,7 @@ public class JVMTensorBroadcast {
      * @param op
      * @return
      */
-    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT>>
+    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     void broadcastFromLeft(INBUFFER leftBuffer, long[] leftShape, long[] leftStride,
                            INBUFFER rightBuffer, long[] rightStride,
                            OUTBUFFER outputBuffer, BiFunction<IN, IN, OUT> op) {
@@ -232,7 +232,7 @@ public class JVMTensorBroadcast {
      * @param op
      */
 
-    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT>>
+    private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     void broadcastFromLeftAndRight(INBUFFER leftBuffer, long[] leftShape, long[] leftStride,
                                    INBUFFER rightBuffer, long[] rightShape, long[] rightStride,
                                    OUTBUFFER outputBuffer, long[] outputStride,

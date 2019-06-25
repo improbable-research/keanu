@@ -18,12 +18,13 @@ import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getLengthAsInt;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
 import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
+import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.getShapeIndices;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static java.util.Arrays.copyOf;
 
-public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends JVMBuffer.PrimitiveArrayWrapper<T>> implements Tensor<T, TENSOR> {
+public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>> implements Tensor<T, TENSOR> {
 
     protected B buffer;
     protected long[] shape;
@@ -60,7 +61,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         return createFromResultWrapper(diag(shape.length, shape, buffer, getFactory()));
     }
 
-    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
     ResultWrapper<T, B> diag(int rank, long[] shape,
                              B buffer, JVMBuffer.ArrayWrapperFactory<T, B> factory) {
 
@@ -93,7 +94,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         return createFromResultWrapper(permute(getFactory(), buffer, shape, stride, rearrange));
     }
 
-    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
     ResultWrapper<T, B> permute(JVMBuffer.ArrayWrapperFactory<T, B> factory,
                                 B buffer,
                                 long[] shape, long[] stride,
@@ -126,7 +127,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
             .collect(Collectors.toList());
     }
 
-    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
     List<ResultWrapper<T, B>> split(JVMBuffer.ArrayWrapperFactory<T, B> factory,
                                     B fromBuffer, long[] shape, long[] stride, int dimension, long... splitAtIndices) {
 
@@ -178,7 +179,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         return createFromResultWrapper(slice(getFactory(), buffer, shape, stride, dimension, index));
     }
 
-    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
     ResultWrapper<T, B> slice(JVMBuffer.ArrayWrapperFactory<T, B> factory,
                               B buffer,
                               long[] shape, long[] stride,
@@ -201,7 +202,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         return new ResultWrapper<>(newBuffer, resultShape, resultStride);
     }
 
-    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
     ResultWrapper<T, B> concat(JVMBuffer.ArrayWrapperFactory<T, B> factory,
                                Tensor[] tensors,
                                int dimension, List<B> toConcat) {
@@ -233,7 +234,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         }
     }
 
-    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
     B concatOnDimensionZero(JVMBuffer.ArrayWrapperFactory<T, B> factory,
                             long[] concatShape, List<B> toConcat) {
 
@@ -242,7 +243,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
         for (int i = 0; i < toConcat.size(); i++) {
 
-            JVMBuffer.PrimitiveArrayWrapper<T> cBuffer = toConcat.get(i);
+            JVMBuffer.PrimitiveArrayWrapper<T, B> cBuffer = toConcat.get(i);
 
             concatBuffer.copyFrom(cBuffer, 0, bufferPosition, cBuffer.getLength());
             bufferPosition += cBuffer.getLength();
@@ -254,22 +255,40 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     protected TENSOR broadcastableBinaryOpWithAutoBroadcast(BiFunction<T, T, T> op,
                                                             JVMTensor<T, TENSOR, B> right) {
 
-        final B rightBuffer = right.buffer;
-        final long[] rightShape = right.shape;
-
         final ResultWrapper<T, B> result = broadcastIfNeeded(
             getFactory(),
             buffer, shape, stride, buffer.getLength(),
-            rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),
+            right.buffer, right.shape, right.stride, right.buffer.getLength(),
             op, true
         );
 
-        return setAsResultWrapper(result);
+        return set(result.outputBuffer, result.outputShape, result.outputStride);
     }
 
-    protected abstract TENSOR createFromResultWrapper(ResultWrapper<T, B> wrapper);
+    @Override
+    public TENSOR reshape(long... newShape) {
+        long[] normalizedShape = getReshapeAllowingWildcard(shape, buffer.getLength(), newShape);
+        return create(buffer.copy(), normalizedShape, getRowFirstStride(normalizedShape));
+    }
 
-    protected abstract TENSOR setAsResultWrapper(ResultWrapper<T, B> wrapper);
+    @Override
+    public TENSOR broadcast(long... toShape) {
+        int outputLength = TensorShape.getLengthAsInt(toShape);
+        long[] outputStride = TensorShape.getRowFirstStride(toShape);
+        B outputBuffer = getFactory().createNew(outputLength);
+
+        JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
+
+        return create(outputBuffer, toShape, outputStride);
+    }
+
+    private TENSOR createFromResultWrapper(ResultWrapper<T, B> wrapper) {
+        return create(wrapper.outputBuffer, wrapper.outputShape, wrapper.outputStride);
+    }
+
+    protected abstract TENSOR create(B buffer, long[] shape, long[] stride);
+
+    protected abstract TENSOR set(B buffer, long[] shape, long[] stride);
 
     protected abstract JVMBuffer.ArrayWrapperFactory<T, B> getFactory();
 }

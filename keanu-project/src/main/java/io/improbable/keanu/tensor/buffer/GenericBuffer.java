@@ -26,15 +26,11 @@ public class GenericBuffer {
         }
     }
 
-    public interface PrimitiveGenericWrapper<T> extends JVMBuffer.PrimitiveArrayWrapper<T> {
-
-        @Override
-        GenericBuffer.PrimitiveGenericWrapper<T> copy();
-
+    public interface PrimitiveGenericWrapper<T> extends JVMBuffer.PrimitiveArrayWrapper<T, PrimitiveGenericWrapper<T>> {
         T[] asArray();
     }
 
-    public static final class GenericArrayWrapper<T> implements GenericBuffer.PrimitiveGenericWrapper<T> {
+    public static final class GenericArrayWrapper<T> implements PrimitiveGenericWrapper<T> {
 
         private final T[] array;
 
@@ -58,12 +54,12 @@ public class GenericBuffer {
         }
 
         @Override
-        public GenericBuffer.PrimitiveGenericWrapper<T> copy() {
-            return new GenericBuffer.GenericArrayWrapper<>(Arrays.copyOf(array, array.length));
+        public PrimitiveGenericWrapper<T> copy() {
+            return new GenericArrayWrapper<>(Arrays.copyOf(array, array.length));
         }
 
         @Override
-        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<T> src, int srcPos, int destPos, int length) {
+        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length) {
             if (src instanceof GenericArrayWrapper) {
                 System.arraycopy(((GenericArrayWrapper) src).array, srcPos, array, destPos, length);
             } else {
@@ -101,15 +97,15 @@ public class GenericBuffer {
 
     }
 
-    public static final class GenericWrapper<T> extends JVMBuffer.SingleValueWrapper<T> implements GenericBuffer.PrimitiveGenericWrapper<T> {
+    public static final class GenericWrapper<T> extends JVMBuffer.SingleValueWrapper<T, PrimitiveGenericWrapper<T>> implements PrimitiveGenericWrapper<T> {
 
         public GenericWrapper(final T value) {
             super(value);
         }
 
         @Override
-        public GenericBuffer.PrimitiveGenericWrapper<T> copy() {
-            return new GenericBuffer.GenericWrapper<>(value);
+        public PrimitiveGenericWrapper<T> copy() {
+            return new GenericWrapper<>(value);
         }
 
         @Override

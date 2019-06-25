@@ -8,7 +8,7 @@ import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
 
-public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, B extends JVMBuffer.PrimitiveArrayWrapper<T>> extends JVMTensor<T, TENSOR, B> implements NumberTensor<T, TENSOR> {
+public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>> extends JVMTensor<T, TENSOR, B> implements NumberTensor<T, TENSOR> {
 
     protected JVMNumberTensor(B buffer, long[] shape, long[] stride) {
         super(buffer, shape, stride);
@@ -18,7 +18,7 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
         return argCompare(getFactory(), buffer, compareOp, shape, stride, axis);
     }
 
-    public static <T extends Number, B extends JVMBuffer.PrimitiveArrayWrapper<T>>
+    public static <T extends Number, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
     IntegerTensor argCompare(JVMBuffer.ArrayWrapperFactory<T, B> factory,
                              B buffer,
                              BiFunction<T, T, Boolean> compareOp,

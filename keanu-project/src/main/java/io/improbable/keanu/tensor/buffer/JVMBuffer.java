@@ -6,16 +6,16 @@ import java.util.function.Function;
 
 public class JVMBuffer {
 
-    public interface PrimitiveArrayWrapper<T> {
+    public interface PrimitiveArrayWrapper<T, IMPL extends PrimitiveArrayWrapper<T, IMPL>> {
         T get(int index);
 
         void set(T value, int index);
 
         int getLength();
 
-        PrimitiveArrayWrapper<T> copy();
+        IMPL copy();
 
-        void copyFrom(PrimitiveArrayWrapper<T> src, int srcPos, int destPos, int length);
+        void copyFrom(PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length);
 
         void apply(Function<T, T> mapper);
 
@@ -24,7 +24,7 @@ public class JVMBuffer {
         void applyLeft(BiFunction<T, T, T> mapper, T leftArg);
     }
 
-    public static abstract class SingleValueWrapper<T> implements PrimitiveArrayWrapper<T> {
+    public static abstract class SingleValueWrapper<T, IMPL extends PrimitiveArrayWrapper<T, IMPL>> implements PrimitiveArrayWrapper<T, IMPL> {
 
         T value;
 
@@ -47,9 +47,7 @@ public class JVMBuffer {
             return 1;
         }
 
-        public abstract PrimitiveArrayWrapper<T> copy();
-
-        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<T> src, int srcPos, int destPos, int length) {
+        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length) {
             if (length == 1 && destPos == 0) {
                 value = src.get(srcPos);
             } else if (length > 1 || length < 0 || destPos != 0) {
@@ -76,7 +74,7 @@ public class JVMBuffer {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            SingleValueWrapper<?> that = (SingleValueWrapper<?>) o;
+            SingleValueWrapper<?, ?> that = (SingleValueWrapper<?, ?>) o;
             return value.equals(that.value);
         }
 
@@ -86,7 +84,7 @@ public class JVMBuffer {
         }
     }
 
-    public interface ArrayWrapperFactory<D, T extends PrimitiveArrayWrapper<D>> {
+    public interface ArrayWrapperFactory<D, T extends PrimitiveArrayWrapper<D, T>> {
         T createNew(int size);
     }
 

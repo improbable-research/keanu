@@ -1,38 +1,24 @@
 package io.improbable.keanu.tensor.generic;
 
-import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.JVMTensor;
-import io.improbable.keanu.tensor.JVMTensorBroadcast;
 import io.improbable.keanu.tensor.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.buffer.GenericBuffer;
-import org.apache.commons.lang3.ArrayUtils;
+import io.improbable.keanu.tensor.buffer.JVMBuffer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
-import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
-import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
-import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
-import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static java.util.Arrays.copyOf;
 
-public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
+public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuffer.PrimitiveGenericWrapper<T>> implements Tensor<T, GenericTensor<T>> {
 
     private static final GenericBuffer.GenericArrayWrapperFactory factory = new GenericBuffer.GenericArrayWrapperFactory();
-
-    private GenericBuffer.PrimitiveGenericWrapper<T> buffer;
-    private long[] shape;
-    private long[] stride;
 
     public static <T> GenericTensor<T> createFilled(T data, long[] shape) {
         return new GenericTensor<>(fillArray(shape, data), shape);
@@ -43,6 +29,9 @@ public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
     }
 
     public static <T> GenericTensor<T> create(T[] data, long[] shape) {
+        if (TensorShape.getLength(shape) != data.length) {
+            throw new IllegalArgumentException("Shape size does not match data length");
+        }
         return new GenericTensor<>(data, shape);
     }
 
@@ -51,63 +40,29 @@ public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
     }
 
     private GenericTensor(GenericBuffer.PrimitiveGenericWrapper<T> buffer, long[] shape, long[] stride) {
-        this.buffer = buffer;
-        this.shape = shape;
-        this.stride = stride;
+        super(buffer, shape, stride);
     }
 
     private GenericTensor(GenericBuffer.PrimitiveGenericWrapper<T> buffer, long[] shape) {
-        this.buffer = buffer;
-        this.shape = shape;
-        this.stride = getRowFirstStride(shape);
+        super(buffer, shape, getRowFirstStride(shape));
     }
 
     private GenericTensor(T[] buffer, long[] shape, long[] stride) {
-        this.buffer = factory.create(buffer);
-        this.shape = shape;
-        this.stride = stride;
+        super(factory.create(buffer), shape, stride);
     }
 
     private GenericTensor(T[] buffer, long[] shape) {
-        if (TensorShape.getLength(shape) != buffer.length) {
-            throw new IllegalArgumentException("Shape size does not match data length");
-        }
-
-        this.buffer = factory.create(Arrays.copyOf(buffer, buffer.length));
-        this.shape = Arrays.copyOf(shape, shape.length);
-        this.stride = getRowFirstStride(shape);
+        this(buffer, shape, getRowFirstStride(shape));
     }
 
     private GenericTensor(T scalar) {
-        this.buffer = new GenericBuffer.GenericWrapper<>(scalar);
-        this.shape = Tensor.SCALAR_SHAPE;
-        this.stride = Tensor.SCALAR_STRIDE;
+        super(new GenericBuffer.GenericWrapper<>(scalar), new long[0], new long[0]);
     }
 
     private static <T> T[] fillArray(long[] shape, T value) {
         Object[] data = new Object[TensorShape.getLengthAsInt(shape)];
         Arrays.fill(data, value);
         return (T[]) data;
-    }
-
-    @Override
-    public int getRank() {
-        return shape.length;
-    }
-
-    @Override
-    public long[] getShape() {
-        return Arrays.copyOf(shape, shape.length);
-    }
-
-    @Override
-    public long[] getStride() {
-        return Arrays.copyOf(stride, stride.length);
-    }
-
-    @Override
-    public long getLength() {
-        return TensorShape.getLength(shape);
     }
 
     @Override
@@ -193,60 +148,21 @@ public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
     }
 
     @Override
-    public GenericTensor<T> reshape(long... newShape) {
-        return new GenericTensor<>(buffer.copy(), getReshapeAllowingWildcard(shape, buffer.getLength(), newShape));
+    protected GenericTensor<T> create(GenericBuffer.PrimitiveGenericWrapper<T> buffer, long[] shape, long[] stride) {
+        return new GenericTensor<>(buffer, shape, stride);
     }
 
     @Override
-    public GenericTensor<T> permute(int... rearrange) {
-        Preconditions.checkArgument(rearrange.length == shape.length);
-        long[] resultShape = getPermutedIndices(shape, rearrange);
-        long[] resultStride = getRowFirstStride(resultShape);
-        GenericBuffer.PrimitiveGenericWrapper<T> newBuffer = factory.createNew(buffer.getLength());
-
-        for (int flatIndex = 0; flatIndex < buffer.getLength(); flatIndex++) {
-
-            int permutedFlatIndex = convertFromFlatIndexToPermutedFlatIndex(
-                flatIndex,
-                shape, stride,
-                resultShape, resultStride,
-                rearrange
-            );
-
-            newBuffer.set(buffer.get(flatIndex), permutedFlatIndex);
-        }
-
-        return new GenericTensor<>(newBuffer, resultShape);
+    protected GenericTensor<T> set(GenericBuffer.PrimitiveGenericWrapper<T> buffer, long[] shape, long[] stride) {
+        this.buffer = buffer;
+        this.shape = shape;
+        this.stride = stride;
+        return this;
     }
 
     @Override
-    public GenericTensor<T> broadcast(long... toShape) {
-        int outputLength = TensorShape.getLengthAsInt(toShape);
-        long[] outputStride = TensorShape.getRowFirstStride(toShape);
-        GenericBuffer.PrimitiveGenericWrapper<T> outputBuffer = factory.createNew(outputLength);
-
-        JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
-
-        return new GenericTensor<>(outputBuffer, toShape, outputStride);
-    }
-
-    @Override
-    public GenericTensor<T> slice(int dimension, long index) {
-        Preconditions.checkArgument(dimension < shape.length && index < shape[dimension]);
-        long[] resultShape = ArrayUtils.remove(shape, dimension);
-        long[] resultStride = getRowFirstStride(resultShape);
-        T[] newBuffer = (T[]) new Object[Ints.checkedCast(TensorShape.getLength(resultShape))];
-
-        for (int i = 0; i < newBuffer.length; i++) {
-
-            long[] shapeIndices = ArrayUtils.insert(dimension, TensorShape.getShapeIndices(resultShape, resultStride, i), index);
-
-            int j = Ints.checkedCast(getFlatIndex(shape, stride, shapeIndices));
-
-            newBuffer[i] = buffer.get(j);
-        }
-
-        return new GenericTensor<>(newBuffer, resultShape);
+    protected JVMBuffer.ArrayWrapperFactory<T, GenericBuffer.PrimitiveGenericWrapper<T>> getFactory() {
+        return factory;
     }
 
     @Override
@@ -254,75 +170,22 @@ public class GenericTensor<T> implements Tensor<T, GenericTensor<T>> {
         return scalar(getValue(index));
     }
 
-    @Override
-    public List<GenericTensor<T>> split(int dimension, long... splitAtIndices) {
-        dimension = getAbsoluteDimension(dimension, getRank());
-
-        if (dimension < 0 || dimension >= shape.length) {
-            throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
-        }
-
-        int[] moveDimToZero = TensorShape.slideDimension(dimension, 0, shape.length);
-        int[] moveZeroToDim = TensorShape.slideDimension(0, dimension, shape.length);
-
-        GenericTensor<T> permutedTensor = this.permute(moveDimToZero);
-
-        GenericBuffer.PrimitiveGenericWrapper<T> rawBuffer = permutedTensor.buffer;
-
-        List<GenericTensor<T>> splitTensor = new ArrayList<>();
-
-        long previousSplitAtIndex = 0;
-        int rawBufferPosition = 0;
-        for (long splitAtIndex : splitAtIndices) {
-
-            long[] subTensorShape = getShape();
-            long subTensorLengthInDimension = splitAtIndex - previousSplitAtIndex;
-
-            if (subTensorLengthInDimension > shape[dimension] || subTensorLengthInDimension <= 0) {
-                throw new IllegalArgumentException("Invalid index to split on " + splitAtIndex + " at " + dimension + " for tensor of shape " + Arrays.toString(shape));
-            }
-
-            subTensorShape[dimension] = subTensorLengthInDimension;
-            int subTensorLength = Ints.checkedCast(TensorShape.getLength(subTensorShape));
-
-            T[] buffer = (T[]) (new Object[subTensorLength]);
-            System.arraycopy(rawBuffer.asArray(), rawBufferPosition, buffer, 0, buffer.length);
-
-            long[] subTensorPermutedShape = getPermutedIndices(subTensorShape, moveDimToZero);
-            GenericTensor<T> subTensor = GenericTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
-            splitTensor.add(subTensor);
-
-            previousSplitAtIndex = splitAtIndex;
-            rawBufferPosition += buffer.length;
-        }
-
-        return splitTensor;
-    }
-
-    @Override
-    public GenericTensor<T> diag() {
-
-        ResultWrapper<T, GenericBuffer.PrimitiveGenericWrapper<T>> result = JVMTensor.diag(getRank(), shape, buffer, factory);
-
-        return new GenericTensor<>(result.outputBuffer, result.outputShape, result.outputStride);
-    }
-
-    private static <T> GenericBuffer.PrimitiveGenericWrapper<T> getRawBufferIfJVMTensor(Tensor<T, ?> tensor) {
+    private static <T> GenericTensor<T> getRawBufferIfJVMTensor(Tensor<T, ?> tensor) {
         if (tensor instanceof GenericTensor) {
-            return ((GenericTensor<T>) tensor).buffer;
+            return ((GenericTensor<T>) tensor);
         } else {
-            return factory.create(tensor.asFlatArray());
+            return new GenericTensor<T>(factory.create(tensor.asFlatArray()), tensor.getShape(), tensor.getStride());
         }
     }
 
     public <R> GenericTensor<R> apply(Tensor<T, ?> right,
                                       BiFunction<T, T, R> op) {
-        final GenericBuffer.PrimitiveGenericWrapper<T> rightBuffer = getRawBufferIfJVMTensor(right);
-        final long[] rightShape = right.getShape();
+
+        final GenericTensor<T> rightTensor = getRawBufferIfJVMTensor(right);
 
         final ResultWrapper<R, GenericBuffer.PrimitiveGenericWrapper<R>> result = broadcastIfNeeded(
             factory, buffer, shape, stride, buffer.getLength(),
-            rightBuffer, rightShape, right.getStride(), rightBuffer.getLength(),
+            rightTensor.buffer, rightTensor.shape, rightTensor.stride, rightTensor.buffer.getLength(),
             op, false
         );
 

@@ -26,20 +26,16 @@ public class BooleanBuffer {
         }
     }
 
-    public interface PrimitiveBooleanWrapper extends JVMBuffer.PrimitiveArrayWrapper<Boolean> {
+    public interface PrimitiveBooleanWrapper extends JVMBuffer.PrimitiveArrayWrapper<Boolean, PrimitiveBooleanWrapper> {
 
         int[] asIntegerArray();
 
         double[] asDoubleArray();
 
         boolean[] asBooleanArray();
-
-        @Override
-        BooleanBuffer.PrimitiveBooleanWrapper copy();
-
     }
 
-    public static final class BooleanArrayWrapper implements BooleanBuffer.PrimitiveBooleanWrapper {
+    public static final class BooleanArrayWrapper implements PrimitiveBooleanWrapper {
 
         private final boolean[] array;
 
@@ -63,12 +59,12 @@ public class BooleanBuffer {
         }
 
         @Override
-        public BooleanBuffer.PrimitiveBooleanWrapper copy() {
+        public PrimitiveBooleanWrapper copy() {
             return new BooleanBuffer.BooleanArrayWrapper(Arrays.copyOf(array, array.length));
         }
 
         @Override
-        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<Boolean> src, int srcPos, int destPos, int length) {
+        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<Boolean, ?> src, int srcPos, int destPos, int length) {
             if (src instanceof BooleanArrayWrapper) {
                 System.arraycopy(((BooleanArrayWrapper) src).array, srcPos, array, destPos, length);
             } else {
@@ -140,15 +136,15 @@ public class BooleanBuffer {
         }
     }
 
-    public static final class BooleanWrapper extends JVMBuffer.SingleValueWrapper<Boolean> implements BooleanBuffer.PrimitiveBooleanWrapper {
+    public static final class BooleanWrapper extends JVMBuffer.SingleValueWrapper<Boolean, PrimitiveBooleanWrapper> implements PrimitiveBooleanWrapper {
 
         public BooleanWrapper(final boolean value) {
             super(value);
         }
 
         @Override
-        public BooleanBuffer.PrimitiveBooleanWrapper copy() {
-            return new BooleanBuffer.BooleanWrapper(value);
+        public PrimitiveBooleanWrapper copy() {
+            return new BooleanWrapper(value);
         }
 
         @Override

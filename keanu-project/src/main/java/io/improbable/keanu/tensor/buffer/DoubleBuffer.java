@@ -26,14 +26,11 @@ public class DoubleBuffer {
         }
     }
 
-    public interface PrimitiveDoubleWrapper extends JVMBuffer.PrimitiveArrayWrapper<Double> {
+    public interface PrimitiveDoubleWrapper extends JVMBuffer.PrimitiveArrayWrapper<Double, PrimitiveDoubleWrapper> {
 
         int[] asIntegerArray();
 
         double[] asDoubleArray();
-
-        @Override
-        PrimitiveDoubleWrapper copy();
 
         double sum();
     }
@@ -67,7 +64,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<Double> src, int srcPos, int destPos, int length) {
+        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<Double, ?> src, int srcPos, int destPos, int length) {
             if (src instanceof DoubleArrayWrapper) {
                 System.arraycopy(((DoubleArrayWrapper) src).array, srcPos, array, destPos, length);
             } else {
@@ -139,15 +136,10 @@ public class DoubleBuffer {
         }
     }
 
-    public static final class DoubleWrapper extends JVMBuffer.SingleValueWrapper<Double> implements PrimitiveDoubleWrapper {
+    public static final class DoubleWrapper extends JVMBuffer.SingleValueWrapper<Double, PrimitiveDoubleWrapper> implements PrimitiveDoubleWrapper {
 
         public DoubleWrapper(final double value) {
             super(value);
-        }
-
-        @Override
-        public PrimitiveDoubleWrapper copy() {
-            return new DoubleWrapper(value);
         }
 
         @Override
@@ -163,6 +155,11 @@ public class DoubleBuffer {
         @Override
         public double[] asDoubleArray() {
             return new double[]{value};
+        }
+
+        @Override
+        public PrimitiveDoubleWrapper copy() {
+            return new DoubleWrapper(value);
         }
     }
 }
