@@ -1,5 +1,7 @@
 package io.improbable.keanu.tensor.buffer;
 
+import org.apache.commons.math3.util.FastMath;
+
 import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -33,6 +35,20 @@ public class DoubleBuffer {
         double[] asDoubleArray();
 
         double sum();
+
+        void times(double val);
+
+        void div(double val);
+
+        void plus(double val);
+
+        void sub(double val);
+
+        void pow(double val);
+
+        void rdiv(double val);
+
+        void rsub(double val);
     }
 
     public static final class DoubleArrayWrapper implements PrimitiveDoubleWrapper {
@@ -82,6 +98,55 @@ public class DoubleBuffer {
             }
             return result;
 
+        }
+
+        @Override
+        public void times(double val) {
+            for (int i = 0; i < array.length; i++) {
+                array[i] *= val;
+            }
+        }
+
+        @Override
+        public void div(double val) {
+            for (int i = 0; i < array.length; i++) {
+                array[i] /= val;
+            }
+        }
+
+        @Override
+        public void plus(double val) {
+            for (int i = 0; i < array.length; i++) {
+                array[i] += val;
+            }
+        }
+
+        @Override
+        public void sub(double val) {
+            for (int i = 0; i < array.length; i++) {
+                array[i] -= val;
+            }
+        }
+
+        @Override
+        public void pow(double val) {
+            for (int i = 0; i < array.length; i++) {
+                array[i] = FastMath.pow(array[i], val);
+            }
+        }
+
+        @Override
+        public void rdiv(double val) {
+            for (int i = 0; i < array.length; i++) {
+                array[i] = val / array[i];
+            }
+        }
+
+        @Override
+        public void rsub(double val) {
+            for (int i = 0; i < array.length; i++) {
+                array[i] = val - array[i];
+            }
         }
 
         @Override
@@ -145,6 +210,41 @@ public class DoubleBuffer {
         @Override
         public double sum() {
             return value;
+        }
+
+        @Override
+        public void times(double val) {
+            value *= val;
+        }
+
+        @Override
+        public void div(double val) {
+            value /= val;
+        }
+
+        @Override
+        public void plus(double val) {
+            value += val;
+        }
+
+        @Override
+        public void sub(double val) {
+            value -= val;
+        }
+
+        @Override
+        public void pow(double val) {
+            value = FastMath.pow(value, val);
+        }
+
+        @Override
+        public void rdiv(double val) {
+            value = val / value;
+        }
+
+        @Override
+        public void rsub(double val) {
+            value = val - value;
         }
 
         @Override

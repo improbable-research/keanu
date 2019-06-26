@@ -247,7 +247,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
             newBuffer.set(newBuffer.get(j) + buffer.get(i), j);
         }
 
-        return new JVMDoubleTensor(newBuffer, resultShape);
+        return new JVMDoubleTensor(newBuffer, resultShape, resultStride);
     }
 
     @Override
@@ -564,12 +564,16 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor powInPlace(DoubleTensor exponent) {
+        if (exponent.isScalar()) {
+            return powInPlace(exponent.scalar());
+        }
         return broadcastableBinaryOpWithAutoBroadcast(FastMath::pow, getAsJVMTensor(exponent));
     }
 
     @Override
     public DoubleTensor powInPlace(Double exponent) {
-        buffer.applyRight(FastMath::pow, exponent);
+//        buffer.applyRight(FastMath::pow, exponent);
+        buffer.pow(exponent);
         return this;
     }
 
@@ -678,7 +682,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor reciprocalInPlace() {
-        buffer.apply((v) -> 1.0 / v);
+        buffer.rdiv(1.0);
         return this;
     }
 
@@ -850,67 +854,103 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor minusInPlace(Double value) {
-        buffer.applyRight(SUB, value);
+//        buffer.applyRight(SUB, value);
+        buffer.sub(value);
         return this;
     }
 
     @Override
     public DoubleTensor minusInPlace(DoubleTensor that) {
+        if (this.isScalar()) {
+            return that.reverseMinus(buffer.get(0));
+        } else if (that.isScalar()) {
+            return minusInPlace(that.scalar());
+        }
         return broadcastableBinaryOpWithAutoBroadcast(SUB, getAsJVMTensor(that));
     }
 
     @Override
     public DoubleTensor reverseMinusInPlace(DoubleTensor that) {
+        if (this.isScalar()) {
+            return that.minus(buffer.get(0));
+        } else if (that.isScalar()) {
+            return reverseMinusInPlace(that.scalar());
+        }
         return broadcastableBinaryOpWithAutoBroadcast(RSUB, getAsJVMTensor(that));
     }
 
     @Override
     public DoubleTensor reverseMinusInPlace(Double value) {
-        buffer.applyRight(RSUB, value);
+//        buffer.applyRight(RSUB, value);
+        buffer.rsub(value);
         return this;
     }
 
     @Override
     public DoubleTensor plusInPlace(Double value) {
-        buffer.applyRight(ADD, value);
+//        buffer.applyRight(ADD, value);
+        buffer.plus(value);
         return this;
     }
 
     @Override
     public DoubleTensor plusInPlace(DoubleTensor that) {
+        if (this.isScalar()) {
+            return that.plus(buffer.get(0));
+        } else if (that.isScalar()) {
+            return plusInPlace(that.scalar());
+        }
         return broadcastableBinaryOpWithAutoBroadcast(ADD, getAsJVMTensor(that));
     }
 
     @Override
     public DoubleTensor timesInPlace(Double value) {
-        buffer.applyRight(MUL, value);
+//        buffer.applyRight(MUL, value);
+        buffer.times(value);
         return this;
     }
 
     @Override
     public DoubleTensor timesInPlace(DoubleTensor that) {
+        if (this.isScalar()) {
+            return that.times(buffer.get(0));
+        } else if (that.isScalar()) {
+            return timesInPlace(that.scalar());
+        }
         return broadcastableBinaryOpWithAutoBroadcast(MUL, getAsJVMTensor(that));
     }
 
     @Override
-    public DoubleTensor divInPlace(Double value) {
-        buffer.applyRight(DIV, value);
+    public DoubleTensor divInPlace(Double that) {
+//        buffer.applyRight(DIV, value);
+        buffer.div(that);
         return this;
     }
 
     @Override
     public DoubleTensor divInPlace(DoubleTensor that) {
+        if (this.isScalar()) {
+            return that.reverseDiv(buffer.get(0));
+        } else if (that.isScalar()) {
+            return divInPlace(that.scalar());
+        }
         return broadcastableBinaryOpWithAutoBroadcast(DIV, getAsJVMTensor(that));
     }
 
     @Override
     public DoubleTensor reverseDivInPlace(Double value) {
-        buffer.applyRight(RDIV, value);
+//        buffer.applyRight(RDIV, value);
+        buffer.rdiv(value);
         return this;
     }
 
     @Override
     public DoubleTensor reverseDivInPlace(DoubleTensor that) {
+        if (this.isScalar()) {
+            return that.div(buffer.get(0));
+        } else if (that.isScalar()) {
+            return reverseDivInPlace(that.scalar());
+        }
         return broadcastableBinaryOpWithAutoBroadcast(RDIV, getAsJVMTensor(that));
     }
 
