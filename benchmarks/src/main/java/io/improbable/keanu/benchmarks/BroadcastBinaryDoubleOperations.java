@@ -31,7 +31,7 @@ public class BroadcastBinaryDoubleOperations {
 
     public String dims;
 
-    @Param({"JVM"})
+    @Param({"JVM", "ND4J"})
     public DoubleTensorImpl impl;
 
     DoubleTensor left;
