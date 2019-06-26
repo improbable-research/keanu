@@ -1,5 +1,7 @@
-package io.improbable.keanu.tensor.buffer;
+package io.improbable.keanu.tensor.dbl;
 
+import io.improbable.keanu.tensor.buffer.JVMBuffer;
+import io.improbable.keanu.tensor.buffer.PrimitiveNumberWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.util.FastMath;
 

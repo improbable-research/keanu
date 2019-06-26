@@ -1,5 +1,6 @@
-package io.improbable.keanu.tensor.buffer;
+package io.improbable.keanu.tensor.bool;
 
+import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;

@@ -1,4 +1,6 @@
-package io.improbable.keanu.tensor.buffer;
+package io.improbable.keanu.tensor.generic;
+
+import io.improbable.keanu.tensor.buffer.JVMBuffer;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;

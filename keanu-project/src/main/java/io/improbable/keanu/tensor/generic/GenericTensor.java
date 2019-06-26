@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.buffer.GenericBuffer;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 
 import java.util.Arrays;

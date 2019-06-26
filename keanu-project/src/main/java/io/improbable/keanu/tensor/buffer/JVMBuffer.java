@@ -29,7 +29,7 @@ public class JVMBuffer {
 
     public static abstract class SingleValueWrapper<T, IMPL extends PrimitiveArrayWrapper<T, IMPL>> implements PrimitiveArrayWrapper<T, IMPL> {
 
-        T value;
+        protected T value;
 
         public SingleValueWrapper(final T value) {
             this.value = value;
