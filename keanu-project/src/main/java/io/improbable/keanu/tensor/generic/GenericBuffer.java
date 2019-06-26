@@ -1,7 +1,6 @@
 package io.improbable.keanu.tensor.generic;
 
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
-import io.improbable.keanu.tensor.dbl.DoubleBuffer;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
