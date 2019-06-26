@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.generic;
 
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
+import io.improbable.keanu.tensor.dbl.DoubleBuffer;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
@@ -95,6 +96,21 @@ public class GenericBuffer {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i]);
             }
+        }
+
+        public boolean equals(final Object o) {
+            if (o == this) return true;
+            if (!(o instanceof PrimitiveGenericWrapper)) return false;
+            final PrimitiveGenericWrapper other = (PrimitiveGenericWrapper) o;
+            if (!Arrays.equals(this.array, other.asArray())) return false;
+            return true;
+        }
+
+        public int hashCode() {
+            final int PRIME = 59;
+            int result = 1;
+            result = result * PRIME + Arrays.hashCode(this.array);
+            return result;
         }
 
     }

@@ -174,11 +174,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor cumSum(int dimension) {
-        return duplicate().cumSumInPlace(dimension);
-    }
-
-    @Override
     public DoubleTensor cumSumInPlace(int requestedDimension) {
         int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + tensor.rank();
         TensorShapeValidation.checkDimensionExistsInShape(dimension, tensor.shape());
@@ -258,41 +253,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor clamp(DoubleTensor min, DoubleTensor max) {
-        return duplicate().clampInPlace(min, max);
-    }
-
-    @Override
-    public DoubleTensor ceil() {
-        return duplicate().ceilInPlace();
-    }
-
-    @Override
-    public DoubleTensor floor() {
-        return duplicate().floorInPlace();
-    }
-
-    @Override
-    public DoubleTensor round() {
-        return duplicate().roundInPlace();
-    }
-
-    @Override
-    public DoubleTensor standardize() {
-        return duplicate().standardizeInPlace();
-    }
-
-    @Override
-    public DoubleTensor replaceNaN(Double value) {
-        return duplicate().replaceNaNInPlace(value);
-    }
-
-    @Override
-    public DoubleTensor sigmoid() {
-        return duplicate().sigmoidInPlace();
-    }
-
-    @Override
     public DoubleTensor choleskyDecomposition() {
         INDArray dup = tensor.dup();
         Nd4j.getBlasWrapper().lapack().potrf(dup, true);
@@ -308,26 +268,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor reciprocal() {
-        return duplicate().reciprocalInPlace();
-    }
-
-    @Override
-    public DoubleTensor minus(Double value) {
-        return duplicate().minusInPlace(value);
-    }
-
-    @Override
-    public DoubleTensor plus(Double value) {
-        return duplicate().plusInPlace(value);
-    }
-
-    @Override
-    public DoubleTensor times(Double value) {
-        return duplicate().timesInPlace(value);
-    }
-
-    @Override
     public DoubleTensor matrixMultiply(DoubleTensor value) {
         TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
         INDArray mmulResult = tensor.mmul(unsafeGetNd4J(value));
@@ -337,91 +277,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
         return TensorMulByMatrixMul.tensorMmul(this, value, dimsLeft, dimsRight);
-    }
-
-    @Override
-    public DoubleTensor div(Double value) {
-        return duplicate().divInPlace(value);
-    }
-
-    @Override
-    public DoubleTensor pow(DoubleTensor exponent) {
-        return duplicate().powInPlace(exponent);
-    }
-
-    @Override
-    public DoubleTensor pow(Double exponent) {
-        return duplicate().powInPlace(exponent);
-    }
-
-    @Override
-    public DoubleTensor sqrt() {
-        return duplicate().sqrtInPlace();
-    }
-
-    @Override
-    public DoubleTensor log() {
-        return duplicate().logInPlace();
-    }
-
-    @Override
-    public DoubleTensor safeLogTimes(DoubleTensor y) {
-        return duplicate().safeLogTimesInPlace(y);
-    }
-
-    @Override
-    public DoubleTensor logGamma() {
-        return duplicate().logGammaInPlace();
-    }
-
-    @Override
-    public DoubleTensor digamma() {
-        return duplicate().digammaInPlace();
-    }
-
-    @Override
-    public DoubleTensor sin() {
-        return duplicate().sinInPlace();
-    }
-
-    @Override
-    public DoubleTensor cos() {
-        return duplicate().cosInPlace();
-    }
-
-    @Override
-    public DoubleTensor tan() {
-        return duplicate().tanInPlace();
-    }
-
-    @Override
-    public DoubleTensor atan() {
-        return duplicate().atanInPlace();
-    }
-
-    @Override
-    public DoubleTensor atan2(Double y) {
-        return duplicate().atan2InPlace(y);
-    }
-
-    @Override
-    public DoubleTensor atan2(DoubleTensor y) {
-        return duplicate().atan2InPlace(y);
-    }
-
-    @Override
-    public DoubleTensor asin() {
-        return duplicate().asinInPlace();
-    }
-
-    @Override
-    public DoubleTensor acos() {
-        return duplicate().acosInPlace();
-    }
-
-    @Override
-    public DoubleTensor exp() {
-        return duplicate().expInPlace();
     }
 
     @Override
@@ -466,21 +321,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else {
             return this.duplicate().divInPlace(that);
         }
-    }
-
-    @Override
-    public DoubleTensor abs() {
-        return duplicate().absInPlace();
-    }
-
-    @Override
-    public DoubleTensor unaryMinus() {
-        return duplicate().unaryMinusInPlace();
-    }
-
-    @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
-        return duplicate().setWithMaskInPlace(mask, value);
     }
 
     @Override
