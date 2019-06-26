@@ -234,7 +234,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
         overDimensions = TensorShape.getAbsoluteDimensions(this.shape.length, overDimensions);
 
-        if (this.isScalar()) {
+        if (this.isScalar() || overDimensions.length == 0) {
             return duplicate();
         } else if (this.isVector()) {
             return new JVMDoubleTensor(buffer.sum());
