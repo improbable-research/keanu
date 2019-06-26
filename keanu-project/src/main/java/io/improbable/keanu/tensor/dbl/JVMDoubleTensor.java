@@ -14,7 +14,6 @@ import io.improbable.keanu.tensor.buffer.DoubleBuffer;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.special.Gamma;
@@ -25,11 +24,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
-import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
-import static io.improbable.keanu.tensor.TensorShape.getSummationResultShape;
-import static io.improbable.keanu.tensor.TensorShape.incrementIndexByShape;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.DIV;
@@ -222,63 +217,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     @Override
     public IntegerTensor toInteger() {
         return IntegerTensor.create(buffer.asIntegerArray(), shapeCopy());
-    }
-
-    @Override
-    public Double sum() {
-        return buffer.sum();
-    }
-
-    @Override
-    public DoubleTensor sum(int... overDimensions) {
-
-        overDimensions = TensorShape.getAbsoluteDimensions(this.shape.length, overDimensions);
-
-        if (this.isScalar() || overDimensions.length == 0) {
-            return duplicate();
-        } else if (this.isVector()) {
-            return new JVMDoubleTensor(buffer.sum());
-        }
-
-        long[] resultShape = getSummationResultShape(shape, overDimensions);
-        long[] resultStride = getRowFirstStride(resultShape);
-        DoubleBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(TensorShape.getLengthAsInt(resultShape));
-
-        for (int i = 0; i < buffer.getLength(); i++) {
-
-            long[] shapeIndices = ArrayUtils.removeAll(TensorShape.getShapeIndices(shape, stride, i), overDimensions);
-
-            int j = Ints.checkedCast(getFlatIndex(resultShape, resultStride, shapeIndices));
-
-            newBuffer.set(newBuffer.get(j) + buffer.get(i), j);
-        }
-
-        return new JVMDoubleTensor(newBuffer, resultShape, resultStride);
-    }
-
-    @Override
-    public DoubleTensor cumSumInPlace(int requestedDimension) {
-
-        int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + shape.length;
-        TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
-        long[] index = new long[shape.length];
-        int[] dimensionOrder = ArrayUtils.remove(dimensionRange(0, shape.length), dimension);
-
-        do {
-
-            double sum = 0.0;
-            for (int i = 0; i < shape[dimension]; i++) {
-
-                index[dimension] = i;
-
-                int j = Ints.checkedCast(getFlatIndex(shape, stride, index));
-                buffer.set(buffer.get(j) + sum, j);
-                sum = buffer.get(j);
-            }
-
-        } while (incrementIndexByShape(shape, index, dimensionOrder));
-
-        return this;
     }
 
     @Override
@@ -663,14 +601,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         return buffer.copy().asDoubleArray();
     }
 
-    private static JVMDoubleTensor getAsJVMTensor(NumberTensor tensor) {
-        if (tensor instanceof JVMDoubleTensor) {
-            return ((JVMDoubleTensor) tensor);
-        } else {
-            return new JVMDoubleTensor(factory.create(tensor.asFlatDoubleArray()), tensor.getShape(), tensor.getStride());
-        }
-    }
-
     @Override
     public int[] asFlatIntegerArray() {
         return buffer.asIntegerArray();
@@ -678,11 +608,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public Double[] asFlatArray() {
-        Double[] boxedBuffer = new Double[buffer.getLength()];
-        for (int i = 0; i < buffer.getLength(); i++) {
-            boxedBuffer[i] = buffer.get(i);
-        }
-        return boxedBuffer;
+        return buffer.asArray();
     }
 
     @Override
@@ -962,6 +888,14 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         }
     }
 
+    private static JVMDoubleTensor getAsJVMTensor(NumberTensor tensor) {
+        if (tensor instanceof JVMDoubleTensor) {
+            return ((JVMDoubleTensor) tensor);
+        } else {
+            return new JVMDoubleTensor(factory.create(tensor.asFlatDoubleArray()), tensor.getShape(), tensor.getStride());
+        }
+    }
+
     private class JVMDoubleFlattenedView {
         public long size() {
             return buffer.getLength();
@@ -989,29 +923,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         public Double getOrScalar(long index) {
             return buffer.get(0);
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        JVMDoubleTensor that = (JVMDoubleTensor) o;
-        return Arrays.equals(shape, that.shape) && buffer.equals(that.buffer);
-    }
-
-    @Override
-    public String toString() {
-        return "{" +
-            "shape=" + Arrays.toString(shape) +
-            ", buffer=" + Arrays.toString(buffer.asDoubleArray()) +
-            '}';
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Arrays.hashCode(shape);
-        result = 31 * result + buffer.hashCode();
-        return result;
     }
 
 }

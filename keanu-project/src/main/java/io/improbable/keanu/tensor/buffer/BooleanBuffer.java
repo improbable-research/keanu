@@ -1,5 +1,7 @@
 package io.improbable.keanu.tensor.buffer;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -120,6 +122,11 @@ public class BooleanBuffer {
             return array;
         }
 
+        @Override
+        public Boolean[] asArray() {
+            return ArrayUtils.toObject(array);
+        }
+
         public boolean equals(final Object o) {
             if (o == this) return true;
             if (!(o instanceof BooleanBuffer.PrimitiveBooleanWrapper)) return false;
@@ -160,6 +167,11 @@ public class BooleanBuffer {
         @Override
         public boolean[] asBooleanArray() {
             return new boolean[]{value};
+        }
+
+        @Override
+        public Boolean[] asArray() {
+            return new Boolean[]{value};
         }
     }
 }

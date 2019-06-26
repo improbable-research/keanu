@@ -7,6 +7,9 @@ import java.util.function.Function;
 public class JVMBuffer {
 
     public interface PrimitiveArrayWrapper<T, IMPL extends PrimitiveArrayWrapper<T, IMPL>> {
+
+        T[] asArray();
+
         T get(int index);
 
         void set(T value, int index);

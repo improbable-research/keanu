@@ -9,7 +9,6 @@ import io.improbable.keanu.tensor.buffer.GenericBuffer;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
@@ -68,24 +67,6 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
     @Override
     public GenericTensor<T> duplicate() {
         return new GenericTensor<>(buffer.copy(), copyOf(shape, shape.length), copyOf(stride, stride.length));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        GenericTensor<?> that = (GenericTensor<?>) o;
-
-        if (!Arrays.equals(shape, that.shape)) return false;
-        return Arrays.equals(buffer.asArray(), that.buffer.asArray());
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(buffer);
-        result = 31 * result + Arrays.hashCode(shape);
-        return result;
     }
 
     @Override

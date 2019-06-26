@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.buffer;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.util.FastMath;
 
 import java.util.Arrays;
@@ -28,27 +29,7 @@ public class DoubleBuffer {
         }
     }
 
-    public interface PrimitiveDoubleWrapper extends JVMBuffer.PrimitiveArrayWrapper<Double, PrimitiveDoubleWrapper> {
-
-        int[] asIntegerArray();
-
-        double[] asDoubleArray();
-
-        double sum();
-
-        void times(double val);
-
-        void div(double val);
-
-        void plus(double val);
-
-        void minus(double val);
-
-        void pow(double val);
-
-        void reverseDiv(double val);
-
-        void reverseMinus(double val);
+    public interface PrimitiveDoubleWrapper extends PrimitiveNumberWrapper<Double, PrimitiveDoubleWrapper> {
     }
 
     public static final class DoubleArrayWrapper implements PrimitiveDoubleWrapper {
@@ -91,7 +72,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public double sum() {
+        public Double sum() {
             double result = 0;
             for (int i = 0; i < array.length; i++) {
                 result += array[i];
@@ -101,51 +82,56 @@ public class DoubleBuffer {
         }
 
         @Override
-        public void times(double val) {
+        public void times(Double that) {
             for (int i = 0; i < array.length; i++) {
-                array[i] *= val;
+                array[i] *= that;
             }
         }
 
         @Override
-        public void div(double val) {
+        public void div(Double that) {
             for (int i = 0; i < array.length; i++) {
-                array[i] /= val;
+                array[i] /= that;
             }
         }
 
         @Override
-        public void plus(double val) {
+        public void plus(Double that) {
             for (int i = 0; i < array.length; i++) {
-                array[i] += val;
+                array[i] += that;
             }
         }
 
         @Override
-        public void minus(double val) {
+        public void plus(int index, Double that) {
+            array[index] += that;
+        }
+
+        @Override
+        public void minus(Double that) {
             for (int i = 0; i < array.length; i++) {
-                array[i] -= val;
+                array[i] -= that;
             }
         }
 
         @Override
-        public void pow(double val) {
+        public void pow(Double that) {
             for (int i = 0; i < array.length; i++) {
-                array[i] = FastMath.pow(array[i], val);
+                array[i] = FastMath.pow(array[i], that);
             }
         }
 
         @Override
-        public void reverseDiv(double val) {
+        public void reverseDiv(Double that) {
             for (int i = 0; i < array.length; i++) {
-                array[i] = val / array[i];
+                array[i] = that / array[i];
             }
         }
 
         @Override
-        public void reverseMinus(double val) {
+        public void reverseMinus(Double that) {
             for (int i = 0; i < array.length; i++) {
-                array[i] = val - array[i];
+                array[i] = that - array[i];
             }
         }
 
@@ -185,6 +171,11 @@ public class DoubleBuffer {
             return array;
         }
 
+        @Override
+        public Double[] asArray() {
+            return ArrayUtils.toObject(array);
+        }
+
         public boolean equals(final Object o) {
             if (o == this) return true;
             if (!(o instanceof PrimitiveDoubleWrapper)) return false;
@@ -208,43 +199,48 @@ public class DoubleBuffer {
         }
 
         @Override
-        public double sum() {
+        public Double sum() {
             return value;
         }
 
         @Override
-        public void times(double val) {
-            value *= val;
+        public void times(Double that) {
+            value *= that;
         }
 
         @Override
-        public void div(double val) {
-            value /= val;
+        public void div(Double that) {
+            value /= that;
         }
 
         @Override
-        public void plus(double val) {
-            value += val;
+        public void plus(Double that) {
+            value += that;
         }
 
         @Override
-        public void minus(double val) {
-            value -= val;
+        public void plus(int index, Double that) {
+            value += that;
         }
 
         @Override
-        public void pow(double val) {
-            value = FastMath.pow(value, val);
+        public void minus(Double that) {
+            value -= that;
         }
 
         @Override
-        public void reverseDiv(double val) {
-            value = val / value;
+        public void pow(Double that) {
+            value = FastMath.pow(value, that);
         }
 
         @Override
-        public void reverseMinus(double val) {
-            value = val - value;
+        public void reverseDiv(Double that) {
+            value = that / value;
+        }
+
+        @Override
+        public void reverseMinus(Double that) {
+            value = that - value;
         }
 
         @Override
@@ -255,6 +251,11 @@ public class DoubleBuffer {
         @Override
         public double[] asDoubleArray() {
             return new double[]{value};
+        }
+
+        @Override
+        public Double[] asArray() {
+            return new Double[]{value};
         }
 
         @Override

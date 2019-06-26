@@ -321,6 +321,39 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         return IntegerTensor.create(maxIndex, ArrayUtils.remove(shape, axis));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JVMTensor that = (JVMTensor) o;
+        return Arrays.equals(shape, that.shape) && buffer.equals(that.buffer);
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder dataString = new StringBuilder();
+        if (buffer.getLength() > 20) {
+            dataString.append(Arrays.toString(Arrays.copyOfRange(buffer.asArray(), 0, 10)));
+            dataString.append("...");
+            dataString.append(Arrays.toString(Arrays.copyOfRange(buffer.asArray(), buffer.getLength() - 10, buffer.getLength())));
+        } else {
+            dataString.append(Arrays.toString(buffer.asArray()));
+        }
+
+        return "{\n" +
+            "shape = " + Arrays.toString(shape) +
+            "\ndata = " + dataString.toString() +
+            "\n}";
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(shape);
+        result = 31 * result + buffer.hashCode();
+        return result;
+    }
+
     private TENSOR createFromResultWrapper(ResultWrapper<T, B> wrapper) {
         return create(wrapper.outputBuffer, wrapper.outputShape, wrapper.outputStride);
     }

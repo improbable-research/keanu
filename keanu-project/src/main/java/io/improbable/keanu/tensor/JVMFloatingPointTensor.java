@@ -1,8 +1,8 @@
 package io.improbable.keanu.tensor;
 
-import io.improbable.keanu.tensor.buffer.JVMBuffer;
+import io.improbable.keanu.tensor.buffer.PrimitiveNumberWrapper;
 
-public abstract class JVMFloatingPointTensor<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>> extends JVMNumberTensor<T, TENSOR, B> implements FloatingPointTensor<T, TENSOR> {
+public abstract class JVMFloatingPointTensor<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, B extends PrimitiveNumberWrapper<T, B>> extends JVMNumberTensor<T, TENSOR, B> implements FloatingPointTensor<T, TENSOR> {
 
     protected JVMFloatingPointTensor(B buffer, long[] shape, long[] stride) {
         super(buffer, shape, stride);
