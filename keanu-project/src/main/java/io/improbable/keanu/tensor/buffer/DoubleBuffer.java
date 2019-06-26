@@ -42,13 +42,13 @@ public class DoubleBuffer {
 
         void plus(double val);
 
-        void sub(double val);
+        void minus(double val);
 
         void pow(double val);
 
-        void rdiv(double val);
+        void reverseDiv(double val);
 
-        void rsub(double val);
+        void reverseMinus(double val);
     }
 
     public static final class DoubleArrayWrapper implements PrimitiveDoubleWrapper {
@@ -122,7 +122,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public void sub(double val) {
+        public void minus(double val) {
             for (int i = 0; i < array.length; i++) {
                 array[i] -= val;
             }
@@ -136,14 +136,14 @@ public class DoubleBuffer {
         }
 
         @Override
-        public void rdiv(double val) {
+        public void reverseDiv(double val) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = val / array[i];
             }
         }
 
         @Override
-        public void rsub(double val) {
+        public void reverseMinus(double val) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = val - array[i];
             }
@@ -228,7 +228,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public void sub(double val) {
+        public void minus(double val) {
             value -= val;
         }
 
@@ -238,12 +238,12 @@ public class DoubleBuffer {
         }
 
         @Override
-        public void rdiv(double val) {
+        public void reverseDiv(double val) {
             value = val / value;
         }
 
         @Override
-        public void rsub(double val) {
+        public void reverseMinus(double val) {
             value = val - value;
         }
 

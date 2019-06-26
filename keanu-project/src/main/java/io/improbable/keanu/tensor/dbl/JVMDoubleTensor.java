@@ -234,6 +234,12 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
         overDimensions = TensorShape.getAbsoluteDimensions(this.shape.length, overDimensions);
 
+        if (this.isScalar()) {
+            return duplicate();
+        } else if (this.isVector()) {
+            return new JVMDoubleTensor(buffer.sum());
+        }
+
         long[] resultShape = getSummationResultShape(shape, overDimensions);
         long[] resultStride = getRowFirstStride(resultShape);
         DoubleBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(TensorShape.getLengthAsInt(resultShape));
@@ -572,7 +578,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor powInPlace(Double exponent) {
-//        buffer.applyRight(FastMath::pow, exponent);
         buffer.pow(exponent);
         return this;
     }
@@ -682,7 +687,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor reciprocalInPlace() {
-        buffer.rdiv(1.0);
+        buffer.reverseDiv(1.0);
         return this;
     }
 
@@ -854,8 +859,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor minusInPlace(Double value) {
-//        buffer.applyRight(SUB, value);
-        buffer.sub(value);
+        buffer.minus(value);
         return this;
     }
 
@@ -881,14 +885,12 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor reverseMinusInPlace(Double value) {
-//        buffer.applyRight(RSUB, value);
-        buffer.rsub(value);
+        buffer.reverseMinus(value);
         return this;
     }
 
     @Override
     public DoubleTensor plusInPlace(Double value) {
-//        buffer.applyRight(ADD, value);
         buffer.plus(value);
         return this;
     }
@@ -905,7 +907,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor timesInPlace(Double value) {
-//        buffer.applyRight(MUL, value);
         buffer.times(value);
         return this;
     }
@@ -922,7 +923,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor divInPlace(Double that) {
-//        buffer.applyRight(DIV, value);
         buffer.div(that);
         return this;
     }
@@ -939,8 +939,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor reverseDivInPlace(Double value) {
-//        buffer.applyRight(RDIV, value);
-        buffer.rdiv(value);
+        buffer.reverseDiv(value);
         return this;
     }
 
