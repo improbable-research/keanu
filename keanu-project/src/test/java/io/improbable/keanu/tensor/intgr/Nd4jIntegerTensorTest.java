@@ -600,6 +600,15 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
+    public void canFindArgMinOfMatrix() {
+        IntegerTensor tensor = IntegerTensor.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
+
+        assertThat(tensor.argMin(0), valuesAndShapesMatch(IntegerTensor.create(0, 1, 1, 1)));
+        assertThat(tensor.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, 1)));
+        assertEquals(0, tensor.argMin());
+    }
+
+    @Test
     public void canFindArgMaxOfHighRank() {
         IntegerTensor tensor = IntegerTensor.create(IntStream.range(0, 512).toArray()).reshape(2, 8, 4, 2, 4);
 
