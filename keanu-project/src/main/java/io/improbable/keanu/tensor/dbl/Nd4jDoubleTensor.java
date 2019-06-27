@@ -215,12 +215,19 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public int argMax() {
+    public int nanArgMax() {
         return tensor.argMax().getInt(0);
     }
 
     @Override
-    public IntegerTensor argMax(int axis) {
+    public int argMax() {
+        return duplicate()
+            .replaceNaNInPlace(Double.MAX_VALUE)
+            .nanArgMax();
+    }
+
+    @Override
+    public IntegerTensor nanArgMax(int axis) {
         long[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
         INDArray max = tensor.argMax(axis).reshape(TensorShape.removeDimension(axis, shape));
@@ -228,15 +235,36 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public int argMin() {
+    public IntegerTensor argMax(int axis) {
+        return duplicate()
+            .replaceNaNInPlace(Double.MAX_VALUE)
+            .nanArgMax(axis);
+    }
+
+    @Override
+    public int nanArgMin() {
         return Nd4j.argMin(tensor).getInt(0);
     }
 
     @Override
-    public IntegerTensor argMin(int axis) {
+    public int argMin() {
+        return duplicate()
+            .replaceNaNInPlace(-Double.MAX_VALUE)
+            .nanArgMin();
+    }
+
+    @Override
+    public IntegerTensor nanArgMin(int axis) {
         long[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
         return new Nd4jIntegerTensor(Nd4j.argMin(tensor, axis).reshape(TensorShape.removeDimension(axis, shape)));
+    }
+
+    @Override
+    public IntegerTensor argMin(int axis) {
+        return duplicate()
+            .replaceNaNInPlace(-Double.MAX_VALUE)
+            .nanArgMin(axis);
     }
 
     @Override

@@ -977,6 +977,51 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canFindArgMaxNumPyExample() {
+        /*
+         * >>> a = np.arange(6).reshape(2,3) + 10
+         * >>> a
+         * array([[10, 11, 12],
+         *        [13, 14, 15]])
+         * >>> np.argmax(a)
+         * 5
+         * >>> np.argmax(a, axis=0)
+         * array([1, 1, 1])
+         * >>> np.argmax(a, axis=1)
+         * array([2, 2])
+         */
+
+        DoubleTensor a = DoubleTensor.arange(0, 6).reshape(2, 3).plus(10);
+
+        assertEquals(5, a.argMax());
+        assertThat(a.argMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 1, 1)));
+        assertThat(a.argMax(1), valuesAndShapesMatch(IntegerTensor.create(2, 2)));
+    }
+
+    @Test
+    public void canFindNanArgMaxOfMatrixNumPyExample() {
+
+        /*
+         * >>> a = np.array([[np.nan, 4], [2, 3]])
+         * >>> np.argmax(a)
+         * 0
+         * >>> np.nanargmax(a)
+         * 1
+         * >>> np.nanargmax(a, axis=0)
+         * array([1, 0])
+         * >>> np.nanargmax(a, axis=1)
+         * array([1, 1])
+         */
+
+        DoubleTensor tensor = DoubleTensor.create(Double.NaN, 4, 2, 3).reshape(2, 2);
+
+        assertEquals(0, tensor.argMax());
+        assertEquals(1, tensor.nanArgMax());
+        assertThat(tensor.nanArgMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 0)));
+        assertThat(tensor.nanArgMax(1), valuesAndShapesMatch(IntegerTensor.create(1, 1)));
+    }
+
+    @Test
     public void canFindArgMaxOfHighRank() {
         DoubleTensor tensor = DoubleTensor.arange(0, 512).reshape(2, 8, 4, 2, 4);
 
@@ -1054,6 +1099,52 @@ public class DoubleTensorTest {
     public void argMinFailsForAxisTooHighWithScalar() {
         DoubleTensor tensor = DoubleTensor.scalar(1);
         tensor.argMin(2);
+    }
+
+    @Test
+    public void canArgMinNumPyExample() {
+
+        /*
+         * >>> a = np.arange(6).reshape(2,3) + 10
+         * >>> a
+         * array([[10, 11, 12],
+         *        [13, 14, 15]])
+         * >>> np.argmin(a)
+         * 0
+         * >>> np.argmin(a, axis=0)
+         * array([0, 0, 0])
+         * >>> np.argmin(a, axis=1)
+         * array([0, 0])
+         */
+
+        DoubleTensor a = DoubleTensor.arange(0, 6).reshape(2, 3).plus(10);
+
+        assertEquals(0, a.argMin());
+        assertThat(a.argMin(0), valuesAndShapesMatch(IntegerTensor.create(0, 0, 0)));
+        assertThat(a.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, 0)));
+    }
+
+    @Test
+    public void canFindNanArgMinNumPyExample() {
+
+        /*
+         * >>> a = np.array([[np.nan, 4], [2, 3]])
+         * >>> np.argmin(a)
+         * 0
+         * >>> np.nanargmin(a)
+         * 2
+         * >>> np.nanargmin(a, axis=0)
+         * array([1, 1])
+         * >>> np.nanargmin(a, axis=1)
+         * array([1, 0])
+         */
+
+        DoubleTensor tensor = DoubleTensor.create(Double.NaN, 4, 2, 3).reshape(2, 2);
+
+        assertEquals(0, tensor.argMin());
+        assertEquals(2, tensor.nanArgMin());
+        assertThat(tensor.nanArgMin(0), valuesAndShapesMatch(IntegerTensor.create(1, 1)));
+        assertThat(tensor.nanArgMin(1), valuesAndShapesMatch(IntegerTensor.create(1, 0)));
     }
 
     private void assertCanSplit(long[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {

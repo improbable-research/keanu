@@ -63,18 +63,20 @@ public class TensorMatchers {
         return new TypeSafeDiagnosingMatcher<Tensor<T, ?>>() {
             @Override
             protected boolean matchesSafely(Tensor<T, ?> item, Description mismatchDescription) {
-                mismatchDescription.appendText("Tensor");
+                mismatchDescription.appendText("and\n  Actual tensor ").appendValue(item);
                 T[] itemArray = item.asFlatArray();
+
                 if (itemArray.length != valueMatchers.size()) {
                     mismatchDescription
                         .appendText(" with different size ")
                         .appendValue(itemArray.length);
                     return false;
                 }
+
                 for (int i = 0; i < valueMatchers.size(); i++) {
                     if (!valueMatchers.get(i).matches(itemArray[i])) {
                         mismatchDescription
-                            .appendText(" with different value ")
+                            .appendText(" has different value ")
                             .appendValue(itemArray[i])
                             .appendText(" at entry ")
                             .appendValue(i);
@@ -86,7 +88,7 @@ public class TensorMatchers {
 
             @Override
             public void describeTo(Description description) {
-                description.appendText("Tensor with value ").appendValue(valueMatchers);
+                description.appendText("\nExpected tensor ").appendValue(valueMatchers);
             }
         };
     }

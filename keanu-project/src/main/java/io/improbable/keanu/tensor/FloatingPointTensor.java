@@ -18,6 +18,14 @@ public interface FloatingPointTensor<N extends Number, T extends FloatingPointTe
         return notNaN().not();
     }
 
+    IntegerTensor nanArgMax(int axis);
+
+    int nanArgMax();
+
+    IntegerTensor nanArgMin(int axis);
+
+    int nanArgMin();
+
     default T reciprocal() {
         return duplicate().reciprocalInPlace();
     }

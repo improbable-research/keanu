@@ -335,43 +335,42 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public int argMax() {
-
-        double max = -Double.MAX_VALUE;
-        int argMax = 0;
-        for (int i = 0; i < buffer.getLength(); i++) {
-            final double value = buffer.get(i);
-            if (value > max) {
-                max = value;
-                argMax = i;
-            }
-        }
-
-        return argMax;
+        return argCompare((value, min) -> value > min);
     }
 
     @Override
     public IntegerTensor argMax(int axis) {
-        return argCompare((l, r) -> l > r, axis);
+        return argCompare((value, max) -> value > max, axis);
     }
 
     @Override
-    public int argMin() {
-        double min = Double.MAX_VALUE;
-        int argMin = 0;
-        for (int i = 0; i < buffer.getLength(); i++) {
-            final double value = buffer.get(i);
-            if (value < min) {
-                min = value;
-                argMin = i;
-            }
-        }
+    public IntegerTensor nanArgMax(int axis) {
+        return argCompare((value, max) -> Double.isNaN(max) || !Double.isNaN(value) && value > max, axis);
+    }
 
-        return argMin;
+    @Override
+    public int nanArgMax() {
+        return argCompare((value, max) -> Double.isNaN(max) || !Double.isNaN(value) && value > max);
     }
 
     @Override
     public IntegerTensor argMin(int axis) {
-        return argCompare((l, r) -> l < r, axis);
+        return argCompare((value, min) -> value < min, axis);
+    }
+
+    @Override
+    public int argMin() {
+        return argCompare((value, min) -> value < min);
+    }
+
+    @Override
+    public IntegerTensor nanArgMin(int axis) {
+        return argCompare((value, min) -> Double.isNaN(min) || !Double.isNaN(value) && value < min, axis);
+    }
+
+    @Override
+    public int nanArgMin() {
+        return argCompare((value, min) -> Double.isNaN(min) || !Double.isNaN(value) && value < min);
     }
 
     @Override

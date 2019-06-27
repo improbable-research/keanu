@@ -322,6 +322,26 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         return IntegerTensor.create(maxIndex, ArrayUtils.remove(shape, axis));
     }
 
+    public int argCompare(BiFunction<T, T, Boolean> compareOp) {
+        return argCompare(buffer, compareOp);
+    }
+
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>> int argCompare(B buffer,
+                                                                                      BiFunction<T, T, Boolean> compareOp) {
+        T min = null;
+        int argMin = -1;
+        for (int i = 0; i < buffer.getLength(); i++) {
+
+            final T value = buffer.get(i);
+            if (argMin < 0 || compareOp.apply(value, min)) {
+                min = value;
+                argMin = i;
+            }
+        }
+
+        return argMin;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
