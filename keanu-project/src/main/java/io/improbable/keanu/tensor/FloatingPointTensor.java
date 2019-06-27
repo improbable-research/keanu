@@ -110,6 +110,48 @@ public interface FloatingPointTensor<N extends Number, T extends FloatingPointTe
 
     T expInPlace();
 
+    default T logAddExp2(T that) {
+        return duplicate().logAddExp2InPlace(that);
+    }
+
+    T logAddExp2InPlace(T that);
+
+    default T logAddExp(T that) {
+        return duplicate().logAddExpInPlace(that);
+    }
+
+    T logAddExpInPlace(T that);
+
+    default T log1p() {
+        return duplicate().log1pInPlace();
+    }
+
+    T log1pInPlace();
+
+    default T log2() {
+        return duplicate().log2InPlace();
+    }
+
+    T log2InPlace();
+
+    default T log10() {
+        return duplicate().log10InPlace();
+    }
+
+    T log10InPlace();
+
+    default T exp2() {
+        return duplicate().exp2InPlace();
+    }
+
+    T exp2InPlace();
+
+    default T expM1() {
+        return duplicate().expM1InPlace();
+    }
+
+    T expM1InPlace();
+
     default T ceil() {
         return duplicate().ceilInPlace();
     }

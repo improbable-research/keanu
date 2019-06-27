@@ -256,16 +256,6 @@ Missing types:
 - cross(a, b[, axisa, axisb, axisc, axis])	Return the cross product of two (arrays of) vectors.
 - trapz(y[, x, dx, axis])	Integrate along the given axis using the composite trapezoidal rule.
 
-#### Exp, log
-
-- expm1(x, /[, out, where, casting, order, …])	Calculate exp(x) - 1 for all elements in the array.
-- exp2(x, /[, out, where, casting, order, …])	Calculate 2**p for all p in the input array.
-- log10(x, /[, out, where, casting, order, …])	Return the base 10 logarithm of the input array, element-wise.
-- log2(x, /[, out, where, casting, order, …])	Base-2 logarithm of x.
-- log1p(x, /[, out, where, casting, order, …])	Return the natural logarithm of one plus the input array, element-wise.
-- logaddexp(x1, x2, /[, out, where, casting, …])	Logarithm of the sum of exponentiations of the inputs.
-- logaddexp2(x1, x2, /[, out, where, casting, …])	Logarithm of the sum of exponentiations of the inputs in base-2.
-
 #### Arithmetic
 
 #### Windowing

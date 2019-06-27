@@ -29,6 +29,8 @@ import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.DIV;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.GTE_MASK;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.GT_MASK;
+import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LOG_ADD_EXP;
+import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LOG_ADD_EXP2;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LTE_MASK;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LT_MASK;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.MUL;
@@ -706,6 +708,46 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     @Override
     public DoubleTensor expInPlace() {
         buffer.apply(FastMath::exp);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor logAddExp2InPlace(DoubleTensor that) {
+        return broadcastableBinaryOpWithAutoBroadcast(LOG_ADD_EXP2, getAsJVMTensor(that));
+    }
+
+    @Override
+    public DoubleTensor logAddExpInPlace(DoubleTensor that) {
+        return broadcastableBinaryOpWithAutoBroadcast(LOG_ADD_EXP, getAsJVMTensor(that));
+    }
+
+    @Override
+    public DoubleTensor log1pInPlace() {
+        buffer.apply(FastMath::log1p);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor log2InPlace() {
+        buffer.apply(v -> FastMath.log(v) / FastMath.log(2));
+        return this;
+    }
+
+    @Override
+    public DoubleTensor log10InPlace() {
+        buffer.apply(FastMath::log10);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor exp2InPlace() {
+        buffer.apply(v -> FastMath.pow(2, v));
+        return this;
+    }
+
+    @Override
+    public DoubleTensor expM1InPlace() {
+        buffer.apply(FastMath::expm1);
         return this;
     }
 

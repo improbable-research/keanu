@@ -35,6 +35,7 @@ import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -1590,6 +1591,57 @@ public class DoubleTensorTest {
         assertUnaryOperation(Gamma::logGamma, DoubleTensor::logGammaInPlace, tensorBetween0And1());
         assertUnaryOperation(FastMath::sqrt, DoubleTensor::sqrt, tensorBetween0And1());
         assertUnaryOperation(FastMath::sqrt, DoubleTensor::sqrtInPlace, tensorBetween0And1());
+
+        assertUnaryOperation(FastMath::expm1, DoubleTensor::expM1InPlace, tensorBetween0And1());
+        assertUnaryOperation(DoubleTensorTest::exp2, DoubleTensor::exp2InPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::log10, DoubleTensor::log10InPlace, tensorBetween0And1());
+        assertUnaryOperation(DoubleTensorTest::log2, DoubleTensor::log2InPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::log1p, DoubleTensor::log1pInPlace, tensorBetween0And1());
+    }
+
+    public static double exp2(double a) {
+        return FastMath.pow(2, a);
+    }
+
+    public static double log2(double a) {
+        return FastMath.log(a) / FastMath.log(2);
+    }
+
+    @Test
+    public void canLogAddExp() {
+        /*
+         * >>> prob1 = np.log(1e-50)
+         * >>> prob2 = np.log(2.5e-50)
+         * >>> prob12 = np.logaddexp(prob1, prob2)
+         * >>> prob12
+         * -113.87649168120691
+         * >>> np.exp(prob12)
+         * 3.5000000000000057e-50
+         */
+
+        DoubleTensor prob1 = DoubleTensor.scalar(Math.log(1e-50));
+        DoubleTensor prob2 = DoubleTensor.scalar(Math.log(2.5e-50));
+        DoubleTensor prob12 = prob1.logAddExp(prob2);
+        assertThat(prob12.scalar(), closeTo(-113.87649168120691, 1e-8));
+    }
+
+    @Test
+    public void canLogAddExp2() {
+
+        /*
+         * >>> prob1 = np.log2(1e-50)
+         * >>> prob2 = np.log2(2.5e-50)
+         * >>> prob12 = np.logaddexp2(prob1, prob2)
+         * >>> prob1, prob2, prob12
+         * (-166.09640474436813, -164.77447664948076, -164.28904982231052)
+         * >>> 2**prob12
+         * 3.4999999999999914e-50
+         */
+
+        DoubleTensor prob1 = DoubleTensor.scalar(Math.log(1e-50) / Math.log(2));
+        DoubleTensor prob2 = DoubleTensor.scalar(Math.log(2.5e-50) / Math.log(2));
+        DoubleTensor prob12 = prob1.logAddExp2(prob2);
+        assertThat(prob12.scalar(), closeTo(-164.28904982231052, 1e-8));
     }
 
     private DoubleTensor tensorRangeWithNegatives() {
