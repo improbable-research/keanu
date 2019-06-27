@@ -82,8 +82,6 @@ The following functions are on the todo list:
 
 #### Searching
 
-- nanargmax(a[, axis])	Return the indices of the maximum values in the specified axis ignoring NaNs.
-- nanargmin(a[, axis])	Return the indices of the minimum values in the specified axis ignoring NaNs.
 - argwhere(a)	Find the indices of array elements that are non-zero, grouped by element.
 - searchsorted(a, v[, side, sorter])	Find indices where elements should be inserted to maintain order.
 - extract(condition, arr)	Return the elements of an array that satisfy some condition.
