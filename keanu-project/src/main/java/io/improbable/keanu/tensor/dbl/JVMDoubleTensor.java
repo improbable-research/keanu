@@ -355,6 +355,26 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
+    public int argMin() {
+        double min = Double.MAX_VALUE;
+        int argMin = 0;
+        for (int i = 0; i < buffer.getLength(); i++) {
+            final double value = buffer.get(i);
+            if (value < min) {
+                min = value;
+                argMin = i;
+            }
+        }
+
+        return argMin;
+    }
+
+    @Override
+    public IntegerTensor argMin(int axis) {
+        return argCompare((l, r) -> l < r, axis);
+    }
+
+    @Override
     public DoubleTensor unaryMinusInPlace() {
         buffer.apply((v) -> -v);
         return this;

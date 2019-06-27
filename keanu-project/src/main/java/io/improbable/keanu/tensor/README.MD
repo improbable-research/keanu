@@ -18,7 +18,6 @@ The following functions are on the todo list:
 - moveaxis(a, source, destination)	Move axes of an array to new positions.
 - rollaxis(a, axis[, start])	Roll the specified axis backwards, until it lies in a given position.
 - swapaxes(a, axis1, axis2)	Interchange two axes of an array.
-- transpose(a[, axes])	Permute the dimensions of an array.
 
 - expand_dims(a, axis)	Expand the shape of an array.
 - squeeze(a[, axis])	Remove single-dimensional entries from the shape of an array.
@@ -84,7 +83,6 @@ The following functions are on the todo list:
 #### Searching
 
 - nanargmax(a[, axis])	Return the indices of the maximum values in the specified axis ignoring NaNs.
-- argmin(a[, axis, out])	Returns the indices of the minimum values along an axis.
 - nanargmin(a[, axis])	Return the indices of the minimum values in the specified axis ignoring NaNs.
 - argwhere(a)	Find the indices of array elements that are non-zero, grouped by element.
 - searchsorted(a, v[, side, sorter])	Find indices where elements should be inserted to maintain order.

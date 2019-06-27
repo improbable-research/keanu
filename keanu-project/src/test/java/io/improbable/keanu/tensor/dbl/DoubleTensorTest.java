@@ -999,6 +999,63 @@ public class DoubleTensorTest {
         tensor.argMax(2);
     }
 
+    @Test
+    public void canFindArgMinOfRowVector() {
+        DoubleTensor tensorRow = DoubleTensor.create(7, 3, 4, 5, 2).reshape(1, 5);
+
+        assertEquals(4, tensorRow.argMin());
+        assertThat(tensorRow.argMin(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
+        assertThat(tensorRow.argMin(1), valuesAndShapesMatch(IntegerTensor.create(new int[]{4}, 1)));
+    }
+
+    @Test
+    public void canFindArgMinOfColumnVector() {
+        DoubleTensor tensorCol = DoubleTensor.create(7, 1, 4, 5, 2).reshape(5, 1);
+
+        assertEquals(1, tensorCol.argMin());
+        assertThat(tensorCol.argMin(0), valuesAndShapesMatch(IntegerTensor.create(new int[]{1}, 1)));
+        assertThat(tensorCol.argMin(1), valuesAndShapesMatch(IntegerTensor.zeros(5)));
+    }
+
+    @Test
+    public void argMinReturnsIndexOfFirstMin() {
+        DoubleTensor tensor = DoubleTensor.create(5, 2, 2, 2, 2);
+
+        assertEquals(1, tensor.argMin());
+    }
+
+    @Test
+    public void canFindArgMinOfMatrix() {
+        DoubleTensor tensor = DoubleTensor.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
+
+        assertThat(tensor.argMin(0), valuesAndShapesMatch(IntegerTensor.create(0, 1, 1, 1)));
+        assertThat(tensor.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, 1)));
+        assertEquals(0, tensor.argMin());
+    }
+
+    @Test
+    public void canFindArgMinOfHighRank() {
+        DoubleTensor tensor = DoubleTensor.arange(0, 512).reshape(2, 8, 4, 2, 4);
+
+        assertThat(tensor.argMin(0), valuesAndShapesMatch(IntegerTensor.zeros(8, 4, 2, 4)));
+        assertThat(tensor.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, new long[]{2, 4, 2, 4})));
+        assertThat(tensor.argMin(2), valuesAndShapesMatch(IntegerTensor.create(0, new long[]{2, 8, 2, 4})));
+        assertThat(tensor.argMin(3), valuesAndShapesMatch(IntegerTensor.zeros(2, 8, 4, 4)));
+        assertEquals(0, tensor.argMin());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void argMinFailsForAxisTooHigh() {
+        DoubleTensor tensor = DoubleTensor.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
+        tensor.argMin(2);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void argMinFailsForAxisTooHighWithScalar() {
+        DoubleTensor tensor = DoubleTensor.scalar(1);
+        tensor.argMin(2);
+    }
+
     private void assertCanSplit(long[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {
 
         long[] splitIndices = new long[concatenatedIndices.length];

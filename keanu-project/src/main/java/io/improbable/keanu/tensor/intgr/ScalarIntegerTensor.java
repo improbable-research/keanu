@@ -481,6 +481,17 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public int argMin() {
+        return 0;
+    }
+
+    @Override
+    public IntegerTensor argMin(int axis) {
+        TensorShapeValidation.checkDimensionExistsInShape(axis, this.getShape());
+        return IntegerTensor.scalar(0);
+    }
+
+    @Override
     public BooleanTensor greaterThan(IntegerTensor that) {
         if (that.isLengthOne()) {
             long[] newShape = calculateShapeForLengthOneBroadcast(shape, that.getShape());

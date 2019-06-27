@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 public interface FloatingPointTensor<N extends Number, T extends FloatingPointTensor<N, T>> extends NumberTensor<N, T>, DoubleOperators<T> {
 

@@ -305,13 +305,14 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
         B maxBuffer = factory.createNew(dimLength);
         int[] maxIndex = new int[dimLength];
+        Arrays.fill(maxIndex, -1);
 
         for (int i = 0; i < permutedBuffer.getLength(); i++) {
 
             final int bufferIndex = i % dimLength;
             final T value = permutedBuffer.get(i);
 
-            if (compareOp.apply(value, maxBuffer.get(bufferIndex))) {
+            if (maxIndex[bufferIndex] < 0 || compareOp.apply(value, maxBuffer.get(bufferIndex))) {
                 maxBuffer.set(value, bufferIndex);
                 maxIndex[bufferIndex] = i / dimLength;
             }

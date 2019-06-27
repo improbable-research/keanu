@@ -228,6 +228,18 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public int argMin() {
+        return Nd4j.argMin(tensor).getInt(0);
+    }
+
+    @Override
+    public IntegerTensor argMin(int axis) {
+        long[] shape = this.getShape();
+        TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
+        return new Nd4jIntegerTensor(Nd4j.argMin(tensor, axis).reshape(TensorShape.removeDimension(axis, shape)));
+    }
+
+    @Override
     public Double average() {
         return tensor.sumNumber().doubleValue() / tensor.length();
     }

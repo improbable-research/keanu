@@ -530,6 +530,18 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public int argMin() {
+        return Nd4j.argMin(tensor).getInt(0);
+    }
+
+    @Override
+    public IntegerTensor argMin(int axis) {
+        long[] shape = this.getShape();
+        TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
+        return new Nd4jIntegerTensor(Nd4j.argMin(tensor, axis).reshape(TensorShape.removeDimension(axis, shape)));
+    }
+
+    @Override
     public BooleanTensor greaterThan(IntegerTensor value) {
 
         INDArray mask;

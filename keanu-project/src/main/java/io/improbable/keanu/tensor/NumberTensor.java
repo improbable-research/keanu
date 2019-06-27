@@ -190,6 +190,10 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> ex
      */
     IntegerTensor argMax(int axis);
 
+    int argMin();
+
+    IntegerTensor argMin(int axis);
+
     default T setWithMask(T mask, N value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
