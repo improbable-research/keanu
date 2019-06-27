@@ -1592,10 +1592,15 @@ public class DoubleTensorTest {
         assertUnaryOperation(FastMath::sqrt, DoubleTensor::sqrt, tensorBetween0And1());
         assertUnaryOperation(FastMath::sqrt, DoubleTensor::sqrtInPlace, tensorBetween0And1());
 
+        assertUnaryOperation(FastMath::expm1, DoubleTensor::expM1, tensorBetween0And1());
         assertUnaryOperation(FastMath::expm1, DoubleTensor::expM1InPlace, tensorBetween0And1());
+        assertUnaryOperation(DoubleTensorTest::exp2, DoubleTensor::exp2, tensorBetween0And1());
         assertUnaryOperation(DoubleTensorTest::exp2, DoubleTensor::exp2InPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::log10, DoubleTensor::log10, tensorBetween0And1());
         assertUnaryOperation(FastMath::log10, DoubleTensor::log10InPlace, tensorBetween0And1());
+        assertUnaryOperation(DoubleTensorTest::log2, DoubleTensor::log2, tensorBetween0And1());
         assertUnaryOperation(DoubleTensorTest::log2, DoubleTensor::log2InPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::log1p, DoubleTensor::log1p, tensorBetween0And1());
         assertUnaryOperation(FastMath::log1p, DoubleTensor::log1pInPlace, tensorBetween0And1());
     }
 
