@@ -225,15 +225,6 @@ Missing types:
 - rad2deg(x, /[, out, where, casting, order, …])	Convert angles from radians to degrees.
 - sinc(x)	Return the sinc function.
 
-#### Hyperbolic functions
-
-- sinh(x, /[, out, where, casting, order, …])	Hyperbolic sine, element-wise.
-- cosh(x, /[, out, where, casting, order, …])	Hyperbolic cosine, element-wise.
-- tanh(x, /[, out, where, casting, order, …])	Compute hyperbolic tangent element-wise.
-- arcsinh(x, /[, out, where, casting, order, …])	Inverse hyperbolic sine element-wise.
-- arccosh(x, /[, out, where, casting, order, …])	Inverse hyperbolic cosine, element-wise.
-- arctanh(x, /[, out, where, casting, order, …])	Inverse hyperbolic tangent element-wise.
-
 #### Rounding
 
 - around(a[, decimals, out])	Evenly round to the given number of decimals.

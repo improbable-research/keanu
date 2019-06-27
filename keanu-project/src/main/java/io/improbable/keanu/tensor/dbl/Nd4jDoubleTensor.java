@@ -16,10 +16,11 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
-import org.apache.commons.math3.util.FastMath;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.accum.LogSumExp;
+import org.nd4j.linalg.api.ops.impl.transforms.ACosh;
+import org.nd4j.linalg.api.ops.impl.transforms.ASinh;
 import org.nd4j.linalg.api.ops.impl.transforms.Expm1;
 import org.nd4j.linalg.api.ops.impl.transforms.Log1p;
 import org.nd4j.linalg.api.ops.impl.transforms.LogX;
@@ -508,6 +509,42 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor sinhInPlace() {
+        Transforms.sinh(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor coshInPlace() {
+        Transforms.cosh(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor tanhInPlace() {
+        Transforms.tanh(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor asinhInPlace() {
+        Nd4j.getExecutioner().execAndReturn(new ASinh(tensor));
+        return this;
+    }
+
+    @Override
+    public DoubleTensor acoshInPlace() {
+        Nd4j.getExecutioner().execAndReturn(new ACosh(tensor));
+        return this;
+    }
+
+    @Override
+    public DoubleTensor atanhInPlace() {
+        Transforms.atanh(tensor, false);
+        return this;
+    }
+
+    @Override
     public DoubleTensor expInPlace() {
         Transforms.exp(tensor, false);
         return this;
@@ -518,7 +555,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         INDArray thatINDArray = unsafeGetNd4J(that);
         INDArray concat = Nd4j.concat(0, tensor.reshape(1, tensor.length()), thatINDArray.reshape(1, thatINDArray.length()));
         concat.muli(Math.log(2));
-        tensor = Nd4j.getExecutioner().exec(new LogSumExp(concat),0, 1).reshape(tensor.shape()).divi(Math.log(2));
+        tensor = Nd4j.getExecutioner().exec(new LogSumExp(concat), 0, 1).reshape(tensor.shape()).divi(Math.log(2));
         return this;
     }
 
@@ -526,7 +563,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor logAddExpInPlace(DoubleTensor that) {
         INDArray thatINDArray = unsafeGetNd4J(that);
         INDArray concat = Nd4j.concat(0, tensor.reshape(1, tensor.length()), thatINDArray.reshape(1, thatINDArray.length()));
-        tensor = Nd4j.getExecutioner().exec(new LogSumExp(concat),0, 1).reshape(tensor.shape());
+        tensor = Nd4j.getExecutioner().exec(new LogSumExp(concat), 0, 1).reshape(tensor.shape());
         return this;
     }
 

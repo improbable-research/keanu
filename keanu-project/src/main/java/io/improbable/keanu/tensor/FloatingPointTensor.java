@@ -104,6 +104,42 @@ public interface FloatingPointTensor<N extends Number, T extends FloatingPointTe
 
     T acosInPlace();
 
+    default T sinh() {
+        return duplicate().sinhInPlace();
+    }
+
+    T sinhInPlace();
+
+    default T cosh() {
+        return duplicate().coshInPlace();
+    }
+
+    T coshInPlace();
+
+    default T tanh() {
+        return duplicate().tanhInPlace();
+    }
+
+    T tanhInPlace();
+
+    default T asinh() {
+        return duplicate().asinhInPlace();
+    }
+
+    T asinhInPlace();
+
+    default T acosh() {
+        return duplicate().acoshInPlace();
+    }
+
+    T acoshInPlace();
+
+    default T atanh() {
+        return duplicate().atanhInPlace();
+    }
+
+    T atanhInPlace();
+
     default T exp() {
         return duplicate().expInPlace();
     }

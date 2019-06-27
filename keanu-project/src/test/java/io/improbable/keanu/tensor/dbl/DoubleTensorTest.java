@@ -1549,18 +1549,30 @@ public class DoubleTensorTest {
 
     @Test
     public void canBasicTrig() {
-        assertUnaryOperation(Math::sin, DoubleTensor::sin, tensorBetween0And1());
-        assertUnaryOperation(Math::sin, DoubleTensor::sinInPlace, tensorBetween0And1());
-        assertUnaryOperation(Math::cos, DoubleTensor::cos, tensorBetween0And1());
-        assertUnaryOperation(Math::cos, DoubleTensor::cosInPlace, tensorBetween0And1());
-        assertUnaryOperation(Math::tan, DoubleTensor::tan, tensorBetween0And1());
-        assertUnaryOperation(Math::tan, DoubleTensor::tanInPlace, tensorBetween0And1());
-        assertUnaryOperation(Math::asin, DoubleTensor::asin, tensorBetween0And1());
-        assertUnaryOperation(Math::asin, DoubleTensor::asinInPlace, tensorBetween0And1());
-        assertUnaryOperation(Math::acos, DoubleTensor::acos, tensorBetween0And1());
-        assertUnaryOperation(Math::acos, DoubleTensor::acosInPlace, tensorBetween0And1());
-        assertUnaryOperation(Math::atan, DoubleTensor::atan, tensorBetween0And1());
-        assertUnaryOperation(Math::atan, DoubleTensor::atanInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::sin, DoubleTensor::sin, tensorBetween0And1());
+        assertUnaryOperation(FastMath::sin, DoubleTensor::sinInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::cos, DoubleTensor::cos, tensorBetween0And1());
+        assertUnaryOperation(FastMath::cos, DoubleTensor::cosInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::tan, DoubleTensor::tan, tensorBetween0And1());
+        assertUnaryOperation(FastMath::tan, DoubleTensor::tanInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::asin, DoubleTensor::asin, tensorBetween0And1());
+        assertUnaryOperation(FastMath::asin, DoubleTensor::asinInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::acos, DoubleTensor::acos, tensorBetween0And1());
+        assertUnaryOperation(FastMath::acos, DoubleTensor::acosInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::atan, DoubleTensor::atan, tensorBetween0And1());
+        assertUnaryOperation(FastMath::atan, DoubleTensor::atanInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::sinh, DoubleTensor::sinh, tensorBetween0And1());
+        assertUnaryOperation(FastMath::sinh, DoubleTensor::sinhInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::cosh, DoubleTensor::cosh, tensorBetween0And1());
+        assertUnaryOperation(FastMath::cosh, DoubleTensor::coshInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::tanh, DoubleTensor::tanh, tensorBetween0And1());
+        assertUnaryOperation(FastMath::tanh, DoubleTensor::tanhInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::asinh, DoubleTensor::asinh, tensorBetween0And1());
+        assertUnaryOperation(FastMath::asinh, DoubleTensor::asinhInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::acosh, DoubleTensor::acosh, tensorBetween(2, 3));
+        assertUnaryOperation(FastMath::acosh, DoubleTensor::acoshInPlace, tensorBetween(2, 3));
+        assertUnaryOperation(FastMath::atanh, DoubleTensor::atanh, tensorBetween0And1());
+        assertUnaryOperation(FastMath::atanh, DoubleTensor::atanhInPlace, tensorBetween0And1());
     }
 
     @Test
@@ -1573,6 +1585,10 @@ public class DoubleTensorTest {
 
     private DoubleTensor tensorBetween0And1() {
         return DoubleTensor.linspace(0.1, 0.9, 4).reshape(2, 2);
+    }
+
+    private DoubleTensor tensorBetween(double start, double end) {
+        return DoubleTensor.linspace(start, end, 4).reshape(2, 2);
     }
 
     @Test

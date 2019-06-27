@@ -706,6 +706,42 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
+    public DoubleTensor sinhInPlace() {
+        buffer.apply(FastMath::sinh);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor coshInPlace() {
+        buffer.apply(FastMath::cosh);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor tanhInPlace() {
+        buffer.apply(FastMath::tanh);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor asinhInPlace() {
+        buffer.apply(FastMath::asinh);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor acoshInPlace() {
+        buffer.apply(FastMath::acosh);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor atanhInPlace() {
+        buffer.apply(FastMath::atanh);
+        return this;
+    }
+
+    @Override
     public DoubleTensor expInPlace() {
         buffer.apply(FastMath::exp);
         return this;
