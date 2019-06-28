@@ -1435,6 +1435,7 @@ public class DoubleTensorTest {
         DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, 3, 3);
         DoubleTensor slice = x.slice(1, 0);
         assertThat(slice, valuesAndShapesMatch(DoubleTensor.create(1, 4, 7)));
+        assertThat(x, valuesAndShapesMatch(DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, 3, 3)));
     }
 
     @Test

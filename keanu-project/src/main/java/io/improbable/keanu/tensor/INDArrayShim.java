@@ -260,31 +260,4 @@ public class INDArrayShim {
         return along;
     }
 
-    public static INDArray sum(INDArray tensor, int... overDimensions) {
-        overDimensions = TensorShape.getAbsoluteDimensions(tensor.rank(), overDimensions);
-
-        long[] newShape = ArrayUtils.removeAll(tensor.shape(), overDimensions);
-        INDArray result = tensor.sum(overDimensions);
-
-        return result.reshape(newShape);
-    }
-
-    public static INDArray slice(INDArray tensor, int dimension, long index) {
-        if (tensor.rank() <= 1) {
-            return tensor.getScalar(index);
-        } else {
-
-            INDArray result = tensor.slice(index, dimension);
-            if (tensor.rank() == 2) {
-                long[] newShape = ArrayUtils.removeAll(tensor.shape(), dimension);
-
-                //dup is required before reshaping due to a bug in ND4J that doesn't always correctly
-                //duplicate true vectors.
-                return result.dup().reshape(newShape);
-            } else {
-                return result;
-            }
-        }
-    }
-
 }

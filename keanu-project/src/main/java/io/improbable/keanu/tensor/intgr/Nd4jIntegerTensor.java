@@ -129,7 +129,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor sum(int... overDimensions) {
-        return new Nd4jIntegerTensor(INDArrayShim.sum(tensor, overDimensions));
+        return new Nd4jIntegerTensor(tensor.sum(overDimensions));
     }
 
     @Override
@@ -565,8 +565,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor slice(int dimension, long index) {
-        INDArray dup = tensor.dup();
-        return new Nd4jIntegerTensor(INDArrayShim.slice(dup, dimension, index));
+        return new Nd4jIntegerTensor(tensor.slice(index, dimension));
     }
 
     @Override

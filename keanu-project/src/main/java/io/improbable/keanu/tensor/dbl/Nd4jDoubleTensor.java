@@ -175,7 +175,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (overDimensions.length == 0) {
             return duplicate();
         }
-        return new Nd4jDoubleTensor(INDArrayShim.sum(tensor, overDimensions));
+        return new Nd4jDoubleTensor(tensor.sum(overDimensions));
     }
 
     @Override
@@ -968,8 +968,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor slice(int dimension, long index) {
-        INDArray dup = tensor.dup();
-        return new Nd4jDoubleTensor(INDArrayShim.slice(dup, dimension, index));
+        return new Nd4jDoubleTensor(tensor.slice(index, dimension));
     }
 
     @Override
