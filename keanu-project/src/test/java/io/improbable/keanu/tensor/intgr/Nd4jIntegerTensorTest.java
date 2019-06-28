@@ -394,6 +394,47 @@ public class Nd4jIntegerTensorTest {
         assertArrayEquals(expected, result.asFlatArray());
     }
 
+    @Test
+    public void doesCompareGreaterThanMask() {
+        IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        IntegerTensor otherMatrix = Nd4jIntegerTensor.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
+        IntegerTensor result = matrix.getGreaterThanMask(otherMatrix);
+        int[] expected = new int[]{1, 0, 0, 0};
+        assertArrayEquals(expected, result.asFlatIntegerArray());
+    }
+
+    @Test
+    public void doesCompareGreaterThanOrEqualMask() {
+        IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        IntegerTensor otherMatrix = Nd4jIntegerTensor.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
+        IntegerTensor result = matrix.getGreaterThanOrEqualToMask(otherMatrix);
+        int[] expected = new int[]{1, 1, 0, 0};
+        assertArrayEquals(expected, result.asFlatIntegerArray());
+    }
+
+    @Test
+    public void doesCompareGreaterThanScalarMask() {
+        IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        IntegerTensor result = matrix.getGreaterThanMask(Nd4jIntegerTensor.scalar(3));
+        int[] expected = new int[]{0, 0, 0, 1};
+        assertArrayEquals(expected, result.asFlatIntegerArray());
+    }
+
+    @Test
+    public void doesCompareGreaterThanOrEqualScalarMask() {
+        IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        IntegerTensor result = matrix.getGreaterThanOrEqualToMask(Nd4jIntegerTensor.scalar(3));
+        int[] expected = new int[]{0, 0, 1, 1};
+        assertArrayEquals(expected, result.asFlatIntegerArray());
+    }
+
+    @Test
+    public void doesCompareGreaterThanOrEqualTensorMask() {
+        IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        IntegerTensor result = matrix.getGreaterThanOrEqualToMask(IntegerTensor.create(0, 4));
+        int[] expected = new int[]{1, 0, 1, 1};
+        assertArrayEquals(expected, result.asFlatIntegerArray());
+    }
 
     @Test
     public void canElementwiseEqualsAScalarValue() {

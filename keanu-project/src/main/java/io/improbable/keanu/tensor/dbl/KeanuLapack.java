@@ -2,10 +2,11 @@ package io.improbable.keanu.tensor.dbl;
 
 import lombok.AllArgsConstructor;
 
-import static org.bytedeco.javacpp.openblas.LAPACKE_dgetrf;
-import static org.bytedeco.javacpp.openblas.LAPACKE_dgetri;
-import static org.bytedeco.javacpp.openblas.LAPACKE_dpotrf;
-import static org.bytedeco.javacpp.openblas.LAPACK_ROW_MAJOR;
+import static org.bytedeco.openblas.global.openblas.LAPACKE_dgetrf;
+import static org.bytedeco.openblas.global.openblas.LAPACKE_dgetri;
+import static org.bytedeco.openblas.global.openblas.LAPACKE_dpotrf;
+import static org.bytedeco.openblas.global.openblas.LAPACK_ROW_MAJOR;
+
 
 /**
  * https://software.intel.com/en-us/mkl-developer-reference-c-matrix-factorization-lapack-computational-routines

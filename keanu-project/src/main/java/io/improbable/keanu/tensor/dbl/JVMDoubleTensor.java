@@ -41,9 +41,9 @@ import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotrf;
 import static java.util.Arrays.copyOf;
-import static org.bytedeco.javacpp.openblas.CblasNoTrans;
-import static org.bytedeco.javacpp.openblas.CblasRowMajor;
-import static org.bytedeco.javacpp.openblas.cblas_dgemm;
+import static org.bytedeco.openblas.global.openblas.CblasNoTrans;
+import static org.bytedeco.openblas.global.openblas.CblasRowMajor;
+import static org.bytedeco.openblas.global.openblas.cblas_dgemm;
 
 public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor, DoubleBuffer.PrimitiveDoubleWrapper> implements DoubleTensor {
 
