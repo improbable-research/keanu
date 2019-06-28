@@ -395,22 +395,22 @@ public class JVMIntegerTensor implements IntegerTensor {
 
     @Override
     public int getRank() {
-        return 0;
+        return shape.length;
     }
 
     @Override
     public long[] getShape() {
-        return new long[0];
+        return copyShape();
     }
 
     @Override
     public long[] getStride() {
-        return new long[0];
+        return copyStride();
     }
 
     @Override
     public long getLength() {
-        return 0;
+        return buffer.length;
     }
 
     @Override
@@ -420,7 +420,15 @@ public class JVMIntegerTensor implements IntegerTensor {
 
     @Override
     public Integer scalar() {
-        return null;
+        return buffer[0];
+    }
+
+    private double[] toDoubleArray() {
+        double[] targetBuffer = new double[buffer.length];
+
+
+
+        return targetBuffer;
     }
 
     @Override
@@ -430,7 +438,7 @@ public class JVMIntegerTensor implements IntegerTensor {
 
     @Override
     public int[] asFlatIntegerArray() {
-        return new int[0];
+        return copyBuffer();
     }
 
     @Override
