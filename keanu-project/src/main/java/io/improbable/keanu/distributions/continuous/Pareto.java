@@ -71,7 +71,7 @@ public class Pareto implements ContinuousDistribution {
     }
 
     private DoubleTensor setProbToZeroForInvalidX(DoubleTensor x, DoubleTensor result) {
-        DoubleTensor invalids = x.getLessThanOrEqualToMask(location);
+        DoubleTensor invalids = x.lessThanOrEqualToMask(location);
         result.setWithMaskInPlace(invalids, Double.NEGATIVE_INFINITY);
 
         return result;

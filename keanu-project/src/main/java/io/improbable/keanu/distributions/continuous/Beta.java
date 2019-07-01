@@ -44,8 +44,8 @@ public class Beta implements ContinuousDistribution {
         final DoubleTensor lessThan = xMax.minus(y2.div(y1PlusY2).timesInPlace(range));
         final DoubleTensor greaterThan = xMin.plus(y1.div(y1PlusY2).timesInPlace(range));
 
-        final DoubleTensor lessMask = alpha.getLessThanMask(beta);
-        final DoubleTensor greaterMask = alpha.getGreaterThanOrEqualToMask(beta);
+        final DoubleTensor lessMask = alpha.lessThanMask(beta);
+        final DoubleTensor greaterMask = alpha.greaterThanOrEqualToMask(beta);
 
         return lessMask.timesInPlace(lessThan).plusInPlace(greaterMask.timesInPlace(greaterThan));
     }

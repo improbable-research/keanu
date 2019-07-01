@@ -394,22 +394,22 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
+    public DoubleTensor greaterThanMask(DoubleTensor greaterThanThis) {
         return duplicate().broadcastableBinaryOpWithAutoBroadcast(GT_MASK, getAsJVMTensor(greaterThanThis));
     }
 
     @Override
-    public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanThis) {
+    public DoubleTensor greaterThanOrEqualToMask(DoubleTensor greaterThanThis) {
         return duplicate().broadcastableBinaryOpWithAutoBroadcast(GTE_MASK, getAsJVMTensor(greaterThanThis));
     }
 
     @Override
-    public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
+    public DoubleTensor lessThanMask(DoubleTensor lessThanThis) {
         return duplicate().broadcastableBinaryOpWithAutoBroadcast(LT_MASK, getAsJVMTensor(lessThanThis));
     }
 
     @Override
-    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis) {
+    public DoubleTensor lessThanOrEqualToMask(DoubleTensor lessThanThis) {
         return duplicate().broadcastableBinaryOpWithAutoBroadcast(LTE_MASK, getAsJVMTensor(lessThanThis));
     }
 
@@ -453,22 +453,22 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public BooleanTensor lessThan(DoubleTensor that) {
-        return maskToBooleanTensor(getLessThanMask(that));
+        return maskToBooleanTensor(lessThanMask(that));
     }
 
     @Override
     public BooleanTensor lessThanOrEqual(DoubleTensor that) {
-        return maskToBooleanTensor(getLessThanOrEqualToMask(that));
+        return maskToBooleanTensor(lessThanOrEqualToMask(that));
     }
 
     @Override
     public BooleanTensor greaterThan(DoubleTensor that) {
-        return maskToBooleanTensor(getGreaterThanMask(that));
+        return maskToBooleanTensor(greaterThanMask(that));
     }
 
     @Override
     public BooleanTensor greaterThanOrEqual(DoubleTensor that) {
-        return maskToBooleanTensor(getGreaterThanOrEqualToMask(that));
+        return maskToBooleanTensor(greaterThanOrEqualToMask(that));
     }
 
     private BooleanTensor maskToBooleanTensor(DoubleTensor mask) {

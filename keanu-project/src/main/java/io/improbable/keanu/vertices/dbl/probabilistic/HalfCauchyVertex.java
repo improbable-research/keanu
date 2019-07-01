@@ -83,7 +83,7 @@ public class HalfCauchyVertex extends CauchyVertex {
         } else {
             for (Map.Entry<Vertex, DoubleTensor> entry : logProb.entrySet()) {
                 DoubleTensor v = entry.getValue();
-                logProb.put(entry.getKey(), v.setWithMaskInPlace(value.getLessThanMask(DoubleTensor.scalar(LOC_ZERO)), 0.0));
+                logProb.put(entry.getKey(), v.setWithMaskInPlace(value.lessThanMask(DoubleTensor.scalar(LOC_ZERO)), 0.0));
             }
             return logProb;
         }

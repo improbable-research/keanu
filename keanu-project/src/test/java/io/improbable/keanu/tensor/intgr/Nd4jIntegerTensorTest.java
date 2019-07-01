@@ -211,8 +211,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixTwos = Nd4jIntegerTensor.create(2, new long[]{2, 2});
         IntegerTensor scalarTwo = IntegerTensor.scalar(2);
 
-        IntegerTensor maskFromMatrix = matrix.getGreaterThanMask(matrixTwos);
-        IntegerTensor maskFromScalar = matrix.getGreaterThanMask(scalarTwo);
+        IntegerTensor maskFromMatrix = matrix.greaterThanMask(matrixTwos);
+        IntegerTensor maskFromScalar = matrix.greaterThanMask(scalarTwo);
 
         int[] expected = new int[]{0, 0, 1, 1};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -225,8 +225,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixTwos = Nd4jIntegerTensor.create(2, new long[]{2, 2});
         IntegerTensor scalarTWo = IntegerTensor.scalar(2);
 
-        IntegerTensor maskFromMatrix = matrix.getGreaterThanOrEqualToMask(matrixTwos);
-        IntegerTensor maskFromScalar = matrix.getGreaterThanOrEqualToMask(scalarTWo);
+        IntegerTensor maskFromMatrix = matrix.greaterThanOrEqualToMask(matrixTwos);
+        IntegerTensor maskFromScalar = matrix.greaterThanOrEqualToMask(scalarTWo);
 
         int[] expected = new int[]{0, 1, 1, 1};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -239,8 +239,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixTwos = Nd4jIntegerTensor.create(2, new long[]{2, 2});
         IntegerTensor scalarTwo = IntegerTensor.scalar(2);
 
-        IntegerTensor maskFromMatrix = matrix.getLessThanMask(matrixTwos);
-        IntegerTensor maskFromScalar = matrix.getLessThanMask(scalarTwo);
+        IntegerTensor maskFromMatrix = matrix.lessThanMask(matrixTwos);
+        IntegerTensor maskFromScalar = matrix.lessThanMask(scalarTwo);
 
         int[] expected = new int[]{1, 0, 0, 0};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -253,8 +253,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixTwos = Nd4jIntegerTensor.create(2, new long[]{2, 2});
         IntegerTensor scalarTwo = IntegerTensor.scalar(2);
 
-        IntegerTensor maskFromMatrix = matrix.getLessThanOrEqualToMask(matrixTwos);
-        IntegerTensor maskFromScalar = matrix.getLessThanOrEqualToMask(scalarTwo);
+        IntegerTensor maskFromMatrix = matrix.lessThanOrEqualToMask(matrixTwos);
+        IntegerTensor maskFromScalar = matrix.lessThanOrEqualToMask(scalarTwo);
 
         int[] expected = new int[]{1, 1, 0, 0};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -398,7 +398,7 @@ public class Nd4jIntegerTensorTest {
     public void doesCompareGreaterThanMask() {
         IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor otherMatrix = Nd4jIntegerTensor.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
-        IntegerTensor result = matrix.getGreaterThanMask(otherMatrix);
+        IntegerTensor result = matrix.greaterThanMask(otherMatrix);
         int[] expected = new int[]{1, 0, 0, 0};
         assertArrayEquals(expected, result.asFlatIntegerArray());
     }
@@ -407,7 +407,7 @@ public class Nd4jIntegerTensorTest {
     public void doesCompareGreaterThanOrEqualMask() {
         IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor otherMatrix = Nd4jIntegerTensor.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
-        IntegerTensor result = matrix.getGreaterThanOrEqualToMask(otherMatrix);
+        IntegerTensor result = matrix.greaterThanOrEqualToMask(otherMatrix);
         int[] expected = new int[]{1, 1, 0, 0};
         assertArrayEquals(expected, result.asFlatIntegerArray());
     }
@@ -415,7 +415,7 @@ public class Nd4jIntegerTensorTest {
     @Test
     public void doesCompareGreaterThanScalarMask() {
         IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrix.getGreaterThanMask(Nd4jIntegerTensor.scalar(3));
+        IntegerTensor result = matrix.greaterThanMask(Nd4jIntegerTensor.scalar(3));
         int[] expected = new int[]{0, 0, 0, 1};
         assertArrayEquals(expected, result.asFlatIntegerArray());
     }
@@ -423,7 +423,7 @@ public class Nd4jIntegerTensorTest {
     @Test
     public void doesCompareGreaterThanOrEqualScalarMask() {
         IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrix.getGreaterThanOrEqualToMask(Nd4jIntegerTensor.scalar(3));
+        IntegerTensor result = matrix.greaterThanOrEqualToMask(Nd4jIntegerTensor.scalar(3));
         int[] expected = new int[]{0, 0, 1, 1};
         assertArrayEquals(expected, result.asFlatIntegerArray());
     }
@@ -431,7 +431,7 @@ public class Nd4jIntegerTensorTest {
     @Test
     public void doesCompareGreaterThanOrEqualTensorMask() {
         IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrix.getGreaterThanOrEqualToMask(IntegerTensor.create(0, 4));
+        IntegerTensor result = matrix.greaterThanOrEqualToMask(IntegerTensor.create(0, 4));
         int[] expected = new int[]{1, 0, 1, 1};
         assertArrayEquals(expected, result.asFlatIntegerArray());
     }

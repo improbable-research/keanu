@@ -41,8 +41,8 @@ public class Uniform implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
 
         DoubleTensor logOfWithinBounds = xMax.minus(xMin).logInPlace().unaryMinusInPlace();
-        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getGreaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
-        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getLessThanMask(xMin), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.greaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.lessThanMask(xMin), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
     }

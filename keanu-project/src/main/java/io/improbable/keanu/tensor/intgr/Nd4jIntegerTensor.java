@@ -121,22 +121,22 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
     }
 
     @Override
-    public IntegerTensor getGreaterThanMask(IntegerTensor greaterThanThis) {
+    public IntegerTensor greaterThanMask(IntegerTensor greaterThanThis) {
         return greaterThan(greaterThanThis).toIntegerMask();
     }
 
     @Override
-    public IntegerTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanOrEqualToThis) {
+    public IntegerTensor greaterThanOrEqualToMask(IntegerTensor greaterThanOrEqualToThis) {
         return greaterThanOrEqual(greaterThanOrEqualToThis).toIntegerMask();
     }
 
     @Override
-    public IntegerTensor getLessThanMask(IntegerTensor lessThanThis) {
+    public IntegerTensor lessThanMask(IntegerTensor lessThanThis) {
         return lessThan(lessThanThis).toIntegerMask();
     }
 
     @Override
-    public IntegerTensor getLessThanOrEqualToMask(IntegerTensor lessThanOrEqualToThis) {
+    public IntegerTensor lessThanOrEqualToMask(IntegerTensor lessThanOrEqualToThis) {
         return lessThanOrEqual(lessThanOrEqualToThis).toIntegerMask();
     }
 

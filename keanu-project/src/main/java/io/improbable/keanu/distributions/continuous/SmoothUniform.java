@@ -75,28 +75,28 @@ public class SmoothUniform implements ContinuousDistribution {
         final DoubleTensor rScaled = r1.timesInPlace(bodyWidth.plus(shoulderWidth)).plusInPlace(xMin.minus(shoulderWidth.div(2)));
         final DoubleTensor bodyHeight = bodyHeight(shoulderWidth, bodyWidth);
 
-        DoubleTensor firstConditional = rScaled.getGreaterThanOrEqualToMask(xMin);
-        firstConditional = firstConditional.timesInPlace(rScaled.getLessThanOrEqualToMask(xMax));
+        DoubleTensor firstConditional = rScaled.greaterThanOrEqualToMask(xMin);
+        firstConditional = firstConditional.timesInPlace(rScaled.lessThanOrEqualToMask(xMax));
         final DoubleTensor inverseFirstConditional = DoubleTensor.ones(firstConditional.getShape()).minusInPlace(firstConditional);
 
-        final DoubleTensor secondConditional = rScaled.getLessThanMask(xMin);
+        final DoubleTensor secondConditional = rScaled.lessThanMask(xMin);
         DoubleTensor spillOnToShoulder = xMin.minus(rScaled);
         DoubleTensor shoulderX = shoulderWidth.minus(spillOnToShoulder);
         DoubleTensor shoulderDensity = shoulder(shoulderWidth, bodyWidth, shoulderX);
         DoubleTensor acceptProbability = shoulderDensity.div(bodyHeight);
 
-        final DoubleTensor secondConditionalNestedTrue = secondConditional.times(r2.getLessThanOrEqualToMask(acceptProbability));
-        final DoubleTensor secondConditionalNestedFalse = secondConditional.timesInPlace(r2.getGreaterThanMask(acceptProbability));
+        final DoubleTensor secondConditionalNestedTrue = secondConditional.times(r2.lessThanOrEqualToMask(acceptProbability));
+        final DoubleTensor secondConditionalNestedFalse = secondConditional.timesInPlace(r2.greaterThanMask(acceptProbability));
         final DoubleTensor secondConditionalNestedFalseResult = xMin.minus(shoulderWidth).plusInPlace(spillOnToShoulder);
 
-        final DoubleTensor secondConditionalFalse = rScaled.getGreaterThanOrEqualToMask(xMin);
+        final DoubleTensor secondConditionalFalse = rScaled.greaterThanOrEqualToMask(xMin);
         spillOnToShoulder = rScaled.minus(xMax);
         shoulderX = shoulderWidth.minus(spillOnToShoulder);
         shoulderDensity = shoulder(shoulderWidth, bodyWidth, shoulderX);
         acceptProbability = shoulderDensity.divInPlace(bodyHeight);
 
-        final DoubleTensor secondConditionalFalseNestedTrue = secondConditionalFalse.times(r2.getLessThanOrEqualToMask(acceptProbability));
-        final DoubleTensor secondConditionalFalseNestedFalse = secondConditionalFalse.timesInPlace(r2.getGreaterThanMask(acceptProbability));
+        final DoubleTensor secondConditionalFalseNestedTrue = secondConditionalFalse.times(r2.lessThanOrEqualToMask(acceptProbability));
+        final DoubleTensor secondConditionalFalseNestedFalse = secondConditionalFalse.timesInPlace(r2.greaterThanMask(acceptProbability));
         final DoubleTensor secondConditionalFalseNestedFalseResult = shoulderWidth.plusInPlace(xMax).minusInPlace(spillOnToShoulder);
 
         return firstConditional.timesInPlace(rScaled)
@@ -113,16 +113,16 @@ public class SmoothUniform implements ContinuousDistribution {
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
 
-        DoubleTensor firstConditional = x.getGreaterThanOrEqualToMask(xMin);
-        firstConditional = firstConditional.timesInPlace(x.getLessThanOrEqualToMask(xMax));
+        DoubleTensor firstConditional = x.greaterThanOrEqualToMask(xMin);
+        firstConditional = firstConditional.timesInPlace(x.lessThanOrEqualToMask(xMax));
         final DoubleTensor firstConditionalResult = bodyHeight(shoulderWidth, bodyWidth);
 
-        DoubleTensor secondConditional = x.getLessThanMask(xMin);
-        secondConditional = secondConditional.timesInPlace(x.getGreaterThanMask(leftCutoff));
+        DoubleTensor secondConditional = x.lessThanMask(xMin);
+        secondConditional = secondConditional.timesInPlace(x.greaterThanMask(leftCutoff));
         final DoubleTensor secondConditionalResult = shoulder(shoulderWidth, bodyWidth, x.minus(leftCutoff));
 
-        DoubleTensor thirdConditional = x.getGreaterThanMask(xMax);
-        thirdConditional = thirdConditional.timesInPlace(x.getLessThanMask(rightCutoff));
+        DoubleTensor thirdConditional = x.greaterThanMask(xMax);
+        thirdConditional = thirdConditional.timesInPlace(x.lessThanMask(rightCutoff));
         final DoubleTensor thirdConditionalResult = shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(x).plusInPlace(xMax));
 
         return firstConditional.timesInPlace(firstConditionalResult)
@@ -164,12 +164,12 @@ public class SmoothUniform implements ContinuousDistribution {
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
 
-        DoubleTensor firstConditional = x.getLessThanMask(xMin);
-        firstConditional = firstConditional.timesInPlace(x.getGreaterThanMask(leftCutoff));
+        DoubleTensor firstConditional = x.lessThanMask(xMin);
+        firstConditional = firstConditional.timesInPlace(x.greaterThanMask(leftCutoff));
         final DoubleTensor firstConditionalResult = dShoulder(shoulderWidth, bodyWidth, x.minus(leftCutoff));
 
-        DoubleTensor secondConditional = x.getGreaterThanMask(xMax);
-        secondConditional = secondConditional.timesInPlace(x.getLessThanMask(rightCutoff));
+        DoubleTensor secondConditional = x.greaterThanMask(xMax);
+        secondConditional = secondConditional.timesInPlace(x.lessThanMask(rightCutoff));
         final DoubleTensor secondConditionalResult = dShoulder(shoulderWidth,
             bodyWidth,
             shoulderWidth.minus(x).plusInPlace(rightCutoff)

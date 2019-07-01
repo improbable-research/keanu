@@ -31,7 +31,7 @@ public class Exponential implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor negXMinusADivB = x.unaryMinus().divInPlace(lambda);
         final DoubleTensor negXMinusADivBMinusLogB = negXMinusADivB.minusInPlace(lambda.log());
-        return negXMinusADivBMinusLogB.setWithMask(x.getLessThanMask(DoubleTensor.scalar(0.0)), Double.NEGATIVE_INFINITY);
+        return negXMinusADivBMinusLogB.setWithMask(x.lessThanMask(DoubleTensor.scalar(0.0)), Double.NEGATIVE_INFINITY);
     }
 
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex lambda) {

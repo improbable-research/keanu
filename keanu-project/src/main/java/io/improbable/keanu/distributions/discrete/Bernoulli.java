@@ -54,10 +54,10 @@ public class Bernoulli implements Distribution<BooleanTensor> {
 
     public DoubleTensor dLogProb(BooleanTensor x) {
         DoubleTensor greaterThanMask = probTrue
-            .getGreaterThanMask(DoubleTensor.scalar(1.0));
+            .greaterThanMask(DoubleTensor.scalar(1.0));
 
         DoubleTensor lessThanOrEqualToMask = probTrue
-            .getLessThanOrEqualToMask(DoubleTensor.scalar(0.0));
+            .lessThanOrEqualToMask(DoubleTensor.scalar(0.0));
 
         DoubleTensor greaterThanOneOrLessThanZero = greaterThanMask.plusInPlace(lessThanOrEqualToMask);
 

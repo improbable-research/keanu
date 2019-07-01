@@ -350,7 +350,7 @@ public class DoubleTensorTest {
 
     @Test
     public void canSetWhereGreaterThanAMatrix() {
-        DoubleTensor mask = matrixA.getGreaterThanMask(DoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
+        DoubleTensor mask = matrixA.greaterThanMask(DoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{1, 2, -2, -2}, result.asFlatDoubleArray(), 0.0);
@@ -358,7 +358,7 @@ public class DoubleTensorTest {
 
     @Test
     public void canSetWhereGreaterThanAScalar() {
-        DoubleTensor mask = matrixA.getGreaterThanMask(DoubleTensor.scalar(2.0));
+        DoubleTensor mask = matrixA.greaterThanMask(DoubleTensor.scalar(2.0));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{1, 2, -2, -2}, result.asFlatDoubleArray(), 0.0);
@@ -366,7 +366,7 @@ public class DoubleTensorTest {
 
     @Test
     public void canSetWhereLessThanOrEqualAMatrix() {
-        DoubleTensor mask = matrixA.getLessThanOrEqualToMask(DoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
+        DoubleTensor mask = matrixA.lessThanOrEqualToMask(DoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, -2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -374,7 +374,7 @@ public class DoubleTensorTest {
 
     @Test
     public void canSetWhereLessThanOrEqualAScalar() {
-        DoubleTensor mask = matrixA.getLessThanOrEqualToMask(DoubleTensor.scalar(2.0));
+        DoubleTensor mask = matrixA.lessThanOrEqualToMask(DoubleTensor.scalar(2.0));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, -2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -382,7 +382,7 @@ public class DoubleTensorTest {
 
     @Test
     public void canSetWhereLessThanAMatrix() {
-        DoubleTensor mask = matrixA.getLessThanMask(DoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
+        DoubleTensor mask = matrixA.lessThanMask(DoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -390,7 +390,7 @@ public class DoubleTensorTest {
 
     @Test
     public void canSetWhereLessThanAScalar() {
-        DoubleTensor mask = matrixA.getLessThanMask(DoubleTensor.scalar(2.0));
+        DoubleTensor mask = matrixA.lessThanMask(DoubleTensor.scalar(2.0));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -402,7 +402,7 @@ public class DoubleTensorTest {
     @Test
 
     public void canSetToZero() {
-        DoubleTensor mask = matrixA.getLessThanMask(DoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
+        DoubleTensor mask = matrixA.lessThanMask(DoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, 0.0);
 
         assertArrayEquals(new double[]{0, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);

@@ -161,46 +161,46 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor getGreaterThanMask(IntegerTensor greaterThanThis) {
+    public IntegerTensor greaterThanMask(IntegerTensor greaterThanThis) {
         if (greaterThanThis.isLengthOne()) {
             long[] newShape = calculateShapeForLengthOneBroadcast(shape, greaterThanThis.getShape());
             return new ScalarIntegerTensor(value > greaterThanThis.scalar() ? 1 : 0, newShape);
         } else {
             return IntegerTensor.create(value, greaterThanThis.getShape())
-                .getGreaterThanMask(greaterThanThis);
+                .greaterThanMask(greaterThanThis);
         }
     }
 
     @Override
-    public IntegerTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanOrEqualToThis) {
+    public IntegerTensor greaterThanOrEqualToMask(IntegerTensor greaterThanOrEqualToThis) {
         if (greaterThanOrEqualToThis.isLengthOne()) {
             long[] newShape = calculateShapeForLengthOneBroadcast(shape, greaterThanOrEqualToThis.getShape());
             return new ScalarIntegerTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0, newShape);
         } else {
             return IntegerTensor.create(value, greaterThanOrEqualToThis.getShape())
-                .getGreaterThanOrEqualToMask(greaterThanOrEqualToThis);
+                .greaterThanOrEqualToMask(greaterThanOrEqualToThis);
         }
     }
 
     @Override
-    public IntegerTensor getLessThanMask(IntegerTensor lessThanThis) {
+    public IntegerTensor lessThanMask(IntegerTensor lessThanThis) {
         if (lessThanThis.isLengthOne()) {
             long[] newShape = calculateShapeForLengthOneBroadcast(shape, lessThanThis.getShape());
             return new ScalarIntegerTensor(value < lessThanThis.scalar() ? 1 : 0, newShape);
         } else {
             return IntegerTensor.create(value, lessThanThis.getShape())
-                .getLessThanMask(lessThanThis);
+                .lessThanMask(lessThanThis);
         }
     }
 
     @Override
-    public IntegerTensor getLessThanOrEqualToMask(IntegerTensor lessThanOrEqualsThis) {
+    public IntegerTensor lessThanOrEqualToMask(IntegerTensor lessThanOrEqualsThis) {
         if (lessThanOrEqualsThis.isLengthOne()) {
             long[] newShape = calculateShapeForLengthOneBroadcast(shape, lessThanOrEqualsThis.getShape());
             return new ScalarIntegerTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0, newShape);
         } else {
             return IntegerTensor.create(value, lessThanOrEqualsThis.getShape())
-                .getLessThanOrEqualToMask(lessThanOrEqualsThis);
+                .lessThanOrEqualToMask(lessThanOrEqualsThis);
         }
     }
 

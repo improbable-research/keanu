@@ -130,10 +130,10 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(PowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
         opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
 
-        opMappers.put(DoubleGreaterThanOrEqualToMaskVertex.class, fluentBinaryOp("getGreaterThanOrEqualToMask"));
-        opMappers.put(DoubleGreaterThanMaskVertex.class, fluentBinaryOp("getGreaterThanMask"));
-        opMappers.put(DoubleLessThanOrEqualToMaskVertex.class, fluentBinaryOp("getLessThanOrEqualToMask"));
-        opMappers.put(DoubleLessThanMaskVertex.class, fluentBinaryOp("getLessThanMask"));
+        opMappers.put(DoubleGreaterThanOrEqualToMaskVertex.class, fluentBinaryOp("greaterThanOrEqualToMask"));
+        opMappers.put(DoubleGreaterThanMaskVertex.class, fluentBinaryOp("greaterThanMask"));
+        opMappers.put(DoubleLessThanOrEqualToMaskVertex.class, fluentBinaryOp("lessThanOrEqualToMask"));
+        opMappers.put(DoubleLessThanMaskVertex.class, fluentBinaryOp("lessThanMask"));
 
         opMappers.put(DoubleSetWithMaskVertex.class, KeanuVertexToTensorOpMapper::setWithMaskDoubleOp);
 

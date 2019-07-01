@@ -198,22 +198,22 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     }
 
     @Override
-    public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
+    public DoubleTensor greaterThanMask(DoubleTensor greaterThanThis) {
         return greaterThan(greaterThanThis).toDoubleMask();
     }
 
     @Override
-    public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanOrEqualToThis) {
+    public DoubleTensor greaterThanOrEqualToMask(DoubleTensor greaterThanOrEqualToThis) {
         return greaterThanOrEqual(greaterThanOrEqualToThis).toDoubleMask();
     }
 
     @Override
-    public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
+    public DoubleTensor lessThanMask(DoubleTensor lessThanThis) {
         return lessThan(lessThanThis).toDoubleMask();
     }
 
     @Override
-    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanOrEqualToThis) {
+    public DoubleTensor lessThanOrEqualToMask(DoubleTensor lessThanOrEqualToThis) {
         return lessThanOrEqual(lessThanOrEqualToThis).toDoubleMask();
     }
 

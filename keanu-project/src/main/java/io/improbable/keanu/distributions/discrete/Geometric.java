@@ -70,7 +70,7 @@ public class Geometric implements DiscreteDistribution {
     }
 
     private DoubleTensor setProbToZeroForInvalidK(IntegerTensor k, DoubleTensor results) {
-        IntegerTensor invalidK = k.getLessThanMask(IntegerTensor.create(1, k.getShape()));
+        IntegerTensor invalidK = k.lessThanMask(IntegerTensor.create(1, k.getShape()));
 
         return results.setWithMaskInPlace(invalidK.toDouble(), Double.NEGATIVE_INFINITY);
     }

@@ -70,25 +70,25 @@ public class IntegerScalarTensorShapePreservationTest {
 
     @Test
     public void tensorGetGreaterThanMaskPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::getGreaterThanMask);
+        checkOperationPreservesShape(IntegerTensor::greaterThanMask);
 
     }
 
     @Test
     public void tensorGetGreaterThanOrEqualToMaskPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::getGreaterThanOrEqualToMask);
+        checkOperationPreservesShape(IntegerTensor::greaterThanOrEqualToMask);
 
     }
 
     @Test
     public void tensorGetLessThanMaskPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::getLessThanMask);
+        checkOperationPreservesShape(IntegerTensor::lessThanMask);
 
     }
 
     @Test
     public void tensorGetLessThanOrEqualToMaskPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::getLessThanOrEqualToMask);
+        checkOperationPreservesShape(IntegerTensor::lessThanOrEqualToMask);
 
     }
 

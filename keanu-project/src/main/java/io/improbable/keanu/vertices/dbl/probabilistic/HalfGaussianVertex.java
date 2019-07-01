@@ -84,7 +84,7 @@ public class HalfGaussianVertex extends GaussianVertex {
         } else {
             for (Map.Entry<Vertex, DoubleTensor> entry : dLogProb.entrySet()) {
                 DoubleTensor v = entry.getValue();
-                dLogProb.put(entry.getKey(), v.setWithMaskInPlace(value.getLessThanMask(DoubleTensor.scalar(MU_ZERO)), 0.0));
+                dLogProb.put(entry.getKey(), v.setWithMaskInPlace(value.lessThanMask(DoubleTensor.scalar(MU_ZERO)), 0.0));
             }
             return dLogProb;
         }

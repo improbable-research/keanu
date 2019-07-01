@@ -121,8 +121,8 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
 
         if (withRespectTo.contains(this)) {
             DoubleTensor dLogPdx = DoubleTensor.zeros(this.xMax.getShape());
-            dLogPdx = dLogPdx.setWithMaskInPlace(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
-            dLogPdx = dLogPdx.setWithMaskInPlace(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
+            dLogPdx = dLogPdx.setWithMaskInPlace(value.greaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
+            dLogPdx = dLogPdx.setWithMaskInPlace(value.lessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
 
             return singletonMap(this, dLogPdx);
         }

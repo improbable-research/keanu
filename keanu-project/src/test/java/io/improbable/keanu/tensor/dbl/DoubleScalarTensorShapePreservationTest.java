@@ -103,22 +103,22 @@ public class DoubleScalarTensorShapePreservationTest {
 
     @Test
     public void tensorGetGreaterThanMaskPreservesShape() {
-        checkOperationPreservesShape(DoubleTensor::getGreaterThanMask);
+        checkOperationPreservesShape(DoubleTensor::greaterThanMask);
     }
 
     @Test
     public void tensorGetGreaterThanOrEqualToMaskPreservesShape() {
-        checkOperationPreservesShape(DoubleTensor::getGreaterThanOrEqualToMask);
+        checkOperationPreservesShape(DoubleTensor::greaterThanOrEqualToMask);
     }
 
     @Test
     public void tensorGetLessThanMaskPreservesShape() {
-        checkOperationPreservesShape(DoubleTensor::getLessThanMask);
+        checkOperationPreservesShape(DoubleTensor::lessThanMask);
     }
 
     @Test
     public void tensorGetLessThanOrEqualToMaskPreservesShape() {
-        checkOperationPreservesShape(DoubleTensor::getLessThanOrEqualToMask);
+        checkOperationPreservesShape(DoubleTensor::lessThanOrEqualToMask);
     }
 
     @Test

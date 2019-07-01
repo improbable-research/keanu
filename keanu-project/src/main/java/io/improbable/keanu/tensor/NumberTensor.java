@@ -242,11 +242,11 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> ex
 
     BooleanTensor greaterThanOrEqual(N value);
 
-    T getGreaterThanMask(T greaterThanThis);
+    T greaterThanMask(T greaterThanThis);
 
-    T getGreaterThanOrEqualToMask(T greaterThanThis);
+    T greaterThanOrEqualToMask(T greaterThanThis);
 
-    T getLessThanMask(T lessThanThis);
+    T lessThanMask(T lessThanThis);
 
-    T getLessThanOrEqualToMask(T lessThanThis);
+    T lessThanOrEqualToMask(T lessThanThis);
 }
