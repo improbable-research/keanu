@@ -22,7 +22,7 @@ public class ElementwiseBinaryDoubleOperations {
     @Param({"TIMES", "MATRIX_MULTIPLY"})
     public BinaryOperation operation;
 
-    @Param({"1", "10", "100", "1000"})
+    @Param({"1", "10", "100", "1000", "10240"})
     public int dimLength;
 
     @Param({"JVM", "ND4J"})

@@ -33,27 +33,15 @@ import static com.google.common.primitives.Ints.checkedCast;
  */
 public class Nd4jIntegerTensor implements IntegerTensor {
 
-
     static {
         INDArrayShim.startNewThreadForNd4j();
     }
 
-    private static final DataType BUFFER_TYPE = DataType.DOUBLE;
+    private static final DataType BUFFER_TYPE = DataType.INT;
     private INDArray tensor;
 
     public Nd4jIntegerTensor(int[] data, long[] shape) {
-        this(TypedINDArrayFactory.create(
-            toDoubles(data),
-            shape, BUFFER_TYPE)
-        );
-    }
-
-    private static double[] toDoubles(int[] ints) {
-        double[] doubles = new double[ints.length];
-        for (int i = 0; i < ints.length; i++) {
-            doubles[i] = ints[i];
-        }
-        return doubles;
+        this(TypedINDArrayFactory.create(data, shape));
     }
 
     public Nd4jIntegerTensor(INDArray tensor) {
@@ -61,7 +49,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     public static Nd4jIntegerTensor scalar(int scalarValue) {
-        return new Nd4jIntegerTensor(TypedINDArrayFactory.scalar(scalarValue, BUFFER_TYPE));
+        return new Nd4jIntegerTensor(Nd4j.scalar(scalarValue));
     }
 
     public static Nd4jIntegerTensor create(int[] values, long[] shape) {
@@ -69,7 +57,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     public static Nd4jIntegerTensor create(int value, long[] shape) {
-        return new Nd4jIntegerTensor(TypedINDArrayFactory.valueArrayOf(shape, value, BUFFER_TYPE));
+        return new Nd4jIntegerTensor(Nd4j.valueArrayOf(shape, value));
     }
 
     public static Nd4jIntegerTensor ones(long[] shape) {
@@ -85,18 +73,18 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     public static Nd4jIntegerTensor arange(int start, int end) {
-        return new Nd4jIntegerTensor(TypedINDArrayFactory.arange(start, end, BUFFER_TYPE));
+        return new Nd4jIntegerTensor(TypedINDArrayFactory.arange(start, end));
     }
 
     public static Nd4jDoubleTensor arange(int start, int end, int stepSize) {
         int stepCount = (end - start) / stepSize;
-        INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount, BUFFER_TYPE).muli(stepSize).addi(start);
+        INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount).muli(stepSize).addi(start);
         return new Nd4jDoubleTensor(arangeWithStep);
     }
 
     static INDArray unsafeGetNd4J(IntegerTensor that) {
         if (that.isLengthOne()) {
-            return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
+            return Nd4j.scalar(that.scalar()).reshape(that.getShape());
         }
         return ((Nd4jIntegerTensor) that).tensor;
     }
@@ -170,21 +158,27 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (this.getLength() != mask.getLength()) {
             throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
         }
+        INDArray maskDup = unsafeGetNd4J(mask);
 
-        INDArray maskDup = unsafeGetNd4J(mask).dup();
+        INDArray dblBuffer = tensor.castTo(DataType.DOUBLE);
+        INDArray dblMask = maskDup.castTo(DataType.DOUBLE);
 
+        double trueValue = 1.0;
         if (value == 0.0) {
-            INDArray swapOnesForZeros = maskDup.rsubi(1.0);
-            tensor.muli(swapOnesForZeros);
-        } else {
-            Nd4j.getExecutioner().exec(
-                new CompareAndSet(maskDup, value, Conditions.equals(1.0))
-            );
-
-            Nd4j.getExecutioner().exec(
-                new CompareAndSet(tensor, maskDup, Conditions.notEquals(0.0))
-            );
+            trueValue = 1.0 - trueValue;
+            dblMask.negi().addi(1.0);
         }
+        double falseValue = 1.0 - trueValue;
+
+        Nd4j.getExecutioner().exec(
+            new CompareAndSet(dblMask, value, Conditions.equals(trueValue))
+        );
+
+        Nd4j.getExecutioner().exec(
+            new CompareAndSet(dblBuffer, dblMask, Conditions.notEquals(falseValue))
+        );
+
+        tensor = dblBuffer.castTo(DataType.INT);
 
         return this;
     }
@@ -341,7 +335,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor setAllInPlace(Integer value) {
-        tensor = TypedINDArrayFactory.valueArrayOf(getShape(), value, BUFFER_TYPE);
+        tensor = Nd4j.valueArrayOf(getShape(), value);
         return this;
     }
 
@@ -509,7 +503,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public DoubleTensor toDouble() {
-        return new Nd4jDoubleTensor(tensor.dup());
+        return new Nd4jDoubleTensor(tensor.castTo(DataType.DOUBLE));
     }
 
     @Override

@@ -39,7 +39,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.google.common.primitives.Ints.checkedCast;
-import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 
 /**
  * Class for representing n-dimensional arrays of doubles. This is
@@ -55,7 +54,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     private INDArray tensor;
 
     public Nd4jDoubleTensor(double[] data, long[] shape) {
-        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
+        this(TypedINDArrayFactory.create(data, shape));
     }
 
     public Nd4jDoubleTensor(INDArray tensor) {
@@ -63,7 +62,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     public static Nd4jDoubleTensor scalar(double scalarValue) {
-        return new Nd4jDoubleTensor(TypedINDArrayFactory.scalar(scalarValue, BUFFER_TYPE));
+        return new Nd4jDoubleTensor(Nd4j.scalar(scalarValue));
     }
 
     public static Nd4jDoubleTensor create(double[] values, long... shape) {
@@ -75,7 +74,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     public static Nd4jDoubleTensor create(double value, long... shape) {
-        return new Nd4jDoubleTensor(valueArrayOf(shape, value, BUFFER_TYPE));
+        return new Nd4jDoubleTensor(Nd4j.valueArrayOf(shape, value));
     }
 
     public static Nd4jDoubleTensor create(double[] values) {
@@ -99,12 +98,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     public static Nd4jDoubleTensor arange(double start, double end) {
-        return new Nd4jDoubleTensor(TypedINDArrayFactory.arange(start, end, BUFFER_TYPE));
+        return new Nd4jDoubleTensor(TypedINDArrayFactory.arange(start, end));
     }
 
     public static Nd4jDoubleTensor arange(double start, double end, double stepSize) {
         double stepCount = Math.ceil((end - start) / stepSize);
-        INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount, BUFFER_TYPE).muli(stepSize).addi(start);
+        INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount).muli(stepSize).addi(start);
         return new Nd4jDoubleTensor(arangeWithStep);
     }
 
@@ -115,10 +114,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else {
 
             if (that.isLengthOne()) {
-                return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
+                return Nd4j.scalar(that.scalar()).reshape(that.getShape());
             }
 
-            return TypedINDArrayFactory.create(that.asFlatDoubleArray(), that.getShape(), BUFFER_TYPE);
+            return TypedINDArrayFactory.create(that.asFlatDoubleArray(), that.getShape());
         }
     }
 
@@ -485,7 +484,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor atan2InPlace(DoubleTensor y) {
         if (y.isScalar()) {
-            tensor = Transforms.atan2(tensor, valueArrayOf(this.tensor.shape(), y.scalar(), BUFFER_TYPE));
+            tensor = Transforms.atan2(tensor, Nd4j.valueArrayOf(this.tensor.shape(), y.scalar()));
         } else {
             tensor = INDArrayShim.atan2(tensor, unsafeGetNd4J(y));
         }
@@ -582,7 +581,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor exp2InPlace() {
-        INDArray indArray = valueArrayOf(tensor.shape(), 2.0, BUFFER_TYPE);
+        INDArray indArray = Nd4j.valueArrayOf(tensor.shape(), 2.0);
         Nd4j.getExecutioner().exec(new PowPairwise(indArray, tensor, tensor));
         return this;
     }

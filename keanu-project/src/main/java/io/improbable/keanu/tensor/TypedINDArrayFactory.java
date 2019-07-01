@@ -9,83 +9,76 @@ import org.nd4j.linalg.factory.Nd4j;
 
 public class TypedINDArrayFactory {
 
-    public static INDArray create(double[] data, long[] shape, DataType bufferType) {
-        Nd4j.setDefaultDataTypes(bufferType, bufferType);
+    private static final DataType DEFAULT_FLOATING_POINT_TYPE = DataType.DOUBLE;
+
+    public static INDArray create(double[] data, long[] shape) {
+        Nd4j.setDefaultDataTypes(DataType.DOUBLE, DEFAULT_FLOATING_POINT_TYPE);
         switch (shape.length) {
             case 0:
                 Preconditions.checkArgument(data.length == 1, "Scalar shape must have only one data element.");
-                return scalar(data[0], bufferType);
+                return Nd4j.scalar(data[0]);
             case 1:
-                return vector(data, bufferType);
+                return Nd4j.createFromArray(data);
             default:
                 DataBuffer buffer = Nd4j.getDataBufferFactory().createDouble(data);
                 return Nd4j.create(buffer, shape);
         }
     }
 
-    public static INDArray valueArrayOf(long[] shape, double value, DataType bufferType) {
-        Nd4j.setDefaultDataTypes(bufferType, bufferType);
+    public static INDArray create(int[] data, long[] shape) {
+        Nd4j.setDefaultDataTypes(DataType.INT, DEFAULT_FLOATING_POINT_TYPE);
         switch (shape.length) {
             case 0:
-                return scalar(value, bufferType);
+                Preconditions.checkArgument(data.length == 1, "Scalar shape must have only one data element.");
+                return Nd4j.scalar(data[0]);
             case 1:
-                return reshapeToVector(Nd4j.valueArrayOf(shape, value));
+                return Nd4j.createFromArray(data);
             default:
-                return Nd4j.valueArrayOf(shape, value);
+                DataBuffer buffer = Nd4j.getDataBufferFactory().createInt(data);
+                return Nd4j.create(buffer, shape);
         }
     }
 
-    public static INDArray scalar(double scalarValue, DataType bufferType) {
-        Nd4j.setDefaultDataTypes(bufferType, bufferType);
-        return Nd4j.trueScalar(scalarValue);
-    }
-
-    public static INDArray vector(double[] vectorValues, DataType bufferType) {
-        Nd4j.setDefaultDataTypes(bufferType, bufferType);
-        return Nd4j.trueVector(vectorValues);
-    }
-
     public static INDArray ones(long[] shape, DataType bufferType) {
-        Nd4j.setDefaultDataTypes(bufferType, bufferType);
+        Nd4j.setDefaultDataTypes(bufferType, DEFAULT_FLOATING_POINT_TYPE);
         switch (shape.length) {
             case 0:
-                return scalar(1.0, bufferType);
+                return Nd4j.scalar(1.0);
             case 1:
-                return reshapeToVector(Nd4j.ones(shape));
+                return Nd4j.ones(shape);
             default:
                 return Nd4j.ones(shape);
         }
     }
 
     public static INDArray eye(long n, DataType bufferType) {
-        Nd4j.setDefaultDataTypes(bufferType, bufferType);
+        Nd4j.setDefaultDataTypes(bufferType, DEFAULT_FLOATING_POINT_TYPE);
         if (n == 0) {
-            return scalar(1.0, bufferType);
+            return Nd4j.scalar(1.0);
         }
         return Nd4j.eye(n);
     }
 
     public static INDArray zeros(long[] shape, DataType bufferType) {
-        Nd4j.setDefaultDataTypes(bufferType, bufferType);
+        Nd4j.setDefaultDataTypes(bufferType, DEFAULT_FLOATING_POINT_TYPE);
         return Nd4j.zeros(shape);
     }
 
     public static INDArray linspace(double start, double end, int numberOfPoints, DataType bufferType) {
-        Nd4j.setDefaultDataTypes(bufferType, bufferType);
+        Nd4j.setDefaultDataTypes(bufferType, DEFAULT_FLOATING_POINT_TYPE);
         return Nd4j.getExecutioner().exec(
             new Linspace(Nd4j.createUninitialized(new long[]{numberOfPoints}, Nd4j.order()), start, end)
         );
     }
 
-    public static INDArray arange(double start, double end, DataType bufferType) {
-        Nd4j.setDefaultDataTypes(bufferType, bufferType);
-        return reshapeToVector(Nd4j.arange(start, end));
+    public static INDArray arange(double start, double end) {
+        Nd4j.setDefaultDataTypes(DataType.DOUBLE, DEFAULT_FLOATING_POINT_TYPE);
+        return Nd4j.arange(start, end);
     }
 
-    private static INDArray reshapeToVector(INDArray vector) {
-        if (vector.shape().length > 1) {
-            vector.setShapeAndStride(new int[]{(int) vector.shape()[1]}, new int[]{1});
-        }
-        return vector;
+    public static INDArray arange(int start, int end) {
+        Nd4j.setDefaultDataTypes(DataType.INT, DEFAULT_FLOATING_POINT_TYPE);
+        return Nd4j.arange(start, end);
     }
+
 }

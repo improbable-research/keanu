@@ -135,6 +135,36 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canEye1() {
+        DoubleTensor expected = DoubleTensor.create(new double[]{1}, 1, 1);
+        DoubleTensor actual = DoubleTensor.eye(1);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canOnes() {
+        DoubleTensor expected = DoubleTensor.create(new double[]{1, 1, 1, 1}, 2, 2);
+        DoubleTensor actual = DoubleTensor.ones(2, 2);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canOnes1() {
+        DoubleTensor expected = DoubleTensor.create(1);
+        DoubleTensor actual = DoubleTensor.ones(1);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canOnes0() {
+        DoubleTensor expected = DoubleTensor.scalar(1);
+        DoubleTensor actual = DoubleTensor.ones();
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void canDiagFromVector() {
         DoubleTensor expected = DoubleTensor.create(new double[]{1, 0, 0, 0, 2, 0, 0, 0, 3}, 3, 3);
         DoubleTensor actual = DoubleTensor.create(1, 2, 3).diag();

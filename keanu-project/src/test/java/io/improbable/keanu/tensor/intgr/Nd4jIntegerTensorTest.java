@@ -265,14 +265,14 @@ public class Nd4jIntegerTensorTest {
     public void doesSetWithMask() {
         IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{-1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor mask = Nd4jIntegerTensor.create(new int[]{1, 1, 0, 0}, new long[]{2, 2});
-        int[] expected = new int[]{100, 100, 3, 4};
+        Nd4jIntegerTensor expected = Nd4jIntegerTensor.create(new int[]{100, 100, 3, 4}, new long[]{2, 2});
 
         IntegerTensor result = matrix.setWithMask(mask, 100);
-        assertArrayEquals(expected, result.asFlatIntegerArray());
+        assertThat(result, valuesAndShapesMatch(expected));
 
         IntegerTensor resultInPlace = matrix.setWithMaskInPlace(mask, 100);
-        assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
-        assertArrayEquals(expected, matrix.asFlatIntegerArray());
+        assertThat(resultInPlace, valuesAndShapesMatch(expected));
+        assertThat(matrix, valuesAndShapesMatch(expected));
     }
 
     @Test
