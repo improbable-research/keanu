@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class TensorMulByMatrixMul {
+public class TensorMulByMatrixMul {
 
-    static <T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>> TENSOR tensorMmul(TENSOR left, TENSOR right, int[] dimsLeft, int[] dimsRight) {
+    public static <T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>> TENSOR tensorMmul(TENSOR left, TENSOR right, int[] dimsLeft, int[] dimsRight) {
 
         long[] leftShape = left.getShape();
         long[] rightShape = right.getShape();

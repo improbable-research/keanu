@@ -7,4 +7,14 @@ public abstract class Nd4jFixedPointTensor<T extends Number, TENSOR extends Fixe
     public Nd4jFixedPointTensor(INDArray tensor) {
         super(tensor);
     }
+
+    @Override
+    public TENSOR modInPlace(T that) {
+        return set(tensor.fmodi(that));
+    }
+
+    @Override
+    public TENSOR modInPlace(TENSOR that) {
+        return set(tensor.fmodi(getTensor(that)));
+    }
 }

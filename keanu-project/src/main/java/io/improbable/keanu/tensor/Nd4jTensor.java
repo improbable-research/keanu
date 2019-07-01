@@ -5,6 +5,8 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements Tensor<T, TENSOR> {
 
@@ -68,6 +70,26 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     }
 
     @Override
+    public TENSOR slice(int dimension, long index) {
+        return create(tensor.slice(index, dimension));
+    }
+
+    @Override
+    public TENSOR take(long... index) {
+        return create(tensor.getScalar(index));
+    }
+
+    @Override
+    public List<TENSOR> split(int dimension, long... splitAtIndices) {
+
+        List<INDArray> splitINDArrays = INDArrayExtensions.split(tensor, dimension, splitAtIndices);
+
+        return splitINDArrays.stream()
+            .map(this::create)
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public int hashCode() {
         return tensor.hashCode();
     }
@@ -99,9 +121,11 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
         return tensor;
     }
 
-    protected abstract INDArray getTensor(TENSOR tensor);
+    protected abstract INDArray getTensor(Tensor<T, ?> tensor);
 
     protected abstract TENSOR create(INDArray tensor);
 
     protected abstract TENSOR set(INDArray tensor);
+
+    protected abstract TENSOR getThis();
 }
