@@ -132,7 +132,7 @@ public interface IntegerTensor extends FixedPointTensor<Integer, IntegerTensor>,
     static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {
-            concatAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toConcat[i]).dup();
+            concatAsINDArray[i] = Nd4jIntegerTensor.getAsINDArray(toConcat[i]).dup();
             if (concatAsINDArray[i].shape().length == 0) {
                 concatAsINDArray[i] = concatAsINDArray[i].reshape(1);
             }

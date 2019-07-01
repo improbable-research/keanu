@@ -59,7 +59,7 @@ public class Nd4jDoubleTensorFactory implements DoubleTensorFactory {
     public DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {
-            concatAsINDArray[i] = Nd4jDoubleTensor.unsafeGetNd4J(toConcat[i]).dup();
+            concatAsINDArray[i] = Nd4jDoubleTensor.getAsINDArray(toConcat[i]).dup();
             if (concatAsINDArray[i].shape().length == 0) {
                 concatAsINDArray[i] = concatAsINDArray[i].reshape(1);
             }

@@ -2,7 +2,6 @@ package io.improbable.keanu.tensor;
 
 import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;

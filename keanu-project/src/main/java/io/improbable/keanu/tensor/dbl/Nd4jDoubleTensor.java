@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
+import io.improbable.keanu.tensor.Nd4jFloatingPointTensor;
+import io.improbable.keanu.tensor.Nd4jTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -21,7 +23,6 @@ import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.scalar.LogX;
 import org.nd4j.linalg.api.ops.impl.scalar.ReplaceNans;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
 import org.nd4j.linalg.api.ops.impl.transforms.pairwise.arithmetic.PowPairwise;
 import org.nd4j.linalg.api.ops.impl.transforms.strict.ACosh;
 import org.nd4j.linalg.api.ops.impl.transforms.strict.ASinh;
@@ -29,7 +30,6 @@ import org.nd4j.linalg.api.ops.impl.transforms.strict.Expm1;
 import org.nd4j.linalg.api.ops.impl.transforms.strict.Log1p;
 import org.nd4j.linalg.api.ops.impl.transforms.strict.Tan;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
@@ -44,21 +44,36 @@ import static com.google.common.primitives.Ints.checkedCast;
  * Class for representing n-dimensional arrays of doubles. This is
  * backed by Nd4j.
  */
-public class Nd4jDoubleTensor implements DoubleTensor {
+public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTensor> implements DoubleTensor {
 
     static {
         INDArrayShim.startNewThreadForNd4j();
     }
 
     private static final DataType BUFFER_TYPE = DataType.DOUBLE;
-    private INDArray tensor;
 
     public Nd4jDoubleTensor(double[] data, long[] shape) {
         this(TypedINDArrayFactory.create(data, shape));
     }
 
     public Nd4jDoubleTensor(INDArray tensor) {
-        this.tensor = tensor;
+        super(tensor);
+    }
+
+    @Override
+    protected INDArray getTensor(DoubleTensor tensor) {
+        return getAsINDArray(tensor);
+    }
+
+    @Override
+    protected DoubleTensor create(INDArray tensor) {
+        return new Nd4jDoubleTensor(tensor);
+    }
+
+    @Override
+    protected DoubleTensor set(INDArray tensor) {
+        this.tensor = tensor.dataType() == DataType.DOUBLE ? tensor : tensor.castTo(DataType.DOUBLE);
+        return this;
     }
 
     public static Nd4jDoubleTensor scalar(double scalarValue) {
@@ -107,66 +122,18 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(arangeWithStep);
     }
 
-    static INDArray unsafeGetNd4J(DoubleTensor that) {
+    static INDArray getAsINDArray(DoubleTensor that) {
 
-        if (that instanceof Nd4jDoubleTensor) {
-            return ((Nd4jDoubleTensor) that).tensor;
-        } else {
-
-            if (that.isLengthOne()) {
-                return Nd4j.scalar(that.scalar()).reshape(that.getShape());
+        if (that instanceof Nd4jTensor) {
+            INDArray array = ((Nd4jTensor) that).getTensor();
+            if (array.dataType() == DataType.DOUBLE) {
+                return array;
+            } else {
+                return array.castTo(DataType.DOUBLE);
             }
-
+        } else {
             return TypedINDArrayFactory.create(that.asFlatDoubleArray(), that.getShape());
         }
-    }
-
-    @Override
-    public int getRank() {
-        return tensor.rank();
-    }
-
-    @Override
-    public long[] getShape() {
-        return tensor.shape();
-    }
-
-    @Override
-    public long[] getStride() {
-        return tensor.stride();
-    }
-
-    @Override
-    public long getLength() {
-        return tensor.length();
-    }
-
-    @Override
-    public DoubleTensor reshape(long... newShape) {
-        return new Nd4jDoubleTensor(tensor.reshape(newShape));
-    }
-
-    @Override
-    public DoubleTensor broadcast(long... toShape) {
-        return new Nd4jDoubleTensor(tensor.broadcast(toShape));
-    }
-
-    @Override
-    public DoubleTensor permute(int... rearrange) {
-        return new Nd4jDoubleTensor(tensor.permute(rearrange));
-    }
-
-    @Override
-    public DoubleTensor diag() {
-        return new Nd4jDoubleTensor(Nd4j.diag(tensor));
-    }
-
-    @Override
-    public DoubleTensor transpose() {
-        if (this.getRank() != 2) {
-            throw new IllegalArgumentException("Cannot transpose rank " + this.getRank() + " tensor. Try permute instead.");
-        }
-        return new Nd4jDoubleTensor(tensor.transpose());
     }
 
     @Override
@@ -189,10 +156,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return tensor.sumNumber().doubleValue();
     }
 
-    @Override
-    public DoubleTensor duplicate() {
-        return new Nd4jDoubleTensor(tensor.dup());
-    }
 
     @Override
     public DoubleTensor apply(Function<Double, Double> function) {
@@ -285,8 +248,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public boolean equalsWithinEpsilon(DoubleTensor o, Double epsilon) {
         if (this == o) return true;
 
-        if (o instanceof Nd4jDoubleTensor) {
-            return tensor.equalsWithEps(((Nd4jDoubleTensor) o).tensor, epsilon);
+        if (o instanceof Nd4jTensor) {
+            return tensor.equalsWithEps(((Nd4jTensor) o).getTensor(), epsilon);
         } else {
             if (this.hasSameShapeAs(o)) {
                 DoubleTensor difference = o.minus(this);
@@ -314,7 +277,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor value) {
         TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
-        INDArray mmulResult = tensor.mmul(unsafeGetNd4J(value));
+        INDArray mmulResult = tensor.mmul(getAsINDArray(value));
         return new Nd4jDoubleTensor(mmulResult);
     }
 
@@ -402,7 +365,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (exponent.isScalar()) {
             Transforms.pow(tensor, exponent.scalar(), false);
         } else {
-            INDArray exponentArray = unsafeGetNd4J(exponent);
+            INDArray exponentArray = getAsINDArray(exponent);
             tensor = INDArrayShim.pow(tensor, exponentArray);
         }
         return this;
@@ -486,7 +449,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (y.isScalar()) {
             tensor = Transforms.atan2(tensor, Nd4j.valueArrayOf(this.tensor.shape(), y.scalar()));
         } else {
-            tensor = INDArrayShim.atan2(tensor, unsafeGetNd4J(y));
+            tensor = INDArrayShim.atan2(tensor, getAsINDArray(y));
         }
         return this;
     }
@@ -604,7 +567,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.minus(that);
         } else {
-            INDArray result = INDArrayShim.subi(tensor, unsafeGetNd4J(that).dup());
+            INDArray result = INDArrayShim.subi(tensor, getAsINDArray(that).dup());
             if (result != tensor) {
                 return new Nd4jDoubleTensor(result);
             }
@@ -619,7 +582,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.minus(that);
         } else {
-            INDArray result = INDArrayShim.rsubi(tensor, unsafeGetNd4J(that).dup());
+            INDArray result = INDArrayShim.rsubi(tensor, getAsINDArray(that).dup());
             if (result != tensor) {
                 return new Nd4jDoubleTensor(result);
             }
@@ -645,7 +608,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.plus(that);
         } else {
-            INDArray result = INDArrayShim.addi(tensor, unsafeGetNd4J(that).dup());
+            INDArray result = INDArrayShim.addi(tensor, getAsINDArray(that).dup());
             if (result != tensor) {
                 return new Nd4jDoubleTensor(result);
             }
@@ -665,7 +628,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.times(that);
         } else {
-            INDArray result = INDArrayShim.muli(tensor, unsafeGetNd4J(that).dup());
+            INDArray result = INDArrayShim.muli(tensor, getAsINDArray(that).dup());
             if (result != tensor) {
                 return new Nd4jDoubleTensor(result);
             }
@@ -685,7 +648,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.div(that);
         } else {
-            INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that).dup());
+            INDArray result = INDArrayShim.divi(tensor, getAsINDArray(that).dup());
             if (result != tensor) {
                 return new Nd4jDoubleTensor(result);
             }
@@ -706,7 +669,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.minus(that);
         } else {
-            INDArray result = INDArrayShim.rdivi(tensor, unsafeGetNd4J(that).dup());
+            INDArray result = INDArrayShim.rdivi(tensor, getAsINDArray(that).dup());
             if (result != tensor) {
                 return new Nd4jDoubleTensor(result);
             }
@@ -753,7 +716,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (value.isScalar()) {
             mask = tensor.gt(value.scalar());
         } else {
-            INDArray indArray = unsafeGetNd4J(value);
+            INDArray indArray = getAsINDArray(value);
             mask = INDArrayShim.gt(tensor, indArray);
         }
 
@@ -767,7 +730,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (value.isScalar()) {
             mask = tensor.gte(value.scalar());
         } else {
-            INDArray indArray = unsafeGetNd4J(value);
+            INDArray indArray = getAsINDArray(value);
             mask = tensor.dup();
             mask = INDArrayShim.gte(mask, indArray);
         }
@@ -802,7 +765,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (value.isScalar()) {
             mask = tensor.lt(value.scalar());
         } else {
-            INDArray indArray = unsafeGetNd4J(value);
+            INDArray indArray = getAsINDArray(value);
             mask = INDArrayShim.lt(tensor, indArray);
         }
 
@@ -817,7 +780,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             mask = tensor.lte(value.scalar());
         } else {
 
-            INDArray indArray = unsafeGetNd4J(value);
+            INDArray indArray = getAsINDArray(value);
             mask = tensor.dup();
             mask = INDArrayShim.lte(mask, indArray);
         }
@@ -833,7 +796,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             } else if (that.isScalar()) {
                 return elementwiseEquals(((DoubleTensor) that).scalar());
             } else {
-                INDArray mask = INDArrayShim.eq(tensor, unsafeGetNd4J((DoubleTensor) that));
+                INDArray mask = INDArrayShim.eq(tensor, getAsINDArray((DoubleTensor) that));
                 return fromMask(mask);
             }
         } else {
@@ -858,31 +821,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
-        if (this.getLength() != mask.getLength()) {
-            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
-        }
-
-        INDArray maskDup = unsafeGetNd4J(mask).dup();
-        double trueValue = 1.0;
-        if (value == 0.0) {
-            trueValue = 1.0 - trueValue;
-            maskDup.negi().addi(1);
-        }
-        double falseValue = 1.0 - trueValue;
-
-        Nd4j.getExecutioner().exec(
-            new CompareAndSet(maskDup, value, Conditions.equals(trueValue))
-        );
-
-        Nd4j.getExecutioner().exec(
-            new CompareAndSet(tensor, maskDup, Conditions.notEquals(falseValue))
-        );
-
-        return this;
-    }
-
-    @Override
     public DoubleTensor applyInPlace(Function<Double, Double> function) {
         DataBuffer data = tensor.data();
         for (int i = 0; i < data.length(); i++) {
@@ -896,7 +834,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (max.isScalar()) {
             Transforms.max(tensor, max.scalar(), false);
         } else {
-            tensor = INDArrayShim.max(tensor, unsafeGetNd4J(max));
+            tensor = INDArrayShim.max(tensor, getAsINDArray(max));
         }
         return this;
     }
@@ -906,7 +844,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (min.isScalar()) {
             Transforms.min(tensor, min.scalar(), false);
         } else {
-            tensor = INDArrayShim.min(tensor, unsafeGetNd4J(min));
+            tensor = INDArrayShim.min(tensor, getAsINDArray(min));
         }
         return this;
     }
@@ -928,7 +866,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return minInPlace(max).maxInPlace(min);
     }
 
-    @Override
     public DoubleTensor ceilInPlace() {
         Transforms.ceil(tensor, false);
         return this;
@@ -994,34 +931,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor replaceNaNInPlace(Double value) {
         Nd4j.getExecutioner().exec(new ReplaceNans(tensor, value));
         return this;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o instanceof Nd4jDoubleTensor) {
-            return tensor.equals(((Nd4jDoubleTensor) o).tensor);
-        } else if (o instanceof Tensor) {
-            Tensor that = (Tensor) o;
-            if (!Arrays.equals(that.getShape(), getShape())) return false;
-            return Arrays.equals(
-                that.asFlatArray(),
-                this.asFlatArray()
-            );
-        }
-
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return tensor.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return tensor.toString();
     }
 
     @Override
