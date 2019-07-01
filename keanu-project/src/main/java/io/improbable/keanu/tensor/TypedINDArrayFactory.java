@@ -1,7 +1,5 @@
 package io.improbable.keanu.tensor;
 
-import com.google.common.base.Preconditions;
-import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.random.impl.Linspace;
@@ -13,42 +11,17 @@ public class TypedINDArrayFactory {
 
     public static INDArray create(double[] data, long[] shape) {
         Nd4j.setDefaultDataTypes(DataType.DOUBLE, DEFAULT_FLOATING_POINT_TYPE);
-        switch (shape.length) {
-            case 0:
-                Preconditions.checkArgument(data.length == 1, "Scalar shape must have only one data element.");
-                return Nd4j.scalar(data[0]);
-            case 1:
-                return Nd4j.createFromArray(data);
-            default:
-                DataBuffer buffer = Nd4j.getDataBufferFactory().createDouble(data);
-                return Nd4j.create(buffer, shape);
-        }
+        return Nd4j.createFromArray(data).reshape(shape);
     }
 
     public static INDArray create(int[] data, long[] shape) {
         Nd4j.setDefaultDataTypes(DataType.INT, DEFAULT_FLOATING_POINT_TYPE);
-        switch (shape.length) {
-            case 0:
-                Preconditions.checkArgument(data.length == 1, "Scalar shape must have only one data element.");
-                return Nd4j.scalar(data[0]);
-            case 1:
-                return Nd4j.createFromArray(data);
-            default:
-                DataBuffer buffer = Nd4j.getDataBufferFactory().createInt(data);
-                return Nd4j.create(buffer, shape);
-        }
+        return Nd4j.createFromArray(data).reshape(shape);
     }
 
     public static INDArray ones(long[] shape, DataType bufferType) {
         Nd4j.setDefaultDataTypes(bufferType, DEFAULT_FLOATING_POINT_TYPE);
-        switch (shape.length) {
-            case 0:
-                return Nd4j.scalar(1.0);
-            case 1:
-                return Nd4j.ones(shape);
-            default:
-                return Nd4j.ones(shape);
-        }
+        return Nd4j.ones(shape);
     }
 
     public static INDArray eye(long n, DataType bufferType) {

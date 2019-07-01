@@ -60,6 +60,7 @@ public class Multinomial implements DiscreteDistribution {
 
         if (validationEnabled) {
             validateBroadcastShapes(shape, n.getShape(), p.getShape());
+            validateXShape(shape, p.getShape());
         }
 
         long[] sampleBatchShape = TensorShape.selectDimensions(0, shape.length - 1, shape);
@@ -161,13 +162,7 @@ public class Multinomial implements DiscreteDistribution {
             throw new IllegalArgumentException("x must be >= 0 and <= n");
         }
 
-        long kAccordingToP = p.getShape()[p.getRank() - 1];
-        long kAccordingToX = x.isScalar() ? 0 : x.getShape()[x.getRank() - 1];
-        Preconditions.checkArgument(
-            kAccordingToX == kAccordingToP,
-            "x shape must have far right dimension matching number of categories k " + kAccordingToP +
-                " but had " + kAccordingToX + " categories."
-        );
+        validateXShape(x.getShape(), p.getShape());
 
         final IntegerTensor xSum = x.sum(-1);
         final boolean xSumValidated = xSum.elementwiseEquals(n).allTrue();
@@ -177,6 +172,17 @@ public class Multinomial implements DiscreteDistribution {
                     " must equal n " + Arrays.toString(n.asFlatDoubleArray())
             );
         }
+    }
+
+    private static void validateXShape(long[] xShape, long[] pShape) {
+
+        long kAccordingToP = pShape[pShape.length - 1];
+        long kAccordingToX = xShape.length == 0 ? 0 : xShape[xShape.length - 1];
+        Preconditions.checkArgument(
+            kAccordingToX == kAccordingToP,
+            "x shape must have far right dimension matching number of categories k " + kAccordingToP +
+                " but had " + kAccordingToX + " categories."
+        );
     }
 
     private static void validateBroadcastShapes(long[] xShape, long[] nShape, long[] pShape) {
