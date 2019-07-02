@@ -81,6 +81,16 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
+    public TENSOR product(int... overDimensions) {
+        return create(tensor.prod(overDimensions));
+    }
+
+    @Override
+    public TENSOR cumProdInPlace(int dimension) {
+        return set(INDArrayExtensions.cumProd(this.tensor, dimension));
+    }
+
+    @Override
     public TENSOR clampInPlace(TENSOR min, TENSOR max) {
         return minInPlace(max).maxInPlace(min);
     }

@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-import static io.improbable.keanu.tensor.TensorShape.getSummationResultShape;
+import static io.improbable.keanu.tensor.TensorShape.getReductionResultShape;
 
 public class IntegerSumVertex extends IntegerUnaryOpVertex {
 
@@ -23,7 +23,7 @@ public class IntegerSumVertex extends IntegerUnaryOpVertex {
     @ExportVertexToPythonBindings
     public IntegerSumVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
                             @LoadVertexParam(DIMENSIONS_NAME) int[] overDimensions) {
-        super(getSummationResultShape(inputVertex.getShape(), overDimensions), inputVertex);
+        super(getReductionResultShape(inputVertex.getShape(), overDimensions), inputVertex);
         this.overDimensions = overDimensions;
     }
 

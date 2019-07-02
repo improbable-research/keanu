@@ -19,6 +19,11 @@ public class GenericBuffer {
             }
         }
 
+        @Override
+        public PrimitiveGenericWrapper<T> createNew(T value) {
+            return new GenericBuffer.GenericWrapper<>(value);
+        }
+
         public final GenericBuffer.PrimitiveGenericWrapper<T> create(T[] data) {
             if (data.length == 1) {
                 return new GenericBuffer.GenericWrapper<>(data[0]);
@@ -46,8 +51,9 @@ public class GenericBuffer {
         }
 
         @Override
-        public void set(final T value, final int index) {
+        public GenericArrayWrapper<T> set(final T value, final int index) {
             array[index] = value;
+            return this;
         }
 
         @Override
@@ -61,7 +67,7 @@ public class GenericBuffer {
         }
 
         @Override
-        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length) {
+        public GenericArrayWrapper<T> copyFrom(JVMBuffer.PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length) {
             if (src instanceof GenericArrayWrapper) {
                 System.arraycopy(((GenericArrayWrapper) src).array, srcPos, array, destPos, length);
             } else {
@@ -69,6 +75,7 @@ public class GenericBuffer {
                     array[destPos + i] = src.get(srcPos + i);
                 }
             }
+            return this;
         }
 
         @Override
@@ -77,24 +84,27 @@ public class GenericBuffer {
         }
 
         @Override
-        public void applyRight(BiFunction<T, T, T> mapper, T rightArg) {
+        public GenericArrayWrapper<T> applyRight(BiFunction<T, T, T> mapper, T rightArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i], rightArg);
             }
+            return this;
         }
 
         @Override
-        public void applyLeft(BiFunction<T, T, T> mapper, T leftArg) {
+        public GenericArrayWrapper<T> applyLeft(BiFunction<T, T, T> mapper, T leftArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(leftArg, array[i]);
             }
+            return this;
         }
 
         @Override
-        public void apply(Function<T, T> mapper) {
+        public GenericArrayWrapper<T> apply(Function<T, T> mapper) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i]);
             }
+            return this;
         }
 
         public boolean equals(final Object o) {
@@ -118,6 +128,11 @@ public class GenericBuffer {
 
         public GenericWrapper(final T value) {
             super(value);
+        }
+
+        @Override
+        protected PrimitiveGenericWrapper<T> getThis() {
+            return this;
         }
 
         @Override

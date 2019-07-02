@@ -55,4 +55,44 @@ public class INDArrayExtensions {
 
         return splits;
     }
+
+    /**
+     * Cumulative prod along a dimension. This code is copied from the
+     * cumSumi implementation in org.nd4j.linalg.api.ndarray.BaseNDArray.java
+     *
+     * @param array array to cumProd
+     * @param dimension the dimension to perform cumulative product along
+     * @return the cumulative product along the specified dimension
+     */
+    public static INDArray cumProd(INDArray array, int dimension) {
+
+        if(array.isScalar() || array.isEmpty())
+            return array;
+
+        if (array.isVector()) {
+            double s = 0.0;
+            for (int i = 0; i < array.length(); i++) {
+                s *= array.getDouble(i);
+                array.putScalar(i, s);
+            }
+        } else if (dimension == Integer.MAX_VALUE) {
+            INDArray flattened = array.ravel();
+            double prevVal = flattened.getDouble(0);
+            for (int i = 1; i < flattened.length(); i++) {
+                double d = prevVal * flattened.getDouble(i);
+                flattened.putScalar(i, d);
+                prevVal = d;
+            }
+
+            return flattened;
+        } else {
+            for (int i = 0; i < array.vectorsAlongDimension(dimension); i++) {
+                INDArray vec = array.vectorAlongDimension(i, dimension);
+                cumProd(vec, 0);
+            }
+        }
+
+
+        return array;
+    }
 }

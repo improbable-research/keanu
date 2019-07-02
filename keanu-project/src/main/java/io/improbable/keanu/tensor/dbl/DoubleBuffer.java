@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 public class DoubleBuffer {
 
-    public static final class DoubleArrayWrapperFactory implements JVMBuffer.ArrayWrapperFactory<Double, PrimitiveDoubleWrapper> {
+    public static final class DoubleArrayWrapperFactory implements JVMBuffer.PrimitiveNumberWrapperFactory<Double, PrimitiveDoubleWrapper> {
 
         @Override
         public final PrimitiveDoubleWrapper createNew(final int size) {
@@ -22,7 +22,24 @@ public class DoubleBuffer {
             }
         }
 
-        public final PrimitiveDoubleWrapper create(double[] data) {
+        @Override
+        public PrimitiveDoubleWrapper createNew(Double value) {
+            return new DoubleWrapper(value);
+        }
+
+        @Override
+        public PrimitiveDoubleWrapper zeroes(final int size) {
+            return createNew(size);
+        }
+
+        @Override
+        public PrimitiveDoubleWrapper ones(final int size) {
+            double[] ones = new double[size];
+            Arrays.fill(ones, 1.0);
+            return create(ones);
+        }
+
+        public final PrimitiveDoubleWrapper create(final double[] data) {
             if (data.length == 1) {
                 return new DoubleWrapper(data[0]);
             } else {
@@ -48,8 +65,9 @@ public class DoubleBuffer {
         }
 
         @Override
-        public void set(final Double value, final int index) {
+        public DoubleArrayWrapper set(final Double value, final int index) {
             array[index] = value;
+            return this;
         }
 
         @Override
@@ -63,7 +81,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<Double, ?> src, int srcPos, int destPos, int length) {
+        public DoubleArrayWrapper copyFrom(JVMBuffer.PrimitiveArrayWrapper<Double, ?> src, int srcPos, int destPos, int length) {
             if (src instanceof DoubleArrayWrapper) {
                 System.arraycopy(((DoubleArrayWrapper) src).array, srcPos, array, destPos, length);
             } else {
@@ -71,6 +89,7 @@ public class DoubleBuffer {
                     array[destPos + i] = src.get(srcPos + i);
                 }
             }
+            return this;
         }
 
         @Override
@@ -80,82 +99,107 @@ public class DoubleBuffer {
                 result += array[i];
             }
             return result;
-
         }
 
         @Override
-        public void times(Double that) {
+        public Double product() {
+            double result = 1.0;
+            for (int i = 0; i < array.length; i++) {
+                result *= array[i];
+            }
+            return result;
+        }
+
+        @Override
+        public DoubleArrayWrapper times(Double that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] *= that;
             }
+            return this;
         }
 
         @Override
-        public void div(Double that) {
+        public DoubleArrayWrapper div(Double that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] /= that;
             }
+            return this;
         }
 
         @Override
-        public void plus(Double that) {
+        public DoubleArrayWrapper plus(Double that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] += that;
             }
+            return this;
         }
 
         @Override
-        public void plus(int index, Double that) {
+        public DoubleArrayWrapper plus(int index, Double that) {
             array[index] += that;
+            return this;
         }
 
         @Override
-        public void minus(Double that) {
+        public DoubleArrayWrapper times(int index, Double that) {
+            array[index] *= that;
+            return this;
+        }
+
+        @Override
+        public DoubleArrayWrapper minus(Double that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] -= that;
             }
+            return this;
         }
 
         @Override
-        public void pow(Double that) {
+        public DoubleArrayWrapper pow(Double that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = FastMath.pow(array[i], that);
             }
+            return this;
         }
 
         @Override
-        public void reverseDiv(Double that) {
+        public DoubleArrayWrapper reverseDiv(Double that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = that / array[i];
             }
+            return this;
         }
 
         @Override
-        public void reverseMinus(Double that) {
+        public DoubleArrayWrapper reverseMinus(Double that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = that - array[i];
             }
+            return this;
         }
 
         @Override
-        public void applyRight(BiFunction<Double, Double, Double> mapper, Double rightArg) {
+        public DoubleArrayWrapper applyRight(BiFunction<Double, Double, Double> mapper, Double rightArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i], rightArg);
             }
+            return this;
         }
 
         @Override
-        public void applyLeft(BiFunction<Double, Double, Double> mapper, Double leftArg) {
+        public DoubleArrayWrapper applyLeft(BiFunction<Double, Double, Double> mapper, Double leftArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(leftArg, array[i]);
             }
+            return this;
         }
 
         @Override
-        public void apply(Function<Double, Double> mapper) {
+        public DoubleArrayWrapper apply(Function<Double, Double> mapper) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i]);
             }
+            return this;
         }
 
         @Override
@@ -206,43 +250,62 @@ public class DoubleBuffer {
         }
 
         @Override
-        public void times(Double that) {
+        public Double product() {
+            return value;
+        }
+
+        @Override
+        public PrimitiveDoubleWrapper times(Double that) {
             value *= that;
+            return this;
         }
 
         @Override
-        public void div(Double that) {
+        public PrimitiveDoubleWrapper div(Double that) {
             value /= that;
+            return this;
         }
 
         @Override
-        public void plus(Double that) {
+        public PrimitiveDoubleWrapper plus(Double that) {
             value += that;
+            return this;
         }
 
         @Override
-        public void plus(int index, Double that) {
+        public PrimitiveDoubleWrapper plus(int index, Double that) {
             value += that;
+            return this;
         }
 
         @Override
-        public void minus(Double that) {
+        public PrimitiveDoubleWrapper minus(Double that) {
             value -= that;
+            return this;
         }
 
         @Override
-        public void pow(Double that) {
+        public PrimitiveDoubleWrapper pow(Double that) {
             value = FastMath.pow(value, that);
+            return this;
         }
 
         @Override
-        public void reverseDiv(Double that) {
+        public PrimitiveDoubleWrapper reverseDiv(Double that) {
             value = that / value;
+            return this;
         }
 
         @Override
-        public void reverseMinus(Double that) {
+        public PrimitiveDoubleWrapper reverseMinus(Double that) {
             value = that - value;
+            return this;
+        }
+
+        @Override
+        public PrimitiveDoubleWrapper times(int index, Double that) {
+            value *= that;
+            return this;
         }
 
         @Override
@@ -263,6 +326,11 @@ public class DoubleBuffer {
         @Override
         public PrimitiveDoubleWrapper copy() {
             return new DoubleWrapper(value);
+        }
+
+        @Override
+        protected PrimitiveDoubleWrapper getThis() {
+            return this;
         }
     }
 }

@@ -12,19 +12,19 @@ public class JVMBuffer {
 
         T get(int index);
 
-        void set(T value, int index);
+        IMPL set(T value, int index);
 
         int getLength();
 
         IMPL copy();
 
-        void copyFrom(PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length);
+        IMPL copyFrom(PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length);
 
-        void apply(Function<T, T> mapper);
+        IMPL apply(Function<T, T> mapper);
 
-        void applyRight(BiFunction<T, T, T> mapper, T rightArg);
+        IMPL applyRight(BiFunction<T, T, T> mapper, T rightArg);
 
-        void applyLeft(BiFunction<T, T, T> mapper, T leftArg);
+        IMPL applyLeft(BiFunction<T, T, T> mapper, T leftArg);
     }
 
     public static abstract class SingleValueWrapper<T, IMPL extends PrimitiveArrayWrapper<T, IMPL>> implements PrimitiveArrayWrapper<T, IMPL> {
@@ -41,8 +41,9 @@ public class JVMBuffer {
         }
 
         @Override
-        public void set(final T value, final int index) {
+        public IMPL set(final T value, final int index) {
             this.value = value;
+            return getThis();
         }
 
         @Override
@@ -50,28 +51,34 @@ public class JVMBuffer {
             return 1;
         }
 
-        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length) {
+        public IMPL copyFrom(JVMBuffer.PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length) {
             if (length == 1 && destPos == 0) {
                 value = src.get(srcPos);
             } else if (length > 1 || length < 0 || destPos != 0) {
                 throw new IndexOutOfBoundsException();
             }
+            return getThis();
         }
 
         @Override
-        public void apply(Function<T, T> mapper) {
+        public IMPL apply(Function<T, T> mapper) {
             value = mapper.apply(value);
+            return getThis();
         }
 
         @Override
-        public void applyRight(BiFunction<T, T, T> mapper, T rightArg) {
+        public IMPL applyRight(BiFunction<T, T, T> mapper, T rightArg) {
             value = mapper.apply(value, rightArg);
+            return getThis();
         }
 
         @Override
-        public void applyLeft(BiFunction<T, T, T> mapper, T leftArg) {
+        public IMPL applyLeft(BiFunction<T, T, T> mapper, T leftArg) {
             value = mapper.apply(leftArg, value);
+            return getThis();
         }
+
+        protected abstract IMPL getThis();
 
         @Override
         public boolean equals(Object o) {
@@ -89,6 +96,14 @@ public class JVMBuffer {
 
     public interface ArrayWrapperFactory<D, T extends PrimitiveArrayWrapper<D, T>> {
         T createNew(int size);
+
+        T createNew(D value);
+    }
+
+    public interface PrimitiveNumberWrapperFactory<D, T extends PrimitiveArrayWrapper<D, T>> extends ArrayWrapperFactory<D, T> {
+        T zeroes(int size);
+
+        T ones(int size);
     }
 
 }

@@ -20,6 +20,11 @@ public class BooleanBuffer {
             }
         }
 
+        @Override
+        public PrimitiveBooleanWrapper createNew(Boolean value) {
+            return new BooleanBuffer.BooleanWrapper(value);
+        }
+
         public final BooleanBuffer.PrimitiveBooleanWrapper create(boolean[] data) {
             if (data.length == 1) {
                 return new BooleanBuffer.BooleanWrapper(data[0]);
@@ -52,8 +57,9 @@ public class BooleanBuffer {
         }
 
         @Override
-        public void set(final Boolean value, final int index) {
+        public BooleanArrayWrapper set(final Boolean value, final int index) {
             array[index] = value;
+            return this;
         }
 
         @Override
@@ -67,7 +73,7 @@ public class BooleanBuffer {
         }
 
         @Override
-        public void copyFrom(JVMBuffer.PrimitiveArrayWrapper<Boolean, ?> src, int srcPos, int destPos, int length) {
+        public BooleanArrayWrapper copyFrom(JVMBuffer.PrimitiveArrayWrapper<Boolean, ?> src, int srcPos, int destPos, int length) {
             if (src instanceof BooleanArrayWrapper) {
                 System.arraycopy(((BooleanArrayWrapper) src).array, srcPos, array, destPos, length);
             } else {
@@ -75,27 +81,31 @@ public class BooleanBuffer {
                     array[destPos + i] = src.get(srcPos + i);
                 }
             }
+            return this;
         }
 
         @Override
-        public void applyRight(BiFunction<Boolean, Boolean, Boolean> mapper, Boolean rightArg) {
+        public BooleanArrayWrapper applyRight(BiFunction<Boolean, Boolean, Boolean> mapper, Boolean rightArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i], rightArg);
             }
+            return this;
         }
 
         @Override
-        public void applyLeft(BiFunction<Boolean, Boolean, Boolean> mapper, Boolean leftArg) {
+        public BooleanArrayWrapper applyLeft(BiFunction<Boolean, Boolean, Boolean> mapper, Boolean leftArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(leftArg, array[i]);
             }
+            return this;
         }
 
         @Override
-        public void apply(Function<Boolean, Boolean> mapper) {
+        public BooleanArrayWrapper apply(Function<Boolean, Boolean> mapper) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i]);
             }
+            return this;
         }
 
         @Override
@@ -173,6 +183,11 @@ public class BooleanBuffer {
         @Override
         public Boolean[] asArray() {
             return new Boolean[]{value};
+        }
+
+        @Override
+        protected PrimitiveBooleanWrapper getThis() {
+            return this;
         }
     }
 }

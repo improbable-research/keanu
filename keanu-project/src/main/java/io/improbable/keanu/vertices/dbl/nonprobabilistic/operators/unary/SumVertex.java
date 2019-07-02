@@ -14,7 +14,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.Arrays;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShape.getSummationResultShape;
+import static io.improbable.keanu.tensor.TensorShape.getReductionResultShape;
 import static java.util.Collections.singletonMap;
 
 public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
@@ -31,7 +31,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
      */
     public SumVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                      @LoadVertexParam(DIMENSIONS_NAME) int[] overDimensions) {
-        super(getSummationResultShape(inputVertex.getShape(), overDimensions), inputVertex);
+        super(getReductionResultShape(inputVertex.getShape(), overDimensions), inputVertex);
         this.overDimensions = overDimensions;
     }
 

@@ -10,7 +10,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.math3.analysis.function.Sigmoid;
@@ -88,7 +87,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    protected JVMBuffer.ArrayWrapperFactory<Double, DoubleBuffer.PrimitiveDoubleWrapper> getFactory() {
+    protected DoubleBuffer.DoubleArrayWrapperFactory getFactory() {
         return factory;
     }
 
@@ -591,16 +590,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         buffer.apply(sigmoid::value);
         return this;
     }
-
-    @Override
-    public Double product() {
-        double result = 1.0;
-        for (int i = 0; i < buffer.getLength(); i++) {
-            result *= buffer.get(i);
-        }
-        return result;
-    }
-
 
     @Override
     public DoubleTensor take(long... index) {

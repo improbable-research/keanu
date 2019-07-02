@@ -116,7 +116,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor sum(int... overDimensions) {
-        overDimensions = TensorShape.getAbsoluteDimensions(shape.length, overDimensions);
+        overDimensions = TensorShape.setToAbsoluteDimensions(shape.length, overDimensions);
         long[] summedShape = ArrayUtils.removeAll(shape, overDimensions);
         return new ScalarIntegerTensor(value, summedShape);
     }
@@ -130,6 +130,16 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public Integer product() {
         return value;
+    }
+
+    @Override
+    public IntegerTensor product(int... overDimensions) {
+        return this;
+    }
+
+    @Override
+    public IntegerTensor cumProdInPlace(int dimension) {
+        return this;
     }
 
     @Override

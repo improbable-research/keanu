@@ -253,7 +253,7 @@ public class TensorShape {
      * @param dimensions positive dimensions are absolute and negative are relative to the rank
      * @return the dimensions converted to all absolute (positive). This mutates the passed in dimension argument.
      */
-    public static int[] getAbsoluteDimensions(int rank, int[] dimensions) {
+    public static int[] setToAbsoluteDimensions(int rank, int[] dimensions) {
         for (int i = 0; i < dimensions.length; i++) {
             dimensions[i] = getAbsoluteDimension(dimensions[i], rank);
         }
@@ -290,7 +290,7 @@ public class TensorShape {
         return dimension;
     }
 
-    public static long[] getSummationResultShape(long[] inputShape, int[] sumOverDimensions) {
+    public static long[] getReductionResultShape(long[] inputShape, int[] sumOverDimensions) {
         if (inputShape.length > 0) {
             return ArrayUtils.removeAll(inputShape, sumOverDimensions);
         } else {

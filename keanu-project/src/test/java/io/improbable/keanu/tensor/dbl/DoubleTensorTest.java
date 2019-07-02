@@ -1437,6 +1437,15 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canProductOverSpecifiedDimensionOfMatrix() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor summationRow = x.product(1);
+        DoubleTensor expected = DoubleTensor.create(2, 12);
+        assertThat(summationRow, equalTo(expected));
+        assertThat(summationRow.getShape(), equalTo(expected.getShape()));
+    }
+
+    @Test
     public void canDuplicateRank1() {
         DoubleTensor x = DoubleTensor.create(1, 2);
         assertEquals(x, x.duplicate());

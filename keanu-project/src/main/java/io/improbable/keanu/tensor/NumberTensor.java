@@ -29,6 +29,14 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>> ex
 
     N product();
 
+    T product(int... overDimensions);
+
+    default T cumProd(int requestedDimension) {
+        return duplicate().cumProdInPlace(requestedDimension);
+    }
+
+    T cumProdInPlace(int dimension);
+
     N max();
 
     default T max(T max) {

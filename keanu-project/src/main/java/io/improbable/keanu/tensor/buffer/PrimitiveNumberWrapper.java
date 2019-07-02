@@ -8,19 +8,23 @@ public interface PrimitiveNumberWrapper<T extends Number, B extends JVMBuffer.Pr
 
     T sum();
 
-    void times(T that);
+    T product();
 
-    void div(T that);
+    B times(T that);
 
-    void plus(T that);
+    B times(int index, T that);
 
-    void plus(int index, T that);
+    B div(T that);
 
-    void minus(T that);
+    B plus(T that);
 
-    void pow(T that);
+    B plus(int index, T that);
 
-    void reverseDiv(T that);
+    B minus(T that);
 
-    void reverseMinus(T that);
+    B pow(T that);
+
+    B reverseDiv(T that);
+
+    B reverseMinus(T that);
 }
