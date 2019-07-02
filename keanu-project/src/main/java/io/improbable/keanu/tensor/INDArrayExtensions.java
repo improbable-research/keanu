@@ -70,7 +70,7 @@ public class INDArrayExtensions {
             return array;
 
         if (array.isVector()) {
-            double s = 0.0;
+            double s = 1.0;
             for (int i = 0; i < array.length(); i++) {
                 s *= array.getDouble(i);
                 array.putScalar(i, s);

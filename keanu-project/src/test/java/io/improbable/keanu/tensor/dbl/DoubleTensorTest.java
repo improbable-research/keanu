@@ -1411,20 +1411,18 @@ public class DoubleTensorTest {
 
     @Test
     public void canSumOverSpecifiedDimensionOfRank3() {
-        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2);
         DoubleTensor summation = x.sum(2);
-        DoubleTensor expected = DoubleTensor.create(new double[]{3, 7, 11, 15}, new long[]{2, 2});
-        assertThat(summation, equalTo(expected));
-        assertThat(summation.getShape(), equalTo(expected.getShape()));
+        DoubleTensor expected = DoubleTensor.create(new double[]{3, 7, 11, 15}, 2, 2);
+        assertThat(summation, valuesAndShapesMatch(expected));
     }
 
     @Test
     public void canSumOverSpecifiedDimensionOfMatrix() {
-        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
         DoubleTensor summationRow = x.sum(1);
         DoubleTensor expected = DoubleTensor.create(3, 7);
-        assertThat(summationRow, equalTo(expected));
-        assertThat(summationRow.getShape(), equalTo(expected.getShape()));
+        assertThat(summationRow, valuesAndShapesMatch(expected));
     }
 
     @Test
@@ -1432,17 +1430,28 @@ public class DoubleTensorTest {
         DoubleTensor x = DoubleTensor.create(1, 2, 3, 4);
         DoubleTensor summation = x.sum(0);
         DoubleTensor expected = DoubleTensor.scalar(10);
-        assertThat(summation.asFlatArray(), equalTo(expected.asFlatArray()));
-        assertThat(summation.getShape(), equalTo(expected.getShape()));
+        assertThat(summation, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canProductOverSpecifiedDimensionOfRank3() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2);
+        assertThat(x.product(0), valuesAndShapesMatch(DoubleTensor.create(new double[]{5, 12, 21, 32}, 2, 2)));
+        assertThat(x.product(1), valuesAndShapesMatch(DoubleTensor.create(new double[]{3, 8, 35, 48}, 2, 2)));
+        assertThat(x.product(2), valuesAndShapesMatch(DoubleTensor.create(new double[]{2, 12, 30, 56}, 2, 2)));
     }
 
     @Test
     public void canProductOverSpecifiedDimensionOfMatrix() {
-        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor summationRow = x.product(1);
-        DoubleTensor expected = DoubleTensor.create(2, 12);
-        assertThat(summationRow, equalTo(expected));
-        assertThat(summationRow.getShape(), equalTo(expected.getShape()));
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        assertThat(x.product(0), valuesAndShapesMatch(DoubleTensor.create(3, 8)));
+        assertThat(x.product(1), valuesAndShapesMatch(DoubleTensor.create(2, 12)));
+    }
+
+    @Test
+    public void canProductOverSpecifiedDimensionOfVector() {
+        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4);
+        assertThat(x.product(0), valuesAndShapesMatch(DoubleTensor.scalar(24)));
     }
 
     @Test
@@ -1901,6 +1910,32 @@ public class DoubleTensorTest {
     @Test(expected = IllegalArgumentException.class)
     public void throwsIfCumSumOnInvalidDimension() {
         DoubleTensor.scalar(2).cumSum(0);
+    }
+
+    @Test
+    public void canCumProdOnMatrix() {
+        DoubleTensor a = DoubleTensor.create(1, 2, 3, 4, 5, 6, 7, 8, 9).reshape(3, 3);
+        DoubleTensor expected0 = DoubleTensor.create(1, 2, 3, 4, 10, 18, 28, 80, 162).reshape(3, 3);
+        DoubleTensor expected1 = DoubleTensor.create(1, 2, 6, 4, 20, 120, 7, 56, 504).reshape(3, 3);
+
+        assertThat(a.cumProd(0), valuesAndShapesMatch(expected0));
+        assertThat(a.cumProd(1), valuesAndShapesMatch(expected1));
+        assertThat(a.cumProd(-1), valuesAndShapesMatch(expected1));
+        assertThat(a.cumProd(-2), valuesAndShapesMatch(expected0));
+    }
+
+    @Test
+    public void canCumProdOnVector() {
+        DoubleTensor a = DoubleTensor.create(1, 2, 3);
+        DoubleTensor expected0 = DoubleTensor.create(1, 2, 6);
+
+        assertThat(a.cumProd(0), valuesAndShapesMatch(expected0));
+        assertThat(a.cumProd(-1), valuesAndShapesMatch(expected0));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfCumProdOnInvalidDimension() {
+        DoubleTensor.scalar(2).cumProd(0);
     }
 
     @Test

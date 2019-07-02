@@ -86,7 +86,9 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
-    public TENSOR cumProdInPlace(int dimension) {
+    public TENSOR cumProdInPlace(int requestedDimension) {
+        int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + tensor.rank();
+        TensorShapeValidation.checkDimensionExistsInShape(dimension, tensor.shape());
         return set(INDArrayExtensions.cumProd(this.tensor, dimension));
     }
 

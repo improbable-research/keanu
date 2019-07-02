@@ -34,9 +34,13 @@ public class DoubleBuffer {
 
         @Override
         public PrimitiveDoubleWrapper ones(final int size) {
-            double[] ones = new double[size];
-            Arrays.fill(ones, 1.0);
-            return create(ones);
+            if (size == 1) {
+                return new DoubleWrapper(1.0);
+            } else {
+                double[] ones = new double[size];
+                Arrays.fill(ones, 1.0);
+                return new DoubleArrayWrapper(ones);
+            }
         }
 
         public final PrimitiveDoubleWrapper create(final double[] data) {
