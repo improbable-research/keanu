@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.bool;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -12,11 +13,11 @@ public class BooleanBuffer {
     public static final class BooleanArrayWrapperFactory implements JVMBuffer.ArrayWrapperFactory<Boolean, PrimitiveBooleanWrapper> {
 
         @Override
-        public final BooleanBuffer.PrimitiveBooleanWrapper createNew(final int size) {
+        public final BooleanBuffer.PrimitiveBooleanWrapper createNew(final long size) {
             if (size == 1) {
                 return new BooleanBuffer.BooleanWrapper(false);
             } else {
-                return new BooleanBuffer.BooleanArrayWrapper(new boolean[size]);
+                return new BooleanBuffer.BooleanArrayWrapper(new boolean[Ints.checkedCast(size)]);
             }
         }
 
@@ -52,18 +53,18 @@ public class BooleanBuffer {
         }
 
         @Override
-        public Boolean get(final int index) {
-            return array[index];
+        public Boolean get(final long index) {
+            return array[Ints.checkedCast(index)];
         }
 
         @Override
-        public BooleanArrayWrapper set(final Boolean value, final int index) {
-            array[index] = value;
+        public BooleanArrayWrapper set(final Boolean value, final long index) {
+            array[Ints.checkedCast(index)] = value;
             return this;
         }
 
         @Override
-        public int getLength() {
+        public long getLength() {
             return array.length;
         }
 
@@ -73,12 +74,12 @@ public class BooleanBuffer {
         }
 
         @Override
-        public BooleanArrayWrapper copyFrom(JVMBuffer.PrimitiveArrayWrapper<Boolean, ?> src, int srcPos, int destPos, int length) {
+        public BooleanArrayWrapper copyFrom(JVMBuffer.PrimitiveArrayWrapper<Boolean, ?> src, long srcPos, long destPos, long length) {
             if (src instanceof BooleanArrayWrapper) {
-                System.arraycopy(((BooleanArrayWrapper) src).array, srcPos, array, destPos, length);
+                System.arraycopy(((BooleanArrayWrapper) src).array, Ints.checkedCast(srcPos), array, Ints.checkedCast(destPos), Ints.checkedCast(length));
             } else {
                 for (int i = 0; i < length; i++) {
-                    array[destPos + i] = src.get(srcPos + i);
+                    array[Ints.checkedCast(destPos + i)] = src.get(srcPos + i);
                 }
             }
             return this;

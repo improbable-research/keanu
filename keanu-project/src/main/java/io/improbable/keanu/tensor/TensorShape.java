@@ -317,7 +317,7 @@ public class TensorShape {
         return inverted;
     }
 
-    public static int convertFromFlatIndexToPermutedFlatIndex(int fromFlatIndex,
+    public static long convertFromFlatIndexToPermutedFlatIndex(long fromFlatIndex,
                                                               long[] shape, long[] stride,
                                                               long[] permutedShape, long[] permutedStride,
                                                               int[] rearrange) {
@@ -325,7 +325,7 @@ public class TensorShape {
 
         long[] permutedIndex = getPermutedIndices(shapeIndices, rearrange);
 
-        return Ints.checkedCast(getFlatIndex(permutedShape, permutedStride, permutedIndex));
+        return getFlatIndex(permutedShape, permutedStride, permutedIndex);
     }
 
     /**
@@ -338,7 +338,7 @@ public class TensorShape {
      * @return a copy of newShape if there is no wildcard used or a wildcard free shape with a length that matches
      * the oldShapeLength
      */
-    public static long[] getReshapeAllowingWildcard(long[] oldShape, int oldShapeLength, long[] newShape) {
+    public static long[] getReshapeAllowingWildcard(long[] oldShape, long oldShapeLength, long[] newShape) {
         long newLength = 1;
         int negativeDimension = -1;
         long[] newShapeCopy = new long[newShape.length];
@@ -413,11 +413,11 @@ public class TensorShape {
         return rearrange;
     }
 
-    public static int getBroadcastedFlatIndex(int fromFlatIndex, long[] fromStride, long[] toShape, long[] toStride) {
+    public static long getBroadcastedFlatIndex(long fromFlatIndex, long[] fromStride, long[] toShape, long[] toStride) {
 
         final int rankDiff = fromStride.length - toStride.length;
-        int remainder = fromFlatIndex;
-        int toFlatIndex = 0;
+        long remainder = fromFlatIndex;
+        long toFlatIndex = 0;
 
         for (int i = 0; i < fromStride.length; i++) {
             final long fromShapeIndex = remainder / fromStride[i];

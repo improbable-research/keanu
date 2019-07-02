@@ -12,7 +12,6 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
@@ -115,12 +114,12 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
 
     @Override
     public DoubleTensor doubleWhere(DoubleTensor trueValue, DoubleTensor falseValue) {
-        double[] trueValues = trueValue.asFlatDoubleArray();
-        double[] falseValues = falseValue.asFlatDoubleArray();
+        FlattenedView<Double> trueValuesFlattened = trueValue.getFlattenedView();
+        FlattenedView<Double> falseValuesFlattened = falseValue.getFlattenedView();
 
-        double[] result = new double[buffer.getLength()];
+        double[] result = new double[Ints.checkedCast(buffer.getLength())];
         for (int i = 0; i < result.length; i++) {
-            result[i] = buffer.get(i) ? getOrScalar(trueValues, i) : getOrScalar(falseValues, i);
+            result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
         }
 
         return DoubleTensor.create(result, copyOf(shape, shape.length));
@@ -131,7 +130,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
         FlattenedView<Integer> trueValuesFlattened = trueValue.getFlattenedView();
         FlattenedView<Integer> falseValuesFlattened = falseValue.getFlattenedView();
 
-        int[] result = new int[buffer.getLength()];
+        int[] result = new int[Ints.checkedCast(buffer.getLength())];
         for (int i = 0; i < result.length; i++) {
             result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
         }
@@ -144,7 +143,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
         FlattenedView<Boolean> trueValuesFlattened = trueValue.getFlattenedView();
         FlattenedView<Boolean> falseValuesFlattened = falseValue.getFlattenedView();
 
-        boolean[] result = new boolean[buffer.getLength()];
+        boolean[] result = new boolean[Ints.checkedCast(buffer.getLength())];
         for (int i = 0; i < result.length; i++) {
             result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
         }
@@ -164,20 +163,12 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
             FlattenedView<T> trueValuesFlattened = trueValue.getFlattenedView();
             FlattenedView<T> falseValuesFlattened = falseValue.getFlattenedView();
 
-            T[] result = (T[]) (new Object[buffer.getLength()]);
+            T[] result = (T[]) (new Object[Ints.checkedCast(buffer.getLength())]);
             for (int i = 0; i < result.length; i++) {
                 result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
             }
 
             return Tensor.create(result, copyOf(shape, shape.length));
-        }
-    }
-
-    private double getOrScalar(double[] values, int index) {
-        if (values.length == 1) {
-            return values[0];
-        } else {
-            return values[index];
         }
     }
 
@@ -268,47 +259,6 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     @Override
     public BooleanTensor duplicate() {
         return new JVMBooleanTensor(buffer.copy(), copyOf(shape, shape.length), copyOf(stride, stride.length));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o instanceof Tensor) {
-            Tensor that = (Tensor) o;
-            if (!Arrays.equals(that.getShape(), shape)) return false;
-            return Arrays.equals(
-                that.asFlatArray(),
-                this.asFlatArray()
-            );
-        }
-
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(buffer);
-        result = 31 * result + Arrays.hashCode(shape);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-
-        StringBuilder dataString = new StringBuilder();
-        if (buffer.getLength() > 20) {
-            dataString.append(Arrays.toString(Arrays.copyOfRange(buffer.asBooleanArray(), 0, 10)));
-            dataString.append("...");
-            dataString.append(Arrays.toString(Arrays.copyOfRange(buffer.asBooleanArray(), buffer.getLength() - 10, buffer.getLength())));
-        } else {
-            dataString.append(Arrays.toString(buffer.asBooleanArray()));
-        }
-
-        return "{\n" +
-            "shape = " + Arrays.toString(shape) +
-            "\ndata = " + dataString.toString() +
-            "\n}";
     }
 
     @Override

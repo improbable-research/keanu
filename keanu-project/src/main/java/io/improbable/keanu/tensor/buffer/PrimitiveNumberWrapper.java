@@ -12,13 +12,13 @@ public interface PrimitiveNumberWrapper<T extends Number, B extends JVMBuffer.Pr
 
     B times(T that);
 
-    B times(int index, T that);
+    B times(long index, T that);
 
     B div(T that);
 
     B plus(T that);
 
-    B plus(int index, T that);
+    B plus(long index, T that);
 
     B minus(T that);
 

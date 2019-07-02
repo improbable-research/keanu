@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.generic;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.JVMTensor;
 import io.improbable.keanu.tensor.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
@@ -75,7 +76,7 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
 
     @Override
     public BooleanTensor elementwiseEquals(T value) {
-        boolean[] result = new boolean[buffer.getLength()];
+        boolean[] result = new boolean[Ints.checkedCast(buffer.getLength())];
         for (int i = 0; i < buffer.getLength(); i++) {
             result[i] = buffer.get(i).equals(value);
         }

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
@@ -53,12 +54,12 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     }
 
     interface BufferOp<T extends Number, B extends PrimitiveNumberWrapper<T, B>> {
-        void apply(PrimitiveNumberWrapper<T, B> buffer, int j, T value);
+        void apply(PrimitiveNumberWrapper<T, B> buffer, long j, T value);
     }
 
-    private TENSOR reduceOverDimensions(BufferOp<T, B> reduce,
+    private TENSOR reduceOverDimensions(BufferOp<T, B> combine,
                                         BiFunction<JVMBuffer.PrimitiveNumberWrapperFactory<T, B>, Integer, B> init,
-                                        Function<B, T> vectorReduction,
+                                        Function<B, T> totalReduction,
                                         int... overDimensions) {
 
         setToAbsoluteDimensions(this.shape.length, overDimensions);
@@ -66,7 +67,7 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
         if (this.isScalar() || overDimensions.length == 0) {
             return duplicate();
         } else if (this.isVector()) {
-            B aNew = getFactory().createNew(vectorReduction.apply(buffer));
+            B aNew = getFactory().createNew(totalReduction.apply(buffer));
             return create(aNew, new long[0], new long[0]);
         }
 
@@ -80,7 +81,7 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
 
             int j = Ints.checkedCast(getFlatIndex(resultShape, resultStride, shapeIndices));
 
-            reduce.apply(newBuffer, j, buffer.get(i));
+            combine.apply(newBuffer, j, buffer.get(i));
         }
 
         return create(newBuffer, resultShape, resultStride);
@@ -90,7 +91,6 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     public TENSOR cumSumInPlace(int requestedDimension) {
         return cumulativeInPlace(
             PrimitiveNumberWrapper::plus,
-            v -> v.zeroes(1),
             requestedDimension
         );
     }
@@ -99,34 +99,36 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     public TENSOR cumProdInPlace(int requestedDimension) {
         return cumulativeInPlace(
             PrimitiveNumberWrapper::times,
-            v -> v.ones(1),
             requestedDimension);
     }
 
-    private TENSOR cumulativeInPlace(BufferOp<T, B> reduce, Function<JVMBuffer.PrimitiveNumberWrapperFactory<T, B>, B> init, int requestedDimension) {
+    private TENSOR cumulativeInPlace(BufferOp<T, B> combine, int requestedDimension) {
 
-        int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + shape.length;
+        final int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + shape.length;
         TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
+        final int[] dimensionOrder = ArrayUtils.remove(dimensionRange(0, shape.length), dimension);
         long[] index = new long[shape.length];
-        int[] dimensionOrder = ArrayUtils.remove(dimensionRange(0, shape.length), dimension);
 
         do {
 
-            B result = init.apply(getFactory());
+            T result = null;
             for (int i = 0; i < shape[dimension]; i++) {
 
                 index[dimension] = i;
 
-                int j = Ints.checkedCast(getFlatIndex(shape, stride, index));
-                reduce.apply(buffer, j, result.get(0));
-                result.set(buffer.get(j), 0);
+                long j = getFlatIndex(shape, stride, index);
+
+                if (i > 0) {
+                    combine.apply(buffer, j, result);
+                }
+
+                result = buffer.get(j);
             }
 
         } while (incrementIndexByShape(shape, index, dimensionOrder));
 
         return set(buffer, shape, stride);
     }
-
 
     @Override
     protected abstract JVMBuffer.PrimitiveNumberWrapperFactory<T, B> getFactory();

@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.buffer.PrimitiveNumberWrapper;
 import org.apache.commons.lang3.ArrayUtils;
@@ -14,11 +15,11 @@ public class DoubleBuffer {
     public static final class DoubleArrayWrapperFactory implements JVMBuffer.PrimitiveNumberWrapperFactory<Double, PrimitiveDoubleWrapper> {
 
         @Override
-        public final PrimitiveDoubleWrapper createNew(final int size) {
+        public final PrimitiveDoubleWrapper createNew(final long size) {
             if (size == 1) {
                 return new DoubleWrapper(0);
             } else {
-                return new DoubleArrayWrapper(new double[size]);
+                return new DoubleArrayWrapper(new double[Ints.checkedCast(size)]);
             }
         }
 
@@ -28,16 +29,16 @@ public class DoubleBuffer {
         }
 
         @Override
-        public PrimitiveDoubleWrapper zeroes(final int size) {
+        public PrimitiveDoubleWrapper zeroes(final long size) {
             return createNew(size);
         }
 
         @Override
-        public PrimitiveDoubleWrapper ones(final int size) {
+        public PrimitiveDoubleWrapper ones(final long size) {
             if (size == 1) {
                 return new DoubleWrapper(1.0);
             } else {
-                double[] ones = new double[size];
+                double[] ones = new double[Ints.checkedCast(size)];
                 Arrays.fill(ones, 1.0);
                 return new DoubleArrayWrapper(ones);
             }
@@ -64,18 +65,18 @@ public class DoubleBuffer {
         }
 
         @Override
-        public Double get(final int index) {
-            return array[index];
+        public Double get(final long index) {
+            return array[Ints.checkedCast(index)];
         }
 
         @Override
-        public DoubleArrayWrapper set(final Double value, final int index) {
-            array[index] = value;
+        public DoubleArrayWrapper set(final Double value, final long index) {
+            array[Ints.checkedCast(index)] = value;
             return this;
         }
 
         @Override
-        public int getLength() {
+        public long getLength() {
             return array.length;
         }
 
@@ -85,12 +86,12 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper copyFrom(JVMBuffer.PrimitiveArrayWrapper<Double, ?> src, int srcPos, int destPos, int length) {
+        public DoubleArrayWrapper copyFrom(JVMBuffer.PrimitiveArrayWrapper<Double, ?> src, long srcPos, long destPos, long length) {
             if (src instanceof DoubleArrayWrapper) {
-                System.arraycopy(((DoubleArrayWrapper) src).array, srcPos, array, destPos, length);
+                System.arraycopy(((DoubleArrayWrapper) src).array, Ints.checkedCast(srcPos), array, Ints.checkedCast(destPos), Ints.checkedCast(length));
             } else {
                 for (int i = 0; i < length; i++) {
-                    array[destPos + i] = src.get(srcPos + i);
+                    array[Ints.checkedCast(destPos + i)] = src.get(srcPos + i);
                 }
             }
             return this;
@@ -139,14 +140,14 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper plus(int index, Double that) {
-            array[index] += that;
+        public DoubleArrayWrapper plus(long index, Double that) {
+            array[Ints.checkedCast(index)] += that;
             return this;
         }
 
         @Override
-        public DoubleArrayWrapper times(int index, Double that) {
-            array[index] *= that;
+        public DoubleArrayWrapper times(long index, Double that) {
+            array[Ints.checkedCast(index)] *= that;
             return this;
         }
 
@@ -277,7 +278,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public PrimitiveDoubleWrapper plus(int index, Double that) {
+        public PrimitiveDoubleWrapper plus(long index, Double that) {
             value += that;
             return this;
         }
@@ -307,7 +308,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public PrimitiveDoubleWrapper times(int index, Double that) {
+        public PrimitiveDoubleWrapper times(long index, Double that) {
             value *= that;
             return this;
         }

@@ -1,7 +1,6 @@
 package io.improbable.keanu.tensor;
 
 import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -69,17 +68,16 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         B newBuffer;
         long[] newShape;
         if (rank == 1) {
-            int n = buffer.getLength();
-            newBuffer = factory.createNew(Ints.checkedCast((long) n * (long) n));
-            ;
-            for (int i = 0; i < n; i++) {
+            long n = buffer.getLength();
+            newBuffer = factory.createNew(n * n);
+            for (long i = 0; i < n; i++) {
                 newBuffer.set(buffer.get(i), i * n + i);
             }
             newShape = new long[]{n, n};
         } else if (rank == 2 && shape[0] == shape[1]) {
-            int n = Ints.checkedCast(shape[0]);
+            long n = shape[0];
             newBuffer = factory.createNew(n);
-            for (int i = 0; i < n; i++) {
+            for (long i = 0; i < n; i++) {
                 newBuffer.set(buffer.get(i * n + i), i);
             }
             newShape = new long[]{n};
@@ -106,9 +104,9 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         long[] resultStride = getRowFirstStride(resultShape);
         B newBuffer = factory.createNew(buffer.getLength());
 
-        for (int flatIndex = 0; flatIndex < buffer.getLength(); flatIndex++) {
+        for (long flatIndex = 0; flatIndex < buffer.getLength(); flatIndex++) {
 
-            int permutedFlatIndex = convertFromFlatIndexToPermutedFlatIndex(
+            long permutedFlatIndex = convertFromFlatIndexToPermutedFlatIndex(
                 flatIndex,
                 shape, stride,
                 resultShape, resultStride,
@@ -146,7 +144,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         List<ResultWrapper<T, B>> splitTensor = new ArrayList<>();
 
         long previousSplitAtIndex = 0;
-        int rawBufferPosition = 0;
+        long rawBufferPosition = 0;
         for (long splitAtIndex : splitAtIndices) {
 
             long[] subTensorShape = Arrays.copyOf(shape, shape.length);
@@ -157,7 +155,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
             }
 
             subTensorShape[dimension] = subTensorLengthInDimension;
-            int subTensorLength = Ints.checkedCast(TensorShape.getLength(subTensorShape));
+            long subTensorLength = TensorShape.getLength(subTensorShape);
 
             B buffer = factory.createNew(subTensorLength);
             buffer.copyFrom(rawBuffer.outputBuffer, rawBufferPosition, 0, subTensorLength);
@@ -191,11 +189,11 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         long[] resultStride = getRowFirstStride(resultShape);
         B newBuffer = factory.createNew(getLengthAsInt(resultShape));
 
-        for (int i = 0; i < newBuffer.getLength(); i++) {
+        for (long i = 0; i < newBuffer.getLength(); i++) {
 
             long[] shapeIndices = ArrayUtils.insert(dimension, getShapeIndices(resultShape, resultStride, i), index);
 
-            int j = Ints.checkedCast(getFlatIndex(shape, stride, shapeIndices));
+            long j = getFlatIndex(shape, stride, shapeIndices);
 
             newBuffer.set(buffer.get(j), i);
         }
@@ -333,7 +331,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         for (int i = 0; i < buffer.getLength(); i++) {
 
             final T value = buffer.get(i);
-            if (argMin < 0 || compareOp.apply(value, min)) {
+            if (i == 0 || compareOp.apply(value, min)) {
                 min = value;
                 argMin = i;
             }
@@ -355,9 +353,9 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
         StringBuilder dataString = new StringBuilder();
         if (buffer.getLength() > 20) {
-            dataString.append(Arrays.toString(Arrays.copyOfRange(buffer.asArray(), 0, 10)));
+            dataString.append(Arrays.toString(buffer.asArray(0, 10)));
             dataString.append("...");
-            dataString.append(Arrays.toString(Arrays.copyOfRange(buffer.asArray(), buffer.getLength() - 10, buffer.getLength())));
+            dataString.append(Arrays.toString(buffer.asArray(buffer.getLength() - 10, buffer.getLength())));
         } else {
             dataString.append(Arrays.toString(buffer.asArray()));
         }

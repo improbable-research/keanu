@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.generic;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 
 import java.util.Arrays;
@@ -11,11 +12,11 @@ public class GenericBuffer {
     public static final class GenericArrayWrapperFactory<T> implements JVMBuffer.ArrayWrapperFactory<T, PrimitiveGenericWrapper<T>> {
 
         @Override
-        public final GenericBuffer.PrimitiveGenericWrapper<T> createNew(final int size) {
+        public final GenericBuffer.PrimitiveGenericWrapper<T> createNew(final long size) {
             if (size == 1) {
                 return new GenericBuffer.GenericWrapper<>(null);
             } else {
-                return new GenericBuffer.GenericArrayWrapper<>((T[]) (new Object[size]));
+                return new GenericBuffer.GenericArrayWrapper<>((T[]) (new Object[Ints.checkedCast(size)]));
             }
         }
 
@@ -46,18 +47,18 @@ public class GenericBuffer {
         }
 
         @Override
-        public T get(final int index) {
-            return array[index];
+        public T get(final long index) {
+            return array[Ints.checkedCast(index)];
         }
 
         @Override
-        public GenericArrayWrapper<T> set(final T value, final int index) {
-            array[index] = value;
+        public GenericArrayWrapper<T> set(final T value, final long index) {
+            array[Ints.checkedCast(index)] = value;
             return this;
         }
 
         @Override
-        public int getLength() {
+        public long getLength() {
             return array.length;
         }
 
@@ -67,12 +68,12 @@ public class GenericBuffer {
         }
 
         @Override
-        public GenericArrayWrapper<T> copyFrom(JVMBuffer.PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length) {
+        public GenericArrayWrapper<T> copyFrom(JVMBuffer.PrimitiveArrayWrapper<T, ?> src, long srcPos, long destPos, long length) {
             if (src instanceof GenericArrayWrapper) {
-                System.arraycopy(((GenericArrayWrapper) src).array, srcPos, array, destPos, length);
+                System.arraycopy(((GenericArrayWrapper) src).array, Ints.checkedCast(srcPos), array, Ints.checkedCast(destPos), Ints.checkedCast(length));
             } else {
                 for (int i = 0; i < length; i++) {
-                    array[destPos + i] = src.get(srcPos + i);
+                    array[Ints.checkedCast(destPos + i)] = src.get(srcPos + i);
                 }
             }
             return this;

@@ -13,8 +13,8 @@ public class JVMTensorBroadcast {
 
     public static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     ResultWrapper<OUT, OUTBUFFER> broadcastIfNeeded(JVMBuffer.ArrayWrapperFactory<OUT, OUTBUFFER> factory,
-                                                    INBUFFER leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
-                                                    INBUFFER rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
+                                                    INBUFFER leftBuffer, long[] leftShape, long[] leftStride, long leftBufferLength,
+                                                    INBUFFER rightBuffer, long[] rightShape, long[] rightStride, long rightBufferLength,
                                                     BiFunction<IN, IN, OUT> op,
                                                     boolean inPlace) {
 
@@ -95,8 +95,8 @@ public class JVMTensorBroadcast {
 
     private static <IN, OUT, INBUFFER extends JVMBuffer.PrimitiveArrayWrapper<IN, INBUFFER>, OUTBUFFER extends JVMBuffer.PrimitiveArrayWrapper<OUT, OUTBUFFER>>
     ResultWrapper<OUT, OUTBUFFER> broadcastBinaryOp(JVMBuffer.ArrayWrapperFactory<OUT, OUTBUFFER> factory,
-                                                    INBUFFER leftBuffer, long[] leftShape, long[] leftStride, int leftBufferLength,
-                                                    INBUFFER rightBuffer, long[] rightShape, long[] rightStride, int rightBufferLength,
+                                                    INBUFFER leftBuffer, long[] leftShape, long[] leftStride, long leftBufferLength,
+                                                    INBUFFER rightBuffer, long[] rightShape, long[] rightStride, long rightBufferLength,
                                                     BiFunction<IN, IN, OUT> op,
                                                     boolean inPlace) {
 
@@ -155,9 +155,9 @@ public class JVMTensorBroadcast {
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>> void broadcast(B buffer, long[] shape, long[] stride,
                                                                                       B outputBuffer, long[] outputStride) {
 
-        for (int i = 0; i < outputBuffer.getLength(); i++) {
+        for (long i = 0; i < outputBuffer.getLength(); i++) {
 
-            int j = getBroadcastedFlatIndex(i, outputStride, shape, stride);
+            long j = getBroadcastedFlatIndex(i, outputStride, shape, stride);
 
             outputBuffer.set(buffer.get(j), i);
         }
@@ -186,13 +186,13 @@ public class JVMTensorBroadcast {
         if (canQuickBroadcast(rightShape, leftShape)) {
             for (int i = 0; i < outputBuffer.getLength(); i++) {
 
-                int j = i % rightBuffer.getLength();
+                long j = i % rightBuffer.getLength();
                 outputBuffer.set(op.apply(leftBuffer.get(i), rightBuffer.get(j)), i);
             }
         } else {
-            for (int i = 0; i < outputBuffer.getLength(); i++) {
+            for (long i = 0; i < outputBuffer.getLength(); i++) {
 
-                int j = getBroadcastedFlatIndex(i, leftStride, rightShape, rightStride);
+                long j = getBroadcastedFlatIndex(i, leftStride, rightShape, rightStride);
                 outputBuffer.set(op.apply(leftBuffer.get(i), rightBuffer.get(j)), i);
             }
         }
@@ -237,15 +237,15 @@ public class JVMTensorBroadcast {
 
 
         if (canQuickBroadcast(leftShape, rightShape)) {
-            for (int i = 0; i < outputBuffer.getLength(); i++) {
+            for (long i = 0; i < outputBuffer.getLength(); i++) {
 
-                int j = i % leftBuffer.getLength();
+                long j = i % leftBuffer.getLength();
                 outputBuffer.set(op.apply(leftBuffer.get(j), rightBuffer.get(i)), i);
             }
         } else {
-            for (int i = 0; i < outputBuffer.getLength(); i++) {
+            for (long i = 0; i < outputBuffer.getLength(); i++) {
 
-                int j = getBroadcastedFlatIndex(i, rightStride, leftShape, leftStride);
+                long j = getBroadcastedFlatIndex(i, rightStride, leftShape, leftStride);
 
                 outputBuffer.set(op.apply(leftBuffer.get(j), rightBuffer.get(i)), i);
             }
@@ -274,10 +274,10 @@ public class JVMTensorBroadcast {
                                    OUTBUFFER outputBuffer, long[] outputStride,
                                    BiFunction<IN, IN, OUT> op) {
 
-        for (int i = 0; i < outputBuffer.getLength(); i++) {
+        for (long i = 0; i < outputBuffer.getLength(); i++) {
 
-            int k = getBroadcastedFlatIndex(i, outputStride, leftShape, leftStride);
-            int j = getBroadcastedFlatIndex(i, outputStride, rightShape, rightStride);
+            long k = getBroadcastedFlatIndex(i, outputStride, leftShape, leftStride);
+            long j = getBroadcastedFlatIndex(i, outputStride, rightShape, rightStride);
 
             outputBuffer.set(op.apply(leftBuffer.get(k), rightBuffer.get(j)), i);
         }

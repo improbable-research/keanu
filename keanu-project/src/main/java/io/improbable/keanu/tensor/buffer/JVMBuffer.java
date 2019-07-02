@@ -1,5 +1,7 @@
 package io.improbable.keanu.tensor.buffer;
 
+import com.google.common.primitives.Ints;
+
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -10,15 +12,24 @@ public class JVMBuffer {
 
         T[] asArray();
 
-        T get(int index);
+        default T[] asArray(long from, long to) {
+            Object[] temp = new Object[Ints.checkedCast(to - from)];
 
-        IMPL set(T value, int index);
+            for (long i = from; i < to; i++) {
+                temp[(int) (i - from)] = get(i);
+            }
+            return (T[]) temp;
+        }
 
-        int getLength();
+        T get(long index);
+
+        IMPL set(T value, long index);
+
+        long getLength();
 
         IMPL copy();
 
-        IMPL copyFrom(PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length);
+        IMPL copyFrom(PrimitiveArrayWrapper<T, ?> src, long srcPos, long destPos, long length);
 
         IMPL apply(Function<T, T> mapper);
 
@@ -36,22 +47,22 @@ public class JVMBuffer {
         }
 
         @Override
-        public T get(final int index) {
+        public T get(final long index) {
             return value;
         }
 
         @Override
-        public IMPL set(final T value, final int index) {
+        public IMPL set(final T value, final long index) {
             this.value = value;
             return getThis();
         }
 
         @Override
-        public int getLength() {
+        public long getLength() {
             return 1;
         }
 
-        public IMPL copyFrom(JVMBuffer.PrimitiveArrayWrapper<T, ?> src, int srcPos, int destPos, int length) {
+        public IMPL copyFrom(JVMBuffer.PrimitiveArrayWrapper<T, ?> src, long srcPos, long destPos, long length) {
             if (length == 1 && destPos == 0) {
                 value = src.get(srcPos);
             } else if (length > 1 || length < 0 || destPos != 0) {
@@ -95,15 +106,15 @@ public class JVMBuffer {
     }
 
     public interface ArrayWrapperFactory<D, T extends PrimitiveArrayWrapper<D, T>> {
-        T createNew(int size);
+        T createNew(long size);
 
         T createNew(D value);
     }
 
     public interface PrimitiveNumberWrapperFactory<D, T extends PrimitiveArrayWrapper<D, T>> extends ArrayWrapperFactory<D, T> {
-        T zeroes(int size);
+        T zeroes(long size);
 
-        T ones(int size);
+        T ones(long size);
     }
 
 }

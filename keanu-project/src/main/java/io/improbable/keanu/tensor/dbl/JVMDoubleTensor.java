@@ -195,7 +195,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public BooleanTensor elementwiseEquals(Double value) {
-        boolean[] newBuffer = new boolean[buffer.getLength()];
+        boolean[] newBuffer = new boolean[Ints.checkedCast(buffer.getLength())];
 
         for (int i = 0; i < buffer.getLength(); i++) {
             newBuffer[i] = value == buffer.get(i).doubleValue();
@@ -472,7 +472,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     private BooleanTensor maskToBooleanTensor(DoubleTensor mask) {
         DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getAsJVMTensor(mask).buffer;
-        boolean[] boolBuffer = new boolean[maskBuffer.getLength()];
+        boolean[] boolBuffer = new boolean[Ints.checkedCast(maskBuffer.getLength())];
 
         for (int i = 0; i < maskBuffer.getLength(); i++) {
             boolBuffer[i] = maskBuffer.get(i) == 1.0;
@@ -483,7 +483,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public BooleanTensor lessThan(Double value) {
-        boolean[] newBuffer = new boolean[buffer.getLength()];
+        boolean[] newBuffer = new boolean[Ints.checkedCast(buffer.getLength())];
 
         for (int i = 0; i < buffer.getLength(); i++) {
             newBuffer[i] = buffer.get(i) < value;
@@ -494,7 +494,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public BooleanTensor lessThanOrEqual(Double value) {
-        boolean[] newBuffer = new boolean[buffer.getLength()];
+        boolean[] newBuffer = new boolean[Ints.checkedCast(buffer.getLength())];
 
         for (int i = 0; i < buffer.getLength(); i++) {
             newBuffer[i] = buffer.get(i) <= value;
@@ -505,7 +505,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public BooleanTensor greaterThan(Double value) {
-        boolean[] newBuffer = new boolean[buffer.getLength()];
+        boolean[] newBuffer = new boolean[Ints.checkedCast(buffer.getLength())];
 
         for (int i = 0; i < buffer.getLength(); i++) {
             newBuffer[i] = buffer.get(i) > value;
@@ -516,7 +516,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public BooleanTensor greaterThanOrEqual(Double value) {
-        boolean[] newBuffer = new boolean[buffer.getLength()];
+        boolean[] newBuffer = new boolean[Ints.checkedCast(buffer.getLength())];
 
         for (int i = 0; i < buffer.getLength(); i++) {
             newBuffer[i] = buffer.get(i) >= value;
@@ -859,7 +859,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public BooleanTensor notNaN() {
-        boolean[] newBuffer = new boolean[buffer.getLength()];
+        boolean[] newBuffer = new boolean[Ints.checkedCast(buffer.getLength())];
 
         for (int i = 0; i < buffer.getLength(); i++) {
             newBuffer[i] = !Double.isNaN(buffer.get(i));
