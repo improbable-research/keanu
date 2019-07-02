@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastedFlatIndex;
-import static io.improbable.keanu.tensor.TensorShape.getLengthAsInt;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 
 public class JVMTensorBroadcast {
@@ -136,7 +135,7 @@ public class JVMTensorBroadcast {
 
             } else {
 
-                outputBuffer = factory.createNew(getLengthAsInt(resultShape));
+                outputBuffer = factory.createNew(TensorShape.getLength(resultShape));
                 outputStride = getRowFirstStride(resultShape);
 
                 //e.g. [2, 2, 1] * [1, 2, 2]

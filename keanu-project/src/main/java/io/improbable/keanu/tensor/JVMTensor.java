@@ -15,7 +15,6 @@ import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-import static io.improbable.keanu.tensor.TensorShape.getLengthAsInt;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
 import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
@@ -187,7 +186,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         Preconditions.checkArgument(dimension < shape.length && index < shape[dimension]);
         long[] resultShape = ArrayUtils.remove(shape, dimension);
         long[] resultStride = getRowFirstStride(resultShape);
-        B newBuffer = factory.createNew(getLengthAsInt(resultShape));
+        B newBuffer = factory.createNew(TensorShape.getLength(resultShape));
 
         for (long i = 0; i < newBuffer.getLength(); i++) {
 
@@ -237,7 +236,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     B concatOnDimensionZero(JVMBuffer.ArrayWrapperFactory<T, B> factory,
                             long[] concatShape, List<B> toConcat) {
 
-        B concatBuffer = factory.createNew(getLengthAsInt(concatShape));
+        B concatBuffer = factory.createNew(TensorShape.getLength(concatShape));
         int bufferPosition = 0;
 
         for (int i = 0; i < toConcat.size(); i++) {
@@ -272,7 +271,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
     @Override
     public TENSOR broadcast(long... toShape) {
-        int outputLength = TensorShape.getLengthAsInt(toShape);
+        long outputLength = TensorShape.getLength(toShape);
         long[] outputStride = TensorShape.getRowFirstStride(toShape);
         B outputBuffer = getFactory().createNew(outputLength);
 

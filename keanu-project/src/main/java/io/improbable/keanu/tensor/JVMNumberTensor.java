@@ -1,17 +1,14 @@
 package io.improbable.keanu.tensor;
 
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.buffer.PrimitiveNumberWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-import static io.improbable.keanu.tensor.TensorShape.getLengthAsInt;
 import static io.improbable.keanu.tensor.TensorShape.getReductionResultShape;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.incrementIndexByShape;
@@ -57,8 +54,21 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
         void apply(PrimitiveNumberWrapper<T, B> buffer, long j, T value);
     }
 
+    /**
+     * This method works by iterating over the entire buffer and calculating which index in the result buffer
+     * it should be combined with using the combine function.
+     *
+     * @param combine        combines two numbers and returns a single number
+     * @param init           a function that returns a buffer initialized with a number suitable for the combine function
+     *                       to start. E.g. for a product reduction this would initialize a buffer to ones such that the
+     *                       first reduction is called with 1 * element 0.
+     * @param totalReduction A function that returns the reduction result of the entire buffer. This is in some cases
+     *                       possible and can be much more performant than the permutation walk done otherwise.
+     * @param overDimensions The dimensions to reduce over.
+     * @return a tensor with a shape with overDimensions dropped and with values reduced.
+     */
     private TENSOR reduceOverDimensions(BufferOp<T, B> combine,
-                                        BiFunction<JVMBuffer.PrimitiveNumberWrapperFactory<T, B>, Integer, B> init,
+                                        BiFunction<JVMBuffer.PrimitiveNumberWrapperFactory<T, B>, Long, B> init,
                                         Function<B, T> totalReduction,
                                         int... overDimensions) {
 
@@ -73,13 +83,13 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
 
         long[] resultShape = getReductionResultShape(shape, overDimensions);
         long[] resultStride = getRowFirstStride(resultShape);
-        B newBuffer = init.apply(getFactory(), getLengthAsInt(resultShape));
+        B newBuffer = init.apply(getFactory(), TensorShape.getLength(resultShape));
 
         for (int i = 0; i < buffer.getLength(); i++) {
 
             long[] shapeIndices = ArrayUtils.removeAll(TensorShape.getShapeIndices(shape, stride, i), overDimensions);
 
-            int j = Ints.checkedCast(getFlatIndex(resultShape, resultStride, shapeIndices));
+            long j = getFlatIndex(resultShape, resultStride, shapeIndices);
 
             combine.apply(newBuffer, j, buffer.get(i));
         }
@@ -102,6 +112,14 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
             requestedDimension);
     }
 
+    /**
+     * A cumulative reduce of the buffer. E.g. for summation of [1,2,3] this would return
+     * [1, 3, 6] where the sum is applied as [1, 1+2, 1+2+3].
+     *
+     * @param combine            combines two numbers and returns a single number
+     * @param requestedDimension cumulative operation over this dimension
+     * @return a tensor of the same shape with the combine operation applied to the requestedDimension
+     */
     private TENSOR cumulativeInPlace(BufferOp<T, B> combine, int requestedDimension) {
 
         final int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + shape.length;
@@ -112,7 +130,7 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
         do {
 
             T result = null;
-            for (int i = 0; i < shape[dimension]; i++) {
+            for (long i = 0; i < shape[dimension]; i++) {
 
                 index[dimension] = i;
 

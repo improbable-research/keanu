@@ -987,11 +987,11 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         }
 
         public Double get(long index) {
-            return buffer.get(Ints.checkedCast(index));
+            return buffer.get(index);
         }
 
         public void set(long index, Double value) {
-            buffer.set(value, Ints.checkedCast(index));
+            buffer.set(value, index);
         }
 
     }

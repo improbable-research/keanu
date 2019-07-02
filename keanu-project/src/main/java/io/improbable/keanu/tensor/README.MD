@@ -235,10 +235,8 @@ Missing types:
 
 #### Sum, Product, Differences
 
-- prod(a[, axis, dtype, out, keepdims, initial])	Return the product of array elements over a given axis.
 - nanprod(a[, axis, dtype, out, keepdims])	Return the product of array elements over a given axis treating Not a Numbers (NaNs) as ones.
 - nansum(a[, axis, dtype, out, keepdims])	Return the sum of array elements over a given axis treating Not a Numbers (NaNs) as zero.
-- cumprod(a[, axis, dtype, out])	Return the cumulative product of elements along a given axis.
 - nancumprod(a[, axis, dtype, out])	Return the cumulative product of array elements over a given axis treating Not a Numbers (NaNs) as one.
 - nancumsum(a[, axis, dtype, out])	Return the cumulative sum of array elements over a given axis treating Not a Numbers (NaNs) as zero.
 - diff(a[, n, axis, prepend, append])	Calculate the n-th discrete difference along the given axis.

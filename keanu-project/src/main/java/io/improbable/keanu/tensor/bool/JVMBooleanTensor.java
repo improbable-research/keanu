@@ -281,7 +281,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
 
         @Override
         public Boolean get(long index) {
-            return buffer.get(Ints.checkedCast(index));
+            return buffer.get(index);
         }
 
         @Override
@@ -295,7 +295,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
 
         @Override
         public void set(long index, Boolean value) {
-            buffer.set(value, Ints.checkedCast(index));
+            buffer.set(value, index);
         }
 
     }
