@@ -179,7 +179,29 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
     @Override
     public TENSOR slice(Slicer slicer) {
-        return null;
+        return createFromResultWrapper(slice(getFactory(), buffer, shape, stride, slicer));
+    }
+
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
+    ResultWrapper<T, B> slice(JVMBuffer.ArrayWrapperFactory<T, B> factory,
+                              B buffer,
+                              long[] shape, long[] stride,
+                              Slicer slicer) {
+
+        SliceIndexMapper indexIterator = new SliceIndexMapper(slicer, shape, stride);
+
+        final long[] resultShape = indexIterator.getResultShape();
+        final long[] resultStride = indexIterator.getResultStride();
+        B newBuffer = factory.createNew(TensorShape.getLength(resultShape));
+
+        for (long i = 0; i < newBuffer.getLength(); i++) {
+
+            final long j = indexIterator.getSourceIndexFromResultIndex(i);
+
+            newBuffer.set(buffer.get(j), i);
+        }
+
+        return new ResultWrapper<>(newBuffer, resultShape, resultStride);
     }
 
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>

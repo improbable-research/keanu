@@ -19,23 +19,24 @@ public class Slicer {
     @Value
     public static class StartStopStep {
         public static final long DEFAULT_START = 0;
-        public static final long DEFAULT_STOP = -1;
+        public static final long UPPER_BOUND_STOP = -1;
+        public static final long START_PLUS_ONE_STOP = -2;
         public static final long DEFAULT_STEP = 1;
-        public static final StartStopStep ALL = new StartStopStep(DEFAULT_START, DEFAULT_STOP, DEFAULT_STEP);
+        public static final StartStopStep ALL = new StartStopStep(DEFAULT_START, UPPER_BOUND_STOP, DEFAULT_STEP);
 
         long start;
         long stop;
         long step;
 
-        public StartStopStep(Long start, Long stop, Long step) {
+        StartStopStep(Long start, Long stop, Long step) {
             this.start = start != null ? start : DEFAULT_START;
-            this.stop = stop != null ? stop : DEFAULT_STOP;
+            this.stop = stop != null ? stop : UPPER_BOUND_STOP;
             this.step = step != null ? step : DEFAULT_STEP;
         }
 
-        public StartStopStep(Integer start, Integer stop, Integer step) {
+        StartStopStep(Integer start, Integer stop, Integer step) {
             this.start = start != null ? start : DEFAULT_START;
-            this.stop = stop != null ? stop : DEFAULT_STOP;
+            this.stop = stop != null ? stop : UPPER_BOUND_STOP;
             this.step = step != null ? step : DEFAULT_STEP;
         }
     }
@@ -77,12 +78,12 @@ public class Slicer {
          * @return a slice for dimension that takes all indices after (inclusively) the start.
          */
         public SlicerBuilder slice(Long start) {
-            this.slices.add(new StartStopStep(start, StartStopStep.DEFAULT_STOP, StartStopStep.DEFAULT_STEP));
+            this.slices.add(new StartStopStep(start, StartStopStep.START_PLUS_ONE_STOP, StartStopStep.DEFAULT_STEP));
             return this;
         }
 
         public SlicerBuilder slice(Integer start) {
-            this.slices.add(new StartStopStep(start, (int) StartStopStep.DEFAULT_STOP, (int) StartStopStep.DEFAULT_STEP));
+            this.slices.add(new StartStopStep(start, (int) StartStopStep.START_PLUS_ONE_STOP, (int) StartStopStep.DEFAULT_STEP));
             return this;
         }
 
@@ -123,7 +124,7 @@ public class Slicer {
             if (dimSlice.equals("...")) {
                 slicerBuilder.all();
             } else {
-                String[] byColon = dimSlice.split(":");
+                String[] byColon = dimSlice.split(":", 3);
 
                 if (byColon.length == 3) {
                     slicerBuilder.slice(parseStart(byColon[0]), parseStop(byColon[1]), parseStep(byColon[2]));
@@ -147,7 +148,7 @@ public class Slicer {
     }
 
     private static Long parseStop(String arg) {
-        return getOrDefault(arg, StartStopStep.DEFAULT_STOP);
+        return getOrDefault(arg, StartStopStep.UPPER_BOUND_STOP);
     }
 
     private static Long parseStep(String arg) {

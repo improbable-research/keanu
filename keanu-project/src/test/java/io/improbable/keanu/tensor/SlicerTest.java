@@ -28,14 +28,14 @@ public class SlicerTest {
     public void canParseSingleDimensionWithOnlyStart() {
         assertThat(Slicer.fromString("2::"),
             equalTo(Slicer.builder()
-                .slice(2)
+                .slice(2, null, null)
                 .build()
             )
         );
 
         assertThat(Slicer.fromString("2:"),
             equalTo(Slicer.builder()
-                .slice(2)
+                .slice(2, null)
                 .build()
             )
         );
@@ -53,7 +53,7 @@ public class SlicerTest {
 
         assertThat(Slicer.fromString(":2:"),
             equalTo(Slicer.builder()
-                .slice(null, 2)
+                .slice(null, 2, null)
                 .build()
             )
         );
@@ -135,15 +135,15 @@ public class SlicerTest {
 
         assertThat(Slicer.fromString("2::,3:"),
             equalTo(Slicer.builder()
-                .slice(2)
-                .slice(3)
+                .slice(2, null, null)
+                .slice(3, null, null)
                 .build()
             )
         );
 
         assertThat(Slicer.fromString("2:,3"),
             equalTo(Slicer.builder()
-                .slice(2)
+                .slice(2, null)
                 .slice(3)
                 .build()
             )
@@ -203,15 +203,15 @@ public class SlicerTest {
 
         assertThat(Slicer.fromString("2 :: ,3: "),
             equalTo(Slicer.builder()
-                .slice(2)
-                .slice(3)
+                .slice(2, null, null)
+                .slice(3, null, null)
                 .build()
             )
         );
 
         assertThat(Slicer.fromString("2: , 3"),
             equalTo(Slicer.builder()
-                .slice(2)
+                .slice(2, null)
                 .slice(3)
                 .build()
             )

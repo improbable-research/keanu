@@ -1977,7 +1977,7 @@ public class DoubleTensorTest {
 
     @Test
     public void canStartStopStepSlice() {
-        /**
+        /*
          * a = np.arange(10)
          * b = a[2:7:2]
          * print b
@@ -1991,8 +1991,42 @@ public class DoubleTensorTest {
             .build();
 
         DoubleTensor b = a.slice(slicer);
+        DoubleTensor c = a.slice("2:7:2");
 
         assertThat(b, valuesAndShapesMatch(DoubleTensor.create(2, 4, 6)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(2, 4, 6)));
+    }
+
+    @Test
+    public void canStartStopSlice2Dimension() {
+        DoubleTensor a = DoubleTensor.arange(30).reshape(10, 3);
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .slice(1, 4, 2)
+            .slice(0, 2)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("1:4:2, 0:2");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(3, 4, 9, 10).reshape(2, 2)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(3, 4, 9, 10).reshape(2, 2)));
+    }
+
+    @Test
+    public void canStartStopSlice2DimensionWhere2ndDimensionIsDropped() {
+        DoubleTensor a = DoubleTensor.arange(30).reshape(10, 3);
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .slice(1, 4, 2)
+            .slice(2)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("1:4:2, 2");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(5, 11)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(5, 11)));
     }
 
 }

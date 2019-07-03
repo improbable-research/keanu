@@ -3,6 +3,8 @@ package io.improbable.keanu.tensor;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.INDArrayIndex;
+import org.nd4j.linalg.indexing.NDArrayIndex;
 
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +78,28 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
 
     @Override
     public TENSOR slice(Slicer slicer) {
-        return null;
+
+        final List<Slicer.StartStopStep> slices = slicer.getSlices();
+        final INDArrayIndex[] indArrayIndices = new INDArrayIndex[slices.size()];
+
+        for (int i = 0; i < indArrayIndices.length; i++) {
+            final Slicer.StartStopStep s = slices.get(i);
+            long stop = s.getStop();
+
+            if (stop == Slicer.StartStopStep.START_PLUS_ONE_STOP) {
+                indArrayIndices[i] = NDArrayIndex.point(s.getStart());
+
+            } else {
+
+                if (stop == Slicer.StartStopStep.UPPER_BOUND_STOP) {
+                    stop = tensor.shape()[i];
+                }
+
+                indArrayIndices[i] = NDArrayIndex.interval(s.getStart(), s.getStep(), stop);
+            }
+        }
+
+        return create(tensor.get(indArrayIndices));
     }
 
     @Override
