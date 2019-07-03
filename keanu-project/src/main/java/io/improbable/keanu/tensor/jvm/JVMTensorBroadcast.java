@@ -1,5 +1,6 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.jvm;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 
 import java.util.Arrays;

@@ -1,8 +1,8 @@
 package io.improbable.keanu.tensor.generic;
 
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.JVMTensor;
-import io.improbable.keanu.tensor.ResultWrapper;
+import io.improbable.keanu.tensor.jvm.JVMTensor;
+import io.improbable.keanu.tensor.jvm.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -11,7 +11,7 @@ import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
-import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
+import static io.improbable.keanu.tensor.jvm.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static java.util.Arrays.copyOf;
 

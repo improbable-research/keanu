@@ -2,7 +2,7 @@ package io.improbable.keanu.tensor.intgr;
 
 import com.google.common.base.Preconditions;
 import com.google.common.math.IntMath;
-import io.improbable.keanu.tensor.Slicer;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;

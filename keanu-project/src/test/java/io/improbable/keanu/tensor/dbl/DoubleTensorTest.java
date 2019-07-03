@@ -2,7 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.tensor.Slicer;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.tensor.TensorFactories;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
@@ -2027,6 +2027,53 @@ public class DoubleTensorTest {
 
         assertThat(b, valuesAndShapesMatch(DoubleTensor.create(5, 11)));
         assertThat(c, valuesAndShapesMatch(DoubleTensor.create(5, 11)));
+    }
+
+    @Test
+    public void canStartStopSlice2DimensionWhere2ndDimensionIsNotSpecified() {
+        DoubleTensor a = DoubleTensor.arange(30).reshape(10, 3);
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .slice(2)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("2");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(6, 7, 8)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(6, 7, 8)));
+    }
+
+    @Test
+    public void canStartStopSlice2DimensionWhere2ndDimensionIsUpperBoundStop() {
+        DoubleTensor a = DoubleTensor.arange(30).reshape(10, 3);
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .all()
+            .slice(2, null)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("::,2:");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(2, 5, 8, 11, 14, 17, 20, 23, 26, 29).reshape(10, 1)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(2, 5, 8, 11, 14, 17, 20, 23, 26, 29).reshape(10, 1)));
+    }
+
+    @Test
+    public void canStartStopSlice2DimensionWhere2ndDimensionIsUpperBoundStopWithStep() {
+        DoubleTensor a = DoubleTensor.arange(30).reshape(10, 3);
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .slice(null, null, 4)
+            .slice(null, null, 2)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("::4,::2");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(0, 2, 12, 14, 24, 26).reshape(3, 2)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(0, 2, 12, 14, 24, 26).reshape(3, 2)));
     }
 
 }

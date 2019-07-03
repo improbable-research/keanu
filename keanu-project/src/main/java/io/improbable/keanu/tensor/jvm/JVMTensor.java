@@ -1,6 +1,8 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.jvm;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -11,7 +13,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static io.improbable.keanu.tensor.JVMTensorBroadcast.broadcastIfNeeded;
+import static io.improbable.keanu.tensor.jvm.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
@@ -174,29 +176,27 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
     @Override
     public TENSOR slice(int dimension, long index) {
+
         return createFromResultWrapper(slice(getFactory(), buffer, shape, stride, dimension, index));
     }
 
     @Override
     public TENSOR slice(Slicer slicer) {
-        return createFromResultWrapper(slice(getFactory(), buffer, shape, stride, slicer));
+        return createFromResultWrapper(slice(getFactory(), buffer, new SlicerIndexMapper(slicer, shape, stride)));
     }
 
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
     ResultWrapper<T, B> slice(JVMBuffer.ArrayWrapperFactory<T, B> factory,
                               B buffer,
-                              long[] shape, long[] stride,
-                              Slicer slicer) {
+                              IndexMapper indexMapper) {
 
-        SliceIndexMapper indexIterator = new SliceIndexMapper(slicer, shape, stride);
-
-        final long[] resultShape = indexIterator.getResultShape();
-        final long[] resultStride = indexIterator.getResultStride();
+        final long[] resultShape = indexMapper.getResultShape();
+        final long[] resultStride = indexMapper.getResultStride();
         B newBuffer = factory.createNew(TensorShape.getLength(resultShape));
 
         for (long i = 0; i < newBuffer.getLength(); i++) {
 
-            final long j = indexIterator.getSourceIndexFromResultIndex(i);
+            final long j = indexMapper.getSourceIndexFromResultIndex(i);
 
             newBuffer.set(buffer.get(j), i);
         }

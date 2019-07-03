@@ -1,5 +1,9 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.ndj4;
 
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;

@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;

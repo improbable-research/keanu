@@ -1,14 +1,14 @@
 package io.improbable.keanu.tensor.dbl;
 
-import io.improbable.keanu.tensor.INDArrayExtensions;
-import io.improbable.keanu.tensor.INDArrayShim;
-import io.improbable.keanu.tensor.Nd4jFloatingPointTensor;
-import io.improbable.keanu.tensor.Nd4jTensor;
+import io.improbable.keanu.tensor.ndj4.INDArrayExtensions;
+import io.improbable.keanu.tensor.ndj4.INDArrayShim;
+import io.improbable.keanu.tensor.ndj4.Nd4jFloatingPointTensor;
+import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
-import io.improbable.keanu.tensor.TypedINDArrayFactory;
+import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;

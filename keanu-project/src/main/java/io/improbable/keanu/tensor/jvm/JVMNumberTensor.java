@@ -1,7 +1,11 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.jvm;
 
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.buffer.PrimitiveNumberWrapper;
+import io.improbable.keanu.tensor.jvm.JVMTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.function.BiFunction;

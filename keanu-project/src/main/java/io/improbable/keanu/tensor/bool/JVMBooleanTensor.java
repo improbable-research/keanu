@@ -2,8 +2,8 @@ package io.improbable.keanu.tensor.bool;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.JVMTensor;
-import io.improbable.keanu.tensor.ResultWrapper;
+import io.improbable.keanu.tensor.jvm.JVMTensor;
+import io.improbable.keanu.tensor.jvm.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;

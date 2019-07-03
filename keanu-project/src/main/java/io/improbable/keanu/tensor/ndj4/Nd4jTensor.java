@@ -1,6 +1,8 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.ndj4;
 
 
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;

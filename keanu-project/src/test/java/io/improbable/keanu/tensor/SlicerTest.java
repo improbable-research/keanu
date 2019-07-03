@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor;
 
+import io.improbable.keanu.tensor.jvm.Slicer;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

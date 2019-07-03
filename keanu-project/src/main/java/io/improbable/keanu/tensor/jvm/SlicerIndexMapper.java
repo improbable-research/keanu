@@ -1,8 +1,11 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.jvm;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.jvm.IndexMapper;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
@@ -22,7 +25,7 @@ import static io.improbable.keanu.tensor.TensorShape.getShapeIndices;
  * Dimensions are dropped for example given 1:2,3 then the 2nd dimension length will be 1 and ALSO dropped but
  * the first dimension will be kept despite also being length one. This is done this way to mimic numpy behaviour.
  */
-public final class SliceIndexMapper {
+public final class SlicerIndexMapper implements IndexMapper {
 
     private final Slicer slicer;
 
@@ -34,7 +37,7 @@ public final class SliceIndexMapper {
     private final long[] resultStrideWithoutRankLoss;
     private final int[] dimensionsDropped;
 
-    public SliceIndexMapper(Slicer slicer, long[] sourceShape, long[] sourceStride) {
+    public SlicerIndexMapper(Slicer slicer, long[] sourceShape, long[] sourceStride) {
         this.slicer = slicer;
         this.sourceShape = sourceShape;
         this.sourceStride = sourceStride;
@@ -54,20 +57,24 @@ public final class SliceIndexMapper {
 
         for (int i = 0; i < sourceShape.length; i++) {
 
-            Slicer.StartStopStep startStopStep = slices.get(i);
-
-            if (startStopStep.getStop() != Slicer.StartStopStep.START_PLUS_ONE_STOP) {
-                if (startStopStep == Slicer.StartStopStep.ALL) {
-                    shapeList.add(sourceShape[i]);
-                } else {
-                    final long absStep = Math.abs(startStopStep.getStep());
-                    final long minStop = Math.min(startStopStep.getStop(), sourceShape[i]);
-                    final long length = 1 + (minStop - 1 - startStopStep.getStart()) / absStep;
-                    shapeList.add(length);
-                }
+            if (i >= slices.size() || slices.get(i) == Slicer.StartStopStep.ALL) {
+                shapeList.add(sourceShape[i]);
             } else {
-                shapeList.add(1L);
-                droppedList.add(i);
+
+                Slicer.StartStopStep slice = slices.get(i);
+
+                if (slice.getStop() == Slicer.StartStopStep.START_PLUS_ONE_STOP) {
+                    shapeList.add(1L);
+                    droppedList.add(i);
+
+                } else {
+
+                    final long stop = slice.getStop() == Slicer.StartStopStep.UPPER_BOUND_STOP ? sourceShape[i] : slice.getStop();
+                    final long absStep = Math.abs(slice.getStep());
+                    final long length = 1 + (stop - 1 - slice.getStart()) / absStep;
+                    shapeList.add(length);
+
+                }
             }
         }
     }
@@ -75,6 +82,7 @@ public final class SliceIndexMapper {
     /**
      * @return The resultShapeWithoutRankLoss with the dropped dimensions dropped.
      */
+    @Override
     public long[] getResultShape() {
         return dimensionsDropped.length > 0 ? ArrayUtils.removeAll(resultShapeWithoutRankLoss, dimensionsDropped) : resultShapeWithoutRankLoss;
     }
@@ -82,6 +90,7 @@ public final class SliceIndexMapper {
     /**
      * @return The resultStrideWithoutRankLoss with the dropped dimensions dropped.
      */
+    @Override
     public long[] getResultStride() {
         return dimensionsDropped.length > 0 ? ArrayUtils.removeAll(resultStrideWithoutRankLoss, dimensionsDropped) : resultStrideWithoutRankLoss;
     }
@@ -90,6 +99,7 @@ public final class SliceIndexMapper {
      * @param resultIndex the index in the result buffer
      * @return the index in the source buffer that maps to the result buffer.
      */
+    @Override
     public long getSourceIndexFromResultIndex(long resultIndex) {
 
         final long[] shapeIndices = getShapeIndices(resultShapeWithoutRankLoss, resultStrideWithoutRankLoss, resultIndex);

@@ -1,5 +1,7 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.ndj4;
 
+import io.improbable.keanu.tensor.FloatingPointTensor;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.TensorMulByMatrixMul;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;

@@ -1,6 +1,7 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.ndj4;
 
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.TensorShape;
 import lombok.extern.slf4j.Slf4j;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
