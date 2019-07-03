@@ -1,13 +1,13 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.ndj4.INDArrayShim;
 import io.improbable.keanu.tensor.ndj4.Nd4jFixedPointTensor;
 import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
-import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.nd4j.linalg.api.buffer.DataType;

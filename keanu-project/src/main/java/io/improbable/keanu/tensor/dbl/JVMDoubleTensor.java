@@ -2,15 +2,15 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.jvm.JVMFloatingPointTensor;
-import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.tensor.jvm.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.jvm.JVMFloatingPointTensor;
+import io.improbable.keanu.tensor.jvm.JVMTensor;
+import io.improbable.keanu.tensor.jvm.ResultWrapper;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.SingularMatrixException;

@@ -13,16 +13,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static io.improbable.keanu.tensor.jvm.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
-import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
 import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
-import static io.improbable.keanu.tensor.TensorShape.getShapeIndices;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
+import static io.improbable.keanu.tensor.jvm.JVMTensorBroadcast.broadcastIfNeeded;
 import static java.util.Arrays.copyOf;
 
 public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>> implements Tensor<T, TENSOR> {
@@ -176,8 +174,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
     @Override
     public TENSOR slice(int dimension, long index) {
-
-        return createFromResultWrapper(slice(getFactory(), buffer, shape, stride, dimension, index));
+        return createFromResultWrapper(slice(getFactory(), buffer, new DimensionIndexMapper(shape, stride, dimension, index)));
     }
 
     @Override
@@ -197,29 +194,6 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         for (long i = 0; i < newBuffer.getLength(); i++) {
 
             final long j = indexMapper.getSourceIndexFromResultIndex(i);
-
-            newBuffer.set(buffer.get(j), i);
-        }
-
-        return new ResultWrapper<>(newBuffer, resultShape, resultStride);
-    }
-
-    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
-    ResultWrapper<T, B> slice(JVMBuffer.ArrayWrapperFactory<T, B> factory,
-                              B buffer,
-                              long[] shape, long[] stride,
-                              int dimension, long index) {
-
-        Preconditions.checkArgument(dimension < shape.length && index < shape[dimension]);
-        long[] resultShape = ArrayUtils.remove(shape, dimension);
-        long[] resultStride = getRowFirstStride(resultShape);
-        B newBuffer = factory.createNew(TensorShape.getLength(resultShape));
-
-        for (long i = 0; i < newBuffer.getLength(); i++) {
-
-            long[] shapeIndices = ArrayUtils.insert(dimension, getShapeIndices(resultShape, resultStride, i), index);
-
-            long j = getFlatIndex(shape, stride, shapeIndices);
 
             newBuffer.set(buffer.get(j), i);
         }

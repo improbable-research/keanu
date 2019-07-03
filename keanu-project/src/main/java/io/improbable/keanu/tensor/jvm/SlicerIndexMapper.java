@@ -4,8 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.jvm.IndexMapper;
-import io.improbable.keanu.tensor.jvm.Slicer;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;

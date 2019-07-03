@@ -47,6 +47,9 @@ public class Slicer {
         private ArrayList<StartStopStep> slices = new ArrayList<>();
 
         /**
+         * @param start index to start at
+         * @param stop  index to stop at
+         * @param step  step from start to stop
          * @return a slice for dimension that takes all indices after (inclusively) the start and up
          * to the stop (exclusively) with a step of step.
          */
@@ -61,6 +64,8 @@ public class Slicer {
         }
 
         /**
+         * @param start index to start at
+         * @param stop  index to stop at
          * @return a slice for dimension that takes all indices after (inclusively) the start and up
          * to the stop (exclusively).
          */
@@ -75,6 +80,7 @@ public class Slicer {
         }
 
         /**
+         * @param start index to start at
          * @return a slice for dimension that takes all indices after (inclusively) the start.
          */
         public SlicerBuilder slice(Long start) {

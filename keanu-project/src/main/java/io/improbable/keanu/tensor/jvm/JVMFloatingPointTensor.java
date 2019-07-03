@@ -2,7 +2,6 @@ package io.improbable.keanu.tensor.jvm;
 
 import io.improbable.keanu.tensor.FloatingPointTensor;
 import io.improbable.keanu.tensor.buffer.PrimitiveNumberWrapper;
-import io.improbable.keanu.tensor.jvm.JVMNumberTensor;
 
 public abstract class JVMFloatingPointTensor<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, B extends PrimitiveNumberWrapper<T, B>> extends JVMNumberTensor<T, TENSOR, B> implements FloatingPointTensor<T, TENSOR> {
 

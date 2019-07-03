@@ -1,18 +1,18 @@
 package io.improbable.keanu.tensor.generic;
 
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.jvm.JVMTensor;
-import io.improbable.keanu.tensor.jvm.ResultWrapper;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
+import io.improbable.keanu.tensor.jvm.JVMTensor;
+import io.improbable.keanu.tensor.jvm.ResultWrapper;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
-import static io.improbable.keanu.tensor.jvm.JVMTensorBroadcast.broadcastIfNeeded;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
+import static io.improbable.keanu.tensor.jvm.JVMTensorBroadcast.broadcastIfNeeded;
 import static java.util.Arrays.copyOf;
 
 public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuffer.PrimitiveGenericWrapper<T>> implements Tensor<T, GenericTensor<T>> {
