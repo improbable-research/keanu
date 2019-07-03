@@ -177,6 +177,11 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         return createFromResultWrapper(slice(getFactory(), buffer, shape, stride, dimension, index));
     }
 
+    @Override
+    public TENSOR slice(Slicer slicer) {
+        return null;
+    }
+
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
     ResultWrapper<T, B> slice(JVMBuffer.ArrayWrapperFactory<T, B> factory,
                               B buffer,

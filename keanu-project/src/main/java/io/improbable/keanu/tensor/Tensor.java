@@ -121,6 +121,12 @@ public interface Tensor<N, T extends Tensor<N, T>> {
 
     T slice(int dimension, long index);
 
+    default T slice(String sliceArg){
+        return slice(Slicer.fromString(sliceArg));
+    }
+
+    T slice(Slicer slicer);
+
     T take(long... index);
 
     /**

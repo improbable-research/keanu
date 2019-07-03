@@ -45,6 +45,10 @@ public interface DoubleTensor extends FloatingPointTensor<Double, DoubleTensor> 
         return TensorFactories.doubleTensorFactory.arange(start, end);
     }
 
+    static DoubleTensor arange(double end) {
+        return TensorFactories.doubleTensorFactory.arange(0, end);
+    }
+
     /**
      * @param start    start of range
      * @param end      end of range (exclusive)

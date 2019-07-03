@@ -75,6 +75,11 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     }
 
     @Override
+    public TENSOR slice(Slicer slicer) {
+        return null;
+    }
+
+    @Override
     public TENSOR take(long... index) {
         return create(tensor.getScalar(index));
     }

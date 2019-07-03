@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.Slicer;
 import io.improbable.keanu.tensor.TensorFactories;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
@@ -1972,6 +1973,26 @@ public class DoubleTensorTest {
         ).reshape(3, 3);
 
         Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canStartStopStepSlice() {
+        /**
+         * a = np.arange(10)
+         * b = a[2:7:2]
+         * print b
+         * [2  4  6]
+         */
+
+        DoubleTensor a = DoubleTensor.arange(10);
+
+        Slicer slicer = Slicer.builder()
+            .slice(2, 7, 2)
+            .build();
+
+        DoubleTensor b = a.slice(slicer);
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(2, 4, 6)));
     }
 
 }

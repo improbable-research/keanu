@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.intgr;
 
 import com.google.common.base.Preconditions;
 import com.google.common.math.IntMath;
+import io.improbable.keanu.tensor.Slicer;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -232,6 +233,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
         } else {
             throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
         }
+    }
+
+    @Override
+    public IntegerTensor slice(Slicer slicer) {
+        return slice(0, 0);
     }
 
     @Override
