@@ -56,6 +56,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor get(BooleanTensor booleanIndex) {
+        return booleanIndex.scalar() ? IntegerTensor.scalar(value) : IntegerTensor.create();
+    }
+
+    @Override
     public IntegerTensor duplicate() {
         return new ScalarIntegerTensor(value, shape);
     }

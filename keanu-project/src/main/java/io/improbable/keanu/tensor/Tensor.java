@@ -106,6 +106,8 @@ public interface Tensor<N, T extends Tensor<N, T>> {
         }
     }
 
+    T get(BooleanTensor booleanIndex);
+
     default void setValue(N value, long... index) {
         if (index.length == 1) {
             getFlattenedView().set(index[0], value);

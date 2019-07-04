@@ -11,11 +11,17 @@ public class TypedINDArrayFactory {
 
     public static INDArray create(double[] data, long[] shape) {
         Nd4j.setDefaultDataTypes(DataType.DOUBLE, DEFAULT_FLOATING_POINT_TYPE);
+        if (data.length == 0) {
+            return Nd4j.empty(DataType.DOUBLE);
+        }
         return Nd4j.createFromArray(data).reshape(shape);
     }
 
     public static INDArray create(int[] data, long[] shape) {
         Nd4j.setDefaultDataTypes(DataType.INT, DEFAULT_FLOATING_POINT_TYPE);
+        if (data.length == 0) {
+            return Nd4j.empty(DataType.INT);
+        }
         return Nd4j.createFromArray(data).reshape(shape);
     }
 
@@ -26,9 +32,6 @@ public class TypedINDArrayFactory {
 
     public static INDArray eye(long n, DataType bufferType) {
         Nd4j.setDefaultDataTypes(bufferType, DEFAULT_FLOATING_POINT_TYPE);
-        if (n == 0) {
-            return Nd4j.scalar(1.0);
-        }
         return Nd4j.eye(n);
     }
 

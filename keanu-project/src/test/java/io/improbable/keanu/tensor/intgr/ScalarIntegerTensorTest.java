@@ -89,4 +89,13 @@ public class ScalarIntegerTensorTest {
 
         Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expected));
     }
+
+    @Test
+    public void canBooleanIndex() {
+        ScalarIntegerTensor a = new ScalarIntegerTensor(1);
+        IntegerTensor result = a.get(BooleanTensor.scalar(false));
+
+        assertThat(result.getLength(), equalTo(0L));
+        assertThat(result.getShape(), equalTo(new long[0]));
+    }
 }

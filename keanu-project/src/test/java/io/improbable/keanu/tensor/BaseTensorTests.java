@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor;
 
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.tensor.dbl.JVMDoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -432,6 +433,24 @@ public class BaseTensorTests {
     public void canExpandDims() {
         Tensor x = factory.apply(new long[]{3});
         assertThat(x.expandDims(0).getShape(), equalTo(new long[]{1, 3}));
+    }
+
+    @Test
+    public void canBooleanIndex() {
+        Tensor x = factory.apply(new long[]{2, 2});
+        Tensor result = x.get(BooleanTensor.create(true, false, false, true).reshape(2, 2));
+
+        assertThat(result.getValue(0), equalTo(x.getValue(0, 0)));
+        assertThat(result.getValue(1), equalTo(x.getValue(1, 1)));
+        assertThat(result.getLength(), equalTo(2L));
+    }
+
+    @Test
+    public void canBooleanIndexWithAllFalse() {
+        Tensor x = factory.apply(new long[]{2, 2});
+        Tensor result = x.get(BooleanTensor.create(false, false, false, false).reshape(2, 2));
+
+        assertThat(result.getLength(), equalTo(0L));
     }
 
 }

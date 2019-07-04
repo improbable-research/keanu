@@ -59,6 +59,27 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     }
 
     @Override
+    public TENSOR get(BooleanTensor booleanIndex) {
+
+        List<Long> indices = new ArrayList<>();
+
+        FlattenedView<Boolean> flattenedView = booleanIndex.getFlattenedView();
+        for (long i = 0; i < booleanIndex.getLength(); i++) {
+            if (flattenedView.get(i)) {
+                indices.add(i);
+            }
+        }
+
+        B newBuffer = getFactory().createNew(indices.size());
+
+        for (int i = 0; i < newBuffer.getLength(); i++) {
+            newBuffer.set(buffer.get(indices.get(i)), i);
+        }
+
+        return create(newBuffer, new long[]{newBuffer.getLength()}, new long[]{1});
+    }
+
+    @Override
     public TENSOR diag() {
         return createFromResultWrapper(diag(shape.length, shape, buffer, getFactory()));
     }

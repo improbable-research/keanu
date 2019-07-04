@@ -1,13 +1,16 @@
 package io.improbable.keanu.tensor.ndj4;
 
 
+import com.google.common.primitives.Longs;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +41,26 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     @Override
     public long getLength() {
         return tensor.length();
+    }
+
+    @Override
+    public TENSOR get(BooleanTensor booleanIndex) {
+
+        List<Long> indices = new ArrayList<>();
+        FlattenedView<Boolean> flattenedView = booleanIndex.getFlattenedView();
+        for (long i = 0; i < booleanIndex.getLength(); i++) {
+            if (flattenedView.get(i)) {
+                indices.add(i);
+            }
+        }
+
+        if(indices.isEmpty()){
+            return create(Nd4j.empty(tensor.dataType()));
+        }
+
+        INDArray result = tensor.reshape(tensor.length()).get(NDArrayIndex.indices(Longs.toArray(indices)));
+
+        return create(result);
     }
 
     @Override
