@@ -394,4 +394,44 @@ public class BaseTensorTests {
         assertTrue(factory.apply(new long[]{2, 2}).isMatrix());
     }
 
+    @Test
+    public void canMoveAxis() {
+        /*
+         * >>> x = np.zeros((3, 4, 5))
+         * >>> np.moveaxis(x, 0, -1).shape
+         * (4, 5, 3)
+         * >>> np.moveaxis(x, -1, 0).shape
+         * (5, 3, 4)
+         */
+
+        Tensor x = factory.apply(new long[]{3, 4, 5});
+        assertThat(x.moveAxis(0, -1).getShape(), equalTo(new long[]{4, 5, 3}));
+        assertThat(x.moveAxis(-1, 0).getShape(), equalTo(new long[]{5, 3, 4}));
+    }
+
+    @Test
+    public void canSwapAxis() {
+        /*
+         * >>> x = np.zeros((3, 4, 5))
+         * >>> np.swapaxes(x, 0, -1).shape
+         * (5, 4, 3)
+         */
+
+        Tensor x = factory.apply(new long[]{3, 4, 5});
+        assertThat(x.swapAxis(0, -1).getShape(), equalTo(new long[]{5, 4, 3}));
+        assertThat(x.swapAxis(1, 2).getShape(), equalTo(new long[]{3, 5, 4}));
+    }
+
+    @Test
+    public void canSqueeze() {
+        Tensor x = factory.apply(new long[]{1, 3, 1});
+        assertThat(x.squeeze().getShape(), equalTo(new long[]{3}));
+    }
+
+    @Test
+    public void canExpandDims() {
+        Tensor x = factory.apply(new long[]{3});
+        assertThat(x.expandDims(0).getShape(), equalTo(new long[]{1, 3}));
+    }
+
 }

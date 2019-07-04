@@ -13,15 +13,6 @@ The following functions are on the todo list:
 
 ### Functions to add
 
-- More generic slicing
-
-- moveaxis(a, source, destination)	Move axes of an array to new positions.
-- rollaxis(a, axis[, start])	Roll the specified axis backwards, until it lies in a given position.
-- swapaxes(a, axis1, axis2)	Interchange two axes of an array.
-
-- expand_dims(a, axis)	Expand the shape of an array.
-- squeeze(a[, axis])	Remove single-dimensional entries from the shape of an array.
-
 - stack(arrays[, axis, out])	Join a sequence of arrays along a new axis.
 - column_stack(tup)	Stack 1-D arrays as columns into a 2-D array.
 - dstack(tup)	Stack arrays in sequence depth wise (along third axis).

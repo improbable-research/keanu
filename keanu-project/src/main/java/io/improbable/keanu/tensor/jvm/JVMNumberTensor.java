@@ -11,6 +11,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getReductionResultShape;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
@@ -125,7 +126,7 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
      */
     private TENSOR cumulativeInPlace(BufferOp<T, B> combine, int requestedDimension) {
 
-        final int dimension = requestedDimension >= 0 ? requestedDimension : requestedDimension + shape.length;
+        final int dimension = getAbsoluteDimension(requestedDimension, shape.length);
         TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
         final int[] dimensionOrder = ArrayUtils.remove(dimensionRange(0, shape.length), dimension);
         long[] index = new long[shape.length];
