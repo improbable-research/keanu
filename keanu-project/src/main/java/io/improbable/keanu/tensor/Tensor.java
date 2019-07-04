@@ -98,6 +98,13 @@ public interface Tensor<N, T extends Tensor<N, T>> {
 
     long getLength();
 
+    /**
+     * getValue returns a single primitive value from a specified index. The number of indices supplied must
+     * match the rank of the tensor.
+     *
+     * @param index the index of the scalar value.
+     * @return The primitive value at the specified index
+     */
     default N getValue(long... index) {
         if (index.length == 1) {
             return getFlattenedView().get(index[0]);
@@ -106,6 +113,11 @@ public interface Tensor<N, T extends Tensor<N, T>> {
         }
     }
 
+    /**
+     * @param booleanIndex a boolean tensor the same shape as this tensor where true is specified if the element
+     *                     should be kept and false if not.
+     * @return a vector with the values that align with true from the boolean index.
+     */
     T get(BooleanTensor booleanIndex);
 
     default void setValue(N value, long... index) {
@@ -205,7 +217,7 @@ public interface Tensor<N, T extends Tensor<N, T>> {
         source = getAbsoluteDimension(source, dimensionRange.length);
         destination = getAbsoluteDimension(destination, dimensionRange.length);
 
-        int[] rearrange = ArrayUtils.insert(destination , ArrayUtils.remove(dimensionRange, source), source);
+        int[] rearrange = ArrayUtils.insert(destination, ArrayUtils.remove(dimensionRange, source), source);
 
         return permute(rearrange);
     }
