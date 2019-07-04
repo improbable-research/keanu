@@ -2116,4 +2116,11 @@ public class DoubleTensorTest {
         assertThat(a.isNegativeInfinity(), valuesAndShapesMatch(BooleanTensor.create(true, false, false, false, false, false).reshape(2, 3)));
     }
 
+    @Test
+    public void canBooleanIndex() {
+        DoubleTensor a = DoubleTensor.create(1, 2, 3, 4, 5, 6).reshape(2, 3);
+        DoubleTensor result = a.get(a.greaterThan(3.));
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(4, 5, 6)));
+    }
+
 }
