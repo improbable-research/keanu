@@ -197,15 +197,6 @@ Missing types:
 #### FFT lib
 - Lots of FFT related stuff. Maybe add?
 
-#### Comparison
-
-- isfinite(x, /[, out, where, casting, order, …])	Test element-wise for finiteness (not infinity or not Not a Number).
-- isinf(x, /[, out, where, casting, order, …])	Test element-wise for positive or negative infinity.
-- isnan(x, /[, out, where, casting, order, …])	Test element-wise for NaN and return result as a boolean array.
-- isnat(x, /[, out, where, casting, order, …])	Test element-wise for NaT (not a time) and return result as a boolean array.
-- isneginf(x[, out])	Test element-wise for negative infinity, return result as bool array.
-- isposinf(x[, out])	Test element-wise for positive infinity, return result as bool array.
-
 #### Trig
 
 - hypot(x1, x2, /[, out, where, casting, …])	Given the “legs” of a right triangle, return its hypotenuse.

@@ -2076,4 +2076,44 @@ public class DoubleTensorTest {
         assertThat(c, valuesAndShapesMatch(DoubleTensor.create(0, 2, 12, 14, 24, 26).reshape(3, 2)));
     }
 
+    @Test
+    public void canIsInfinity() {
+        DoubleTensor a = DoubleTensor.create(
+            Double.NEGATIVE_INFINITY, 1, Double.NaN,
+            Double.POSITIVE_INFINITY, -0, 0
+        ).reshape(2, 3);
+
+        assertThat(a.isInfinite(), valuesAndShapesMatch(BooleanTensor.create(true, false, false, true, false, false).reshape(2, 3)));
+    }
+
+    @Test
+    public void canIsFinite() {
+        DoubleTensor a = DoubleTensor.create(
+            Double.NEGATIVE_INFINITY, 1, Double.NaN,
+            Double.POSITIVE_INFINITY, -0, 0
+        ).reshape(2, 3);
+
+        assertThat(a.isFinite(), valuesAndShapesMatch(BooleanTensor.create(false, true, false, false, true, true).reshape(2, 3)));
+    }
+
+    @Test
+    public void canIsPosInfinity() {
+        DoubleTensor a = DoubleTensor.create(
+            Double.NEGATIVE_INFINITY, 1, Double.NaN,
+            Double.POSITIVE_INFINITY, -0, 0
+        ).reshape(2, 3);
+
+        assertThat(a.isPositiveInfinity(), valuesAndShapesMatch(BooleanTensor.create(false, false, false, true, false, false).reshape(2, 3)));
+    }
+
+    @Test
+    public void canIsNegInfinity() {
+        DoubleTensor a = DoubleTensor.create(
+            Double.NEGATIVE_INFINITY, 1, Double.NaN,
+            Double.POSITIVE_INFINITY, -0, 0
+        ).reshape(2, 3);
+
+        assertThat(a.isNegativeInfinity(), valuesAndShapesMatch(BooleanTensor.create(true, false, false, false, false, false).reshape(2, 3)));
+    }
+
 }

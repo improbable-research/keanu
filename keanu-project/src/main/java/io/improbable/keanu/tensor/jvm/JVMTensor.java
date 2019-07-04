@@ -1,8 +1,10 @@
 package io.improbable.keanu.tensor.jvm;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
@@ -338,6 +341,16 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         }
 
         return argMin;
+    }
+
+    public BooleanTensor isApply(Function<T, Boolean> op) {
+        boolean[] newBuffer = new boolean[Ints.checkedCast(buffer.getLength())];
+
+        for (int i = 0; i < buffer.getLength(); i++) {
+            newBuffer[i] = op.apply(buffer.get(i));
+        }
+
+        return BooleanTensor.create(newBuffer, Arrays.copyOf(shape, shape.length));
     }
 
     @Override

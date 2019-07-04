@@ -859,13 +859,32 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public BooleanTensor notNaN() {
-        boolean[] newBuffer = new boolean[Ints.checkedCast(buffer.getLength())];
+        return isApply(v -> !Double.isNaN(v));
+    }
 
-        for (int i = 0; i < buffer.getLength(); i++) {
-            newBuffer[i] = !Double.isNaN(buffer.get(i));
-        }
+    @Override
+    public BooleanTensor isNaN() {
+        return isApply(v -> Double.isNaN(v));
+    }
 
-        return BooleanTensor.create(newBuffer, shapeCopy());
+    @Override
+    public BooleanTensor isFinite() {
+        return isApply(Double::isFinite);
+    }
+
+    @Override
+    public BooleanTensor isInfinite() {
+        return isApply(v -> Double.isInfinite(v));
+    }
+
+    @Override
+    public BooleanTensor isNegativeInfinity() {
+        return isApply(v -> v == Double.NEGATIVE_INFINITY);
+    }
+
+    @Override
+    public BooleanTensor isPositiveInfinity() {
+        return isApply(v -> v == Double.POSITIVE_INFINITY);
     }
 
     @Override

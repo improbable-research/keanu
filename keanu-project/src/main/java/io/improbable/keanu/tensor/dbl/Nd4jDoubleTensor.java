@@ -1,9 +1,12 @@
 package io.improbable.keanu.tensor.dbl;
 
+import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.tensor.ndj4.INDArrayExtensions;
@@ -14,10 +17,13 @@ import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.special.Gamma;
+import org.bytedeco.javacpp.indexer.BooleanIndexer;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.scalar.ReplaceNans;
+import org.nd4j.linalg.api.ops.impl.transforms.bool.MatchConditionTransform;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.conditions.Conditions;
 
 import java.util.Arrays;
 
@@ -255,6 +261,53 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     public DoubleTensor replaceNaNInPlace(Double value) {
         Nd4j.getExecutioner().exec(new ReplaceNans(tensor, value));
         return this;
+    }
+
+    @Override
+    public BooleanTensor isFinite() {
+        INDArray result = Nd4j.getExecutioner().exec(
+            new MatchConditionTransform(
+                tensor, Nd4j.createUninitialized(DataType.BOOL, tensor.shape(), tensor.ordering()),
+                Conditions.isFinite())
+        );
+        return BooleanTensor.create(asBoolean(result), tensor.shape());
+    }
+
+    @Override
+    public BooleanTensor isInfinite() {
+        INDArray result = tensor.isInfinite();
+        return BooleanTensor.create(asBoolean(result), tensor.shape());
+    }
+
+    private boolean[] asBoolean(INDArray array) {
+        Preconditions.checkArgument(array.dataType() == DataType.BOOL);
+        boolean[] buffer = new boolean[Ints.checkedCast(array.length())];
+
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = ((BooleanIndexer) (array.data()).indexer()).get(i);
+        }
+
+        return buffer;
+    }
+
+    @Override
+    public BooleanTensor isNegativeInfinity() {
+        INDArray result = Nd4j.getExecutioner().exec(
+            new MatchConditionTransform(
+                tensor, Nd4j.createUninitialized(DataType.BOOL, tensor.shape(), tensor.ordering()),
+                Conditions.equals(Double.NEGATIVE_INFINITY))
+        );
+        return BooleanTensor.create(asBoolean(result), tensor.shape());
+    }
+
+    @Override
+    public BooleanTensor isPositiveInfinity() {
+        INDArray result = Nd4j.getExecutioner().exec(
+            new MatchConditionTransform(
+                tensor, Nd4j.createUninitialized(DataType.BOOL, tensor.shape(), tensor.ordering()),
+                Conditions.equals(Double.POSITIVE_INFINITY))
+        );
+        return BooleanTensor.create(asBoolean(result), tensor.shape());
     }
 
     @Override

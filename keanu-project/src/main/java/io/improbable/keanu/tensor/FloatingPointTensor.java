@@ -18,6 +18,14 @@ public interface FloatingPointTensor<N extends Number, T extends FloatingPointTe
         return notNaN().not();
     }
 
+    BooleanTensor isFinite();
+
+    BooleanTensor isInfinite();
+
+    BooleanTensor isNegativeInfinity();
+
+    BooleanTensor isPositiveInfinity();
+
     IntegerTensor nanArgMax(int axis);
 
     int nanArgMax();
