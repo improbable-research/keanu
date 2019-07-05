@@ -29,6 +29,7 @@ windows: &windows
     - "environment=production"
     - "permission_set=builder"
     - "platform=windows"
+    - "agent_count=8"
     - "queue=${CI_WINDOWS_BUILDER_QUEUE:-v3-1561705708-f00efba34de7ca20-------z}"
     - "scaler_version=2"
 
