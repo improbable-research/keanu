@@ -158,8 +158,6 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
         return set(buffer, shape, stride);
     }
 
-
-
     @Override
     protected abstract JVMBuffer.PrimitiveNumberWrapperFactory<T, B> getFactory();
 

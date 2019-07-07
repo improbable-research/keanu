@@ -1,4 +1,4 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu;
 
 import java.util.function.Function;
 

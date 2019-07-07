@@ -1,4 +1,4 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu;
 
 public interface BaseFixedPointTensor<
     BOOLEAN extends BaseTensor<BOOLEAN, Boolean, BOOLEAN>,

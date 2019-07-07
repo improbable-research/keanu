@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor;
 
+import io.improbable.keanu.BaseNumberTensor;
 import io.improbable.keanu.kotlin.NumberOperators;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
