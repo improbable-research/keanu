@@ -118,7 +118,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
     @Override
     public double logProb(IntegerTensor xTensor) {
-        return Multinomial.withParameters(n.getValue(), p.getValue(), validationEnabled).logProb(xTensor).sum();
+        return Multinomial.withParameters(n.getValue(), p.getValue(), validationEnabled).logProb(xTensor).sumNumber();
     }
 
     @Override

@@ -197,7 +197,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new GreaterThanVertex<>(this, rhs);
     }
 
-    public <T extends NumberTensor> BooleanVertex greaterThanOrEqualTo(Vertex<T> rhs) {
+    public <N extends Number, T extends NumberTensor<N, T>> BooleanVertex greaterThanOrEqualTo(Vertex<T> rhs) {
         return new GreaterThanOrEqualVertex<>(this, rhs);
     }
 

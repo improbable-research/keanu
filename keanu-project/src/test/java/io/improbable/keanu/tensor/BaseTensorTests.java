@@ -28,8 +28,8 @@ import static org.junit.Assert.assertNotEquals;
 @RunWith(Parameterized.class)
 public class BaseTensorTests {
 
-    public interface TensorFactory extends Function<long[], Tensor> {
-        Tensor apply(long[] shape);
+    public interface TensorFactory extends Function<long[], Tensor<?, ?>> {
+        Tensor<?, ?> apply(long[] shape);
     }
 
     @Value
@@ -161,8 +161,8 @@ public class BaseTensorTests {
 
     @Test
     public void canSliceRank2() {
-        Tensor x = factory.apply(new long[]{3, 3});
-        Tensor slice = x.slice(1, 0);
+        Tensor<?, ?> x = factory.apply(new long[]{3, 3});
+        Tensor<?, ?> slice = x.slice(1, 0);
         assertThat(slice.getShape(), equalTo(new long[]{3}));
         assertThat(
             slice.asFlatArray(),
@@ -179,8 +179,8 @@ public class BaseTensorTests {
 
     @Test
     public void canSliceRank1() {
-        Tensor x = factory.apply(new long[]{4});
-        Tensor slice = x.slice(0, 1);
+        Tensor<?, ?> x = factory.apply(new long[]{4});
+        Tensor<?, ?> slice = x.slice(0, 1);
         assertThat(slice.getShape(), equalTo(new long[0]));
         assertThat(
             slice.asFlatArray(),
@@ -191,15 +191,15 @@ public class BaseTensorTests {
 
     @Test
     public void canTakeValue() {
-        Tensor matrix = factory.apply(new long[]{2, 2});
+        Tensor<?, ?> matrix = factory.apply(new long[]{2, 2});
         assertThat(matrix.getValue(0, 1), equalTo(matrix.take(0, 1).scalar()));
     }
 
     @Test
     public void canSplit() {
-        Tensor a = factory.apply(new long[]{2, 2, 2});
+        Tensor<?, ?> a = factory.apply(new long[]{2, 2, 2});
 
-        List<Tensor> split = a.split(0, 1, 2);
+        List<? extends Tensor<?, ?>> split = a.split(0, 1, 2);
 
         assertThat(
             split.get(0).asFlatArray(),
@@ -214,9 +214,9 @@ public class BaseTensorTests {
 
     @Test
     public void canSliceAlongDimension() {
-        Tensor a = factory.apply(new long[]{2, 2, 2});
+        Tensor<?, ?> a = factory.apply(new long[]{2, 2, 2});
 
-        List<Tensor> slices = a.sliceAlongDimension(0, 0, 2);
+        List<? extends Tensor<?, ?>> slices = a.sliceAlongDimension(0, 0, 2);
 
         assertThat(
             slices.get(0).asFlatArray(),
@@ -231,14 +231,14 @@ public class BaseTensorTests {
 
     @Test
     public void canDiag() {
-        Tensor x = factory.apply(new long[]{2});
-        Tensor xDiag = x.diag();
+        Tensor<?, ?> x = factory.apply(new long[]{2});
+        Tensor<?, ?> xDiag = x.diag();
 
         assertThat(xDiag.getShape(), equalTo(new long[]{2, 2}));
         assertThat(xDiag.getValue(0, 0), equalTo(x.getValue(0)));
         assertThat(xDiag.getValue(1, 1), equalTo(x.getValue(1)));
 
-        Tensor xUnDiag = xDiag.diag();
+        Tensor<?, ?> xUnDiag = xDiag.diag();
         assertThat(xUnDiag.getShape(), equalTo(new long[]{2}));
         assertThat(xUnDiag.getValue(0), equalTo(x.getValue(0)));
         assertThat(xUnDiag.getValue(1), equalTo(x.getValue(1)));
@@ -246,16 +246,16 @@ public class BaseTensorTests {
 
     @Test
     public void permuteDoesCauseReshape() {
-        Tensor a = factory.apply(new long[]{2, 1, 3});
-        Tensor actual = a.permute(1, 0, 2);
+        Tensor<?, ?> a = factory.apply(new long[]{2, 1, 3});
+        Tensor<?, ?> actual = a.permute(1, 0, 2);
         assertThat(actual.getShape(), equalTo(new long[]{1, 2, 3}));
     }
 
     @Test
     public void canPermuteUpperDimensions() {
-        Tensor a = factory.apply(new long[]{1, 2, 2, 2});
+        Tensor<?, ?> a = factory.apply(new long[]{1, 2, 2, 2});
 
-        Tensor permuted = a.permute(0, 1, 3, 2);
+        Tensor<?, ?> permuted = a.permute(0, 1, 3, 2);
 
         Object expected = new Object[]{
             a.getValue(0), a.getValue(2),
@@ -269,9 +269,9 @@ public class BaseTensorTests {
 
     @Test
     public void canTransposeMatrix() {
-        Tensor a = factory.apply(new long[]{2, 2});
+        Tensor<?, ?> a = factory.apply(new long[]{2, 2});
 
-        Tensor transposed = a.transpose();
+        Tensor<?, ?> transposed = a.transpose();
 
         Object expected = new Object[]{
             a.getValue(0, 0), a.getValue(1, 0),
@@ -289,8 +289,8 @@ public class BaseTensorTests {
 
     @Test
     public void canReshape() {
-        Tensor a = factory.apply(new long[]{2, 2});
-        Tensor actual = a.reshape(4);
+        Tensor<?, ?> a = factory.apply(new long[]{2, 2});
+        Tensor<?, ?> actual = a.reshape(4);
 
         assertThat(actual.getShape(), equalTo(new long[]{4}));
         assertThat(actual.getLength(), equalTo(4L));
@@ -308,9 +308,9 @@ public class BaseTensorTests {
 
     @Test
     public void canBroadcastRowVectorToShape() {
-        Tensor a = factory.apply(new long[]{1, 2});
+        Tensor<?, ?> a = factory.apply(new long[]{1, 2});
 
-        Tensor actual = a.broadcast(2, 2);
+        Tensor<?, ?> actual = a.broadcast(2, 2);
 
         assertThat(actual.getShape(), equalTo(new long[]{2, 2}));
         assertThat(actual.asFlatArray(), equalTo(
@@ -323,9 +323,9 @@ public class BaseTensorTests {
 
     @Test
     public void canBroadcastColumnVectorToShape() {
-        Tensor a = factory.apply(new long[]{2, 1});
+        Tensor<?, ?> a = factory.apply(new long[]{2, 1});
 
-        Tensor actual = a.broadcast(2, 2);
+        Tensor<?, ?> actual = a.broadcast(2, 2);
 
         assertThat(actual.getShape(), equalTo(new long[]{2, 2}));
         assertThat(actual.asFlatArray(), equalTo(
@@ -338,9 +338,9 @@ public class BaseTensorTests {
 
     @Test
     public void canBroadcastScalarToShape() {
-        Tensor a = factory.apply(new long[0]);
+        Tensor<?, ?> a = factory.apply(new long[0]);
 
-        Tensor actual = a.broadcast(2, 2);
+        Tensor<?, ?> actual = a.broadcast(2, 2);
 
         assertThat(actual.getShape(), equalTo(new long[]{2, 2}));
         assertThat(actual.asFlatArray(), equalTo(
@@ -437,8 +437,8 @@ public class BaseTensorTests {
 
     @Test
     public void canBooleanIndex() {
-        Tensor x = factory.apply(new long[]{2, 2});
-        Tensor result = x.get(BooleanTensor.create(true, false, false, true).reshape(2, 2));
+        Tensor<?, ?> x = factory.apply(new long[]{2, 2});
+        Tensor<?, ?> result = x.get(BooleanTensor.create(true, false, false, true).reshape(2, 2));
 
         assertThat(result.getValue(0), equalTo(x.getValue(0, 0)));
         assertThat(result.getValue(1), equalTo(x.getValue(1, 1)));
@@ -447,8 +447,8 @@ public class BaseTensorTests {
 
     @Test
     public void canBooleanIndexWithAllFalse() {
-        Tensor x = factory.apply(new long[]{2, 2});
-        Tensor result = x.get(BooleanTensor.create(false, false, false, false).reshape(2, 2));
+        Tensor<?, ?> x = factory.apply(new long[]{2, 2});
+        Tensor<?, ?> result = x.get(BooleanTensor.create(false, false, false, false).reshape(2, 2));
 
         assertThat(result.getLength(), equalTo(0L));
     }

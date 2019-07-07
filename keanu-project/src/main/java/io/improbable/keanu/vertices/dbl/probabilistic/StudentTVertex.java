@@ -67,7 +67,7 @@ public class StudentTVertex extends DoubleVertex implements Differentiable, Prob
 
     @Override
     public double logProb(DoubleTensor t) {
-        return StudentT.withParameters(v.getValue()).logProb(t).sum();
+        return StudentT.withParameters(v.getValue()).logProb(t).sumNumber();
     }
 
     @Override

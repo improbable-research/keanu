@@ -132,7 +132,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         String variableType = getAssigmentType(visiting);
         String name = toSourceVariableName(visiting.getReference());
 
-        append(computeSourceBuilder, "final ", variableType, " ", name, " = ", opMapperFor.apply(visiting, lookup), ";\n");
+        append(computeSourceBuilder, "final ", variableType, " ", name, " = (", variableType, ") ", opMapperFor.apply(visiting, lookup), ";\n");
 
         lookup.put(visiting.getReference(), new KeanuCompiledVariable(name, true));
     }

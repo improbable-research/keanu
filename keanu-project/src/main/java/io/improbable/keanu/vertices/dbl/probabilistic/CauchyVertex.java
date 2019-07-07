@@ -101,7 +101,7 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
 
         DoubleTensor logPdfs = Cauchy.withParameters(locationValues, scaleValues).logProb(value);
 
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

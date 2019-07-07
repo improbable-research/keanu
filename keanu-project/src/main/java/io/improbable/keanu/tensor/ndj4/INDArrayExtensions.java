@@ -1,10 +1,12 @@
 package io.improbable.keanu.tensor.ndj4;
 
+import com.google.common.primitives.Ints;
+import org.bytedeco.javacpp.indexer.BooleanIndexer;
+import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
-import org.nd4j.linalg.ops.transforms.Transforms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,11 +16,18 @@ import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 public class INDArrayExtensions {
 
-    public static INDArray castToInteger(INDArray tensor, boolean duplicate) {
-        INDArray tensorToDropFractionOn = duplicate ? tensor.dup() : tensor;
-        INDArray sign = Transforms.sign(tensorToDropFractionOn);
-        Transforms.floor(Transforms.abs(tensorToDropFractionOn, false), false).muli(sign);
-        return tensorToDropFractionOn;
+    public static boolean[] asBoolean(INDArray array) {
+        if (array.dataType() != DataType.BOOL) {
+            array = array.castTo(DataType.BOOL);
+        }
+
+        boolean[] buffer = new boolean[Ints.checkedCast(array.length())];
+
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = ((BooleanIndexer) (array.data()).indexer()).get(i);
+        }
+
+        return buffer;
     }
 
     public static List<INDArray> split(INDArray tensor, int dimension, long... splitAtIndices) {
@@ -60,13 +69,13 @@ public class INDArrayExtensions {
      * Cumulative prod along a dimension. This code is copied from the
      * cumSumi implementation in org.nd4j.linalg.api.ndarray.BaseNDArray.java
      *
-     * @param array array to cumProd
+     * @param array     array to cumProd
      * @param dimension the dimension to perform cumulative product along
      * @return the cumulative product along the specified dimension
      */
     public static INDArray cumProd(INDArray array, int dimension) {
 
-        if(array.isScalar() || array.isEmpty())
+        if (array.isScalar() || array.isEmpty())
             return array;
 
         if (array.isVector()) {

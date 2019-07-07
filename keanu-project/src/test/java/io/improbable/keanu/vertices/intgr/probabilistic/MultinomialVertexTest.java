@@ -204,7 +204,7 @@ public class MultinomialVertexTest {
 
         assertThat(sample, hasShape(3));
         assertThat(sample, allValues(both(greaterThan(-1)).and(lessThan(n))));
-        assertThat(sample.sum(), equalTo(n));
+        assertThat(sample.sumNumber(), equalTo(n));
     }
 
     @Test
@@ -226,7 +226,7 @@ public class MultinomialVertexTest {
 
         int n = 100;
         DoubleTensor p = DoubleTensor.create(0.1, new long[]{10});
-        Double pSum = p.sum();
+        Double pSum = p.sumNumber();
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Probabilities must sum to 1 but summed to [" + pSum + "]");
@@ -546,8 +546,8 @@ public class MultinomialVertexTest {
             IntegerTensor sampleForIndexI = samples.slice(1, i);
 
             Double probability = p.getValue(i);
-            double mean = sampleForIndexI.toDouble().average();
-            double std = sampleForIndexI.toDouble().standardDeviation();
+            double mean = sampleForIndexI.toDouble().average().scalar();
+            double std = sampleForIndexI.toDouble().standardDeviation().scalar();
 
             double epsilonForMean = 0.5;
             double epsilonForVariance = 5.;

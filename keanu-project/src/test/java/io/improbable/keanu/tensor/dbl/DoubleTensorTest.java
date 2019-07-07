@@ -103,14 +103,14 @@ public class DoubleTensorTest {
 
     @Test
     public void canAverage() {
-        assertEquals(2.5, matrixA.average(), 1e-6);
+        assertEquals(2.5, matrixA.average().scalar(), 1e-6);
     }
 
     @Test
     public void canStandardDeviation() {
         DoubleTensor A = DoubleTensor.create(0, 0.1, -0.1, 0.3, 0.4);
 
-        double actual = A.standardDeviation();
+        double actual = A.standardDeviation().scalar();
         double expected = 0.20736;
 
         assertEquals(expected, actual, 1e-3);
@@ -121,8 +121,8 @@ public class DoubleTensorTest {
         KeanuRandom random = new KeanuRandom();
         DoubleTensor A = random.nextGaussian(new long[]{50});
 
-        double actual = A.standardDeviation();
-        double expected = Math.sqrt(A.minus(A.average()).pow(2).sum() / (A.getLength() - 1));
+        double actual = A.standardDeviation().scalar();
+        double expected = Math.sqrt(A.minus(A.average()).pow(2).sumNumber() / (A.getLength() - 1));
 
         assertEquals(expected, actual, 1e-3);
     }
@@ -196,7 +196,7 @@ public class DoubleTensorTest {
     public void canInverseMatrix() {
         DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
 
-        DoubleTensor expected = DoubleTensor.create(4, -2, -3, 1).reshape(2, 2).times(1.0 / A.determinant());
+        DoubleTensor expected = DoubleTensor.create(4, -2, -3, 1).reshape(2, 2).times(1.0 / A.determinant().scalar());
 
         DoubleTensor actual = A.matrixInverse();
 
@@ -254,14 +254,14 @@ public class DoubleTensorTest {
     public void canFindDeterminantOf2By2Matrix() {
         DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
         double expected = 1 * 4 - 2 * 3;
-        assertEquals(expected, A.determinant(), 1e-10);
+        assertEquals(expected, A.determinant().scalar(), 1e-10);
     }
 
     @Test
     public void canFindDeterminantOfSingular3By3Matrix() {
         DoubleTensor A = DoubleTensor.arange(1, 10).reshape(3, 3);
         double expected = 0;
-        assertEquals(expected, A.determinant(), 1e-10);
+        assertEquals(expected, A.determinant().scalar(), 1e-10);
     }
 
     @Test
@@ -278,7 +278,7 @@ public class DoubleTensorTest {
             new double[]{10, -3, 5}
         })).getDeterminant();
 
-        assertEquals(expected, A.determinant(), 1e-10);
+        assertEquals(expected, A.determinant().scalar(), 1e-10);
     }
 
     @Test
@@ -541,10 +541,10 @@ public class DoubleTensorTest {
         DoubleTensor a = DoubleTensor.create(aData, new long[]{2, 2, 2, 2, 2});
         DoubleTensor b = DoubleTensor.create(bData, new long[]{2, 2, 2, 2, 2});
         DoubleTensor c = DoubleTensor.create(cData, new long[]{2, 2, 2, 2, 2});
-        assertTrue("equals with epsilon should be true", a.equalsWithinEpsilon(b, 0.5));
-        assertTrue("equals with epsilon should be true (inverted order)", b.equalsWithinEpsilon(a, 0.5));
-        assertTrue("equals with epsilon should be not true (max delta is 0.4)", !a.equalsWithinEpsilon(b, 0.2));
-        assertTrue("equals with epsilon should be not true (max delta is 1.0)", !a.equalsWithinEpsilon(c, 0.5));
+        assertTrue("equals with epsilon should be true", a.equalsWithinEpsilon(b, 0.5).allTrue());
+        assertTrue("equals with epsilon should be true (inverted order)", b.equalsWithinEpsilon(a, 0.5).allTrue());
+        assertTrue("equals with epsilon should be not true (max delta is 0.4)", !a.equalsWithinEpsilon(b, 0.2).allTrue());
+        assertTrue("equals with epsilon should be not true (max delta is 1.0)", !a.equalsWithinEpsilon(c, 0.5).allTrue());
     }
 
     @Test
@@ -768,8 +768,8 @@ public class DoubleTensorTest {
 
     @Test
     public void canCalculateProductOfVector() {
-        double productVectorA = vectorA.product();
-        double productRankThreeTensor = rankThreeTensor.product();
+        double productVectorA = vectorA.product().scalar();
+        double productRankThreeTensor = rankThreeTensor.product().scalar();
 
         assertEquals(6., productVectorA, 1e-6);
         assertEquals(40320, productRankThreeTensor, 1e-6);
@@ -924,8 +924,8 @@ public class DoubleTensorTest {
     @Test
     public void canFindScalarMinAndMax() {
         DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(2, 2);
-        double min = a.min();
-        double max = a.max();
+        double min = a.min().scalar();
+        double max = a.max().scalar();
         assertEquals(2., min, 1e-6);
         assertEquals(5., max, 1e-6);
     }
@@ -978,7 +978,7 @@ public class DoubleTensorTest {
     public void canFindArgMaxOfRowVector() {
         DoubleTensor tensorRow = DoubleTensor.create(1, 3, 4, 5, 2).reshape(1, 5);
 
-        assertEquals(3, tensorRow.argMax());
+        assertThat(tensorRow.argMax().scalar(), equalTo(3));
         assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
         assertThat(tensorRow.argMax(1), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
     }
@@ -987,7 +987,7 @@ public class DoubleTensorTest {
     public void canFindArgMaxOfColumnVector() {
         DoubleTensor tensorCol = DoubleTensor.create(1, 3, 4, 5, 2).reshape(5, 1);
 
-        assertEquals(3, tensorCol.argMax());
+        assertThat(tensorCol.argMax().scalar(), equalTo(3));
         assertThat(tensorCol.argMax(0), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
         assertThat(tensorCol.argMax(1), valuesAndShapesMatch(IntegerTensor.zeros(5)));
     }
@@ -996,7 +996,7 @@ public class DoubleTensorTest {
     public void argMaxReturnsIndexOfFirstMax() {
         DoubleTensor tensor = DoubleTensor.create(1, 5, 5, 5, 5);
 
-        assertEquals(tensor.argMax(), 1);
+        assertThat(tensor.argMax().scalar(), equalTo(1));
     }
 
     @Test
@@ -1005,7 +1005,7 @@ public class DoubleTensorTest {
 
         assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 0, 0, 0)));
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(2, 0)));
-        assertEquals(2, tensor.argMax());
+        assertThat(tensor.argMax().scalar(), equalTo(2));
     }
 
     @Test
@@ -1025,7 +1025,7 @@ public class DoubleTensorTest {
 
         DoubleTensor a = DoubleTensor.arange(0, 6).reshape(2, 3).plus(10);
 
-        assertEquals(5, a.argMax());
+        assertThat(a.argMax().scalar(), equalTo(5));
         assertThat(a.argMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 1, 1)));
         assertThat(a.argMax(1), valuesAndShapesMatch(IntegerTensor.create(2, 2)));
     }
@@ -1047,8 +1047,8 @@ public class DoubleTensorTest {
 
         DoubleTensor tensor = DoubleTensor.create(Double.NaN, 4, 2, 3).reshape(2, 2);
 
-        assertEquals(0, tensor.argMax());
-        assertEquals(1, tensor.nanArgMax());
+        assertThat(tensor.argMax().scalar(), equalTo(0));
+        assertThat(tensor.nanArgMax().scalar(), equalTo(1));
         assertThat(tensor.nanArgMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 0)));
         assertThat(tensor.nanArgMax(1), valuesAndShapesMatch(IntegerTensor.create(1, 1)));
     }
@@ -1061,7 +1061,7 @@ public class DoubleTensorTest {
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(7, new long[]{2, 4, 2, 4})));
         assertThat(tensor.argMax(2), valuesAndShapesMatch(IntegerTensor.create(3, new long[]{2, 8, 2, 4})));
         assertThat(tensor.argMax(3), valuesAndShapesMatch(IntegerTensor.ones(2, 8, 4, 4)));
-        assertEquals(511, tensor.argMax());
+        assertThat(tensor.argMax().scalar(), equalTo(511));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1080,7 +1080,7 @@ public class DoubleTensorTest {
     public void canFindArgMinOfRowVector() {
         DoubleTensor tensorRow = DoubleTensor.create(7, 3, 4, 5, 2).reshape(1, 5);
 
-        assertEquals(4, tensorRow.argMin());
+        assertThat(tensorRow.argMin().scalar(), equalTo(4));
         assertThat(tensorRow.argMin(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
         assertThat(tensorRow.argMin(1), valuesAndShapesMatch(IntegerTensor.create(new int[]{4}, 1)));
     }
@@ -1089,7 +1089,7 @@ public class DoubleTensorTest {
     public void canFindArgMinOfColumnVector() {
         DoubleTensor tensorCol = DoubleTensor.create(7, 1, 4, 5, 2).reshape(5, 1);
 
-        assertEquals(1, tensorCol.argMin());
+        assertThat(tensorCol.argMin().scalar(), equalTo(1));
         assertThat(tensorCol.argMin(0), valuesAndShapesMatch(IntegerTensor.create(new int[]{1}, 1)));
         assertThat(tensorCol.argMin(1), valuesAndShapesMatch(IntegerTensor.zeros(5)));
     }
@@ -1098,7 +1098,7 @@ public class DoubleTensorTest {
     public void argMinReturnsIndexOfFirstMin() {
         DoubleTensor tensor = DoubleTensor.create(5, 2, 2, 2, 2);
 
-        assertEquals(1, tensor.argMin());
+        assertThat(tensor.argMin().scalar(), equalTo(1));
     }
 
     @Test
@@ -1107,7 +1107,7 @@ public class DoubleTensorTest {
 
         assertThat(tensor.argMin(0), valuesAndShapesMatch(IntegerTensor.create(0, 1, 1, 1)));
         assertThat(tensor.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, 1)));
-        assertEquals(0, tensor.argMin());
+        assertThat(tensor.argMin().scalar(), equalTo(0));
     }
 
     @Test
@@ -1118,7 +1118,7 @@ public class DoubleTensorTest {
         assertThat(tensor.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, new long[]{2, 4, 2, 4})));
         assertThat(tensor.argMin(2), valuesAndShapesMatch(IntegerTensor.create(0, new long[]{2, 8, 2, 4})));
         assertThat(tensor.argMin(3), valuesAndShapesMatch(IntegerTensor.zeros(2, 8, 4, 4)));
-        assertEquals(0, tensor.argMin());
+        assertThat(tensor.argMin().scalar(), equalTo(0));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1151,7 +1151,7 @@ public class DoubleTensorTest {
 
         DoubleTensor a = DoubleTensor.arange(0, 6).reshape(2, 3).plus(10);
 
-        assertEquals(0, a.argMin());
+        assertThat(a.argMin().scalar(), equalTo(0));
         assertThat(a.argMin(0), valuesAndShapesMatch(IntegerTensor.create(0, 0, 0)));
         assertThat(a.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, 0)));
     }
@@ -1173,8 +1173,8 @@ public class DoubleTensorTest {
 
         DoubleTensor tensor = DoubleTensor.create(Double.NaN, 4, 2, 3).reshape(2, 2);
 
-        assertEquals(0, tensor.argMin());
-        assertEquals(2, tensor.nanArgMin());
+        assertThat(tensor.argMin().scalar(), equalTo(0));
+        assertThat(tensor.nanArgMin().scalar(), equalTo(2));
         assertThat(tensor.nanArgMin(0), valuesAndShapesMatch(IntegerTensor.create(1, 1)));
         assertThat(tensor.nanArgMin(1), valuesAndShapesMatch(IntegerTensor.create(1, 0)));
     }
@@ -1738,7 +1738,7 @@ public class DoubleTensorTest {
         DoubleTensor output = tensorOp.apply(input);
         DoubleTensor expected = DoubleTensor.create(expectedBuffer, input.getShape());
 
-        assertTrue(expected.equalsWithinEpsilon(output, 1e-6));
+        assertTrue(expected.equalsWithinEpsilon(output, 1e-6).allTrue());
     }
 
     @Test
@@ -1793,7 +1793,7 @@ public class DoubleTensorTest {
     public void canArgFindMaxOfScalar() {
         DoubleTensor tensor = DoubleTensor.scalar(1).reshape(1, 1);
 
-        assertEquals(0, tensor.argMax());
+        assertThat(tensor.argMax().scalar(), equalTo(0));
         assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.vector(0)));
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.vector(0)));
     }

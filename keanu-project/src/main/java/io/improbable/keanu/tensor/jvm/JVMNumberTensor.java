@@ -18,20 +18,26 @@ import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.incrementIndexByShape;
 import static io.improbable.keanu.tensor.TensorShape.setToAbsoluteDimensions;
 
-public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, B extends PrimitiveNumberWrapper<T, B>> extends JVMTensor<T, TENSOR, B> implements NumberTensor<T, TENSOR> {
+public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, B extends PrimitiveNumberWrapper<T, B>>
+    extends JVMTensor<T, TENSOR, B> implements NumberTensor<T, TENSOR> {
 
     protected JVMNumberTensor(B buffer, long[] shape, long[] stride) {
         super(buffer, shape, stride);
     }
 
     @Override
-    public T sum() {
+    public T sumNumber(){
         return buffer.sum();
     }
 
     @Override
-    public T product() {
-        return buffer.product();
+    public TENSOR sum() {
+        return create(getFactory().createNew(sumNumber()), new long[0], new long[0]);
+    }
+
+    @Override
+    public TENSOR product() {
+        return create(getFactory().createNew(buffer.product()), new long[0], new long[0]);
     }
 
     @Override
@@ -151,6 +157,8 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
 
         return set(buffer, shape, stride);
     }
+
+
 
     @Override
     protected abstract JVMBuffer.PrimitiveNumberWrapperFactory<T, B> getFactory();

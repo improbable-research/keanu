@@ -33,7 +33,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
 
     @Override
     protected DoubleTensor op(DoubleTensor value) {
-        return DoubleTensor.scalar(value.determinant());
+        return value.determinant();
     }
 
     @Override
@@ -45,7 +45,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
 
         PartialDerivative dOutputTimesDeterminant = derivativeOfOutputWithRespectToSelf
-            .multiplyBy(inputVertex.getValue().determinant());
+            .multiplyBy(inputVertex.getValue().determinant().scalar());
 
         long[] resultShape = TensorShape.concat(
             derivativeOfOutputWithRespectToSelf.get().getShape(),

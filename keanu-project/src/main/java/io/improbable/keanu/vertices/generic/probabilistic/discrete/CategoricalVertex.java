@@ -101,7 +101,7 @@ public class CategoricalVertex<CATEGORY> extends GenericTensorVertex<CATEGORY> i
     public double logProb(GenericTensor<CATEGORY> value) {
         Categorical<CATEGORY> categorical = Categorical.
             withParameters(selectableValuesMappedToDoubleTensor());
-        return categorical.logProb(value).sum();
+        return categorical.logProb(value).sumNumber();
     }
 
     @Override

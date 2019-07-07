@@ -94,7 +94,7 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
         DoubleTensor kValues = k.getValue();
 
         DoubleTensor logPdfs = Gamma.withParameters(thetaValues, kValues).logProb(value);
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

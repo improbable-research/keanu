@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
@@ -76,7 +75,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
     }
 
     private static DoubleVertex oneByOneMatrix(double value) {
-        return new ConstantDoubleVertex(DoubleTensor.scalar(value).reshape(Tensor.ONE_BY_ONE_SHAPE));
+        return new ConstantDoubleVertex(DoubleTensor.create(value, new long[]{1, 1}));
     }
 
     @SaveVertexParam(MU_NAME)

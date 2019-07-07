@@ -100,7 +100,7 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
 
         DoubleTensor logPdfs = Pareto.withParameters(locValues, scaleValues).logProb(value);
 
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

@@ -7,7 +7,9 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.ResultWrapper;
+import org.apache.commons.lang3.ArrayUtils;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
@@ -71,7 +73,7 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
 
     @Override
     public FlattenedView<T> getFlattenedView() {
-        return new BaseSimpleFlattenedView<>(buffer.asArray());
+        return new BaseSimpleFlattenedView();
     }
 
     @Override
@@ -83,30 +85,39 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
         return BooleanTensor.create(result, shape);
     }
 
-    private static class BaseSimpleFlattenedView<T> implements FlattenedView<T> {
+    @Override
+    public BooleanTensor elementwiseEquals(GenericTensor<T> that) {
+        if (isScalar()) {
+            return that.elementwiseEquals(this.scalar());
+        } else if (that.isScalar()) {
+            return elementwiseEquals(that.scalar());
+        } else {
 
-        T[] data;
-
-        public BaseSimpleFlattenedView(T[] data) {
-            this.data = data;
+            GenericTensor<Boolean> resultTensor = apply(that, (l, r) -> l.equals(r));
+            if (resultTensor.getLength() > 0) {
+                boolean[] result = ArrayUtils.toPrimitive(resultTensor.asFlatArray());
+                return BooleanTensor.create(result, getShape());
+            } else {
+                return BooleanTensor.create();
+            }
         }
+    }
+
+    private class BaseSimpleFlattenedView implements FlattenedView<T> {
 
         @Override
         public long size() {
-            return data.length;
+            return buffer.getLength();
         }
 
         @Override
         public T get(long index) {
-            if (index > Integer.MAX_VALUE) {
-                throw new IllegalArgumentException("Only integer based indexing supported for generic tensors");
-            }
-            return data[(int) index];
+            return buffer.get(index);
         }
 
         @Override
         public T getOrScalar(long index) {
-            if (data.length == 1) {
+            if (buffer.getLength() == 1) {
                 return get(0);
             } else {
                 return get(index);
@@ -115,17 +126,21 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
 
         @Override
         public void set(long index, T value) {
-            if (index > Integer.MAX_VALUE) {
-                throw new IllegalArgumentException("Only integer based indexing supported for generic tensors");
-            }
-            data[(int) index] = value;
+            buffer.set(value, index);
         }
 
     }
 
     @Override
     public T[] asFlatArray() {
-        return buffer.copy().asArray();
+        if (buffer.getLength() == 0) {
+            return (T[]) (new Object[0]);
+        } else {
+            int length = Ints.checkedCast(buffer.getLength());
+            T[] typed = (T[]) Array.newInstance(buffer.get(0).getClass(), Ints.checkedCast(length));
+            System.arraycopy(buffer.asArray(), 0, typed, 0, length);
+            return typed;
+        }
     }
 
     @Override

@@ -73,7 +73,7 @@ public class KDEVertex extends DoubleVertex implements Differentiable, Probabili
 
     @Override
     public double logProb(DoubleTensor x) {
-        return pdf(x).log().sum();
+        return pdf(x).log().sumNumber();
     }
 
     @Override
@@ -100,7 +100,7 @@ public class KDEVertex extends DoubleVertex implements Differentiable, Probabili
     }
 
     private static double scottsBandwidth(DoubleTensor samples) {
-        return 1.06 * samples.standardDeviation() * Math.pow(samples.getLength(), -1. / 5.);
+        return 1.06 * samples.standardDeviation().scalar() * Math.pow(samples.getLength(), -1. / 5.);
     }
 
     public DoubleTensor sample(int nSamples, KeanuRandom random) {

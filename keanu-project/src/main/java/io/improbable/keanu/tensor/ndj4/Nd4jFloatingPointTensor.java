@@ -19,7 +19,10 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>> extends Nd4jNumberTensor<T, TENSOR> implements FloatingPointTensor<T, TENSOR> {
+import static io.improbable.keanu.tensor.ndj4.INDArrayExtensions.asBoolean;
+
+public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>>
+    extends Nd4jNumberTensor<T, TENSOR> implements FloatingPointTensor<T, TENSOR> {
 
     public Nd4jFloatingPointTensor(INDArray tensor) {
         super(tensor);
@@ -194,7 +197,7 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
 
     @Override
     public TENSOR standardizeInPlace() {
-        tensor.subi(average()).divi(standardDeviation());
+        tensor.subi(average().scalar()).divi(standardDeviation().scalar());
         return getThis();
     }
 
@@ -233,21 +236,21 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
     }
 
     @Override
-    public T determinant() {
+    public TENSOR determinant() {
         INDArray dup = tensor.dup();
         double[][] asMatrix = dup.toDoubleMatrix();
         RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
-        return getNumber(new LUDecomposition(matrix).getDeterminant());
-    }
-
-    @Override
-    public T product() {
-        return getNumber(tensor.prod().getNumber(0));
+        return create(Nd4j.scalar(new LUDecomposition(matrix).getDeterminant()));
     }
 
     @Override
     public BooleanTensor notNaN() {
-        return this.elementwiseEquals(this);
+        return isNaN().notInPlace();
+    }
+
+    @Override
+    public BooleanTensor isNaN() {
+        return BooleanTensor.create(asBoolean(tensor.isNaN()), tensor.shape());
     }
 
 }

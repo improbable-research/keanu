@@ -100,7 +100,7 @@ public class LogNormalVertex extends DoubleVertex implements Differentiable, Pro
 
         DoubleTensor logPdfs = LogNormal.withParameters(muValues, sigmaValues).logProb(value);
 
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

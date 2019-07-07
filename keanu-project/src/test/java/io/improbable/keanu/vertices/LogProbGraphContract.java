@@ -12,7 +12,7 @@ public class LogProbGraphContract {
 
     public static void matchesKnownLogDensity(LogProbGraph logProbGraph, double expectedLogDensity) {
         DoubleVertex logProbGraphOutput = logProbGraph.getLogProbOutput();
-        double actualDensity = logProbGraphOutput.getValue().sum();
+        double actualDensity = logProbGraphOutput.getValue().sumNumber();
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 

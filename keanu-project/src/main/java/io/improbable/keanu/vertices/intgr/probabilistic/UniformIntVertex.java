@@ -91,7 +91,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
 
     @Override
     public double logProb(IntegerTensor value) {
-        return UniformInt.withParameters(min.getValue(), max.getValue()).logProb(value).sum();
+        return UniformInt.withParameters(min.getValue(), max.getValue()).logProb(value).sumNumber();
     }
 
     @Override

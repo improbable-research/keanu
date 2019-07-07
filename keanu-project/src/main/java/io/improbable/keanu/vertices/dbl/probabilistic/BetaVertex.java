@@ -108,7 +108,7 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
     @Override
     public double logProb(DoubleTensor value) {
         DoubleTensor logPdfs = distribution().logProb(value);
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

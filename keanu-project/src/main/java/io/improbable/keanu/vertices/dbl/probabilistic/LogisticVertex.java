@@ -88,7 +88,7 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
 
         DoubleTensor logPdfs = Logistic.withParameters(muValues, sValues).logProb(value);
 
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

@@ -88,7 +88,7 @@ public class GaussianProposalDistributionTest {
         DoubleTensor cov = DoubleTensor.concat(sigmaForVertex1, sigmaForVertex2).pow(2.).diag();
         DoubleTensor x = DoubleTensor.concat(proposedStateForVertex1, proposedStateForVertex2);
         DoubleTensor expectedLogProb = MultivariateGaussian.withParameters(mu, cov).logProb(x);
-        assertThat(logProb, closeTo(expectedLogProb.sum(), 1e-14)); // sum of .log().sum() has rounding errors
+        assertThat(logProb, closeTo(expectedLogProb.sumNumber(), 1e-14)); // sum of .log().sum() has rounding errors
     }
 
     @Test
@@ -98,7 +98,7 @@ public class GaussianProposalDistributionTest {
         DoubleTensor cov = DoubleTensor.concat(sigmaForVertex1, sigmaForVertex2).pow(2.).diag();
         DoubleTensor x = DoubleTensor.concat(currentStateForVertex1, currentStateForVertex2);
         DoubleTensor expectedLogProb = MultivariateGaussian.withParameters(mu, cov).logProb(x);
-        assertThat(logProb, closeTo(expectedLogProb.sum(), 1e-14)); // sum of .log().sum() has rounding errors
+        assertThat(logProb, closeTo(expectedLogProb.sumNumber(), 1e-14)); // sum of .log().sum() has rounding errors
     }
 
     @Test

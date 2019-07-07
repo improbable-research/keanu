@@ -86,7 +86,7 @@ public class LogProbGradientCalculatorTest {
         Map<VertexId, DoubleTensor> gradient = calculator.getJointLogProbGradientWrtLatents();
         DoubleTensor dBLogProbWrtAValue = gradient.get(A.getId());
 
-        double expectedDLogProbWrtA = B.dLogProb(bValue, A).get(A).sum();
+        double expectedDLogProbWrtA = B.dLogProb(bValue, A).get(A).sumNumber();
 
         assertThat(dBLogProbWrtAValue.scalar(), equalTo(expectedDLogProbWrtA));
         assertThat(dBLogProbWrtAValue.getLength(), equalTo(1L));
@@ -112,7 +112,7 @@ public class LogProbGradientCalculatorTest {
         DoubleTensor dBLogProbWrtAValue = gradient.get(A.getId());
         DoubleTensor dBLogProbWrtCValue = gradient.get(C.getId());
 
-        double expectedDLogProbWrtA = B.dLogProb(bValue, D).get(D).times(cValue).sum();
+        double expectedDLogProbWrtA = B.dLogProb(bValue, D).get(D).times(cValue).sumNumber();
         DoubleTensor expectedDLogProbWrtC = B.dLogProb(bValue, D).get(D).times(aValue);
 
         assertArrayEquals(new long[]{}, dBLogProbWrtAValue.getShape());

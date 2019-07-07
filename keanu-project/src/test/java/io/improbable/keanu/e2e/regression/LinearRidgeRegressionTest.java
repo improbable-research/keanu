@@ -88,7 +88,7 @@ public class LinearRidgeRegressionTest {
             .withPriorOnWeightsAndIntercept(0, 0.00001)
             .build();
 
-        assertThat(linearRegressionModelNarrow.getWeightVertex().getValue().pow(2).sum(), lessThan(linearRegressionModelWide.getWeightVertex().getValue().pow(2).sum()));
+        assertThat(linearRegressionModelNarrow.getWeightVertex().getValue().pow(2).sumNumber(), lessThan(linearRegressionModelWide.getWeightVertex().getValue().pow(2).sumNumber()));
 
     }
 

@@ -56,12 +56,12 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    protected BooleanTensor create(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
+    protected JVMBooleanTensor create(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
         return new JVMBooleanTensor(buffer, shape, stride);
     }
 
     @Override
-    protected BooleanTensor set(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
+    protected JVMBooleanTensor set(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
         this.buffer = buffer;
         this.shape = shape;
         this.stride = stride;
@@ -252,18 +252,23 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    public BooleanTensor take(long... index) {
+    public JVMBooleanTensor take(long... index) {
         return new JVMBooleanTensor(getValue(index));
     }
 
     @Override
-    public BooleanTensor duplicate() {
+    public JVMBooleanTensor duplicate() {
         return new JVMBooleanTensor(buffer.copy(), copyOf(shape, shape.length), copyOf(stride, stride.length));
     }
 
     @Override
     public BooleanTensor elementwiseEquals(Boolean value) {
-        return Tensor.elementwiseEquals(this, BooleanTensor.create(value, this.getShape()));
+        return value ? duplicate() : not();
+    }
+
+    @Override
+    public BooleanTensor elementwiseEquals(BooleanTensor that) {
+        return xor(that).notInPlace();
     }
 
     @Override

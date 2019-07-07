@@ -66,8 +66,13 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public Integer sum() {
-        return value;
+    public IntegerTensor sum() {
+        return duplicate();
+    }
+
+    @Override
+    public BooleanTensor toBoolean() {
+        return BooleanTensor.scalar(value == 1);
     }
 
     @Override
@@ -134,8 +139,8 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public Integer product() {
-        return value;
+    public IntegerTensor product() {
+        return duplicate();
     }
 
     @Override
@@ -149,9 +154,9 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public boolean equalsWithinEpsilon(IntegerTensor other, Integer epsilon) {
+    public BooleanTensor equalsWithinEpsilon(IntegerTensor other, Integer epsilon) {
         if (other instanceof ScalarIntegerTensor) {
-            return Math.abs(other.scalar() - value) < epsilon;
+            return BooleanTensor.scalar(Math.abs(other.scalar() - value) < epsilon);
         } else {
             return other.equalsWithinEpsilon(this, epsilon);
         }
@@ -298,13 +303,13 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public Integer average() {
-        return value;
+    public IntegerTensor average() {
+        return duplicate();
     }
 
     @Override
-    public Integer standardDeviation() {
-        return 0;
+    public IntegerTensor standardDeviation() {
+        return IntegerTensor.scalar(0);
     }
 
     @Override
@@ -455,6 +460,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public Integer sumNumber() {
+        return value;
+    }
+
+    @Override
     public IntegerTensor minInPlace(IntegerTensor min) {
         if (min.isLengthOne()) {
             long[] newShape = calculateShapeForLengthOneBroadcast(shape, min.getShape());
@@ -481,18 +491,18 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public Integer min() {
-        return value;
+    public IntegerTensor min() {
+        return duplicate();
     }
 
     @Override
-    public Integer max() {
-        return value;
+    public IntegerTensor max() {
+        return duplicate();
     }
 
     @Override
-    public int argMax() {
-        return 0;
+    public IntegerTensor argMax() {
+        return IntegerTensor.scalar(0);
     }
 
     @Override
@@ -502,8 +512,8 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public int argMin() {
-        return 0;
+    public IntegerTensor argMin() {
+        return IntegerTensor.scalar(0);
     }
 
     @Override
@@ -556,17 +566,12 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public BooleanTensor elementwiseEquals(Tensor that) {
-        if (that instanceof IntegerTensor) {
-            IntegerTensor thatAsInteger = (IntegerTensor) that;
-            if (that.isLengthOne()) {
-                long[] newShape = calculateShapeForLengthOneBroadcast(shape, that.getShape());
-                return BooleanTensor.create(value.equals(thatAsInteger.scalar()), newShape);
-            } else {
-                return thatAsInteger.elementwiseEquals(value);
-            }
+    public BooleanTensor elementwiseEquals(IntegerTensor that) {
+        if (that.isLengthOne()) {
+            long[] newShape = calculateShapeForLengthOneBroadcast(shape, that.getShape());
+            return BooleanTensor.create(value.equals(that.scalar()), newShape);
         } else {
-            return Tensor.elementwiseEquals(this, that);
+            return that.elementwiseEquals(value);
         }
     }
 

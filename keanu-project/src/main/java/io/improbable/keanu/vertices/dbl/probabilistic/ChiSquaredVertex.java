@@ -77,7 +77,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
 
     @Override
     public double logProb(DoubleTensor value) {
-        return ChiSquared.withParameters(k.getValue()).logProb(value).sum();
+        return ChiSquared.withParameters(k.getValue()).logProb(value).sumNumber();
     }
 
     @Override

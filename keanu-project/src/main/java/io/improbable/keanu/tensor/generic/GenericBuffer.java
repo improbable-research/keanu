@@ -16,7 +16,7 @@ public class GenericBuffer {
             if (size == 1) {
                 return new GenericBuffer.GenericWrapper<>(null);
             } else {
-                return new GenericBuffer.GenericArrayWrapper<>((T[]) (new Object[Ints.checkedCast(size)]));
+                return new GenericBuffer.GenericArrayWrapper<>((new Object[Ints.checkedCast(size)]));
             }
         }
 
@@ -25,9 +25,9 @@ public class GenericBuffer {
             return new GenericBuffer.GenericWrapper<>(value);
         }
 
-        public final GenericBuffer.PrimitiveGenericWrapper<T> create(T[] data) {
+        public final GenericBuffer.PrimitiveGenericWrapper<T> create(Object[] data) {
             if (data.length == 1) {
-                return new GenericBuffer.GenericWrapper<>(data[0]);
+                return new GenericBuffer.GenericWrapper<>((T) data[0]);
             } else {
                 return new GenericBuffer.GenericArrayWrapper<>(data);
             }
@@ -35,20 +35,19 @@ public class GenericBuffer {
     }
 
     public interface PrimitiveGenericWrapper<T> extends JVMBuffer.PrimitiveArrayWrapper<T, PrimitiveGenericWrapper<T>> {
-        T[] asArray();
     }
 
     public static final class GenericArrayWrapper<T> implements PrimitiveGenericWrapper<T> {
 
-        private final T[] array;
+        private final Object[] array;
 
-        public GenericArrayWrapper(final T[] array) {
+        public GenericArrayWrapper(final Object[] array) {
             this.array = array;
         }
 
         @Override
         public T get(final long index) {
-            return array[Ints.checkedCast(index)];
+            return (T) array[Ints.checkedCast(index)];
         }
 
         @Override
@@ -80,14 +79,14 @@ public class GenericBuffer {
         }
 
         @Override
-        public T[] asArray() {
+        public Object[] asArray() {
             return array;
         }
 
         @Override
         public GenericArrayWrapper<T> applyRight(BiFunction<T, T, T> mapper, T rightArg) {
             for (int i = 0; i < array.length; i++) {
-                array[i] = mapper.apply(array[i], rightArg);
+                array[i] = mapper.apply((T) array[i], rightArg);
             }
             return this;
         }
@@ -95,7 +94,7 @@ public class GenericBuffer {
         @Override
         public GenericArrayWrapper<T> applyLeft(BiFunction<T, T, T> mapper, T leftArg) {
             for (int i = 0; i < array.length; i++) {
-                array[i] = mapper.apply(leftArg, array[i]);
+                array[i] = mapper.apply(leftArg, (T) array[i]);
             }
             return this;
         }
@@ -103,7 +102,7 @@ public class GenericBuffer {
         @Override
         public GenericArrayWrapper<T> apply(Function<T, T> mapper) {
             for (int i = 0; i < array.length; i++) {
-                array[i] = mapper.apply(array[i]);
+                array[i] = mapper.apply((T) array[i]);
             }
             return this;
         }
@@ -142,8 +141,8 @@ public class GenericBuffer {
         }
 
         @Override
-        public T[] asArray() {
-            return (T[]) (new Object[]{value});
+        public Object[] asArray() {
+            return new Object[]{value};
         }
 
     }

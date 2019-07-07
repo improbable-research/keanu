@@ -35,7 +35,7 @@ public class IntegerSumVertex extends IntegerUnaryOpVertex {
     @Override
     protected IntegerTensor op(IntegerTensor value) {
         if (overDimensions == null) {
-            return IntegerTensor.scalar(value.sum());
+            return value.sum();
         } else {
             return value.sum(overDimensions);
         }

@@ -152,7 +152,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(RoundVertex.class, fluentUnaryOp("round", "roundInPlace"));
         opMappers.put(SigmoidVertex.class, fluentUnaryOp("sigmoid", "sigmoidInPlace"));
 
-        opMappers.put(MatrixDeterminantVertex.class, unaryOp("DoubleTensor.scalar(%s.determinant())"));
+        opMappers.put(MatrixDeterminantVertex.class, fluentUnaryOp("determinant"));
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));
 
         opMappers.put(ConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatDoubleOp);
@@ -272,22 +272,6 @@ public class KeanuVertexToTensorOpMapper {
 
             return leftVariable.getName() + "." + call + "(" + rightVariable.getName() + ")";
 
-        };
-    }
-
-    /**
-     * Similar to fluent unary op except it allows defining the entire string template
-     *
-     * @param format the format for the right hand side of the assignment. e.g. DoubleTensor.scalar(%s.determinant())
-     * @return an OpMapper that will map an operation using the provided format
-     */
-    private static OpMapper unaryOp(String format) {
-        return (vertex, lookup) -> {
-            VertexUnaryOp unaryOpVertex = (VertexUnaryOp) vertex;
-            Vertex<?> input = unaryOpVertex.getInputVertex();
-            KeanuCompiledVariable inputVariable = lookup.get(input.getReference());
-
-            return String.format(format, inputVariable.getName());
         };
     }
 
@@ -520,7 +504,6 @@ public class KeanuVertexToTensorOpMapper {
         return sumOp(
             sumVertex.getInputVertex().getReference(),
             dimensions,
-            "DoubleTensor.scalar",
             lookup
         );
     }
@@ -533,14 +516,12 @@ public class KeanuVertexToTensorOpMapper {
         return sumOp(
             sumVertex.getInputVertex().getReference(),
             dimensions,
-            "IntegerTensor.scalar",
             lookup
         );
     }
 
     private static String sumOp(VariableReference inputReference,
                                 int[] dimensions,
-                                String scalarFactory,
                                 Map<VariableReference, KeanuCompiledVariable> lookup) {
 
         String declaration = lookup.get(inputReference).getName();
@@ -553,7 +534,7 @@ public class KeanuVertexToTensorOpMapper {
             String args = "new int[]{" + dims + "}";
             return declaration + ".sum(" + args + ")";
         } else {
-            return scalarFactory + "(" + declaration + ".sum())";
+            return declaration + ".sum()";
         }
     }
 

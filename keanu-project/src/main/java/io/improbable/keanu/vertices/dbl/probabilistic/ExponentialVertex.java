@@ -76,7 +76,7 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
 
         DoubleTensor logPdfs = Exponential.withParameters(lambdaValues).logProb(value);
 
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

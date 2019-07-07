@@ -146,7 +146,7 @@ public class DirichletVertexTest {
         DoubleVertex concentration = ConstantVertex.of(3., 4., 5.);
         DirichletVertex vertex = new DirichletVertex(concentration);
         DoubleTensor x = DoubleTensor.create(0.1, 0.6, 0.300011);
-        assertThat(Math.abs(x.sum() - 1.), is(greaterThan((.00001))));
+        assertThat(Math.abs(x.sumNumber() - 1.), is(greaterThan((.00001))));
 
         LogProbGraph logProbGraph = vertex.logProbGraph();
         LogProbGraphValueFeeder.feedValue(logProbGraph, concentration, concentration.getValue());
@@ -175,9 +175,9 @@ public class DirichletVertexTest {
         DoubleTensor stringTwo = samples.slice(1, 1);
         DoubleTensor stringThree = samples.slice(1, 2);
 
-        double stringOneLength = stringOne.average();
-        double stringTwoLength = stringTwo.average();
-        double stringThreeLength = stringThree.average();
+        double stringOneLength = stringOne.average().scalar();
+        double stringTwoLength = stringTwo.average().scalar();
+        double stringThreeLength = stringThree.average().scalar();
 
         Assert.assertEquals(1.0, stringOneLength + stringTwoLength + stringThreeLength, 1e-3);
         Assert.assertEquals(10. / 18., stringOneLength, 1e-3);

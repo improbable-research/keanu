@@ -38,7 +38,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
         final long dimensions = numberOfDimensions();
         final double kLog2Pi = dimensions * LOG_2_PI;
-        final double logCovDet = Math.log(covariance.determinant());
+        final double logCovDet = Math.log(covariance.determinant().scalar());
         DoubleTensor xMinusMu = x.minus(mu).reshape(dimensions, 1);
         DoubleTensor xMinusMuT = xMinusMu.reshape(1, dimensions);
         DoubleTensor covInv = covariance.matrixInverse();

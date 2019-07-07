@@ -71,7 +71,7 @@ public class BernoulliVertex extends BooleanVertex implements ProbabilisticBoole
 
     @Override
     public double logProb(BooleanTensor value) {
-        return Bernoulli.withParameters(probTrue.getValue()).logProb(value).sum();
+        return Bernoulli.withParameters(probTrue.getValue()).logProb(value).sumNumber();
     }
 
     @Override

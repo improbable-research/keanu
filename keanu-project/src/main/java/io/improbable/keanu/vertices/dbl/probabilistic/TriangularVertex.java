@@ -136,7 +136,7 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
         DoubleTensor cValues = c.getValue();
 
         DoubleTensor logPdfs = Triangular.withParameters(xMinValues, xMaxValues, cValues).logProb(value);
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

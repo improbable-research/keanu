@@ -139,7 +139,8 @@ public class Multinomial implements DiscreteDistribution {
         final DoubleTensor pSum = p.sum(-1);
         final boolean pSumValidated = pSum.equalsWithinEpsilon(
             DoubleTensor.create(1.0, pSum.getShape()), allowedProbabilityError
-        );
+        ).allTrue();
+
         if (!pSumValidated) {
             throw new IllegalArgumentException(
                 "Probabilities must sum to 1 but summed to " + Arrays.toString(pSum.asFlatDoubleArray())

@@ -74,7 +74,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
 
     @Override
     public double logProb(IntegerTensor k) {
-        return Binomial.withParameters(p.getValue(), n.getValue()).logProb(k).sum();
+        return Binomial.withParameters(p.getValue(), n.getValue()).logProb(k).sumNumber();
     }
 
     @Override

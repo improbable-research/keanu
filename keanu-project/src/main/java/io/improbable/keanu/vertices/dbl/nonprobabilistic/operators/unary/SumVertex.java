@@ -49,7 +49,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
     @Override
     protected DoubleTensor op(DoubleTensor value) {
         if (overDimensions == null) {
-            return DoubleTensor.scalar(value.sum());
+            return value.sum();
         } else {
             return value.sum(overDimensions);
         }

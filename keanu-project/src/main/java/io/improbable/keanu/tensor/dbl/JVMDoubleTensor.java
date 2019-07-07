@@ -3,7 +3,6 @@ package io.improbable.keanu.tensor.dbl;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -175,21 +174,17 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public BooleanTensor elementwiseEquals(Tensor that) {
-        if (that instanceof DoubleTensor) {
-            if (isScalar()) {
-                return that.elementwiseEquals(this.scalar());
-            } else if (that.isScalar()) {
-                return elementwiseEquals(((DoubleTensor) that).scalar());
-            } else {
-                DoubleTensor equalsMask = duplicate().broadcastableBinaryOpWithAutoBroadcast(
-                    (l, r) -> l.doubleValue() == r.doubleValue() ? 1.0 : 0.0, getAsJVMTensor((DoubleTensor) that)
-                );
-
-                return maskToBooleanTensor(equalsMask);
-            }
+    public BooleanTensor elementwiseEquals(DoubleTensor that) {
+        if (isScalar()) {
+            return that.elementwiseEquals(this.scalar());
+        } else if (that.isScalar()) {
+            return elementwiseEquals(that.scalar());
         } else {
-            return Tensor.elementwiseEquals(this, that);
+            DoubleTensor equalsMask = duplicate().broadcastableBinaryOpWithAutoBroadcast(
+                (l, r) -> l.doubleValue() == r.doubleValue() ? 1.0 : 0.0, getAsJVMTensor(that)
+            );
+
+            return equalsMask.toBoolean();
         }
     }
 
@@ -205,8 +200,29 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
+    public BooleanTensor equalsWithinEpsilon(DoubleTensor that, Double epsilon) {
+
+        DoubleTensor equalsMask = duplicate().broadcastableBinaryOpWithAutoBroadcast(
+            (l, r) -> Math.abs(l - r) < epsilon ? 1.0 : 0.0, getAsJVMTensor(that)
+        );
+
+        return equalsMask.toBoolean();
+    }
+
+    @Override
     public JVMDoubleTensor duplicate() {
         return new JVMDoubleTensor(buffer.copy(), shapeCopy(), Arrays.copyOf(stride, stride.length));
+    }
+
+    @Override
+    public BooleanTensor toBoolean() {
+        boolean[] boolBuffer = new boolean[Ints.checkedCast(buffer.getLength())];
+
+        for (int i = 0; i < buffer.getLength(); i++) {
+            boolBuffer[i] = buffer.get(i) == 1.0;
+        }
+
+        return BooleanTensor.create(boolBuffer, getShape());
     }
 
     @Override
@@ -251,7 +267,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public Double determinant() {
+    public DoubleTensor determinant() {
 
         final int m = Ints.checkedCast(shape[0]);
         final int n = Ints.checkedCast(shape[1]);
@@ -263,7 +279,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         if (factorizationResult < 0) {
             throw new IllegalStateException("Matrix factorization failed");
         } else if (factorizationResult > 0) {
-            return 0.0;
+            return new JVMDoubleTensor(0.0);
         }
 
         //credit: https://stackoverflow.com/questions/47315471/compute-determinant-from-lu-decomposition-in-lapack
@@ -280,7 +296,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
             detU *= newBuffer[i * m + i];
         }
 
-        return detU * detp;
+        return new JVMDoubleTensor(detU * detp);
     }
 
     @Override
@@ -335,8 +351,8 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public int argMax() {
-        return argCompare((value, min) -> value > min);
+    public IntegerTensor argMax() {
+        return IntegerTensor.scalar(argCompare((value, min) -> value > min));
     }
 
     @Override
@@ -350,8 +366,8 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public int nanArgMax() {
-        return argCompare((value, max) -> Double.isNaN(max) || !Double.isNaN(value) && value > max);
+    public IntegerTensor nanArgMax() {
+        return IntegerTensor.scalar(argCompare((value, max) -> Double.isNaN(max) || !Double.isNaN(value) && value > max));
     }
 
     @Override
@@ -360,8 +376,8 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public int argMin() {
-        return argCompare((value, min) -> value < min);
+    public IntegerTensor argMin() {
+        return IntegerTensor.scalar(argCompare((value, min) -> value < min));
     }
 
     @Override
@@ -370,8 +386,8 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public int nanArgMin() {
-        return argCompare((value, min) -> Double.isNaN(min) || !Double.isNaN(value) && value < min);
+    public IntegerTensor nanArgMin() {
+        return IntegerTensor.scalar(argCompare((value, min) -> Double.isNaN(min) || !Double.isNaN(value) && value < min));
     }
 
     @Override
@@ -452,33 +468,22 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public BooleanTensor lessThan(DoubleTensor that) {
-        return maskToBooleanTensor(lessThanMask(that));
+        return lessThanMask(that).toBoolean();
     }
 
     @Override
     public BooleanTensor lessThanOrEqual(DoubleTensor that) {
-        return maskToBooleanTensor(lessThanOrEqualToMask(that));
+        return lessThanOrEqualToMask(that).toBoolean();
     }
 
     @Override
     public BooleanTensor greaterThan(DoubleTensor that) {
-        return maskToBooleanTensor(greaterThanMask(that));
+        return greaterThanMask(that).toBoolean();
     }
 
     @Override
     public BooleanTensor greaterThanOrEqual(DoubleTensor that) {
-        return maskToBooleanTensor(greaterThanOrEqualToMask(that));
-    }
-
-    private BooleanTensor maskToBooleanTensor(DoubleTensor mask) {
-        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getAsJVMTensor(mask).buffer;
-        boolean[] boolBuffer = new boolean[Ints.checkedCast(maskBuffer.getLength())];
-
-        for (int i = 0; i < maskBuffer.getLength(); i++) {
-            boolBuffer[i] = maskBuffer.get(i) == 1.0;
-        }
-
-        return BooleanTensor.create(boolBuffer, mask.getShape());
+        return greaterThanOrEqualToMask(that).toBoolean();
     }
 
     @Override
@@ -551,36 +556,19 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public Double average() {
-        return sum() / buffer.getLength();
+    public DoubleTensor average() {
+        return new JVMDoubleTensor(buffer.sum() / buffer.getLength());
     }
 
     @Override
-    public Double standardDeviation() {
+    public DoubleTensor standardDeviation() {
 
         SummaryStatistics stats = new SummaryStatistics();
         for (int i = 0; i < buffer.getLength(); i++) {
             stats.addValue(buffer.get(i));
         }
 
-        return stats.getStandardDeviation();
-    }
-
-    @Override
-    public boolean equalsWithinEpsilon(DoubleTensor other, Double epsilon) {
-        if (!Arrays.equals(shape, other.getShape())) {
-            return false;
-        }
-
-        DoubleBuffer.PrimitiveDoubleWrapper otherBuffer = getAsJVMTensor(other).buffer;
-
-        for (int i = 0; i < buffer.getLength(); i++) {
-            if (Math.abs(buffer.get(i) - otherBuffer.get(i)) > epsilon) {
-                return false;
-            }
-        }
-
-        return true;
+        return new JVMDoubleTensor(stats.getStandardDeviation());
     }
 
     private static final Sigmoid sigmoid = new Sigmoid();
@@ -777,12 +765,12 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public Double min() {
+    public DoubleTensor min() {
         double result = Double.MAX_VALUE;
         for (int i = 0; i < buffer.getLength(); i++) {
             result = Math.min(result, buffer.get(i));
         }
-        return result;
+        return new JVMDoubleTensor(result);
     }
 
     @Override
@@ -791,12 +779,12 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public Double max() {
+    public DoubleTensor max() {
         double result = -Double.MAX_VALUE;
         for (int i = 0; i < buffer.getLength(); i++) {
             result = Math.max(result, buffer.get(i));
         }
-        return result;
+        return new JVMDoubleTensor(result);
     }
 
     @Override

@@ -73,7 +73,7 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
         return new Nd4jDoubleTensor(arangeWithStep);
     }
 
-    static INDArray getAsINDArray(Tensor<Integer, ?> that) {
+    static INDArray getAsINDArray(Tensor that) {
 
         if (that instanceof Nd4jTensor) {
             INDArray array = ((Nd4jTensor) that).getTensor();
@@ -87,21 +87,6 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
         } else {
             throw new IllegalArgumentException("Cannot convert " + that.getClass().getSimpleName() + " to double INDArray/");
         }
-    }
-
-    @Override
-    public boolean equalsWithinEpsilon(IntegerTensor o, Integer epsilon) {
-        if (this == o) return true;
-
-        if (o instanceof Nd4jTensor) {
-            return tensor.equalsWithEps(((Nd4jTensor) o).getTensor(), epsilon);
-        } else {
-            if (this.hasSameShapeAs(o)) {
-                IntegerTensor difference = o.minus(this);
-                return difference.abs().lessThan(epsilon).allTrue();
-            }
-        }
-        return false;
     }
 
     @Override
@@ -164,16 +149,6 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
     @Override
     protected IntegerTensor getThis() {
         return this;
-    }
-
-    @Override
-    public double[] asFlatDoubleArray() {
-        return tensor.dup().data().asDouble();
-    }
-
-    @Override
-    public int[] asFlatIntegerArray() {
-        return tensor.dup().data().asInt();
     }
 
     @Override

@@ -109,7 +109,7 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
 
         DoubleTensor logPdfs = Laplace.withParameters(muValues, betaValues).logProb(value);
 
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

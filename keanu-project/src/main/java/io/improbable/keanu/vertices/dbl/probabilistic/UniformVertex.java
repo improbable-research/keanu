@@ -99,7 +99,7 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
 
     @Override
     public double logProb(DoubleTensor value) {
-        return Uniform.withParameters(xMin.getValue(), xMax.getValue()).logProb(value).sum();
+        return Uniform.withParameters(xMin.getValue(), xMax.getValue()).logProb(value).sumNumber();
     }
 
     @Override

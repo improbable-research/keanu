@@ -266,7 +266,7 @@ public class ProbabilisticDoubleTensorContract {
         hyperParameterVertices.remove(tensorVertex);
 
         for (Vertex vertex : hyperParameterVertices) {
-            assertEquals(expectedPartialDerivatives.getWithRespectTo(vertex.getId()).sum(), actualDerivatives.get(vertex).sum(), 1e-5);
+            assertEquals(expectedPartialDerivatives.getWithRespectTo(vertex.getId()).sumNumber(), actualDerivatives.get(vertex).sumNumber(), 1e-5);
         }
 
         double expected = 0;
@@ -274,7 +274,7 @@ public class ProbabilisticDoubleTensorContract {
             expected += expectedPartialDerivatives.getWithRespectTo(scalarVertex.getId()).scalar();
         }
 
-        double actual = actualDerivatives.get(tensorVertex).sum();
+        double actual = actualDerivatives.get(tensorVertex).sumNumber();
         assertEquals(expected, actual, 1e-5);
     }
 

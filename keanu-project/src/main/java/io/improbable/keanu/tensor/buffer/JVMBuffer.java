@@ -10,15 +10,15 @@ public class JVMBuffer {
 
     public interface PrimitiveArrayWrapper<T, IMPL extends PrimitiveArrayWrapper<T, IMPL>> {
 
-        T[] asArray();
+        Object[] asArray();
 
-        default T[] asArray(long from, long to) {
+        default Object[] asArray(long from, long to) {
             Object[] temp = new Object[Ints.checkedCast(to - from)];
 
             for (long i = from; i < to; i++) {
                 temp[(int) (i - from)] = get(i);
             }
-            return (T[]) temp;
+            return temp;
         }
 
         T get(long index);

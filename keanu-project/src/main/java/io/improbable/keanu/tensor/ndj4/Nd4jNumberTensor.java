@@ -1,11 +1,12 @@
 package io.improbable.keanu.tensor.ndj4;
 
 import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import org.nd4j.linalg.api.buffer.DataBuffer;
@@ -21,8 +22,10 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import java.util.function.Function;
 
 import static com.google.common.primitives.Ints.checkedCast;
+import static io.improbable.keanu.tensor.ndj4.INDArrayExtensions.asBoolean;
 
-public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTensor<T, TENSOR>> extends Nd4jTensor<T, TENSOR> implements NumberTensor<T, TENSOR> {
+public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTensor<T, TENSOR>>
+    extends Nd4jTensor<T, TENSOR> implements NumberTensor<T, TENSOR> {
 
     public Nd4jNumberTensor(INDArray tensor) {
         super(tensor);
@@ -60,6 +63,11 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
+    public T sumNumber() {
+        return getNumber(tensor.sumNumber());
+    }
+
+    @Override
     public TENSOR sum(int... overDimensions) {
         if (overDimensions.length == 0) {
             return duplicate();
@@ -68,8 +76,8 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
-    public T sum() {
-        return getNumber(tensor.sumNumber());
+    public TENSOR sum() {
+        return create(Nd4j.scalar(tensor.sumNumber().doubleValue()).castTo(tensor.dataType()));
     }
 
     @Override
@@ -80,8 +88,8 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
-    public T product() {
-        return getNumber(tensor.prodNumber());
+    public TENSOR product() {
+        return create(Nd4j.scalar(tensor.prodNumber().doubleValue()).castTo(tensor.dataType()));
     }
 
     @Override
@@ -102,13 +110,13 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
-    public T max() {
-        return getNumber(tensor.maxNumber());
+    public TENSOR max() {
+        return create(Nd4j.scalar(tensor.maxNumber().doubleValue()).castTo(tensor.dataType()));
     }
 
     @Override
-    public T min() {
-        return getNumber(tensor.minNumber());
+    public TENSOR min() {
+        return create(Nd4j.scalar(tensor.minNumber().doubleValue()).castTo(tensor.dataType()));
     }
 
     @Override
@@ -132,8 +140,8 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
-    public int argMax() {
-        return tensor.argMax().getInt(0);
+    public IntegerTensor argMax() {
+        return IntegerTensor.scalar(tensor.argMax().getInt(0));
     }
 
     @Override
@@ -145,8 +153,8 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
-    public int argMin() {
-        return Nd4j.argMin(tensor).getInt(0);
+    public IntegerTensor argMin() {
+        return IntegerTensor.scalar(Nd4j.argMin(tensor).getInt(0));
     }
 
     @Override
@@ -369,13 +377,13 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
-    public T average() {
-        return getNumber(tensor.meanNumber());
+    public TENSOR average() {
+        return create(Nd4j.scalar(tensor.meanNumber().doubleValue()).castTo(tensor.dataType()));
     }
 
     @Override
-    public T standardDeviation() {
-        return getNumber(tensor.stdNumber());
+    public TENSOR standardDeviation() {
+        return create(Nd4j.scalar(tensor.stdNumber().doubleValue()).castTo(tensor.dataType()));
     }
 
     @Override
@@ -467,24 +475,25 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
-    public BooleanTensor elementwiseEquals(Tensor that) {
-        if (that instanceof NumberTensor) {
-            if (isScalar()) {
-                return that.elementwiseEquals(this.scalar());
-            } else if (that.isScalar()) {
-                return elementwiseEquals((T) that.scalar());
-            } else {
-                INDArray mask = INDArrayShim.eq(tensor, getTensor(that));
-                return fromMask(mask);
-            }
+    public BooleanTensor elementwiseEquals(TENSOR that) {
+        if (isScalar()) {
+            return that.elementwiseEquals(this.scalar());
+        } else if (that.isScalar()) {
+            return elementwiseEquals(that.scalar());
         } else {
-            return Tensor.elementwiseEquals(this, that);
+            INDArray mask = INDArrayShim.eq(tensor, getTensor(that));
+            return fromMask(mask);
         }
     }
 
     @Override
     public BooleanTensor elementwiseEquals(T value) {
         return fromMask(tensor.eq(value));
+    }
+
+    @Override
+    public BooleanTensor equalsWithinEpsilon(TENSOR o, T epsilon) {
+        return this.minus(o).absInPlace().lessThan(epsilon);
     }
 
     @Override
@@ -495,6 +504,31 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     @Override
     public TENSOR tensorMultiply(TENSOR value, int[] dimLeft, int[] dimsRight) {
         return set(Nd4j.tensorMmul(tensor, getTensor(value), new int[][]{dimLeft, dimsRight}));
+    }
+
+    @Override
+    public double[] asFlatDoubleArray() {
+        return tensor.dup().data().asDouble();
+    }
+
+    @Override
+    public int[] asFlatIntegerArray() {
+        return tensor.dup().data().asInt();
+    }
+
+    @Override
+    public BooleanTensor toBoolean() {
+        return BooleanTensor.create(asBoolean(tensor.castTo(DataType.BOOL)), getShape());
+    }
+
+    @Override
+    public DoubleTensor toDouble() {
+        return new Nd4jDoubleTensor(tensor.castTo(DataType.DOUBLE));
+    }
+
+    @Override
+    public IntegerTensor toInteger() {
+        return new Nd4jIntegerTensor(tensor.castTo(DataType.INT));
     }
 
     protected final BooleanTensor fromMask(INDArray mask) {

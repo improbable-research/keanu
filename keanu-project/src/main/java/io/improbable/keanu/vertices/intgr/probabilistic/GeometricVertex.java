@@ -69,7 +69,7 @@ public class GeometricVertex extends IntegerVertex implements ProbabilisticInteg
 
     @Override
     public double logProb(IntegerTensor value) {
-        return Geometric.withParameters(p.getValue()).logProb(value).sum();
+        return Geometric.withParameters(p.getValue()).logProb(value).sumNumber();
     }
 
     @Override

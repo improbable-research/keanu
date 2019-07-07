@@ -106,7 +106,7 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
         DoubleTensor betaValues = beta.getValue();
 
         DoubleTensor logPdfs = InverseGamma.withParameters(alphaValues, betaValues).logProb(value);
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

@@ -1,7 +1,5 @@
 package io.improbable.keanu.tensor.dbl;
 
-import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -9,7 +7,6 @@ import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
-import io.improbable.keanu.tensor.ndj4.INDArrayExtensions;
 import io.improbable.keanu.tensor.ndj4.INDArrayShim;
 import io.improbable.keanu.tensor.ndj4.Nd4jFloatingPointTensor;
 import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
@@ -17,7 +14,6 @@ import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.special.Gamma;
-import org.bytedeco.javacpp.indexer.BooleanIndexer;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.scalar.ReplaceNans;
@@ -26,6 +22,8 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 
 import java.util.Arrays;
+
+import static io.improbable.keanu.tensor.ndj4.INDArrayExtensions.asBoolean;
 
 /**
  * Class for representing n-dimensional arrays of doubles. This is
@@ -131,12 +129,12 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     }
 
     @Override
-    public int nanArgMax() {
-        return tensor.argMax().getInt(0);
+    public IntegerTensor nanArgMax() {
+        return IntegerTensor.scalar(tensor.argMax().getInt(0));
     }
 
     @Override
-    public int argMax() {
+    public IntegerTensor argMax() {
         return duplicate()
             .replaceNaNInPlace(Double.MAX_VALUE)
             .nanArgMax();
@@ -158,12 +156,12 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     }
 
     @Override
-    public int nanArgMin() {
-        return Nd4j.argMin(tensor).getInt(0);
+    public IntegerTensor nanArgMin() {
+        return IntegerTensor.scalar(Nd4j.argMin(tensor).getInt(0));
     }
 
     @Override
-    public int argMin() {
+    public IntegerTensor argMin() {
         return duplicate()
             .replaceNaNInPlace(-Double.MAX_VALUE)
             .nanArgMin();
@@ -186,21 +184,6 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     @Override
     protected Double getNumber(Number number) {
         return number.doubleValue();
-    }
-
-    @Override
-    public boolean equalsWithinEpsilon(DoubleTensor o, Double epsilon) {
-        if (this == o) return true;
-
-        if (o instanceof Nd4jTensor) {
-            return tensor.equalsWithEps(((Nd4jTensor) o).getTensor(), epsilon);
-        } else {
-            if (this.hasSameShapeAs(o)) {
-                DoubleTensor difference = o.minus(this);
-                return difference.abs().lessThan(epsilon).allTrue();
-            }
-        }
-        return false;
     }
 
     @Override
@@ -279,17 +262,6 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
         return BooleanTensor.create(asBoolean(result), tensor.shape());
     }
 
-    private boolean[] asBoolean(INDArray array) {
-        Preconditions.checkArgument(array.dataType() == DataType.BOOL);
-        boolean[] buffer = new boolean[Ints.checkedCast(array.length())];
-
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = ((BooleanIndexer) (array.data()).indexer()).get(i);
-        }
-
-        return buffer;
-    }
-
     @Override
     public BooleanTensor isNegativeInfinity() {
         INDArray result = Nd4j.getExecutioner().exec(
@@ -308,26 +280,6 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
                 Conditions.equals(Double.POSITIVE_INFINITY))
         );
         return BooleanTensor.create(asBoolean(result), tensor.shape());
-    }
-
-    @Override
-    public DoubleTensor toDouble() {
-        return duplicate();
-    }
-
-    @Override
-    public IntegerTensor toInteger() {
-        return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(tensor, true));
-    }
-
-    @Override
-    public double[] asFlatDoubleArray() {
-        return tensor.dup().data().asDouble();
-    }
-
-    @Override
-    public int[] asFlatIntegerArray() {
-        return tensor.dup().data().asInt();
     }
 
     @Override

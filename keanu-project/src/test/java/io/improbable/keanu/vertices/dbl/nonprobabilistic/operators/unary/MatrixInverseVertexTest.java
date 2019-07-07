@@ -96,8 +96,8 @@ public class MatrixInverseVertexTest {
 
             DoubleTensor changeInMultipliedWrtInput = Differentiator.forwardModeAutoDiff(inputVertex, multiplied).of(multiplied);
             DoubleTensor reverseOutputWrtInput = Differentiator.reverseModeAutoDiff(multiplied, inputVertex).withRespectTo(inputVertex);
-            assertEquals(changeInMultipliedWrtInput.pow(2.0).sum(), 0.0, 1e-10);
-            assertEquals(reverseOutputWrtInput.pow(2.0).sum(), 0.0, 1e-10);
+            assertEquals(changeInMultipliedWrtInput.pow(2.0).sumNumber(), 0.0, 1e-10);
+            assertEquals(reverseOutputWrtInput.pow(2.0).sumNumber(), 0.0, 1e-10);
         }
     }
 

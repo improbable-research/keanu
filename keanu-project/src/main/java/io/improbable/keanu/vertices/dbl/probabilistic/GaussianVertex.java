@@ -101,7 +101,7 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
 
         DoubleTensor logPdfs = Gaussian.withParameters(muValues, sigmaValues).logProb(value);
 
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

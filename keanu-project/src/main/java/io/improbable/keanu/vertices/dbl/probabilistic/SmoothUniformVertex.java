@@ -146,7 +146,7 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor density = SmoothUniform.withParameters(min, max, this.edgeSharpness).logProb(value);
-        return density.sum();
+        return density.sumNumber();
     }
 
     @Override

@@ -54,6 +54,8 @@ public class DoubleBuffer {
     }
 
     public interface PrimitiveDoubleWrapper extends PrimitiveNumberWrapper<Double, PrimitiveDoubleWrapper> {
+        @Override
+        Double[] asArray();
     }
 
     public static final class DoubleArrayWrapper implements PrimitiveDoubleWrapper {

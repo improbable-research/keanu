@@ -84,7 +84,7 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
     public double logProb(DoubleTensor value) {
         DoubleTensor concentrationValues = concentration.getValue();
         DoubleTensor logPdfs = Dirichlet.withParameters(concentrationValues).logProb(value);
-        return logPdfs.sum();
+        return logPdfs.sumNumber();
     }
 
     @Override

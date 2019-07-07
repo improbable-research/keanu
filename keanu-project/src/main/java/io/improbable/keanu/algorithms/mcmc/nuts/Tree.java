@@ -342,8 +342,8 @@ class Tree {
             final DoubleTensor vBackward = velocityBackward.get(latentId);
             final DoubleTensor rhoForLatent = rho.get(latentId);
 
-            forward += vForward.times(rhoForLatent).sum();
-            backward += vBackward.times(rhoForLatent).sum();
+            forward += vForward.times(rhoForLatent).sumNumber();
+            backward += vBackward.times(rhoForLatent).sumNumber();
         }
 
         return (forward < 0.0) || (backward < 0.0);
