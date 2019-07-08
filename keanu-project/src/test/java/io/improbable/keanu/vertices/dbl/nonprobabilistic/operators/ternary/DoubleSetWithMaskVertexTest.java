@@ -41,7 +41,7 @@ public class DoubleSetWithMaskVertexTest {
 
     @Test
     public void canSetWithMaskGivenScalar() {
-        DoubleVertex mask = vertex.toGreaterThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
+        DoubleVertex mask = vertex.greaterThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
         DoubleVertex result = new DoubleSetWithMaskVertex(vertex, mask, ConstantVertex.of(-2.));
         DoubleTensor expected = DoubleTensor.create(new double[]{1., 2., -2., -2.}, 2, 2);
         assertThat(expected, TensorMatchers.valuesAndShapesMatch(result.getValue()));
@@ -52,7 +52,7 @@ public class DoubleSetWithMaskVertexTest {
      */
     @Test
     public void canSetToZero() {
-        DoubleVertex mask = vertex.toLessThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
+        DoubleVertex mask = vertex.lessThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
         DoubleVertex result = new DoubleSetWithMaskVertex(vertex, mask, ConstantVertex.of(0.));
         DoubleTensor expected = DoubleTensor.create(new double[]{0., 2., 3., 4.}, 2, 2);
         assertThat(expected, TensorMatchers.valuesAndShapesMatch(result.getValue()));

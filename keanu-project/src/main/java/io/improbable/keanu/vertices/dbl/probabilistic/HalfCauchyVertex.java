@@ -61,7 +61,7 @@ public class HalfCauchyVertex extends CauchyVertex {
         final DoubleVertex cauchyLogProbOutput = Cauchy.logProbOutput(xPlaceholder, locationPlaceholder, scalePlaceholder);
 
         final DoubleVertex result = cauchyLogProbOutput.plus(LOG_TWO);
-        final DoubleVertex invalidMask = xPlaceholder.toLessThanMask(LOC_ZERO);
+        final DoubleVertex invalidMask = xPlaceholder.lessThanMask(LOC_ZERO);
         final DoubleVertex halfCauchyLogProbOutput = result.setWithMask(invalidMask, Double.NEGATIVE_INFINITY);
 
         // Set the value of locationPlaceholder since we know it's 0.

@@ -365,9 +365,9 @@ public class KeanuCompiledGraphTest {
     public void canCompileDoubleCompare() {
         long[] shape = new long[]{10, 10};
         assertDoubleCompareMatches(shape, shape, DoubleVertex::greaterThan);
-        assertDoubleCompareMatches(shape, shape, DoubleVertex::greaterThanOrEqualTo);
+        assertDoubleCompareMatches(shape, shape, DoubleVertex::greaterThanOrEqual);
         assertDoubleCompareMatches(shape, shape, DoubleVertex::lessThan);
-        assertDoubleCompareMatches(shape, shape, DoubleVertex::lessThanOrEqualTo);
+        assertDoubleCompareMatches(shape, shape, DoubleVertex::lessThanOrEqual);
     }
 
     private void assertDoubleCompareMatches(long[] shapeA, long[] shapeB, BiFunction<DoubleVertex, DoubleVertex, BooleanVertex> op) {

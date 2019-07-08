@@ -146,6 +146,22 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
         }
     }
 
+    public long[] getStride() {
+        if (state.getValue() instanceof Tensor) {
+            return ((Tensor) state.getValue()).getStride();
+        } else {
+            return null;
+        }
+    }
+
+    public long getLength() {
+        if (state.getValue() instanceof Tensor) {
+            return ((Tensor) state.getValue()).getLength();
+        } else {
+            return 1;
+        }
+    }
+
     public int getRank() {
         return getShape().length;
     }

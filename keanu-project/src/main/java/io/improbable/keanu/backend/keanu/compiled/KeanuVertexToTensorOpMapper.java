@@ -14,6 +14,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.XorBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
@@ -211,6 +212,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(OrBinaryVertex.class, fluentBinaryOp("or"));
         opMappers.put(AndBinaryVertex.class, fluentBinaryOp("and"));
         opMappers.put(NotBinaryVertex.class, fluentUnaryOp("not"));
+        opMappers.put(XorBinaryVertex.class, fluentUnaryOp("xor"));
 
         opMappers.put(CastToBooleanVertex.class, fluentUnaryOp("toBoolean"));
 

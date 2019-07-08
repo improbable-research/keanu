@@ -138,17 +138,17 @@ public class SmoothUniform implements ContinuousDistribution {
         final DoubleVertex leftCutoff = xMin.minus(shoulderWidth);
 
         final DoubleVertex firstConditional = x
-            .toGreaterThanOrEqualToMask(xMin)
-            .times(x.toLessThanOrEqualToMask(xMax));
+            .greaterThanOrEqualToMask(xMin)
+            .times(x.lessThanOrEqualToMask(xMax));
         final DoubleVertex firstConditionResult = bodyHeightVertex(shoulderWidth, bodyWidth);
 
         final DoubleVertex secondConditional = x
-            .toLessThanMask(xMin)
-            .times(x.toGreaterThanMask(leftCutoff));
+            .lessThanMask(xMin)
+            .times(x.greaterThanMask(leftCutoff));
         final DoubleVertex secondConditionalResult = shoulderVertex(shoulderWidth, bodyWidth, x.minus(leftCutoff));
 
-        final DoubleVertex thirdConditional = x.toGreaterThanMask(xMax)
-            .times(x.toLessThanMask(rightCutoff));
+        final DoubleVertex thirdConditional = x.greaterThanMask(xMax)
+            .times(x.lessThanMask(rightCutoff));
         final DoubleVertex thirdConditionalResult = shoulderVertex(shoulderWidth, bodyWidth, shoulderWidth.minus(x).plus(xMax));
 
         return firstConditional.times(firstConditionResult)

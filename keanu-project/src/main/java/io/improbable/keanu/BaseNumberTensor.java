@@ -16,8 +16,19 @@ public interface BaseNumberTensor<
 
     INTEGER toInteger();
 
+    /**
+     * Sum over all dimensions. This will always result in a scalar.
+     *
+     * @return the summation result
+     */
     T sum();
 
+    /**
+     * Sum over specified dimensions.
+     *
+     * @param overDimensions dimensions to sum over.
+     * @return the summation result
+     */
     T sum(int... overDimensions);
 
     T cumSum(int requestedDimension);
@@ -38,7 +49,7 @@ public interface BaseNumberTensor<
 
     T clamp(T min, T max);
 
-    T matrixMultiply(T value);
+    T matrixMultiply(T that);
 
     T tensorMultiply(T value, int[] dimLeft, int[] dimsRight);
 

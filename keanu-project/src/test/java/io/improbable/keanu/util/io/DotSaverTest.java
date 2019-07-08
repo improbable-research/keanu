@@ -48,10 +48,10 @@ public class DotSaverTest {
     public static void setUpComplexNet() {
         VertexId.resetIdGenerator();
         complexResultVertex = ((new GammaVertex(0, 1))
-            .lessThan(new ConstantIntegerVertex(-1)))
+            .lessThan(-1.0))
             .or((new GaussianVertex(0, 1))
-                .plus(new ConstantDoubleVertex(5))
-                .equalTo(new ConstantDoubleVertex(10)));
+                .plus(5.0)
+                .elementwiseEquals(10.0));
         BayesianNetwork complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
         complexNetDotSaver = new DotSaver(complexNet);
     }

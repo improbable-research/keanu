@@ -14,7 +14,7 @@ public class DoubleGreaterThanOrEqualToMaskVertexTest {
             2.0,
             3.0,
             0.0,
-            DoubleVertex::toGreaterThanOrEqualToMask
+            DoubleVertex::greaterThanOrEqualToMask
         );
     }
 
@@ -24,7 +24,7 @@ public class DoubleGreaterThanOrEqualToMaskVertexTest {
             new double[]{1.0, 4.0, 3.0, -3.0},
             new double[]{2.0, 2.0, 3.0, 3.0},
             new double[]{0.0, 1.0, 1.0, 0.0},
-            DoubleVertex::toGreaterThanOrEqualToMask
+            DoubleVertex::greaterThanOrEqualToMask
         );
     }
 }

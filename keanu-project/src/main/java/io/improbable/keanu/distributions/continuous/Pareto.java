@@ -56,9 +56,9 @@ public class Pareto implements ContinuousDistribution {
     }
 
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex location, DoublePlaceholderVertex scale) {
-        final DoubleVertex invalidXMask = x.toGreaterThanMask(location)
-            .times(location.toGreaterThanMask(0.))
-            .times(scale.toGreaterThanMask(0.))
+        final DoubleVertex invalidXMask = x.greaterThanMask(location)
+            .times(location.greaterThanMask(0.))
+            .times(scale.greaterThanMask(0.))
             .unaryMinus()
             .plus(1.);
         final DoubleVertex ifValid = scale.log().plus(location.log().times(scale))

@@ -49,6 +49,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilis
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.XorBinaryVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex")
@@ -174,6 +175,10 @@ def AndBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_typ
 
 def OrBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     return Boolean(context.jvm_view().OrBinaryVertex, label, cast_to_vertex(a), cast_to_vertex(b))
+
+
+def XorBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().XorBinaryVertex, label, cast_to_vertex(a), cast_to_vertex(b))
 
 
 def Equals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

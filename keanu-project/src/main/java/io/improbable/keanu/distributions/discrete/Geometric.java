@@ -46,8 +46,8 @@ public class Geometric implements DiscreteDistribution {
     public static DoubleVertex logProbOutput(IntegerPlaceholderVertex k, DoublePlaceholderVertex p) {
         DoubleVertex zeroes = ConstantVertex.of(DoubleTensor.zeros(k.getShape()));
         DoubleVertex ones = ConstantVertex.of(DoubleTensor.ones(k.getShape()));
-        DoubleVertex parameterIsInvalidMask = p.toGreaterThanMask(zeroes)
-            .times(p.toLessThanMask(ones))
+        DoubleVertex parameterIsInvalidMask = p.greaterThanMask(zeroes)
+            .times(p.lessThanMask(ones))
             .unaryMinus()
             .plus(ones);
         return calculateLogProb(k, p).setWithMask(parameterIsInvalidMask, Double.NEGATIVE_INFINITY);
@@ -76,7 +76,7 @@ public class Geometric implements DiscreteDistribution {
     }
 
     private static DoubleVertex setProbToZeroForInvalidK(IntegerVertex k, DoubleVertex results) {
-        DoubleVertex invalidK = k.toDouble().toLessThanMask(1.);
+        DoubleVertex invalidK = k.toDouble().lessThanMask(1.);
 
         return results.setWithMask(invalidK, Double.NEGATIVE_INFINITY);
     }

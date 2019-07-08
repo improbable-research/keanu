@@ -56,9 +56,9 @@ public class IntegerVertexTest {
     public void doesEqualTo() {
         IntegerVertex v3 = ConstantVertex.of(3);
 
-        assertFalse(v1.equalTo(v2).eval().scalar());
+        assertFalse(v1.elementwiseEquals(v2).eval().scalar());
         assertTrue(v1.notEqualTo(v2).eval().scalar());
-        assertFalse(v2.equalTo(v3).eval().scalar());
+        assertFalse(v2.elementwiseEquals(v3).eval().scalar());
         assertTrue(v2.notEqualTo(v3).eval().scalar());
     }
 

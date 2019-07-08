@@ -49,8 +49,8 @@ public class UniformInt implements DiscreteDistribution {
         DoubleVertex xDouble = x.toDouble();
 
         DoubleVertex logOfWithinBounds = maxBound.minus(minBound).log().unaryMinus();
-        logOfWithinBounds = logOfWithinBounds.setWithMask(xDouble.toGreaterThanOrEqualToMask(maxBound), Double.NEGATIVE_INFINITY);
-        logOfWithinBounds = logOfWithinBounds.setWithMask(xDouble.toLessThanMask(minBound), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMask(xDouble.greaterThanOrEqualToMask(maxBound), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMask(xDouble.lessThanMask(minBound), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
     }

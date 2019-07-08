@@ -23,12 +23,12 @@ public class GreaterThanOrEqualVertexTest {
     }
 
     private void isGreaterThanOrEqual(int a, int b, boolean expected) {
-        BooleanVertex vertex = ConstantVertex.of(a).greaterThanOrEqualTo(ConstantVertex.of(b));
+        BooleanVertex vertex = ConstantVertex.of(a).greaterThanOrEqual(ConstantVertex.of(b));
         assertEquals(expected, vertex.eval().scalar());
     }
 
     private void isGreaterThanOrEqual(double a, double b, boolean expected) {
-        BooleanVertex vertex = ConstantVertex.of(a).greaterThanOrEqualTo(ConstantVertex.of(b));
+        BooleanVertex vertex = ConstantVertex.of(a).greaterThanOrEqual(ConstantVertex.of(b));
         assertEquals(expected, vertex.eval().scalar());
     }
 }

@@ -50,8 +50,8 @@ public class Uniform implements ContinuousDistribution {
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex xMin, DoublePlaceholderVertex xMax) {
 
         DoubleVertex logOfWithinBounds = xMax.minus(xMin).log().unaryMinus();
-        logOfWithinBounds = logOfWithinBounds.setWithMask(x.toGreaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
-        logOfWithinBounds = logOfWithinBounds.setWithMask(x.toLessThanMask(xMin), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMask(x.greaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMask(x.lessThanMask(xMin), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
     }

@@ -62,7 +62,7 @@ public class HalfGaussianVertex extends GaussianVertex {
         final DoubleVertex gaussianLogProbOutput = Gaussian.logProbOutput(xPlaceholder, muPlaceholder, sigmaPlaceholder);
 
         final DoubleVertex result = gaussianLogProbOutput.plus(LOG_TWO);
-        final DoubleVertex invalidMask = xPlaceholder.toLessThanMask(MU_ZERO);
+        final DoubleVertex invalidMask = xPlaceholder.lessThanMask(MU_ZERO);
         final DoubleVertex halfGaussianLogProbOutput = result.setWithMask(invalidMask, Double.NEGATIVE_INFINITY).sum();
 
         // Set the value of muPlaceholder since we know it's 0.

@@ -64,13 +64,13 @@ public class Triangular implements ContinuousDistribution {
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex xMin, DoublePlaceholderVertex xMax, DoublePlaceholderVertex c) {
         final DoubleVertex range = xMax.minus(xMin);
 
-        final DoubleVertex conditionalFirstHalf = x.toGreaterThanMask(xMin);
-        final DoubleVertex conditionalSecondHalf = x.toLessThanMask(c);
+        final DoubleVertex conditionalFirstHalf = x.greaterThanMask(xMin);
+        final DoubleVertex conditionalSecondHalf = x.lessThanMask(c);
         final DoubleVertex conditionalAnd = conditionalFirstHalf.times(conditionalSecondHalf);
         final DoubleVertex conditionalResult = range.reverseDiv(1.).times(2.).times(x.minus(xMin)).div(c.minus(xMin));
 
-        final DoubleVertex elseIfConditionalFirstHalf = x.toGreaterThanMask(c);
-        final DoubleVertex elseIfConditionalSecondHalf = x.toLessThanOrEqualToMask(xMax);
+        final DoubleVertex elseIfConditionalFirstHalf = x.greaterThanMask(c);
+        final DoubleVertex elseIfConditionalSecondHalf = x.lessThanOrEqualToMask(xMax);
         final DoubleVertex elseIfConditionalAnd = elseIfConditionalFirstHalf.times(elseIfConditionalSecondHalf);
         final DoubleVertex elseIfConditionalResult = range.reverseDiv(1.).times(2.).times(xMax.minus(x)).div(xMax.minus(c));
 

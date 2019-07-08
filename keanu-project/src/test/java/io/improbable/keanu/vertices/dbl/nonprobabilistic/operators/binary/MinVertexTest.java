@@ -14,7 +14,7 @@ public class MinVertexTest {
 
     @Test
     public void minOfTwoScalarValues() {
-        operatesOnTwoScalarVertexValues(2.0, 3.0, 2.0, DoubleVertex::min);
+        operatesOnTwoScalarVertexValues(2.0, 3.0, 2.0, (l, r) -> l.min(r));
     }
 
     @Test
@@ -23,7 +23,7 @@ public class MinVertexTest {
             new double[]{1.0, 2.0, 6.0, 4.0},
             new double[]{2.0, 4.0, 3.0, 4.0},
             new double[]{1.0, 2.0, 3.0, 4.0},
-            DoubleVertex::min
+            (l, r) -> l.min(r)
         );
     }
 

@@ -23,12 +23,12 @@ public class LessThanOrEqualVertexTest {
     }
 
     private void isLessThanOrEqual(int a, int b, boolean expected) {
-        BooleanVertex vertex = ConstantVertex.of(a).lessThanOrEqualTo(ConstantVertex.of(b));
+        BooleanVertex vertex = ConstantVertex.of(a).lessThanOrEqual(ConstantVertex.of(b));
         assertEquals(expected, vertex.eval().scalar());
     }
 
     private void isLessThanOrEqual(double a, double b, boolean expected) {
-        BooleanVertex vertex = ConstantVertex.of(a).lessThanOrEqualTo(ConstantVertex.of(b));
+        BooleanVertex vertex = ConstantVertex.of(a).lessThanOrEqual(ConstantVertex.of(b));
         assertEquals(expected, vertex.eval().scalar());
     }
 }

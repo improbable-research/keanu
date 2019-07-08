@@ -14,7 +14,7 @@ public class MaxVertexTest {
 
     @Test
     public void maxOfTwoScalarValues() {
-        operatesOnTwoScalarVertexValues(2.0, 3.0, 3.0, DoubleVertex::max);
+        operatesOnTwoScalarVertexValues(2.0, 3.0, 3.0, (l, r) -> l.max(r));
     }
 
     @Test
@@ -23,7 +23,7 @@ public class MaxVertexTest {
             new double[]{1.0, 2.0, 6.0, 4.0},
             new double[]{2.0, 4.0, 3.0, 4.0},
             new double[]{2.0, 4.0, 6.0, 4.0},
-            DoubleVertex::max
+            (l, r) -> l.max(r)
         );
     }
 
