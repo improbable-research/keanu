@@ -156,7 +156,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public BooleanTensor equalsWithinEpsilon(IntegerTensor other, Integer epsilon) {
         if (other instanceof ScalarIntegerTensor) {
-            return BooleanTensor.scalar(Math.abs(other.scalar() - value) < epsilon);
+            return BooleanTensor.scalar(Math.abs(other.scalar() - value) <= epsilon);
         } else {
             return other.equalsWithinEpsilon(this, epsilon);
         }

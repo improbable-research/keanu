@@ -203,7 +203,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     public BooleanTensor equalsWithinEpsilon(DoubleTensor that, Double epsilon) {
 
         DoubleTensor equalsMask = duplicate().broadcastableBinaryOpWithAutoBroadcast(
-            (l, r) -> Math.abs(l - r) < epsilon ? 1.0 : 0.0, getAsJVMTensor(that)
+            (l, r) -> Math.abs(l - r) <= epsilon ? 1.0 : 0.0, getAsJVMTensor(that)
         );
 
         return equalsMask.toBoolean();

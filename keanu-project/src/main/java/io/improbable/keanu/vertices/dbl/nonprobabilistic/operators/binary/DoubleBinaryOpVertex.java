@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
 public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, VertexBinaryOp<DoubleVertex, DoubleVertex> {
 
@@ -22,10 +22,8 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
      * @param left  a vertex
      * @param right a vertex
      */
-    public DoubleBinaryOpVertex(
-        DoubleVertex left, DoubleVertex right) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()),
-            left, right);
+    public DoubleBinaryOpVertex(DoubleVertex left, DoubleVertex right) {
+        this(getBroadcastResultShape(left.getShape(), right.getShape()), left, right);
     }
 
     /**

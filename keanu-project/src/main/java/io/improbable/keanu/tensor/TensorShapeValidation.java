@@ -103,10 +103,6 @@ public class TensorShapeValidation {
         );
     }
 
-    public static long[] checkIsBroadcastable(long[] left, long[] right) {
-        return TensorShape.getBroadcastResultShape(left, right);
-    }
-
     public static boolean isBroadcastable(long[] left, long[] right) {
         try {
             TensorShape.getBroadcastResultShape(left, right);

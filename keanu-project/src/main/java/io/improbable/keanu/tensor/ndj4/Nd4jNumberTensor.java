@@ -493,7 +493,7 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
 
     @Override
     public BooleanTensor equalsWithinEpsilon(TENSOR o, T epsilon) {
-        return this.minus(o).absInPlace().lessThan(epsilon);
+        return this.minus(o).absInPlace().lessThanOrEqual(epsilon);
     }
 
     @Override

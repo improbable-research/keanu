@@ -1,7 +1,6 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
@@ -163,8 +162,8 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(SliceVertex.class, KeanuVertexToTensorOpMapper::sliceDoubleOp);
         opMappers.put(TakeVertex.class, KeanuVertexToTensorOpMapper::takeDoubleOp);
 
-        opMappers.put(MaxVertex.class, binaryOp("DoubleTensor.max(%s,%s)"));
-        opMappers.put(MinVertex.class, binaryOp("DoubleTensor.min(%s,%s)"));
+        opMappers.put(MaxVertex.class, fluentBinaryOp("max"));
+        opMappers.put(MinVertex.class, fluentBinaryOp("min"));
 
         opMappers.put(CastToDoubleVertex.class, fluentUnaryOp("toDouble"));
 
@@ -187,8 +186,8 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(IntegerPermuteVertex.class, KeanuVertexToTensorOpMapper::permuteIntegerOp);
         opMappers.put(IntegerTakeVertex.class, KeanuVertexToTensorOpMapper::takeIntegerOp);
 
-        opMappers.put(IntegerMaxVertex.class, binaryOp("IntegerTensor.max(%s,%s)"));
-        opMappers.put(IntegerMinVertex.class, binaryOp("IntegerTensor.min(%s,%s)"));
+        opMappers.put(IntegerMaxVertex.class, fluentBinaryOp("max"));
+        opMappers.put(IntegerMinVertex.class, fluentBinaryOp("min"));
 
         opMappers.put(CastToIntegerVertex.class, fluentUnaryOp("toInteger"));
 
@@ -323,25 +322,6 @@ public class KeanuVertexToTensorOpMapper {
 
     private static String constant(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         throw new IllegalArgumentException("Constant should not be operation mapped");
-    }
-
-    /**
-     * Similar to fluent binary op except it allows defining the entire string template
-     *
-     * @param format the format for the right hand side of the assignment. e.g. DoubleTensor.max(%s,%s)
-     * @return an OpMapper that will map an operation using the provided format
-     */
-    private static OpMapper binaryOp(String format) {
-        return (vertex, lookup) -> {
-            VertexBinaryOp<?, ?> binaryOpVertex = (VertexBinaryOp<?, ?>) vertex;
-            Vertex<?> left = binaryOpVertex.getLeft();
-            Vertex<?> right = binaryOpVertex.getRight();
-
-            KeanuCompiledVariable leftVariable = lookup.get(left.getReference());
-            KeanuCompiledVariable rightVariable = lookup.get(right.getReference());
-
-            return String.format(format, leftVariable.getName(), rightVariable.getName());
-        };
     }
 
     private static String setWithMaskDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
@@ -610,15 +590,14 @@ public class KeanuVertexToTensorOpMapper {
 
     private static String numericalEqualsOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         NumericalEqualsVertex numericalEquals = (NumericalEqualsVertex) vertex;
-        Vertex<? extends NumberTensor> a = numericalEquals.getA();
-        Vertex<? extends NumberTensor> b = numericalEquals.getB();
-        Vertex<? extends NumberTensor> epsilon = numericalEquals.getEpsilon();
+        Vertex a = numericalEquals.getA();
+        Vertex b = numericalEquals.getB();
+        Number epsilon = numericalEquals.getEpsilon();
 
         String aName = lookup.get(a.getId()).getName();
         String bName = lookup.get(b.getId()).getName();
-        String epsilonName = lookup.get(epsilon.getId()).getName();
 
-        return aName + ".toDouble().minus(" + bName + ".toDouble()).absInPlace().lessThanOrEqual(" + epsilonName + ".toDouble())";
+        return aName + ".equalsWithinEpsilon(" + bName + "," + epsilon.toString() + ")";
     }
 
     private static String assertOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {

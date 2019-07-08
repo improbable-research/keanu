@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkIsBroadcastable;
 import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
 
 /**
@@ -92,7 +91,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
             );
         }
 
-        return TensorShape.concat(checkIsBroadcastable(nShape, pBatchShape), new long[]{k});
+        return TensorShape.concat(TensorShape.getBroadcastResultShape(nShape, pBatchShape), new long[]{k});
     }
 
     @ExportVertexToPythonBindings

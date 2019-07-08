@@ -349,7 +349,7 @@ public class KeanuCompiledGraphTest {
         GaussianVertex A = new GaussianVertex(shape, 0, 1);
         GaussianVertex B = new GaussianVertex(shape, 0, 1);
 
-        assertCompiledIsSameAsVertexEvaluation(A, B, new NumericalEqualsVertex(A, B, ConstantVertex.of(0.5)));
+        assertCompiledIsSameAsVertexEvaluation(A, B, new NumericalEqualsVertex<>(A, B, 0.5));
     }
 
     @Test
@@ -358,7 +358,7 @@ public class KeanuCompiledGraphTest {
         GaussianVertex A = new GaussianVertex(shape, 0, 1);
         PoissonVertex B = new PoissonVertex(shape, 1);
 
-        assertCompiledIsSameAsVertexEvaluation(A, B, new NumericalEqualsVertex(A, B, ConstantVertex.of(IntegerTensor.create(1, shape))));
+        assertCompiledIsSameAsVertexEvaluation(A, B, new NumericalEqualsVertex<>(A, B.toDouble(), 1.0));
     }
 
     @Test

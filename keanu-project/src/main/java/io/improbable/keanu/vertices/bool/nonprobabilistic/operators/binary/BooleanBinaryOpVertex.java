@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
 public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> extends BooleanVertex implements NonProbabilistic<BooleanTensor>, VertexBinaryOp<Vertex<A>, Vertex<B>> {
 
@@ -18,7 +18,7 @@ public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> 
     protected final static String B_NAME = "right";
 
     public BooleanBinaryOpVertex(Vertex<A> left, Vertex<B> right) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right);
+        this(getBroadcastResultShape(left.getShape(), right.getShape()), left, right);
     }
 
     public BooleanBinaryOpVertex(long[] shape, Vertex<A> left, Vertex<B> right) {

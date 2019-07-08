@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.FixedPointTensorVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
@@ -45,18 +46,6 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
     ////  Vertex helpers
     //////////////////////////
 
-    public static IntegerVertex concat(int dimension, IntegerVertex... toConcat) {
-        return new IntegerConcatenationVertex(dimension, toConcat);
-    }
-
-    public static IntegerVertex min(IntegerVertex a, IntegerVertex b) {
-        return new IntegerMinVertex(a, b);
-    }
-
-    public static IntegerVertex max(IntegerVertex a, IntegerVertex b) {
-        return new IntegerMaxVertex(a, b);
-    }
-
     @Override
     public void saveValue(NetworkSaver netSaver) {
         netSaver.saveValue(this);
@@ -83,10 +72,6 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         super.setAndCascade(IntegerTensor.create(values));
     }
 
-    //////////////////////////
-    ////  Tensor Operations
-    //////////////////////////
-
     public void observe(int value) {
         super.observe(IntegerTensor.scalar(value));
     }
@@ -97,6 +82,22 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
 
     public int getValue(long... index) {
         return getValue().getValue(index);
+    }
+
+    //////////////////////////
+    ////  Tensor Operations
+    //////////////////////////
+
+    public static IntegerVertex concat(int dimension, IntegerVertex... toConcat) {
+        return new IntegerConcatenationVertex(dimension, toConcat);
+    }
+
+    public static IntegerVertex min(IntegerVertex a, IntegerVertex b) {
+        return new IntegerMinVertex(a, b);
+    }
+
+    public static IntegerVertex max(IntegerVertex a, IntegerVertex b) {
+        return new IntegerMaxVertex(a, b);
     }
 
     @Override
@@ -149,14 +150,14 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new EqualsVertex<>(this, rhs);
     }
 
-    //////////////////////////
-    ////  Number Tensor Operations
-    //////////////////////////
-
     @Override
     public BooleanVertex elementwiseEquals(Integer value) {
         return elementwiseEquals(new ConstantIntegerVertex(value));
     }
+
+    //////////////////////////
+    ////  Number Tensor Operations
+    //////////////////////////
 
     public BooleanVertex notEqualTo(IntegerVertex rhs) {
         return new NotEqualsVertex<>(this, rhs);
@@ -288,7 +289,6 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerPowerVertex(this, new ConstantIntegerVertex(exponent));
     }
 
-
     @Override
     public IntegerVertex average() {
         return null;
@@ -336,7 +336,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
 
     @Override
     public BooleanVertex equalsWithinEpsilon(IntegerVertex other, Integer epsilon) {
-        return null;
+        return new NumericalEqualsVertex<>(this, other, epsilon);
     }
 
     @Override

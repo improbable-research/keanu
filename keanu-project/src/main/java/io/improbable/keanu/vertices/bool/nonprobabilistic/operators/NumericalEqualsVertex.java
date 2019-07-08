@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -13,34 +12,33 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 /**
  * Returns true if a vertex value is equal to another vertex value within an epsilon.
  */
-public class NumericalEqualsVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
+public class NumericalEqualsVertex<N extends Number, TENSOR extends NumberTensor<N, TENSOR>> extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
 
-    protected Vertex<? extends NumberTensor> a;
-    protected Vertex<? extends NumberTensor> b;
-    private Vertex<? extends NumberTensor> epsilon;
+    protected Vertex<TENSOR> a;
+    protected Vertex<TENSOR> b;
+    private N epsilon;
     private final static String A_NAME = "a";
     private final static String B_NAME = "b";
     private final static String EPSILON_NAME = "epsilon";
 
     @ExportVertexToPythonBindings
-    public NumericalEqualsVertex(@LoadVertexParam(A_NAME) Vertex<? extends NumberTensor> a,
-                                 @LoadVertexParam(B_NAME) Vertex<? extends NumberTensor> b,
-                                 @LoadVertexParam(EPSILON_NAME) Vertex<? extends NumberTensor> epsilon) {
+    public NumericalEqualsVertex(@LoadVertexParam(A_NAME) Vertex<TENSOR> a,
+                                 @LoadVertexParam(B_NAME) Vertex<TENSOR> b,
+                                 @LoadVertexParam(EPSILON_NAME) N epsilon) {
         super(a.getShape());
         this.a = a;
         this.b = b;
         this.epsilon = epsilon;
-        setParents(a, b, epsilon);
+        setParents(a, b);
     }
 
     @Override
     public BooleanTensor calculate() {
-        return op(a.getValue(), b.getValue(), epsilon.getValue());
+        return op(a.getValue(), b.getValue(), epsilon);
     }
 
-    private BooleanTensor op(NumberTensor a, NumberTensor b, NumberTensor epsilon) {
-        final DoubleTensor absoluteDifference = a.toDouble().minus(b.toDouble()).absInPlace();
-        return absoluteDifference.lessThanOrEqual(epsilon.toDouble());
+    private BooleanTensor op(TENSOR a, TENSOR b, N epsilon) {
+        return a.equalsWithinEpsilon(b, epsilon);
     }
 
     @SaveVertexParam(A_NAME)
@@ -54,7 +52,7 @@ public class NumericalEqualsVertex extends BooleanVertex implements NonProbabili
     }
 
     @SaveVertexParam(EPSILON_NAME)
-    public Vertex<? extends NumberTensor> getEpsilon() {
+    public N getEpsilon() {
         return epsilon;
     }
 }

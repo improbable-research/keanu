@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -11,10 +12,10 @@ public class NumericalEqualsVertexTest {
     @Test
     public void canCompareNumbersNotEqual() {
 
-        NumericalEqualsVertex equals = new NumericalEqualsVertex(
-            ConstantVertex.of(new double[]{1, 2, 3}),
-            ConstantVertex.of(new double[]{4, 5, 6}),
-            ConstantVertex.of(new double[]{0, 0, 0})
+        BooleanVertex equals = new NumericalEqualsVertex<>(
+            ConstantVertex.of(1., 2., 3.),
+            ConstantVertex.of(4., 5., 6.),
+            0.0
         );
 
         BooleanTensor equality = equals.lazyEval();
@@ -25,10 +26,10 @@ public class NumericalEqualsVertexTest {
     @Test
     public void canCompareNumbersEqual() {
 
-        NumericalEqualsVertex equals = new NumericalEqualsVertex(
-            ConstantVertex.of(new double[]{1, 2, 3}),
-            ConstantVertex.of(new double[]{1, 2, 3}),
-            ConstantVertex.of(new double[]{0, 0, 0})
+        BooleanVertex equals = new NumericalEqualsVertex<>(
+            ConstantVertex.of(1., 2., 3.),
+            ConstantVertex.of(1., 2., 3.),
+            0.0
         );
 
         BooleanTensor equality = equals.lazyEval();
@@ -39,10 +40,10 @@ public class NumericalEqualsVertexTest {
     @Test
     public void canCompareNumbersAlmostEqual() {
 
-        NumericalEqualsVertex equals = new NumericalEqualsVertex(
-            ConstantVertex.of(new double[]{1, 2, 3}),
-            ConstantVertex.of(new double[]{1.5, 2.01, 3}),
-            ConstantVertex.of(new double[]{0.1, 0.1, 0.1})
+        BooleanVertex equals = new NumericalEqualsVertex<>(
+            ConstantVertex.of(1., 2., 3.),
+            ConstantVertex.of(1.5, 2.01, 3),
+            0.1
         );
 
         BooleanTensor equality = equals.lazyEval();
@@ -53,10 +54,10 @@ public class NumericalEqualsVertexTest {
     @Test
     public void canCompareIntegersAlmostEqual() {
 
-        NumericalEqualsVertex equals = new NumericalEqualsVertex(
-            ConstantVertex.of(new int[]{1, 2, 3}),
-            ConstantVertex.of(new int[]{2, 2, 6}),
-            ConstantVertex.of(1.1)
+        BooleanVertex equals = new NumericalEqualsVertex<>(
+            ConstantVertex.of(1, 2, 3),
+            ConstantVertex.of(2, 2, 6),
+            1
         );
 
         BooleanTensor equality = equals.lazyEval();
@@ -67,10 +68,10 @@ public class NumericalEqualsVertexTest {
     @Test
     public void canCompareIntegersAndDoublesAlmostEqual() {
 
-        NumericalEqualsVertex equals = new NumericalEqualsVertex(
-            ConstantVertex.of(new int[]{1, 2, 3}),
-            ConstantVertex.of(new double[]{2.0, 2.0, 5.5}),
-            ConstantVertex.of(2.1)
+        BooleanVertex equals = new NumericalEqualsVertex<>(
+            ConstantVertex.of(new int[]{1, 2, 3}).toDouble(),
+            ConstantVertex.of(2.0, 2.0, 5.5),
+            2.1
         );
 
         BooleanTensor equality = equals.lazyEval();

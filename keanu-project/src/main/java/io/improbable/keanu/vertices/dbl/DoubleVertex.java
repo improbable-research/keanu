@@ -10,6 +10,7 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.FloatingPointTensorVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
@@ -509,7 +510,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     @Override
     public BooleanVertex equalsWithinEpsilon(DoubleVertex other, Double epsilon) {
-        return null;
+        return new NumericalEqualsVertex<>(this, other, epsilon);
     }
 
     public DoubleVertex setWithMask(DoubleVertex mask, DoubleVertex value) {
