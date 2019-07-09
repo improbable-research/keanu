@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-public abstract class Vertex<T> implements IVertex<T> {
+public abstract class VertexImpl<T> implements IVertex<T> {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
@@ -31,11 +31,11 @@ public abstract class Vertex<T> implements IVertex<T> {
     private VertexState<T> state;
     private VertexLabel label = null;
 
-    public Vertex() {
+    public VertexImpl() {
         this(Tensor.SCALAR_SHAPE);
     }
 
-    public Vertex(long[] initialShape) {
+    public VertexImpl(long[] initialShape) {
         this.initialShape = initialShape;
         this.state = VertexState.nullState();
     }

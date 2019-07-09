@@ -5,11 +5,11 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
-public abstract class BooleanUnaryOpVertex<T extends Tensor> extends Vertex<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexUnaryOp<IVertex<T>> {
+public abstract class BooleanUnaryOpVertex<T extends Tensor> extends VertexImpl<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexUnaryOp<IVertex<T>> {
 
     protected final IVertex<T> a;
     protected final static String INPUT_NAME = "inputVertex";

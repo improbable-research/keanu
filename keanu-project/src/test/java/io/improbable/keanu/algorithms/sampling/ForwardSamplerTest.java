@@ -8,8 +8,8 @@ import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.IVertex;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -265,7 +265,7 @@ public class ForwardSamplerTest {
         assertEquals(0.0, averageA, 0.1);
     }
 
-    public static class IDTrackerVertex extends Vertex<DoubleTensor> implements DoubleVertex, Differentiable, ProbabilisticDouble {
+    public static class IDTrackerVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, Differentiable, ProbabilisticDouble {
 
         private final List<VertexId> ids;
 

@@ -6,12 +6,12 @@ import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 
-public class AssertVertex extends Vertex<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
+public class AssertVertex extends VertexImpl<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
 
     private static final String PREDICATE_NAME = "predicate";
     private static final String ERROR_MESSAGE_NAME = "error";

@@ -6,10 +6,10 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
-public class BooleanIfVertex extends Vertex<BooleanTensor> implements BooleanVertex,  NonProbabilistic<BooleanTensor> {
+public class BooleanIfVertex extends VertexImpl<BooleanTensor> implements BooleanVertex,  NonProbabilistic<BooleanTensor> {
 
     private final BooleanVertex predicate;
     private final BooleanVertex thn;

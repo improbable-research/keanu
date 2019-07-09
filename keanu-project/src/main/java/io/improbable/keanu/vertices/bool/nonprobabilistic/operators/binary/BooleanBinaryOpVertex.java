@@ -5,13 +5,13 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
-public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> extends Vertex<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexBinaryOp<IVertex<A>, IVertex<B>> {
+public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> extends VertexImpl<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexBinaryOp<IVertex<A>, IVertex<B>> {
 
     protected final IVertex<A> left;
     protected final IVertex<B> right;

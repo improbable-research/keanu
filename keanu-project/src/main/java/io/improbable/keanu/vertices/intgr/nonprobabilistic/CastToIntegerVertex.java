@@ -7,11 +7,11 @@ import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class CastToIntegerVertex<T extends NumberTensor> extends Vertex<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, VertexUnaryOp<IVertex<T>> {
+public class CastToIntegerVertex<T extends NumberTensor> extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, VertexUnaryOp<IVertex<T>> {
 
     private final IVertex<T> inputVertex;
     private static final String INPUT_NAME = "inputVertex";

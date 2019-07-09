@@ -6,10 +6,10 @@ import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
-public class CastToBooleanVertex extends Vertex<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
+public class CastToBooleanVertex extends VertexImpl<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
 
     private final IVertex<? extends BooleanTensor> inputVertex;
     private final static String INPUT_NAME = "inputVertex";

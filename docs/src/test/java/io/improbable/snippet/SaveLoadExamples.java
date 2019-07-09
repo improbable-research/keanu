@@ -8,7 +8,7 @@ import io.improbable.keanu.util.io.JsonLoader;
 import io.improbable.keanu.util.io.JsonSaver;
 import io.improbable.keanu.util.io.ProtobufLoader;
 import io.improbable.keanu.util.io.ProtobufSaver;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +44,7 @@ public class SaveLoadExamples {
     //%%SNIPPET_END%% SaveToDot
 
     //%%SNIPPET_START%% SavePartialToDot
-    public void savePartialNetToDot(Vertex startingVertex,
+    public void savePartialNetToDot(VertexImpl startingVertex,
                                     int degree,
                                     BayesianNetwork net,
                                     OutputStream outputStream,

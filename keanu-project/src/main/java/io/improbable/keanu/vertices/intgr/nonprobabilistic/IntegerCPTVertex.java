@@ -5,14 +5,14 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.CPTCondition;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.List;
 import java.util.Map;
 
-public class IntegerCPTVertex extends Vertex<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public class IntegerCPTVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
 
     private final List<IVertex<? extends Tensor<?, ?>>> inputs;
     private final Map<CPTCondition, IntegerVertex> conditions;

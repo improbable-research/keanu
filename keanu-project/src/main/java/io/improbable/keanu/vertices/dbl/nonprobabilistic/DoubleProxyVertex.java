@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class DoubleProxyVertex extends Vertex<DoubleTensor> implements DoubleVertex,  Differentiable, ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
+public class DoubleProxyVertex extends VertexImpl<DoubleTensor> implements DoubleVertex,  Differentiable, ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
 
     private static final String LABEL_PARAM_NAME = "label";
     private static final String PARENT_NAME = "parent";

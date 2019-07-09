@@ -7,10 +7,10 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class ConstantIntegerVertex extends Vertex<IntegerTensor> implements IntegerVertex, ConstantVertex, NonProbabilistic<IntegerTensor> {
+public class ConstantIntegerVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, ConstantVertex, NonProbabilistic<IntegerTensor> {
 
     private final static String CONSTANT_NAME = "constant";
 

@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.model.ModelResult;
@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.model.ModelVertex;
 /**
  * A non-probabilistic double vertex whose value is extracted from an upstream model vertex.
  */
-public class DoubleModelResultVertex extends Vertex<DoubleTensor> implements DoubleVertex, ModelResultProvider<DoubleTensor>, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class DoubleModelResultVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, ModelResultProvider<DoubleTensor>, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
     private final ModelResult<DoubleTensor> delegate;
 

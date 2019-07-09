@@ -10,13 +10,13 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class IntegerProxyVertex extends Vertex<IntegerTensor> implements IntegerVertex, ProxyVertex<IntegerVertex>, NonProbabilistic<IntegerTensor> {
+public class IntegerProxyVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, ProxyVertex<IntegerVertex>, NonProbabilistic<IntegerTensor> {
 
     private static final String LABEL_NAME = "label";
     private static final String PARENT_NAME = "parent";

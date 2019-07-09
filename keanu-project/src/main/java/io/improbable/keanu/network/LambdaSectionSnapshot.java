@@ -3,7 +3,6 @@ package io.improbable.keanu.network;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.Vertex;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,7 +29,7 @@ public class LambdaSectionSnapshot {
 
         Set<IVertex> allAffectedVariables = new HashSet<>();
         for (Variable variable : variables) {
-            if (variable instanceof Vertex) {
+            if (variable instanceof IVertex) {
 
                 LambdaSection lambdaSection = createVariablesAffectedByCache((IVertex) variable);
 

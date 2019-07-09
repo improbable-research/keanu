@@ -4,7 +4,6 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.vertices.IVertex;
-import io.improbable.keanu.vertices.Vertex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +23,7 @@ public class RollbackAndCascadeOnRejection implements ProposalRejectionStrategy 
         fromValues = new HashMap<>();
         for (Variable variable : proposal.getVariablesWithProposal()) {
 
-            if (variable instanceof Vertex) {
+            if (variable instanceof IVertex) {
                 fromValues.put((IVertex) variable, variable.getValue());
             } else {
                 throw new IllegalArgumentException(this.getClass().getSimpleName() + " is to only be used with Keanu's Vertex");

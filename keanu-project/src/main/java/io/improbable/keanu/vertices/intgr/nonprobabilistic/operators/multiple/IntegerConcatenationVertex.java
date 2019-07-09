@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.lang.reflect.Array;
@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class IntegerConcatenationVertex extends Vertex<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
+public class IntegerConcatenationVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
 
     private final static String DIMENSION_NAME = "dimension";
     private final static String OPERANDS_NAME = "operands";

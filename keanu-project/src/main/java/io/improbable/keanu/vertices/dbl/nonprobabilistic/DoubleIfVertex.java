@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class DoubleIfVertex extends Vertex<DoubleTensor> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor> {
+public class DoubleIfVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final BooleanVertex predicate;
     private final DoubleVertex thn;

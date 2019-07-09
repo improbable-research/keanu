@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
@@ -456,7 +456,7 @@ public class ProtobufTest {
         return savedModel;
     }
 
-    private class TestNonSaveableVertex extends Vertex<DoubleTensor> implements DoubleVertex, NonSaveableVertex {
+    private class TestNonSaveableVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, NonSaveableVertex {
 
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});

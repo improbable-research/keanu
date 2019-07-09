@@ -77,7 +77,7 @@ The Dot saver also has the option to only output Vertices within a certain dista
 a user requested a distance of 1 then the Dot output would contain the Vertex itself and its direct parents and children).
 This operation is similarly simple:
 ```java
-public void savePartialNetToDot(Vertex startingVertex,
+public void savePartialNetToDot(VertexImpl startingVertex,
                                 int degree,
                                 BayesianNetwork net,
                                 OutputStream outputStream,

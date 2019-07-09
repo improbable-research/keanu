@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.generic;
 
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 
-public abstract class GenericVertex<T> extends Vertex<T> {
+public abstract class GenericVertex<T> extends VertexImpl<T> {
 
     public GenericVertex() {
         super();

@@ -15,7 +15,6 @@ import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.ProxyVertex;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -336,7 +335,7 @@ public class ProtobufLoader implements NetworkLoader {
 
     private IVertex[] extractVertexArray(SavedBayesNet.NamedParam param,
                                          Map<SavedBayesNet.VertexID, IVertex> existingVertices) {
-        IVertex[] newVertexArray = new Vertex[param.getVertexArrayParam().getValuesCount()];
+        IVertex[] newVertexArray = new IVertex[param.getVertexArrayParam().getValuesCount()];
 
         for (int i = 0; i < newVertexArray.length; i++) {
             SavedBayesNet.VertexID parentId = param.getVertexArrayParam().getValues(i);

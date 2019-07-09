@@ -3,7 +3,7 @@ package io.improbable.keanu.network;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -107,7 +107,7 @@ public class BayesianNetworkTest {
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
     }
 
-    private class TestNonSaveableVertex extends Vertex<DoubleTensor> implements DoubleVertex, NonSaveableVertex {
+    private class TestNonSaveableVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, NonSaveableVertex {
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});
         }
