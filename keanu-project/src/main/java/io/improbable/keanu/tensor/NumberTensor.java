@@ -231,13 +231,4 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>>
 
     N sumNumber();
 
-//    N productNumber();
-//
-//    N averageNumber();
-//
-//    N standardDeviationNumber();
-//
-//    N minNumber();
-//
-//    N maxNumber();
 }

@@ -2,7 +2,6 @@ package io.improbable.keanu.network;
 
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.vertices.IVertex;
-import io.improbable.keanu.vertices.Vertex;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;

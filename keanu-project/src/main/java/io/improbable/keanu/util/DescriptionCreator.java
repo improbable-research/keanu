@@ -3,7 +3,6 @@ package io.improbable.keanu.util;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;

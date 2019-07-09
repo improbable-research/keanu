@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.vertices.IVertex;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import org.junit.Before;
 import org.junit.Rule;

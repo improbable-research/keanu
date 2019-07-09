@@ -14,7 +14,6 @@ import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.network.TransitiveClosure;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.IVertex;
-import io.improbable.keanu.vertices.Vertex;
 import org.nd4j.base.Preconditions;
 
 import java.util.ArrayList;

@@ -3,7 +3,6 @@ package io.improbable.keanu.algorithms.graphtraversal;
 import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;

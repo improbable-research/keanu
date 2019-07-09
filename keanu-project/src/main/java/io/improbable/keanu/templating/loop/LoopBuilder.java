@@ -25,7 +25,7 @@ public class LoopBuilder {
     private int maxLoopCount = Loop.DEFAULT_MAX_COUNT;
     private boolean throwWhenMaxCountIsReached = true;
 
-    <V extends IVertex<?>> LoopBuilder(VertexDictionary initialState) {
+    LoopBuilder(VertexDictionary initialState) {
         this.initialState = initialState;
     }
 

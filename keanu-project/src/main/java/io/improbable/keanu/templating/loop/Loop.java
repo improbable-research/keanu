@@ -26,24 +26,24 @@ import java.util.Map;
  * "V" is the output of the loop
  * "L" indicates if it's still looping. This is used to detect the error case in which the loop was too short to complete.
  * <p>
- * cond true base
- * \ |   |  \
- * AND  | iterate
- * |\  |  /|
- * | \ | / |
- * cond  |  IF   |
- * \ |   |\  |
- * AND  | iterate
- * |\  |  /|
- * | \ | / |
- * cond  |  IF   |
- * \ |   |\  |
- * AND  | iterate
- * |\  |  /
- * | \ | /
- * |  IF
- * |   |
- * L   V
+ *       cond true base
+ *           \ |   |  \
+ *            AND  | iterate
+ *             |\  |  /|
+ *             | \ | / |
+ *       cond  |  IF   |
+ *           \ |   |\  |
+ *            AND  | iterate
+ *             |\  |  /|
+ *             | \ | / |
+ *       cond  |  IF   |
+ *           \ |   |\  |
+ *            AND  | iterate
+ *             |\  |  /
+ *             | \ | /
+ *             |  IF
+ *             |   |
+ *             L   V
  */
 @Slf4j
 public class Loop {
