@@ -300,7 +300,7 @@ public class KeanuCompiledGraphTest {
 
     @Test
     public void compilesEqualTo() {
-        assertBinaryBooleanMatches(BooleanVertex::equalTo);
+        assertBinaryBooleanMatches(BooleanVertex::elementwiseEquals);
     }
 
     @Test

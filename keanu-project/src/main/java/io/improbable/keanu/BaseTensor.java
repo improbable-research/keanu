@@ -184,4 +184,8 @@ public interface BaseTensor<
     BOOLEAN elementwiseEquals(T that);
 
     BOOLEAN elementwiseEquals(N value);
+
+    BOOLEAN notEqualTo(T that);
+
+    BOOLEAN notEqualTo(N value);
 }

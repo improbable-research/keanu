@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl;
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.Vertex;
@@ -180,8 +179,14 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return new EqualsVertex<>(this, new ConstantDoubleVertex(value));
     }
 
-    default <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
-        return new NotEqualsVertex<>(this, rhs);
+    @Override
+    default BooleanVertex notEqualTo(DoubleVertex that) {
+        return new NotEqualsVertex<>(this, that);
+    }
+
+    @Override
+    default BooleanVertex notEqualTo(Double value) {
+        return notEqualTo(new ConstantDoubleVertex(value));
     }
 
     //////////////////////////

@@ -141,13 +141,18 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return elementwiseEquals(new ConstantIntegerVertex(value));
     }
 
-    //////////////////////////
-    ////  Number Tensor Operations
-    //////////////////////////
-
     default BooleanVertex notEqualTo(IntegerVertex rhs) {
         return new NotEqualsVertex<>(this, rhs);
     }
+
+    @Override
+    default BooleanVertex notEqualTo(Integer value) {
+        return notEqualTo(new ConstantIntegerVertex(value));
+    }
+
+    //////////////////////////
+    ////  Number Tensor Operations
+    //////////////////////////
 
     @Override
     default IntegerVertex minus(IntegerVertex that) {

@@ -6,7 +6,6 @@ import io.improbable.keanu.kotlin.BooleanOperators;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.TensorVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
@@ -82,14 +81,6 @@ public interface BooleanVertex extends
         return new AssertVertex(this, errorMessage);
     }
 
-    default BooleanVertex equalTo(BooleanVertex rhs) {
-        return new EqualsVertex<>(this, rhs);
-    }
-
-    default <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
-        return new NotEqualsVertex<>(this, rhs);
-    }
-
     default BooleanVertex take(long... index) {
         return new BooleanTakeVertex(this, index);
     }
@@ -119,13 +110,23 @@ public interface BooleanVertex extends
     }
 
     @Override
+    default BooleanVertex notEqualTo(BooleanVertex that) {
+        return new NotEqualsVertex<>(this, that);
+    }
+
+    @Override
+    default BooleanVertex notEqualTo(Boolean value) {
+        return notEqualTo(new ConstantBooleanVertex(value));
+    }
+
+    @Override
     default BooleanVertex elementwiseEquals(BooleanVertex that) {
-        return null;
+        return new EqualsVertex<>(this, that);
     }
 
     @Override
     default BooleanVertex elementwiseEquals(Boolean value) {
-        return elementwiseEquals(ConstantVertex.of(value));
+        return elementwiseEquals(new ConstantBooleanVertex(value));
     }
 
     @Override

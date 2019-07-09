@@ -103,4 +103,12 @@ public interface Tensor<N, T extends Tensor<N, T>> extends BaseTensor<BooleanTen
 
     BooleanTensor elementwiseEquals(N value);
 
+    default BooleanTensor notEqualTo(T that) {
+        return elementwiseEquals(that).notInPlace();
+    }
+
+    default BooleanTensor notEqualTo(N value) {
+        return elementwiseEquals(value).notInPlace();
+    }
+
 }

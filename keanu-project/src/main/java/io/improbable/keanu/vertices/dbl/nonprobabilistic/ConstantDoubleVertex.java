@@ -61,4 +61,5 @@ public class ConstantDoubleVertex extends VertexImpl<DoubleTensor> implements Do
     public DoubleTensor getConstantValue() {
         return getValue();
     }
+
 }

@@ -71,9 +71,9 @@ public class BooleanVertexTest {
         v2.setValue(false);
         BooleanVertex v3 = ConstantVertex.of(true);
 
-        assertFalse(v1.equalTo(v2).eval().scalar());
+        assertFalse(v1.elementwiseEquals(v2).eval().scalar());
         assertTrue(v1.notEqualTo(v2).eval().scalar());
-        assertFalse(v2.equalTo(v3).eval().scalar());
+        assertFalse(v2.elementwiseEquals(v3).eval().scalar());
         assertTrue(v2.notEqualTo(v3).eval().scalar());
     }
 
