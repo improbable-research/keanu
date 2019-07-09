@@ -9,15 +9,15 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-public interface IVertex<T> extends Observable<T>, Variable<T, VertexState<T>> {
+public interface Vertex<T> extends Observable<T>, Variable<T, VertexState<T>> {
 
-    <V extends IVertex<T>> V setLabel(VertexLabel label);
+    <V extends Vertex<T>> V setLabel(VertexLabel label);
 
-    <V extends IVertex<T>> V setLabel(String label);
+    <V extends Vertex<T>> V setLabel(String label);
 
     VertexLabel getLabel();
 
-    <V extends IVertex<T>> V removeLabel();
+    <V extends Vertex<T>> V removeLabel();
 
     T lazyEval();
 
@@ -45,9 +45,9 @@ public interface IVertex<T> extends Observable<T>, Variable<T, VertexState<T>> {
 
     int getRank();
 
-    <V extends IVertex<T>> V print();
+    <V extends Vertex<T>> V print();
 
-    <V extends IVertex<T>> V print(final String message, final boolean printData);
+    <V extends Vertex<T>> V print(final String message, final boolean printData);
 
     void setAndCascade(T value);
 
@@ -67,23 +67,23 @@ public interface IVertex<T> extends Observable<T>, Variable<T, VertexState<T>> {
 
     int getIndentation();
 
-    Set<IVertex> getChildren();
+    Set<Vertex> getChildren();
 
-    void addChild(IVertex<?> v);
+    void addChild(Vertex<?> v);
 
-    void setParents(Collection<? extends IVertex> parents);
+    void setParents(Collection<? extends Vertex> parents);
 
-    void setParents(IVertex<?>... parents);
+    void setParents(Vertex<?>... parents);
 
-    void addParents(Collection<? extends IVertex> parents);
+    void addParents(Collection<? extends Vertex> parents);
 
-    void addParent(IVertex<?> parent);
+    void addParent(Vertex<?> parent);
 
-    Set<IVertex> getParents();
+    Set<Vertex> getParents();
 
     int getDegree();
 
-    Set<IVertex> getConnectedGraph();
+    Set<Vertex> getConnectedGraph();
 
     void save(NetworkSaver netSaver);
 

@@ -4,10 +4,10 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
@@ -76,12 +76,12 @@ public class HalfCauchyVertex extends CauchyVertex {
     }
 
     @Override
-    public Map<IVertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends IVertex> withRespectTo) {
-        Map<IVertex, DoubleTensor> logProb = super.dLogProb(value, withRespectTo);
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+        Map<Vertex, DoubleTensor> logProb = super.dLogProb(value, withRespectTo);
         if (value.greaterThanOrEqual(LOC_ZERO).allTrue()) {
             return logProb;
         } else {
-            for (Map.Entry<IVertex, DoubleTensor> entry : logProb.entrySet()) {
+            for (Map.Entry<Vertex, DoubleTensor> entry : logProb.entrySet()) {
                 DoubleTensor v = entry.getValue();
                 logProb.put(entry.getKey(), v.setWithMaskInPlace(value.lessThanMask(DoubleTensor.scalar(LOC_ZERO)), 0.0));
             }

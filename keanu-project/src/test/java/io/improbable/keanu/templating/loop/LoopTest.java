@@ -4,7 +4,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexMatchers;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -32,7 +32,7 @@ public class LoopTest {
     private final Function<DoubleVertex, DoubleVertex> increment = (v) -> v.plus(1.);
     private final Supplier<BooleanVertex> flip = () -> new BernoulliVertex(0.5);
     private final Supplier<BooleanVertex> alwaysTrue = () -> ConstantVertex.of(true);
-    private final IVertex startValue = ConstantVertex.of(0.);
+    private final Vertex startValue = ConstantVertex.of(0.);
 
     @Test
     public void youCanGetTheOutputVertex() {
@@ -40,7 +40,7 @@ public class LoopTest {
             .withInitialConditions(startValue)
             .iterateWhile(flip)
             .apply(increment);
-        IVertex<?> output = loop.getOutput();
+        Vertex<?> output = loop.getOutput();
         assertThat(output, instanceOf(DoubleVertex.class));
     }
 
@@ -125,15 +125,15 @@ public class LoopTest {
             .iterateWhile(alwaysTrue)
             .apply(increment);
 
-        IVertex<?> outputFromFirstLoop = loop.getOutput();
+        Vertex<?> outputFromFirstLoop = loop.getOutput();
 
         Loop loop2 = Loop
-            .withInitialConditions((IVertex<?>) loop.getOutput())
+            .withInitialConditions((Vertex<?>) loop.getOutput())
             .doNotThrowWhenMaxCountIsReached()
             .iterateWhile(alwaysTrue)
             .apply(increment);
 
-        IVertex<?> output = loop2.getOutput();
+        Vertex<?> output = loop2.getOutput();
 
         new BayesianNetwork(output.getConnectedGraph());
     }

@@ -7,8 +7,8 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,19 +24,19 @@ import static java.util.stream.Collectors.toMap;
  */
 public class KeanuProbabilisticModel implements ProbabilisticModel {
 
-    private final Map<VariableReference, IVertex> vertexLookup;
-    private final List<IVertex> latentVertices;
-    private final List<IVertex> observedVertices;
-    private final List<IVertex> latentOrObservedVertices;
+    private final Map<VariableReference, Vertex> vertexLookup;
+    private final List<Vertex> latentVertices;
+    private final List<Vertex> observedVertices;
+    private final List<Vertex> latentOrObservedVertices;
     private final LambdaSectionSnapshot lambdaSectionSnapshot;
 
-    public KeanuProbabilisticModel(Collection<? extends IVertex> variables) {
+    public KeanuProbabilisticModel(Collection<? extends Vertex> variables) {
         this(new BayesianNetwork(variables));
     }
 
     public KeanuProbabilisticModel(BayesianNetwork bayesianNetwork) {
         this.vertexLookup = bayesianNetwork.getLatentOrObservedVertices().stream()
-            .collect(toMap(IVertex::getId, v -> v));
+            .collect(toMap(Vertex::getId, v -> v));
 
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
@@ -57,12 +57,12 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     @Override
     public double logProbAfter(Map<VariableReference, Object> newValues, double logProbBefore) {
-        ImmutableSet.Builder<IVertex> affectedVerticesBuilder = ImmutableSet.builder();
+        ImmutableSet.Builder<Vertex> affectedVerticesBuilder = ImmutableSet.builder();
         for (VariableReference reference : newValues.keySet()) {
-            IVertex vertex = vertexLookup.get(reference);
+            Vertex vertex = vertexLookup.get(reference);
             affectedVerticesBuilder.add(vertex);
         }
-        Set<IVertex> affectedVertices = affectedVerticesBuilder.build();
+        Set<Vertex> affectedVertices = affectedVerticesBuilder.build();
 
         double lambdaSectionLogProbBefore = lambdaSectionSnapshot.logProb(affectedVertices);
         cascadeValues(newValues);
@@ -84,11 +84,11 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
         return (List) this.latentVertices;
     }
 
-    public List<IVertex> getLatentVertices() {
+    public List<Vertex> getLatentVertices() {
         return this.latentVertices;
     }
 
-    public List<IVertex> getLatentOrObservedVertices() {
+    public List<Vertex> getLatentOrObservedVertices() {
         return latentOrObservedVertices;
     }
 
@@ -112,9 +112,9 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     protected void cascadeValues(Map<VariableReference, ?> inputs) {
 
-        List<IVertex> updatedVertices = new ArrayList<>();
+        List<Vertex> updatedVertices = new ArrayList<>();
         for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {
-            IVertex updatingVertex = vertexLookup.get(input.getKey());
+            Vertex updatingVertex = vertexLookup.get(input.getKey());
 
             if (updatingVertex == null) {
                 throw new IllegalArgumentException("Cannot cascade update for input: " + input.getKey());

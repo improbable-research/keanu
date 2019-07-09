@@ -51,14 +51,14 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
             PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
             autoDiffCount.incrementAndGet();
             return derivativeOfParentWithRespectToInputs;
         }
 
         @Override
-        public Map<IVertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
             autoDiffCount.incrementAndGet();
             return Collections.singletonMap(inputVertex, derivativeOfOutputWithRespectToSelf);
         }
@@ -98,7 +98,7 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
             PartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
             PartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
             autoDiffCount.incrementAndGet();
@@ -106,9 +106,9 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public Map<IVertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
             autoDiffCount.incrementAndGet();
-            Map<IVertex, PartialDerivative> partials = new HashMap<>();
+            Map<Vertex, PartialDerivative> partials = new HashMap<>();
             partials.put(left, derivativeOfOutputWithRespectToSelf);
             partials.put(right, derivativeOfOutputWithRespectToSelf);
             return partials;

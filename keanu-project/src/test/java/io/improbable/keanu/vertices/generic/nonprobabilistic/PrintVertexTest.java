@@ -7,8 +7,8 @@ import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.io.ProtobufLoader;
 import io.improbable.keanu.util.io.ProtobufSaver;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -93,7 +93,7 @@ public class PrintVertexTest {
     @Test
     public void whenPrintVertexHasAChildThenChildCanGetGrandParentsValue() {
         // this use case is quite unlikely, the Print vertex is meant to hang off its parent but not have any children
-        final IVertex<DoubleTensor> realParent = new ConstantDoubleVertex(30);
+        final Vertex<DoubleTensor> realParent = new ConstantDoubleVertex(30);
         final PrintVertex<DoubleTensor> sut = new PrintVertex<>(realParent);
 
         final UnaryOpVertex<DoubleTensor, DoubleTensor> child = new PlusOneOp(new long[]{1, 1}, sut);
@@ -124,7 +124,7 @@ public class PrintVertexTest {
 
     @Test
     public void whenRunningMetropolisHastingsThenSamplesArePrinted() {
-        final IVertex<DoubleTensor> temperature = new UniformVertex(20., 30.);
+        final Vertex<DoubleTensor> temperature = new UniformVertex(20., 30.);
 
         new PrintVertex<>(temperature);
 
@@ -142,7 +142,7 @@ public class PrintVertexTest {
     public void whenPrintIsCalledAddsPrintVertexAsChild() {
         final UniformVertex A = new UniformVertex(0, 1);
         A.print();
-        final IVertex printVertex = Iterables.getOnlyElement(A.getChildren());
+        final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
         assertThat(printVertex, instanceOf(PrintVertex.class));
     }
 
@@ -154,7 +154,7 @@ public class PrintVertexTest {
         final DoubleVertex A = new ConstantDoubleVertex(42);
         A.print("testprefix\n", true);
 
-        final IVertex printVertex = Iterables.getOnlyElement(A.getChildren());
+        final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
         printVertex.getValue();
 
         final String expectedOutput = "testprefix\n" +
@@ -165,7 +165,7 @@ public class PrintVertexTest {
 
     @Test
     public void whenSavingAndLoadingThenVertexStateIsRestored() throws IOException {
-        final IVertex<DoubleTensor> realParent = new ConstantDoubleVertex(30);
+        final Vertex<DoubleTensor> realParent = new ConstantDoubleVertex(30);
         final PrintVertex<DoubleTensor> sut = new PrintVertex<>(realParent, "my vertex\n", true);
 
         final BayesianNetwork net = new BayesianNetwork(sut.getConnectedGraph());
@@ -187,7 +187,7 @@ public class PrintVertexTest {
     }
 
     private static class PlusOneOp extends UnaryOpVertex<DoubleTensor, DoubleTensor> implements NonSaveableVertex {
-        public PlusOneOp(final long[] shape, final IVertex<DoubleTensor> inputVertex) {
+        public PlusOneOp(final long[] shape, final Vertex<DoubleTensor> inputVertex) {
             super(shape, inputVertex);
         }
 

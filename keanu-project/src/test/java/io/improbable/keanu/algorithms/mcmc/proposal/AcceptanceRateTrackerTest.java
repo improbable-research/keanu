@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import com.google.common.collect.ImmutableList;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import org.junit.Before;
 import org.junit.Rule;
@@ -16,8 +16,8 @@ import static org.mockito.Mockito.when;
 
 public class AcceptanceRateTrackerTest {
 
-    private IVertex vertex1 = mock(IVertex.class);
-    private IVertex vertex2 = mock(IVertex.class);
+    private Vertex vertex1 = mock(Vertex.class);
+    private Vertex vertex2 = mock(Vertex.class);
     ProposalNotifier notifier;
     private AcceptanceRateTracker acceptanceRateTracker;
 
@@ -107,7 +107,7 @@ public class AcceptanceRateTrackerTest {
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex2.getId()), equalTo(0.5));
     }
 
-    private void expectRateToBeMissing(IVertex vertex) {
+    private void expectRateToBeMissing(Vertex vertex) {
         try {
             double acceptanceRate = acceptanceRateTracker.getAcceptanceRate(vertex.getId());
             throw new RuntimeException(String.format("Expected rate for %s to be missing but got %.2f", vertex, acceptanceRate));

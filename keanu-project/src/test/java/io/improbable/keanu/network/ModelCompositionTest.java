@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -58,9 +58,9 @@ public class ModelCompositionTest {
 
         trueLocation = new UniformVertex(0.1, 50.0);
 
-        Map<VertexLabel, IVertex> inputVertices = ImmutableMap.of(new VertexLabel("Location"), trueLocation);
+        Map<VertexLabel, Vertex> inputVertices = ImmutableMap.of(new VertexLabel("Location"), trueLocation);
 
-        Map<VertexLabel, IVertex> outputs = ModelComposition.composeModel(
+        Map<VertexLabel, Vertex> outputs = ModelComposition.composeModel(
             innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1"))
         );
 
@@ -103,9 +103,9 @@ public class ModelCompositionTest {
 
     @Test
     public void idOrderingStillImpliesTopologicalOrdering() {
-        for (IVertex v : outerNet.getVertices()) {
-            Set<IVertex> parentSet = v.getParents();
-            for (IVertex parent : parentSet) {
+        for (Vertex v : outerNet.getVertices()) {
+            Set<Vertex> parentSet = v.getParents();
+            for (Vertex parent : parentSet) {
                 assertTrue(v.getId().compareTo(parent.getId()) > 0);
             }
         }
@@ -132,8 +132,8 @@ public class ModelCompositionTest {
 
     @Test
     public void bayesNetCanReturnTopLevelVerticesOnly() {
-        Set<IVertex> latentOuterVertices = ImmutableSet.of(trueLocation, gaussOutputVertex);
-        Set<IVertex> filteredVertices = new HashSet<>(outerNet.getTopLevelLatentVertices());
+        Set<Vertex> latentOuterVertices = ImmutableSet.of(trueLocation, gaussOutputVertex);
+        Set<Vertex> filteredVertices = new HashSet<>(outerNet.getTopLevelLatentVertices());
 
         assertTrue(latentOuterVertices.containsAll(filteredVertices));
         assertTrue(filteredVertices.containsAll(latentOuterVertices));

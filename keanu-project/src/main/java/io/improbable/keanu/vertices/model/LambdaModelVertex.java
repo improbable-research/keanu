@@ -2,8 +2,8 @@ package io.improbable.keanu.vertices.model;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -17,10 +17,10 @@ import java.util.function.Supplier;
 
 public class LambdaModelVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, ModelVertex<DoubleTensor>, NonSaveableVertex {
 
-    private Map<VertexLabel, IVertex<? extends Tensor>> inputs;
-    private Map<VertexLabel, IVertex<? extends Tensor>> outputs;
-    private Consumer<Map<VertexLabel, IVertex<? extends Tensor>>> executor;
-    private Supplier<Map<VertexLabel, IVertex<? extends Tensor>>> extractOutput;
+    private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
+    private Map<VertexLabel, Vertex<? extends Tensor>> outputs;
+    private Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor;
+    private Supplier<Map<VertexLabel, Vertex<? extends Tensor>>> extractOutput;
     private boolean hasValue;
 
     /**
@@ -34,9 +34,9 @@ public class LambdaModelVertex extends VertexImpl<DoubleTensor> implements Doubl
      * @param updateValues a function to extract the output values (once the operation has been performed) and update
      *                     the models output values.
      */
-    public LambdaModelVertex(Map<VertexLabel, IVertex<? extends Tensor>> inputs,
-                             Consumer<Map<VertexLabel, IVertex<? extends Tensor>>> executor,
-                             Supplier<Map<VertexLabel, IVertex<? extends Tensor>>> updateValues) {
+    public LambdaModelVertex(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
+                             Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
+                             Supplier<Map<VertexLabel, Vertex<? extends Tensor>>> updateValues) {
         super(Tensor.SCALAR_SHAPE);
         this.inputs = inputs;
         this.outputs = Collections.emptyMap();
@@ -59,9 +59,9 @@ public class LambdaModelVertex extends VertexImpl<DoubleTensor> implements Doubl
      * @return a process model vertex
      */
     @SuppressWarnings("squid:S2142")    // "InterruptedException" should not be ignored
-    public static LambdaModelVertex createFromProcess(Map<VertexLabel, IVertex<? extends Tensor>> inputs,
+    public static LambdaModelVertex createFromProcess(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                                                       String command,
-                                                      Supplier<Map<VertexLabel, IVertex<? extends Tensor>>> updateValues) {
+                                                      Supplier<Map<VertexLabel, Vertex<? extends Tensor>>> updateValues) {
         return new LambdaModelVertex(inputs, i -> {
             try {
                 Process cmd = Runtime.getRuntime().exec(command);
@@ -98,7 +98,7 @@ public class LambdaModelVertex extends VertexImpl<DoubleTensor> implements Doubl
     }
 
     @Override
-    public Map<VertexLabel, IVertex<? extends Tensor>> updateValues() {
+    public Map<VertexLabel, Vertex<? extends Tensor>> updateValues() {
         outputs = extractOutput.get();
         return outputs;
     }

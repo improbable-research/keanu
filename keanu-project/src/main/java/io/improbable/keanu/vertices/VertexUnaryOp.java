@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices;
 
-public interface VertexUnaryOp<T extends IVertex> {
+public interface VertexUnaryOp<T extends Vertex> {
 
     T getInputVertex();
 }

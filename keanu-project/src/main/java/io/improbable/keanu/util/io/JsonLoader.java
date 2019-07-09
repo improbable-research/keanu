@@ -3,7 +3,7 @@ package io.improbable.keanu.util.io;
 import com.google.protobuf.util.JsonFormat;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkLoader;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -50,7 +50,7 @@ public class JsonLoader implements NetworkLoader {
     }
 
     @Override
-    public void loadValue(IVertex vertex) {
+    public void loadValue(Vertex vertex) {
         protobufLoader.loadValue(vertex);
     }
 }

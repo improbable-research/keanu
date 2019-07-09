@@ -1,13 +1,13 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
 
 public class ParticleFilterBuilder {
 
-    private Collection<? extends IVertex> vertices;
+    private Collection<? extends Vertex> vertices;
     private int numParticles = 1000;
     private int resamplingCycles = 3;
     private double resamplingProportion = 0.5;
@@ -16,7 +16,7 @@ public class ParticleFilterBuilder {
     /**
      * @param vertices the vertices of a Bayesian network to find probable values for
      */
-    public ParticleFilterBuilder(Collection<? extends IVertex> vertices) {
+    public ParticleFilterBuilder(Collection<? extends Vertex> vertices) {
         this.vertices = vertices;
     }
 

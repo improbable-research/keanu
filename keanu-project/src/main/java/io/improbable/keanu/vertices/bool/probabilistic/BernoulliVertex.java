@@ -6,13 +6,13 @@ import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.BooleanPlaceholderVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -88,7 +88,7 @@ public class BernoulliVertex extends VertexImpl<BooleanTensor> implements Boolea
     }
 
     @Override
-    public Map<IVertex, DoubleTensor> dLogProb(BooleanTensor value, Set<? extends IVertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(BooleanTensor value, Set<? extends Vertex> withRespectTo) {
 
         if (!(probTrue.isDifferentiable())) {
             throw new UnsupportedOperationException("The probability of the Bernoulli being true must be differentiable");

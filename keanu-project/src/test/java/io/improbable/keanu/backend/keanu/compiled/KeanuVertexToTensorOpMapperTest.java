@@ -1,8 +1,8 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
 import org.junit.Test;
 import org.reflections.Reflections;
 
@@ -20,8 +20,8 @@ public class KeanuVertexToTensorOpMapperTest {
 
         Reflections reflections = new Reflections("io.improbable.keanu.vertices");
 
-        Set<Class<? extends IVertex>> vertices = reflections.getSubTypesOf(IVertex.class);
-        List<Class<? extends IVertex>> supportedVertices = vertices.stream()
+        Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
+        List<Class<? extends Vertex>> supportedVertices = vertices.stream()
             .filter(v -> !Probabilistic.class.isAssignableFrom(v))
             .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
             .filter(v -> !Modifier.isAbstract(v.getModifiers()))
@@ -30,8 +30,8 @@ public class KeanuVertexToTensorOpMapperTest {
         assertDoesSupport(supportedVertices);
     }
 
-    private void assertDoesSupport(List<Class<? extends IVertex>> supportedVertices) {
-        List<Class<? extends IVertex>> unsupportedVertices = supportedVertices.stream()
+    private void assertDoesSupport(List<Class<? extends Vertex>> supportedVertices) {
+        List<Class<? extends Vertex>> unsupportedVertices = supportedVertices.stream()
             .filter(v -> getOpMapperFor(v) == null)
             .collect(Collectors.toList());
 

@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.junit.Before;
@@ -110,7 +110,7 @@ public class ExponentialVertexTest {
         bTensor.setValue(2.5);
 
         ExponentialVertex tensorExponentialVertex = new ExponentialVertex(bTensor);
-        Map<IVertex, DoubleTensor> actualDerivatives = tensorExponentialVertex.dLogPdf(1.5, bTensor, tensorExponentialVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorExponentialVertex.dLogPdf(1.5, bTensor, tensorExponentialVertex);
 
         assertEquals(exponentialLogDiff.dPdlambda, actualDerivatives.get(bTensor).scalar(), 1e-5);
         assertEquals(exponentialLogDiff.dPdx, actualDerivatives.get(tensorExponentialVertex).scalar(), 1e-5);

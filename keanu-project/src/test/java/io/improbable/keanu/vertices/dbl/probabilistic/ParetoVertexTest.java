@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.Pareto;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import org.apache.commons.math3.distribution.ParetoDistribution;
@@ -154,7 +154,7 @@ public class ParetoVertexTest {
         scaleTensor.setValue(1.5);
 
         ParetoVertex vertex = new ParetoVertex(locationTensor, scaleTensor);
-        Map<IVertex, DoubleTensor> actualDerivatives = vertex.dLogPdf(2.5, locationTensor, scaleTensor, vertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = vertex.dLogPdf(2.5, locationTensor, scaleTensor, vertex);
 
         assertEquals(paretoLogDiff.dPdLocation, actualDerivatives.get(locationTensor).scalar(), 1e-5);
         assertEquals(paretoLogDiff.dPdScale, actualDerivatives.get(scaleTensor).scalar(), 1e-5);

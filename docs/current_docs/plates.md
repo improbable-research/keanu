@@ -79,7 +79,7 @@ BayesianNetwork network = sequence.toBayesianNetwork();
 // Keanu-Example.Sequence_Item_<<index>>.<<hash>>.<<vertex-label>>
 // where the <<hash>> is a unique identifier for the Sequence.
 // You can get all the vertices with a particular name, regardless of which SequenceItem they belong to.
-List<IVertex> allXVertices = network.getVerticesIgnoringNamespace(x1Label.getUnqualifiedName());
+List<Vertex> allXVertices = network.getVerticesIgnoringNamespace(x1Label.getUnqualifiedName());
 
 // You get vertices from specific sequence items
 // For instance here we retrieve a vertex from the last sequence item

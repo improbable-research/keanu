@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.mcmc;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.network.LambdaSectionSnapshot;
 import io.improbable.keanu.network.NetworkSnapshot;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Set;
 
@@ -22,7 +22,7 @@ public class RollBackToCachedValuesOnRejection implements ProposalRejectionStrat
 
     @Override
     public void onProposalCreated(Proposal proposal) {
-        Set<IVertex> affectedVariables = lambdaSectionSnapshot.getAllVerticesAffectedBy(proposal.getVariablesWithProposal());
+        Set<Vertex> affectedVariables = lambdaSectionSnapshot.getAllVerticesAffectedBy(proposal.getVariablesWithProposal());
         networkSnapshot = NetworkSnapshot.create(affectedVariables);
     }
 

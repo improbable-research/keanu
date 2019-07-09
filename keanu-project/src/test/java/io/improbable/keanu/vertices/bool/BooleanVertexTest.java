@@ -5,7 +5,7 @@ import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -247,7 +247,7 @@ public class BooleanVertexTest {
         return pA + pB - (pA * pB);
     }
 
-    public static double priorProbabilityTrue(IVertex<? extends Tensor<Boolean, ?>> vertex, int sampleCount, KeanuRandom random) {
+    public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean, ?>> vertex, int sampleCount, KeanuRandom random) {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
 
         long trueCount = MetropolisHastings.withDefaultConfig(random)

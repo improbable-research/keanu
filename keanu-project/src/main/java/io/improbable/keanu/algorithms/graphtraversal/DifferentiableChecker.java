@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import lombok.experimental.UtilityClass;
 
@@ -63,51 +63,51 @@ public class DifferentiableChecker {
      * @param vertices the vertices to check are differentiable w.r.t latents.
      * @return true if all given vertices are differentiable, false otherwise.
      */
-    public static boolean isDifferentiableWrtLatents(Collection<IVertex> vertices) {
+    public static boolean isDifferentiableWrtLatents(Collection<Vertex> vertices) {
         // All probabilistic need to be double or observed to ensure that the dLogProb can be calculated, for example
         // the dLogProb of BernoulliVertex can only be calculated when it is observed.
         if (!allProbabilisticAreDoubleOrObserved(vertices)) {
             return false;
         }
-        Set<IVertex> allParents = allParentsOf(vertices);
-        Set<IVertex> constantValueVerticesCache = new HashSet<>();
+        Set<Vertex> allParents = allParentsOf(vertices);
+        Set<Vertex> constantValueVerticesCache = new HashSet<>();
         return diffableOrConstantUptoNextRV(allParents, constantValueVerticesCache);
     }
 
-    private static boolean allProbabilisticAreDoubleOrObserved(Collection<IVertex> vertices) {
-        return vertices.stream().filter(IVertex::isProbabilistic)
+    private static boolean allProbabilisticAreDoubleOrObserved(Collection<Vertex> vertices) {
+        return vertices.stream().filter(Vertex::isProbabilistic)
             .allMatch(DifferentiableChecker::isDoubleOrObserved);
     }
 
-    private static boolean isDoubleOrObserved(IVertex v) {
+    private static boolean isDoubleOrObserved(Vertex v) {
         return (v instanceof DoubleVertex || v.isObserved());
     }
 
-    private static Set<IVertex> allParentsOf(Collection<IVertex> vertices) {
-        Set<IVertex> allParents = new HashSet<>();
-        for (IVertex vertex : vertices) {
+    private static Set<Vertex> allParentsOf(Collection<Vertex> vertices) {
+        Set<Vertex> allParents = new HashSet<>();
+        for (Vertex vertex : vertices) {
             allParents.addAll(vertex.getParents());
         }
         return allParents;
     }
 
-    private static boolean diffableOrConstantUptoNextRV(Collection<IVertex> vertices, Set<IVertex> constantValueVerticesCache) {
+    private static boolean diffableOrConstantUptoNextRV(Collection<Vertex> vertices, Set<Vertex> constantValueVerticesCache) {
         return BreadthFirstSearch.bfsWithFailureCondition(vertices,
             vertex -> isNonDiffableAndNotConstant(vertex, constantValueVerticesCache),
             DifferentiableChecker::getParentsIfVertexIsNotProbabilistic,
             BreadthFirstSearch::doNothing);
     }
 
-    private static Collection<IVertex> getParentsIfVertexIsNotProbabilistic(IVertex visiting) {
+    private static Collection<Vertex> getParentsIfVertexIsNotProbabilistic(Vertex visiting) {
         return visiting.isProbabilistic() ? Collections.emptySet() : visiting.getParents();
     }
 
-    private static boolean isNonDiffableAndNotConstant(IVertex vertex, Set<IVertex> constantValueVerticesCache) {
+    private static boolean isNonDiffableAndNotConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
         return !vertex.isDifferentiable() &&
             !isVertexValueConstant(vertex, constantValueVerticesCache);
     }
 
-    private static boolean isVertexValueConstant(IVertex vertex, Set<IVertex> constantValueVerticesCache) {
+    private static boolean isVertexValueConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
         if (isValueKnownToBeConstant(vertex, constantValueVerticesCache)) {
             return true;
         }
@@ -118,19 +118,19 @@ public class DifferentiableChecker {
             constantValueVerticesCache::addAll);
     }
 
-    private static boolean isUnobservedProbabilistic(IVertex vertex) {
+    private static boolean isUnobservedProbabilistic(Vertex vertex) {
         return vertex.isProbabilistic() && !vertex.isObserved();
     }
 
-    private static Collection<IVertex> getParentsIfValueNotKnownToBeConstant(IVertex visiting,
-                                                                             Set<IVertex> constantValueVerticesCache) {
+    private static Collection<Vertex> getParentsIfValueNotKnownToBeConstant(Vertex visiting,
+                                                                            Set<Vertex> constantValueVerticesCache) {
 
         return isValueKnownToBeConstant(visiting, constantValueVerticesCache) ? Collections.emptySet() : visiting.getParents();
     }
 
     // We know whether these are constant. For cases such as a MultiplicationVertex we would need to
     // explore its parents to ensure its constant.
-    private static boolean isValueKnownToBeConstant(IVertex vertex, Set<IVertex> constantValueVerticesCache) {
+    private static boolean isValueKnownToBeConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
         return vertex instanceof ConstantVertex || vertex.isObserved() || constantValueVerticesCache.contains(vertex);
     }
 }

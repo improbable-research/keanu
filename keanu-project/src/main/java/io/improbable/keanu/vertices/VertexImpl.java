@@ -21,13 +21,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-public abstract class VertexImpl<T> implements IVertex<T> {
+public abstract class VertexImpl<T> implements Vertex<T> {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
 
-    private Set<IVertex> children = new TreeSet<>(Comparator.comparing(IVertex::getId));
-    private Set<IVertex> parents = Collections.emptySet();
+    private Set<Vertex> children = new TreeSet<>(Comparator.comparing(Vertex::getId));
+    private Set<Vertex> parents = Collections.emptySet();
     private VertexState<T> state;
     private VertexLabel label = null;
 
@@ -47,12 +47,12 @@ public abstract class VertexImpl<T> implements IVertex<T> {
      * @param <V>   vertex type
      * @return this
      */
-    public <V extends IVertex<T>> V setLabel(VertexLabel label) {
+    public <V extends Vertex<T>> V setLabel(VertexLabel label) {
         this.label = label;
         return (V) this;
     }
 
-    public <V extends IVertex<T>> V setLabel(String label) {
+    public <V extends Vertex<T>> V setLabel(String label) {
         return this.setLabel(new VertexLabel(label));
     }
 
@@ -60,7 +60,7 @@ public abstract class VertexImpl<T> implements IVertex<T> {
         return this.label;
     }
 
-    public <V extends IVertex<T>> V removeLabel() {
+    public <V extends Vertex<T>> V removeLabel() {
         this.label = null;
         return (V) this;
     }
@@ -166,13 +166,13 @@ public abstract class VertexImpl<T> implements IVertex<T> {
         return getShape().length;
     }
 
-    public <V extends IVertex<T>> V print() {
+    public <V extends Vertex<T>> V print() {
         new PrintVertex<>(this);
         return (V) this;
     }
 
 
-    public <V extends IVertex<T>> V print(final String message, final boolean printData) {
+    public <V extends Vertex<T>> V print(final String message, final boolean printData) {
         new PrintVertex<>(this, message, printData);
         return (V) this;
     }
@@ -206,7 +206,7 @@ public abstract class VertexImpl<T> implements IVertex<T> {
         state = new VertexState<>(value, true);
     }
 
-    private static boolean isObservable(Class<? extends IVertex> v) {
+    private static boolean isObservable(Class<? extends Vertex> v) {
         boolean isProbabilistic = Probabilistic.class.isAssignableFrom(v);
         boolean isNotDoubleOrIntegerVertex = !IntegerVertex.class.isAssignableFrom(v) && !DoubleVertex.class.isAssignableFrom(v);
 
@@ -248,26 +248,26 @@ public abstract class VertexImpl<T> implements IVertex<T> {
         return id.getIndentation();
     }
 
-    public Set<IVertex> getChildren() {
+    public Set<Vertex> getChildren() {
         return Collections.unmodifiableSet(children);
     }
 
-    public void addChild(IVertex<?> v) {
+    public void addChild(Vertex<?> v) {
         children.add(v);
     }
 
-    public void setParents(Collection<? extends IVertex> parents) {
+    public void setParents(Collection<? extends Vertex> parents) {
         this.parents = Collections.emptySet();
         addParents(parents);
     }
 
-    public void setParents(IVertex<?>... parents) {
+    public void setParents(Vertex<?>... parents) {
         setParents(Arrays.asList(parents));
     }
 
-    public void addParents(Collection<? extends IVertex> parents) {
+    public void addParents(Collection<? extends Vertex> parents) {
 
-        this.parents = ImmutableSet.<IVertex>builder()
+        this.parents = ImmutableSet.<Vertex>builder()
             .addAll(getParents())
             .addAll(parents)
             .build();
@@ -275,11 +275,11 @@ public abstract class VertexImpl<T> implements IVertex<T> {
         parents.forEach(p -> p.addChild(this));
     }
 
-    public void addParent(IVertex<?> parent) {
+    public void addParent(Vertex<?> parent) {
         addParents(ImmutableSet.of(parent));
     }
 
-    public Set<IVertex> getParents() {
+    public Set<Vertex> getParents() {
         return parents;
     }
 
@@ -292,7 +292,7 @@ public abstract class VertexImpl<T> implements IVertex<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        IVertex<?> vertex = (IVertex<?>) o;
+        Vertex<?> vertex = (Vertex<?>) o;
 
         return this.id.equals(vertex.getId());
     }
@@ -302,7 +302,7 @@ public abstract class VertexImpl<T> implements IVertex<T> {
         return id.hashCode();
     }
 
-    public Set<IVertex> getConnectedGraph() {
+    public Set<Vertex> getConnectedGraph() {
         return DiscoverGraph.getEntireGraph(this);
     }
 

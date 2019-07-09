@@ -1,6 +1,6 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
@@ -27,7 +27,7 @@ public class LambdaSectionEfficiencyTest {
         MutableInt callsToNext = new MutableInt(0);
         MutableInt callsToPredicate = new MutableInt(0);
 
-        Set<IVertex> verticesDepthFirst = Propagation.getVertices(A, (v) -> {
+        Set<Vertex> verticesDepthFirst = Propagation.getVertices(A, (v) -> {
                 callsToNext.increment();
                 return v.getChildren();
             }, (v) -> v.isProbabilistic() || v.isObserved(),
@@ -55,7 +55,7 @@ public class LambdaSectionEfficiencyTest {
         MutableInt callsToNext = new MutableInt(0);
         MutableInt callsToPredicate = new MutableInt(0);
 
-        Set<IVertex> verticesDepthFirst = Propagation.getVertices(Arrays.asList(A, B, C), (v) -> {
+        Set<Vertex> verticesDepthFirst = Propagation.getVertices(Arrays.asList(A, B, C), (v) -> {
                 callsToNext.increment();
                 return v.getChildren();
             },

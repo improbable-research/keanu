@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.CauchyDistribution;
 import org.junit.Before;
@@ -110,7 +110,7 @@ public class CauchyVertexTest {
         scaleTensor.setValue(1.0);
 
         CauchyVertex tensorCauchyVertex = new CauchyVertex(locationTensor, scaleTensor);
-        Map<IVertex, DoubleTensor> actualDerivatives = tensorCauchyVertex.dLogPdf(0.5, locationTensor, scaleTensor, tensorCauchyVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorCauchyVertex.dLogPdf(0.5, locationTensor, scaleTensor, tensorCauchyVertex);
 
         assertEquals(cauchyLogDiff.dPdlocation, actualDerivatives.get(locationTensor).scalar(), 1e-5);
         assertEquals(cauchyLogDiff.dPdscale, actualDerivatives.get(scaleTensor).scalar(), 1e-5);

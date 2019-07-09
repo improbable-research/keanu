@@ -6,9 +6,9 @@ public class ProbabilityCalculator {
     private ProbabilityCalculator() {
     }
 
-    public static double calculateLogProbFor(Collection<? extends IVertex> vertices) {
+    public static double calculateLogProbFor(Collection<? extends Vertex> vertices) {
         double sum = 0.0;
-        for (IVertex<?> vertex : vertices) {
+        for (Vertex<?> vertex : vertices) {
             if (vertex instanceof Probabilistic) {
                 double logProbAtValue = ((Probabilistic) vertex).logProbAtValue();
                 if (isImpossibleLogProb(logProbAtValue)) {

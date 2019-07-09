@@ -3,7 +3,7 @@ package io.improbable.keanu.backend.keanu;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
@@ -36,8 +36,8 @@ public class KeanuComputableGraphTest {
         C.getValue();
         C.setLabel(cLabel);
 
-        List<IVertex> toposortedGraph = C.getConnectedGraph().stream()
-            .sorted(Comparator.comparing(IVertex::getId, Comparator.naturalOrder()))
+        List<Vertex> toposortedGraph = C.getConnectedGraph().stream()
+            .sorted(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()))
             .collect(Collectors.toList());
 
         KeanuComputableGraph computableGraph = new KeanuComputableGraph(toposortedGraph, ImmutableSet.of(C));
@@ -63,8 +63,8 @@ public class KeanuComputableGraphTest {
         DoubleVertex F = D.plus(E);
         F.getValue();
 
-        List<IVertex> toposortedGraph = F.getConnectedGraph().stream()
-            .sorted(Comparator.comparing(IVertex::getId, Comparator.naturalOrder()))
+        List<Vertex> toposortedGraph = F.getConnectedGraph().stream()
+            .sorted(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()))
             .collect(Collectors.toList());
 
         KeanuComputableGraph computableGraph = new KeanuComputableGraph(toposortedGraph, ImmutableSet.of(F));

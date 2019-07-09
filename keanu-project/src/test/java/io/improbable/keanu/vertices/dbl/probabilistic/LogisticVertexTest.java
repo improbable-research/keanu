@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.Logistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.LogisticDistribution;
 import org.junit.Before;
@@ -96,7 +96,7 @@ public class LogisticVertexTest {
         bTensor.setValue(0.5);
 
         LogisticVertex tensorLogisticVertex = new LogisticVertex(aTensor, bTensor);
-        Map<IVertex, DoubleTensor> actualDerivatives = tensorLogisticVertex.dLogPdf(1.5, aTensor, bTensor, tensorLogisticVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorLogisticVertex.dLogPdf(1.5, aTensor, bTensor, tensorLogisticVertex);
 
         assertEquals(logisticLogDiff.dPda, actualDerivatives.get(aTensor).scalar(), 1e-5);
         assertEquals(logisticLogDiff.dPdb, actualDerivatives.get(bTensor).scalar(), 1e-5);

@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.LogNormal;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.junit.Before;
@@ -97,7 +97,7 @@ public class LogNormalVertexTest {
         sigmaTensor.setValue(1.0);
 
         LogNormalVertex tensorLogNormalVertex = new LogNormalVertex(muTensor, sigmaTensor);
-        Map<IVertex, DoubleTensor> actualDerivatives = tensorLogNormalVertex.dLogPdf(0.5, muTensor, sigmaTensor, tensorLogNormalVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorLogNormalVertex.dLogPdf(0.5, muTensor, sigmaTensor, tensorLogNormalVertex);
 
         assertEquals(logNormalLogDiff.dPdmu, actualDerivatives.get(muTensor).scalar(), 1e-5);
         assertEquals(logNormalLogDiff.dPdsigma, actualDerivatives.get(sigmaTensor).scalar(), 1e-5);

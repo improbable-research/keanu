@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.LaplaceDistribution;
 import org.junit.Before;
@@ -96,7 +96,7 @@ public class LaplaceVertexTest {
         betaTensor.setValue(1.0);
 
         LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(muTensor, betaTensor);
-        Map<IVertex, DoubleTensor> actualDerivatives = tensorLaplaceVertex.dLogPdf(0.5, muTensor, betaTensor, tensorLaplaceVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorLaplaceVertex.dLogPdf(0.5, muTensor, betaTensor, tensorLaplaceVertex);
 
         assertEquals(laplaceLogDiff.dPdmu, actualDerivatives.get(muTensor).scalar(), 1e-5);
         assertEquals(laplaceLogDiff.dPdbeta, actualDerivatives.get(betaTensor).scalar(), 1e-5);

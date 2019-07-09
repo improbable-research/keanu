@@ -6,7 +6,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import lombok.Getter;
@@ -16,8 +16,8 @@ import java.util.function.Function;
 
 public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, OUTPUT> {
     private final DoubleVertex xVertex;
-    private final IVertex<OUTPUT> yVertex;
-    private final IVertex<OUTPUT> yObservationVertex;
+    private final Vertex<OUTPUT> yVertex;
+    private final Vertex<OUTPUT> yObservationVertex;
     private final DoubleVertex weightsVertex;
     private final DoubleVertex interceptVertex;
     @Getter
@@ -62,13 +62,13 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
         return weightsVertex;
     }
 
-    public IVertex<OUTPUT> getOutputVertex() {
+    public Vertex<OUTPUT> getOutputVertex() {
         return yObservationVertex;
     }
 
     @Value
     public static class OutputVertices<OUTPUT> {
-        IVertex<OUTPUT> outputVertex;
-        IVertex<OUTPUT> observedVertex;
+        Vertex<OUTPUT> outputVertex;
+        Vertex<OUTPUT> observedVertex;
     }
 }

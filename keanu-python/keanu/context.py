@@ -119,8 +119,8 @@ class KeanuContext(metaclass=Singleton):
         return self.to_java_array(l, self._gateway.jvm.String)
 
     def to_java_vertex_array(self, l: Collection[Any]) -> JavaArray:
-        java_import(self.jvm_view(), "io.improbable.keanu.vertices.IVertex")
-        return self.to_java_array(list(map(lambda x: x.unwrap(), l)), self.jvm_view().IVertex)
+        java_import(self.jvm_view(), "io.improbable.keanu.vertices.Vertex")
+        return self.to_java_array(list(map(lambda x: x.unwrap(), l)), self.jvm_view().Vertex)
 
     def __infer_class_from_array(self, l: Collection[Any]) -> JavaClass:
         if len(l) == 0:

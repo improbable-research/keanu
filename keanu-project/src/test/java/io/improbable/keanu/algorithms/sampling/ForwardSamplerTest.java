@@ -7,7 +7,7 @@ import io.improbable.keanu.algorithms.ProbabilisticModel;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -287,7 +287,7 @@ public class ForwardSamplerTest {
         }
 
         @Override
-        public Map<IVertex, DoubleTensor> dLogProb(DoubleTensor atValue, Set<? extends IVertex> withRespectTo) {
+        public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor atValue, Set<? extends Vertex> withRespectTo) {
             return null;
         }
     }

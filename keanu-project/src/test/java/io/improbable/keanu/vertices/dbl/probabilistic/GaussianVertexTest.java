@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Before;
@@ -98,7 +98,7 @@ public class GaussianVertexTest {
         sigmaTensor.setValue(1.0);
 
         GaussianVertex tensorGaussianVertex = new GaussianVertex(muTensor, sigmaTensor);
-        Map<IVertex, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5, muTensor, sigmaTensor, tensorGaussianVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5, muTensor, sigmaTensor, tensorGaussianVertex);
 
         assertEquals(gaussianLogDiff.dPdmu, actualDerivatives.get(muTensor).scalar(), 1e-5);
         assertEquals(gaussianLogDiff.dPdsigma, actualDerivatives.get(sigmaTensor).scalar(), 1e-5);

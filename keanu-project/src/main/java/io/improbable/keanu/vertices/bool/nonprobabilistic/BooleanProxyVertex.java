@@ -4,12 +4,12 @@ import com.google.common.collect.Iterables;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -47,7 +47,7 @@ public class BooleanProxyVertex extends VertexImpl<BooleanTensor> implements Boo
     }
 
     @Override
-    public <V extends IVertex<BooleanTensor>> V setLabel(VertexLabel label) {
+    public <V extends Vertex<BooleanTensor>> V setLabel(VertexLabel label) {
         if (this.getLabel() != null && !this.getLabel().getUnqualifiedName().equals(label.getUnqualifiedName())) {
             throw new RuntimeException("You should not change the label on a Proxy Vertex");
         }

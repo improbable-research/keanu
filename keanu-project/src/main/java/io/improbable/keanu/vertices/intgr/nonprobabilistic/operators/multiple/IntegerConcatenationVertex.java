@@ -2,10 +2,10 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -30,7 +30,7 @@ public class IntegerConcatenationVertex extends VertexImpl<IntegerTensor> implem
      * @param operands  the input vertices to concatenate
      */
     public IntegerConcatenationVertex(int dimension, IntegerVertex... operands) {
-        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, IVertex::getShape, operands)));
+        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, operands)));
         this.dimension = dimension;
         this.operands = operands;
         setParents(operands);
@@ -38,24 +38,24 @@ public class IntegerConcatenationVertex extends VertexImpl<IntegerTensor> implem
 
     @ExportVertexToPythonBindings
     public IntegerConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
-                                      @LoadVertexParam(OPERANDS_NAME) IVertex[] input) {
+                                      @LoadVertexParam(OPERANDS_NAME) Vertex[] input) {
         this(dimension, convertVertexArrayToIntegerVertex(input));
     }
 
-    private static IntegerVertex[] convertVertexArrayToIntegerVertex(IVertex[] input) {
+    private static IntegerVertex[] convertVertexArrayToIntegerVertex(Vertex[] input) {
         return Arrays.stream(input).toArray(IntegerVertex[]::new);
     }
 
     @Override
     public IntegerTensor calculate() {
-        return op(extractFromInputs(IntegerTensor.class, IVertex::getValue, operands));
+        return op(extractFromInputs(IntegerTensor.class, Vertex::getValue, operands));
     }
 
     private IntegerTensor op(IntegerTensor... inputs) {
         return IntegerTensor.concat(dimension, inputs);
     }
 
-    private static <T> T[] extractFromInputs(Class<T> clazz, Function<IVertex<IntegerTensor>, T> func, IntegerVertex[] input) {
+    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<IntegerTensor>, T> func, IntegerVertex[] input) {
         T[] extract = (T[]) Array.newInstance(clazz, input.length);
         for (int i = 0; i < input.length; i++) {
             extract[i] = func.apply(input[i]);

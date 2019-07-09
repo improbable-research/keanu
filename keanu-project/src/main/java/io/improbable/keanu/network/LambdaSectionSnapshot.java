@@ -1,8 +1,8 @@
 package io.improbable.keanu.network;
 
 import io.improbable.keanu.algorithms.Variable;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,24 +14,24 @@ import java.util.Set;
  */
 public class LambdaSectionSnapshot {
 
-    private final Map<IVertex, LambdaSection> affectedVariablesCache;
+    private final Map<Vertex, LambdaSection> affectedVariablesCache;
 
     public LambdaSectionSnapshot() {
         this.affectedVariablesCache = new HashMap<>();
     }
 
     public double logProb(Set<? extends Variable> variables) {
-        Set<IVertex> lambdaSectionUnion = getAllVerticesAffectedBy(variables);
+        Set<Vertex> lambdaSectionUnion = getAllVerticesAffectedBy(variables);
         return ProbabilityCalculator.calculateLogProbFor(lambdaSectionUnion);
     }
 
-    public Set<IVertex> getAllVerticesAffectedBy(Set<? extends Variable> variables) {
+    public Set<Vertex> getAllVerticesAffectedBy(Set<? extends Variable> variables) {
 
-        Set<IVertex> allAffectedVariables = new HashSet<>();
+        Set<Vertex> allAffectedVariables = new HashSet<>();
         for (Variable variable : variables) {
-            if (variable instanceof IVertex) {
+            if (variable instanceof Vertex) {
 
-                LambdaSection lambdaSection = createVariablesAffectedByCache((IVertex) variable);
+                LambdaSection lambdaSection = createVariablesAffectedByCache((Vertex) variable);
 
                 allAffectedVariables.addAll(lambdaSection.getAllVertices());
             } else {
@@ -50,7 +50,7 @@ public class LambdaSectionSnapshot {
      * @return A variable to Lambda Section map that represents the downstream Lambda Section for the latent vertex.
      * This Lambda Section may include all of the nonprobabilistic vertices if useCacheOnRejection is enabled.
      */
-    private LambdaSection createVariablesAffectedByCache(IVertex latent) {
+    private LambdaSection createVariablesAffectedByCache(Vertex latent) {
         return affectedVariablesCache.computeIfAbsent(
             latent,
             v -> LambdaSection.getDownstreamLambdaSection(v, true)

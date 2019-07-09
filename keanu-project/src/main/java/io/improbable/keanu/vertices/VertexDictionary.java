@@ -4,15 +4,15 @@ import java.util.Map;
 
 public interface VertexDictionary {
 
-    <V extends IVertex<?>> V get(VertexLabel label);
+    <V extends Vertex<?>> V get(VertexLabel label);
 
-    VertexDictionary withExtraEntries(Map<VertexLabel, IVertex<?>> extraEntries);
+    VertexDictionary withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries);
 
-    static VertexDictionary backedBy(Map<VertexLabel, IVertex<?>> map) {
+    static VertexDictionary backedBy(Map<VertexLabel, Vertex<?>> map) {
         return SimpleVertexDictionary.backedBy(map);
     }
 
-    static VertexDictionary of(IVertex... vertices) {
+    static VertexDictionary of(Vertex... vertices) {
         return SimpleVertexDictionary.of(vertices);
     }
 }

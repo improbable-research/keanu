@@ -4,9 +4,9 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 
 public class BooleanTakeVertex extends BooleanUnaryOpVertex<BooleanTensor> {
 
@@ -20,7 +20,7 @@ public class BooleanTakeVertex extends BooleanUnaryOpVertex<BooleanTensor> {
      * @param index       the index to extract at
      */
     @ExportVertexToPythonBindings
-    public BooleanTakeVertex(@LoadVertexParam(INPUT_NAME) IVertex<BooleanTensor> inputVertex,
+    public BooleanTakeVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
                              @LoadVertexParam(INDEX_NAME) long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         this.index = index;

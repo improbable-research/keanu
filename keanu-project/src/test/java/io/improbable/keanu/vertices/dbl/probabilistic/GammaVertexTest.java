@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.GammaDistribution;
 import org.junit.Before;
@@ -96,7 +96,7 @@ public class GammaVertexTest {
         kTensor.setValue(DoubleTensor.scalar(5.5));
 
         GammaVertex tensorGamma = new GammaVertex(thetaTensor, kTensor);
-        Map<IVertex, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(DoubleTensor.scalar(1.5), thetaTensor, kTensor, tensorGamma);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(DoubleTensor.scalar(1.5), thetaTensor, kTensor, tensorGamma);
 
         assertEquals(gammaLogDiff.dPdtheta, actualDerivatives.get(thetaTensor).scalar(), 1e-5);
         assertEquals(gammaLogDiff.dPdk, actualDerivatives.get(kTensor).scalar(), 1e-5);

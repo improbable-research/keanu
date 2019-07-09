@@ -1,7 +1,7 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.ProxyVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 
@@ -30,10 +30,10 @@ public final class ModelComposition {
      * @param desiredOutputs  The set of labels we wish to output from the supplied BayesNet
      * @return A map of Labels to Output Vertices
      */
-    public static Map<VertexLabel, IVertex> composeModel(BayesianNetwork bayesianNetwork,
-                                                         Map<VertexLabel, IVertex> inputVertices,
-                                                         List<VertexLabel> desiredOutputs) {
-        Map<VertexLabel, IVertex> outputMap = extractOutputs(bayesianNetwork, desiredOutputs);
+    public static Map<VertexLabel, Vertex> composeModel(BayesianNetwork bayesianNetwork,
+                                                        Map<VertexLabel, Vertex> inputVertices,
+                                                        List<VertexLabel> desiredOutputs) {
+        Map<VertexLabel, Vertex> outputMap = extractOutputs(bayesianNetwork, desiredOutputs);
         increaseDepth(bayesianNetwork, outputMap);
         checkAndLinkInputs(bayesianNetwork, inputVertices);
         cleanOutputLabels(outputMap);
@@ -41,16 +41,16 @@ public final class ModelComposition {
         return outputMap;
     }
 
-    private static Map<VertexLabel, IVertex> extractOutputs(BayesianNetwork bayesianNetwork,
-                                                            List<VertexLabel> desiredOutputs) {
+    private static Map<VertexLabel, Vertex> extractOutputs(BayesianNetwork bayesianNetwork,
+                                                           List<VertexLabel> desiredOutputs) {
         if (desiredOutputs.isEmpty()) {
             throw new IllegalArgumentException("At least one output must be specified");
         }
 
-        Map<VertexLabel, IVertex> outputMap = new HashMap<>();
+        Map<VertexLabel, Vertex> outputMap = new HashMap<>();
 
         for (VertexLabel label : desiredOutputs) {
-            IVertex v = bayesianNetwork.getVertexByLabel(label);
+            Vertex v = bayesianNetwork.getVertexByLabel(label);
             if (v == null) {
                 throw new IllegalArgumentException("Unable to find Output Vertex: " + label);
             }
@@ -60,7 +60,7 @@ public final class ModelComposition {
         return outputMap;
     }
 
-    private static void increaseDepth(BayesianNetwork bayesianNetwork, Map<VertexLabel, IVertex> outputVertices) {
+    private static void increaseDepth(BayesianNetwork bayesianNetwork, Map<VertexLabel, Vertex> outputVertices) {
         VertexId newPrefix = new VertexId();
         bayesianNetwork.incrementIndentation();
         bayesianNetwork.getVertices().stream()
@@ -71,9 +71,9 @@ public final class ModelComposition {
             .forEach(v -> v.getId().resetID());
     }
 
-    private static void checkAndLinkInputs(BayesianNetwork bayesianNetwork, Map<VertexLabel, IVertex> inputs) {
-        for (Map.Entry<VertexLabel, IVertex> entry : inputs.entrySet()) {
-            IVertex v = bayesianNetwork.getVertexByLabel(entry.getKey());
+    private static void checkAndLinkInputs(BayesianNetwork bayesianNetwork, Map<VertexLabel, Vertex> inputs) {
+        for (Map.Entry<VertexLabel, Vertex> entry : inputs.entrySet()) {
+            Vertex v = bayesianNetwork.getVertexByLabel(entry.getKey());
 
             if (v == null) {
                 throw new IllegalArgumentException("No node labelled \"" + entry.getKey() + "\" found");
@@ -92,7 +92,7 @@ public final class ModelComposition {
         }
     }
 
-    private static void cleanOutputLabels(Map<VertexLabel, IVertex> outputMap) {
+    private static void cleanOutputLabels(Map<VertexLabel, Vertex> outputMap) {
         outputMap.values().stream()
             .forEach(v -> v.setLabel((VertexLabel) null));
     }

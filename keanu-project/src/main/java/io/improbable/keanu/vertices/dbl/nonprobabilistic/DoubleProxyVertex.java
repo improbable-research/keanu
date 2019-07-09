@@ -4,12 +4,12 @@ import com.google.common.collect.Iterables;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -52,7 +52,7 @@ public class DoubleProxyVertex extends VertexImpl<DoubleTensor> implements Doubl
     }
 
     @Override
-    public <V extends IVertex<DoubleTensor>> V setLabel(VertexLabel label) {
+    public <V extends Vertex<DoubleTensor>> V setLabel(VertexLabel label) {
         if (this.getLabel() != null && !this.getLabel().getUnqualifiedName().equals(label.getUnqualifiedName())) {
             throw new RuntimeException("You should not change the label on a Proxy Vertex");
         }
@@ -85,12 +85,12 @@ public class DoubleProxyVertex extends VertexImpl<DoubleTensor> implements Doubl
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         return derivativeOfParentsWithRespectToInput.get(getParent());
     }
 
     @Override
-    public Map<IVertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         return Collections.singletonMap(getParent(), derivativeOfOutputWithRespectToSelf);
     }
 

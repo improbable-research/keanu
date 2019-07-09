@@ -1,6 +1,6 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import lombok.Value;
 
 import java.util.Collections;
@@ -29,13 +29,13 @@ import static io.improbable.keanu.network.Propagation.getVertices;
 @Value
 public class LambdaSection {
 
-    private static final Predicate<IVertex> ADD_ALL = vertex -> true;
-    private static final Predicate<IVertex> PROBABILISTIC_OR_OBSERVED_ONLY = vertex -> vertex.isObserved() || vertex.isProbabilistic();
+    private static final Predicate<Vertex> ADD_ALL = vertex -> true;
+    private static final Predicate<Vertex> PROBABILISTIC_OR_OBSERVED_ONLY = vertex -> vertex.isObserved() || vertex.isProbabilistic();
 
-    private final Set<IVertex> allVertices;
-    private final Set<IVertex> latentAndObservedVertices;
+    private final Set<Vertex> allVertices;
+    private final Set<Vertex> latentAndObservedVertices;
 
-    private LambdaSection(Set<IVertex> allVertices) {
+    private LambdaSection(Set<Vertex> allVertices) {
         this.allVertices = allVertices;
         this.latentAndObservedVertices = allVertices.stream()
             .filter(PROBABILISTIC_OR_OBSERVED_ONLY)
@@ -49,7 +49,7 @@ public class LambdaSection {
      * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
      * includeNonProbabilistic is false.
      */
-    public static LambdaSection getUpstreamLambdaSection(IVertex<?> aVertex, boolean includeNonProbabilistic) {
+    public static LambdaSection getUpstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
         return getUpstreamLambdaSectionForCollection(Collections.singletonList(aVertex), includeNonProbabilistic);
     }
 
@@ -60,7 +60,7 @@ public class LambdaSection {
      * is true. All downstream probabilistic or observed vertices stopping at probabilistic or observed if
      * includeNonProbabilistic is false.
      */
-    public static LambdaSection getDownstreamLambdaSection(IVertex<?> aVertex, boolean includeNonProbabilistic) {
+    public static LambdaSection getDownstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
         return getDownstreamLambdaSectionForCollection(Collections.singletonList(aVertex), includeNonProbabilistic);
     }
 
@@ -71,13 +71,13 @@ public class LambdaSection {
      * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
      * includeNonProbabilistic is false.
      */
-    public static LambdaSection getUpstreamLambdaSectionForCollection(List<IVertex> vertices, boolean includeNonProbabilistic) {
+    public static LambdaSection getUpstreamLambdaSectionForCollection(List<Vertex> vertices, boolean includeNonProbabilistic) {
 
-        Predicate<IVertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
+        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
-        Set<IVertex> upstreamVertices = getVertices(
+        Set<Vertex> upstreamVertices = getVertices(
             vertices,
-            IVertex::getParents,
+            Vertex::getParents,
             v -> v.isObserved() || v.isProbabilistic(),
             shouldAdd
         );
@@ -92,13 +92,13 @@ public class LambdaSection {
      * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
      * includeNonProbabilistic is false.
      */
-    public static LambdaSection getDownstreamLambdaSectionForCollection(List<IVertex> vertices, boolean includeNonProbabilistic) {
+    public static LambdaSection getDownstreamLambdaSectionForCollection(List<Vertex> vertices, boolean includeNonProbabilistic) {
 
-        Predicate<IVertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
+        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
-        Set<IVertex> downstreamVertices = getVertices(
+        Set<Vertex> downstreamVertices = getVertices(
             vertices,
-            IVertex::getChildren,
+            Vertex::getChildren,
             v -> v.isObserved() || v.isProbabilistic(),
             shouldAdd
         );

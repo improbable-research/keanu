@@ -7,7 +7,7 @@ import io.improbable.keanu.codegen.python.PythonParam;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -103,7 +103,7 @@ class JavaVertexToPythonConverter {
     private String toTypedParam(Class<?> parameterClass) {
         Class parameterType = Primitives.wrap(parameterClass);
 
-        if (IVertex.class.isAssignableFrom(parameterType)) {
+        if (Vertex.class.isAssignableFrom(parameterType)) {
             return "vertex_constructor_param_types";
         } else if (DoubleTensor.class.isAssignableFrom(parameterType) ||
             IntegerTensor.class.isAssignableFrom(parameterType) ||
@@ -122,7 +122,7 @@ class JavaVertexToPythonConverter {
         } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
             long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
             return "Collection[int]";
-        } else if (IVertex[].class.isAssignableFrom(parameterType)) {
+        } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "Collection[Vertex]";
         } else if (VertexLabel.class.isAssignableFrom(parameterType)) {
             return "str";
@@ -154,7 +154,7 @@ class JavaVertexToPythonConverter {
             return "cast_to_integer_vertex(" + pythonParameter + ")";
         } else if (BooleanVertex.class.isAssignableFrom(parameterType)) {
             return "cast_to_boolean_vertex(" + pythonParameter + ")";
-        } else if (IVertex.class.isAssignableFrom(parameterType)) {
+        } else if (Vertex.class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex(" + pythonParameter + ")";
         } else if (DoubleTensor.class.isAssignableFrom(parameterType)) {
             return "cast_to_double_tensor(" + pythonParameter + ")";
@@ -176,7 +176,7 @@ class JavaVertexToPythonConverter {
             return "cast_to_long_array(" + pythonParameter + ")";
         } else if (Integer[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
             return "cast_to_int_array(" + pythonParameter + ")";
-        } else if (IVertex[].class.isAssignableFrom(parameterType)) {
+        } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex_array(" + pythonParameter + ")";
         } else if (VertexLabel.class.isAssignableFrom(parameterType)) {
             return "_VertexLabel(" + pythonParameter + ")";

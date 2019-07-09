@@ -7,11 +7,11 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -123,7 +123,7 @@ public class ProtobufTest {
         ProtobufLoader loader = new ProtobufLoader();
 
         BayesianNetwork readNet = loader.loadNetwork(inputStream);
-        IVertex vertexToShapeCheck = readNet.getVertexByLabel(LABEL_ONE);
+        Vertex vertexToShapeCheck = readNet.getVertexByLabel(LABEL_ONE);
         assertThat(vertexToShapeCheck.getShape(), is(shape1));
         vertexToShapeCheck = readNet.getVertexByLabel(LABEL_TWO);
         assertThat(vertexToShapeCheck.getShape(), is(shape2));
@@ -314,7 +314,7 @@ public class ProtobufTest {
 
     @Test
     public void metadataCanBeSavedToProtobuf() throws IOException {
-        IVertex vertex = new ConstantIntegerVertex(1);
+        Vertex vertex = new ConstantIntegerVertex(1);
         BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
         Map<String, String> metadata = ImmutableMap.of("Author", "Some Author", "Tag", "MyBayesNet");
 
@@ -477,14 +477,14 @@ public class ProtobufTest {
     public void allSaveableVerticesHaveCorrectAnnotations() {
         Reflections reflections = new Reflections("io.improbable.keanu.vertices");
 
-        Set<Class<? extends IVertex>> vertices = reflections.getSubTypesOf(IVertex.class);
+        Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
         vertices.stream()
             .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
             .filter(v -> !Modifier.isAbstract(v.getModifiers()))
             .forEach(this::checkSaveableVertex);
     }
 
-    private void checkSaveableVertex(Class<? extends IVertex> vertexClass) {
+    private void checkSaveableVertex(Class<? extends Vertex> vertexClass) {
         /*
          * For each vertex we need to check that we have a single constructor we can use for loading and that we save
          * all the necessary Params for that constructor
@@ -532,7 +532,7 @@ public class ProtobufTest {
             .collect(Collectors.toSet());
     }
 
-    private Map<String, Set<Class>> getSavedParams(Class<? extends IVertex> vertexClass) {
+    private Map<String, Set<Class>> getSavedParams(Class<? extends Vertex> vertexClass) {
         Map<String, Set<Class>> savedParams = new HashMap<>();
 
         for (Method method : filterAnnotatedObjects(vertexClass.getMethods(), SaveVertexParam.class)) {
@@ -544,7 +544,7 @@ public class ProtobufTest {
         return savedParams;
     }
 
-    private Map<String, Class> checkConstructorParamValidityAndGetRequiredSaves(Class<? extends IVertex> vertexClass) {
+    private Map<String, Class> checkConstructorParamValidityAndGetRequiredSaves(Class<? extends Vertex> vertexClass) {
         Set<Constructor> loadConstructors = getConstructorsWithAnnotatedParameters(vertexClass, LoadVertexParam.class);
         loadConstructors.addAll(getConstructorsWithAnnotatedParameters(vertexClass, LoadShape.class));
 
@@ -580,7 +580,7 @@ public class ProtobufTest {
         saver.save(writer, true);
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork reconstructedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
-        IVertex reconstructedVertex = reconstructedNetwork.getVertexByLabel(proxyLabel);
+        Vertex reconstructedVertex = reconstructedNetwork.getVertexByLabel(proxyLabel);
         assertThat(reconstructedVertex, notNullValue());
     }
 }

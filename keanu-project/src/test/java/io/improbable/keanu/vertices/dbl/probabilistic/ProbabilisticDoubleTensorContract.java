@@ -3,8 +3,8 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
@@ -201,7 +201,7 @@ public class ProbabilisticDoubleTensorContract {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
-        Map<IVertex, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue(hyperParameterVertex);
+        Map<Vertex, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue(hyperParameterVertex);
 
         double actualDiffLnDensity = diffln.get(hyperParameterVertex).scalar();
 
@@ -257,15 +257,15 @@ public class ProbabilisticDoubleTensorContract {
 
         V tensorVertex = vertexUnderTestSupplier.get();
 
-        Map<IVertex, DoubleTensor> actualDerivatives = tensorVertex.dLogProb(
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorVertex.dLogProb(
             DoubleTensor.create(vector, new long[]{vector.length, 1}),
             tensorVertex
         );
 
-        HashSet<IVertex> hyperParameterVertices = new HashSet<>(actualDerivatives.keySet());
+        HashSet<Vertex> hyperParameterVertices = new HashSet<>(actualDerivatives.keySet());
         hyperParameterVertices.remove(tensorVertex);
 
-        for (IVertex vertex : hyperParameterVertices) {
+        for (Vertex vertex : hyperParameterVertices) {
             assertEquals(expectedPartialDerivatives.getWithRespectTo(vertex.getId()).sumNumber(), actualDerivatives.get(vertex).sumNumber(), 1e-5);
         }
 

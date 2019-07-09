@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.function.Function;
 
@@ -10,7 +10,7 @@ public abstract class BooleanUnaryOpLambda<A extends Tensor> extends BooleanUnar
 
     private final Function<A, BooleanTensor> boolOp;
 
-    public BooleanUnaryOpLambda(long[] shape, IVertex<A> a, Function<A, BooleanTensor> boolOp) {
+    public BooleanUnaryOpLambda(long[] shape, Vertex<A> a, Function<A, BooleanTensor> boolOp) {
         super(shape, a);
         this.boolOp = boolOp;
     }

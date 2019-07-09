@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -17,18 +17,18 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLen
 
 public class DoubleBinaryOpLambda<A, B> extends VertexImpl<DoubleTensor> implements DoubleVertex,  Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
-    protected final IVertex<A> left;
-    protected final IVertex<B> right;
+    protected final Vertex<A> left;
+    protected final Vertex<B> right;
     protected final BiFunction<A, B, DoubleTensor> op;
-    protected final Function<Map<IVertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda;
-    protected final Function<PartialDerivative, Map<IVertex, PartialDerivative>> reverseModeAutoDiffLambda;
+    protected final Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda;
+    protected final Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda;
 
     public DoubleBinaryOpLambda(long[] shape,
-                                IVertex<A> left,
-                                IVertex<B> right,
+                                Vertex<A> left,
+                                Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
-                                Function<Map<IVertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
-                                Function<PartialDerivative, Map<IVertex, PartialDerivative>> reverseModeAutoDiffLambda) {
+                                Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
+                                Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         super(shape);
         this.left = left;
         this.right = right;
@@ -38,19 +38,19 @@ public class DoubleBinaryOpLambda<A, B> extends VertexImpl<DoubleTensor> impleme
         setParents(left, right);
     }
 
-    public DoubleBinaryOpLambda(long[] shape, IVertex<A> left, IVertex<B> right, BiFunction<A, B, DoubleTensor> op) {
+    public DoubleBinaryOpLambda(long[] shape, Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
         this(shape, left, right, op, null, null);
     }
 
-    public DoubleBinaryOpLambda(IVertex<A> left,
-                                IVertex<B> right,
+    public DoubleBinaryOpLambda(Vertex<A> left,
+                                Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
-                                Function<Map<IVertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
-                                Function<PartialDerivative, Map<IVertex, PartialDerivative>> reverseModeAutoDiffLambda) {
+                                Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
+                                Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
-    public DoubleBinaryOpLambda(IVertex<A> left, IVertex<B> right, BiFunction<A, B, DoubleTensor> op) {
+    public DoubleBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right, op, null, null);
     }
 
@@ -60,7 +60,7 @@ public class DoubleBinaryOpLambda<A, B> extends VertexImpl<DoubleTensor> impleme
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         if (forwardModeAutoDiffLambda != null) {
             return forwardModeAutoDiffLambda.apply(derivativeOfParentsWithRespectToInput);
         }
@@ -69,7 +69,7 @@ public class DoubleBinaryOpLambda<A, B> extends VertexImpl<DoubleTensor> impleme
     }
 
     @Override
-    public Map<IVertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         return reverseModeAutoDiffLambda.apply(derivativeOfOutputWithRespectToSelf);
     }
 }

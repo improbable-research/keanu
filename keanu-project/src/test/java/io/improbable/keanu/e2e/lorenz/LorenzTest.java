@@ -6,7 +6,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import lombok.extern.slf4j.Slf4j;
@@ -121,7 +121,7 @@ public class LorenzTest {
         List<DoubleVertex> slice = graphTimeSteps.get(time);
 
         return slice.stream()
-            .map(IVertex::getValue)
+            .map(Vertex::getValue)
             .collect(Collectors.toList());
     }
 

@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,11 +15,11 @@ import java.util.Map;
  */
 public class Particle {
 
-    private Map<IVertex, Object> latentVertices = new HashMap<>();
-    private List<IVertex> observedVertices = new ArrayList<>();
+    private Map<Vertex, Object> latentVertices = new HashMap<>();
+    private List<Vertex> observedVertices = new ArrayList<>();
     private double sumLogPOfSubgraph = 1.0;
 
-    public Map<IVertex, Object> getLatentVertices() {
+    public Map<Vertex, Object> getLatentVertices() {
         return latentVertices;
     }
 
@@ -30,19 +30,19 @@ public class Particle {
         return sumLogPOfSubgraph;
     }
 
-    public double getScalarValueOfVertex(IVertex<DoubleTensor> vertex) {
+    public double getScalarValueOfVertex(Vertex<DoubleTensor> vertex) {
         return ((DoubleTensor) latentVertices.get(vertex)).scalar();
     }
 
-    public <T> T getValueOfVertex(IVertex<T> vertex) {
+    public <T> T getValueOfVertex(Vertex<T> vertex) {
         return (T) latentVertices.get(vertex);
     }
 
-    <T> void addLatentVertex(IVertex<T> vertex, T value) {
+    <T> void addLatentVertex(Vertex<T> vertex, T value) {
         latentVertices.put(vertex, value);
     }
 
-    <T> void addObservedVertex(IVertex<T> vertex) {
+    <T> void addObservedVertex(Vertex<T> vertex) {
         observedVertices.add(vertex);
     }
 
@@ -69,7 +69,7 @@ public class Particle {
         latentVertices.keySet().forEach(this::applyLatentVertexValue);
     }
 
-    private <T> void applyLatentVertexValue(IVertex<T> vertex) {
+    private <T> void applyLatentVertexValue(Vertex<T> vertex) {
         if (latentVertices.containsKey(vertex)) {
             T value = (T) latentVertices.get(vertex);
             vertex.setAndCascade(value);

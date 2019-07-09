@@ -1,6 +1,6 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -18,5 +18,5 @@ public interface NetworkLoader {
 
     void loadValue(IntegerVertex vertex);
 
-    void loadValue(IVertex vertex);
+    void loadValue(Vertex vertex);
 }

@@ -3,10 +3,10 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -38,7 +38,7 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor> implements Dou
      * @param operands  the operands vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... operands) {
-        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, IVertex::getShape, operands)));
+        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, operands)));
         this.dimension = dimension;
         this.operands = operands;
         setParents(operands);
@@ -46,16 +46,16 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor> implements Dou
 
     @ExportVertexToPythonBindings
     public ConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
-                               @LoadVertexParam(OPERANDS_NAME) IVertex[] operands) {
+                               @LoadVertexParam(OPERANDS_NAME) Vertex[] operands) {
         this(dimension, convertFromVertexToDoubleVertex(operands));
     }
 
-    private static DoubleVertex[] convertFromVertexToDoubleVertex(IVertex[] operands) {
+    private static DoubleVertex[] convertFromVertexToDoubleVertex(Vertex[] operands) {
         return Arrays.stream(operands).toArray(DoubleVertex[]::new);
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         List<PartialDerivative> partialsOfOperands = new ArrayList<>();
         List<DoubleTensor> operandValues = new ArrayList<>();
 
@@ -125,8 +125,8 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor> implements Dou
     }
 
     @Override
-    public Map<IVertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<IVertex, PartialDerivative> splitPartials = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> splitPartials = new HashMap<>();
 
         long currentSplitIndex = 0;
         long[] splitIndices = new long[operands.length];
@@ -154,14 +154,14 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor> implements Dou
 
     @Override
     public DoubleTensor calculate() {
-        return op(extractFromInputs(DoubleTensor.class, IVertex::getValue, operands));
+        return op(extractFromInputs(DoubleTensor.class, Vertex::getValue, operands));
     }
 
     protected DoubleTensor op(DoubleTensor... inputs) {
         return DoubleTensor.concat(dimension, inputs);
     }
 
-    private static <T> T[] extractFromInputs(Class<T> clazz, Function<IVertex<DoubleTensor>, T> func, DoubleVertex[] operands) {
+    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor>, T> func, DoubleVertex[] operands) {
         T[] extract = (T[]) Array.newInstance(clazz, operands.length);
         for (int i = 0; i < operands.length; i++) {
             extract[i] = func.apply(operands[i]);

@@ -3,10 +3,10 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
@@ -15,16 +15,16 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
  */
 public class NumericalEqualsVertex<N extends Number, TENSOR extends NumberTensor<N, TENSOR>> extends VertexImpl<BooleanTensor> implements BooleanVertex,  NonProbabilistic<BooleanTensor> {
 
-    protected IVertex<TENSOR> a;
-    protected IVertex<TENSOR> b;
+    protected Vertex<TENSOR> a;
+    protected Vertex<TENSOR> b;
     private N epsilon;
     private final static String A_NAME = "a";
     private final static String B_NAME = "b";
     private final static String EPSILON_NAME = "epsilon";
 
     @ExportVertexToPythonBindings
-    public NumericalEqualsVertex(@LoadVertexParam(A_NAME) IVertex<TENSOR> a,
-                                 @LoadVertexParam(B_NAME) IVertex<TENSOR> b,
+    public NumericalEqualsVertex(@LoadVertexParam(A_NAME) Vertex<TENSOR> a,
+                                 @LoadVertexParam(B_NAME) Vertex<TENSOR> b,
                                  @LoadVertexParam(EPSILON_NAME) N epsilon) {
         super(a.getShape());
         this.a = a;
@@ -43,12 +43,12 @@ public class NumericalEqualsVertex<N extends Number, TENSOR extends NumberTensor
     }
 
     @SaveVertexParam(A_NAME)
-    public IVertex<? extends NumberTensor> getA() {
+    public Vertex<? extends NumberTensor> getA() {
         return a;
     }
 
     @SaveVertexParam(B_NAME)
-    public IVertex<? extends NumberTensor> getB() {
+    public Vertex<? extends NumberTensor> getB() {
         return b;
     }
 

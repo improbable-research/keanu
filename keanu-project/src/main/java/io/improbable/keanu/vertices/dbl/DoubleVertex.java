@@ -6,7 +6,7 @@ import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
@@ -180,7 +180,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return new EqualsVertex<>(this, new ConstantDoubleVertex(value));
     }
 
-    default <T extends Tensor> BooleanVertex notEqualTo(IVertex<T> rhs) {
+    default <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);
     }
 
@@ -795,14 +795,14 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     default DoubleUnaryOpLambda<DoubleTensor> lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
-                                                     Function<Map<IVertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
-                                                     Function<PartialDerivative, Map<IVertex, PartialDerivative>> reverseModeAutoDiffLambda) {
+                                                     Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
+                                                     Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
     default DoubleUnaryOpLambda<DoubleTensor> lambda(Function<DoubleTensor, DoubleTensor> op,
-                                                     Function<Map<IVertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
-                                                     Function<PartialDerivative, Map<IVertex, PartialDerivative>> reverseModeAutoDiffLambda) {
+                                                     Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
+                                                     Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 

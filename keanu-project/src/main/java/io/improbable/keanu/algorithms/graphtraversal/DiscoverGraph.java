@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -25,27 +25,27 @@ public class DiscoverGraph {
      * @return a set containing EVERY vertex in a graph that the
      * starting vertex is apart of.
      */
-    public static Set<IVertex> getEntireGraph(IVertex<?> initialVertex) {
+    public static Set<Vertex> getEntireGraph(Vertex<?> initialVertex) {
 
-        Set<IVertex> discoveredGraph = new HashSet<>();
+        Set<Vertex> discoveredGraph = new HashSet<>();
 
-        Deque<IVertex<?>> stack = new ArrayDeque<>();
+        Deque<Vertex<?>> stack = new ArrayDeque<>();
 
         discoveredGraph.add(initialVertex);
         stack.addFirst(initialVertex);
 
         while (!stack.isEmpty()) {
 
-            IVertex<?> visiting = stack.removeFirst();
+            Vertex<?> visiting = stack.removeFirst();
 
-            for (IVertex<?> child : visiting.getChildren()) {
+            for (Vertex<?> child : visiting.getChildren()) {
                 if (!discoveredGraph.contains(child)) {
                     stack.addFirst(child);
                     discoveredGraph.add(child);
                 }
             }
 
-            for (IVertex<?> parent : visiting.getParents()) {
+            for (Vertex<?> parent : visiting.getParents()) {
                 if (!discoveredGraph.contains(parent)) {
                     stack.addFirst(parent);
                     discoveredGraph.add(parent);

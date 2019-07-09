@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices;
 
-public interface VertexBinaryOp<L extends IVertex, R extends IVertex> {
+public interface VertexBinaryOp<L extends Vertex, R extends Vertex> {
 
     L getLeft();
 

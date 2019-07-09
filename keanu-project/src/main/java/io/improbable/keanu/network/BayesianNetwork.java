@@ -7,10 +7,10 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 
 import java.util.ArrayList;
@@ -26,41 +26,41 @@ import java.util.stream.Stream;
 
 public class BayesianNetwork {
 
-    private final List<? extends IVertex> vertices;
-    private final Map<VertexLabel, IVertex> vertexLabels;
+    private final List<? extends Vertex> vertices;
+    private final Map<VertexLabel, Vertex> vertexLabels;
     private static final int TOP_LEVEL_INDENTATION = 1;
     private int indentation = TOP_LEVEL_INDENTATION;
 
-    public BayesianNetwork(Set<? extends IVertex> vertices) {
+    public BayesianNetwork(Set<? extends Vertex> vertices) {
         Preconditions.checkArgument(!vertices.isEmpty(), "A bayesian network must contain at least one vertex");
         this.vertices = ImmutableList.copyOf(vertices);
         this.vertexLabels = buildLabelMap(vertices);
     }
 
-    public BayesianNetwork(Collection<? extends IVertex> vertices) {
+    public BayesianNetwork(Collection<? extends Vertex> vertices) {
         this(new HashSet<>(vertices));
     }
 
-    public IVertex getVertexByLabel(VertexLabel label) {
+    public Vertex getVertexByLabel(VertexLabel label) {
         Preconditions.checkArgument(vertexLabels.containsKey(label), String.format("Vertex with label %s was not found in BayesianNetwork.", label));
         return vertexLabels.get(label);
     }
 
-    public List<IVertex> getVerticesInNamespace(String... namespace) {
+    public List<Vertex> getVerticesInNamespace(String... namespace) {
         return vertices.stream()
             .filter(v -> v.getLabel() != null && v.getLabel().isInNamespace(namespace))
             .collect(Collectors.toList());
     }
 
-    public List<IVertex> getVerticesIgnoringNamespace(String innerNamespace) {
+    public List<Vertex> getVerticesIgnoringNamespace(String innerNamespace) {
         return vertices.stream()
             .filter(v -> v.getLabel() != null && v.getLabel().getUnqualifiedName().equals(innerNamespace))
             .collect(Collectors.toList());
     }
 
-    private Map<VertexLabel, IVertex> buildLabelMap(Set<? extends IVertex> vertices) {
-        Map<VertexLabel, IVertex> labelMap = new HashMap<>();
-        for (IVertex v : vertices) {
+    private Map<VertexLabel, Vertex> buildLabelMap(Set<? extends Vertex> vertices) {
+        Map<VertexLabel, Vertex> labelMap = new HashMap<>();
+        for (Vertex v : vertices) {
             VertexLabel label = v.getLabel();
             if (v.getIndentation() == this.indentation && label != null) {
                 if (labelMap.containsKey(label)) {
@@ -79,7 +79,7 @@ public class BayesianNetwork {
     }
 
     public double getAverageVertexDegree() {
-        return getVertices().stream().mapToDouble(IVertex::getDegree).average().getAsDouble();
+        return getVertices().stream().mapToDouble(Vertex::getDegree).average().getAsDouble();
     }
 
     public void setState(NetworkState state) {
@@ -93,11 +93,11 @@ public class BayesianNetwork {
     /**
      * @return A list of all vertices in the network.
      */
-    public List<IVertex> getAllVertices() {
+    public List<Vertex> getAllVertices() {
         return Collections.unmodifiableList(vertices);
     }
 
-    public List<? extends IVertex> getVertices() {
+    public List<? extends Vertex> getVertices() {
         return vertices;
     }
 
@@ -105,7 +105,7 @@ public class BayesianNetwork {
         boolean filter(boolean isProbabilistic, boolean isObserved, int indentation);
     }
 
-    private List<IVertex> getFilteredVertexList(VertexFilter filter) {
+    private List<Vertex> getFilteredVertexList(VertexFilter filter) {
         return vertices.stream()
             .filter(v -> filter.filter(v.isProbabilistic(), v.isObserved(), v.getIndentation()))
             .collect(Collectors.toList());
@@ -114,15 +114,15 @@ public class BayesianNetwork {
     /**
      * @return All vertices that are latent or observed
      */
-    public List<IVertex> getLatentOrObservedVertices() {
+    public List<Vertex> getLatentOrObservedVertices() {
         return getLatentOrObservedVertices(Integer.MAX_VALUE);
     }
 
-    public List<IVertex> getTopLevelLatentOrObservedVertices() {
+    public List<Vertex> getTopLevelLatentOrObservedVertices() {
         return getLatentOrObservedVertices(TOP_LEVEL_INDENTATION);
     }
 
-    private List<IVertex> getLatentOrObservedVertices(int maxIndentation) {
+    private List<Vertex> getLatentOrObservedVertices(int maxIndentation) {
         return getFilteredVertexList((isProbabilistic, isObserved, indentation)
             -> (isProbabilistic || isObserved) && maxIndentation >= indentation);
     }
@@ -130,15 +130,15 @@ public class BayesianNetwork {
     /**
      * @return All vertices that are latent (i.e. probabilistic non-observed)
      */
-    public List<IVertex> getLatentVertices() {
+    public List<Vertex> getLatentVertices() {
         return getLatentVertices(Integer.MAX_VALUE);
     }
 
-    public List<IVertex> getTopLevelLatentVertices() {
+    public List<Vertex> getTopLevelLatentVertices() {
         return getLatentVertices(TOP_LEVEL_INDENTATION);
     }
 
-    private List<IVertex> getLatentVertices(int maxIndentation) {
+    private List<Vertex> getLatentVertices(int maxIndentation) {
         return getFilteredVertexList((isProbabilistic, isObserved, indentation)
             -> (isProbabilistic && !isObserved) && maxIndentation >= indentation);
     }
@@ -146,15 +146,15 @@ public class BayesianNetwork {
     /**
      * @return All vertices that are observed - which may be probabilistic or non-probabilistic
      */
-    public List<IVertex> getObservedVertices() {
+    public List<Vertex> getObservedVertices() {
         return getObservedVertices(Integer.MAX_VALUE);
     }
 
-    public List<IVertex> getTopLevelObservedVertices() {
+    public List<Vertex> getTopLevelObservedVertices() {
         return getObservedVertices(TOP_LEVEL_INDENTATION);
     }
 
-    private List<IVertex> getObservedVertices(int maxIndentation) {
+    private List<Vertex> getObservedVertices(int maxIndentation) {
         return getFilteredVertexList((isProbabilistic, isObserved, indentation) ->
             isObserved && maxIndentation >= indentation);
     }
@@ -183,7 +183,7 @@ public class BayesianNetwork {
 
         if (isInImpossibleState()) {
 
-            List<IVertex> sortedByDependency = TopologicalSort.sort(getLatentVertices());
+            List<Vertex> sortedByDependency = TopologicalSort.sort(getLatentVertices());
             setFromSampleAndCascade(sortedByDependency, random);
 
             probeForNonZeroProbability(sortedByDependency, attempts, random);
@@ -194,7 +194,7 @@ public class BayesianNetwork {
      * Attempt to find a non-zero master probability by repeatedly
      * cascading values from the given vertices
      */
-    private void probeForNonZeroProbability(List<? extends IVertex> latentVertices, int attempts, KeanuRandom random) {
+    private void probeForNonZeroProbability(List<? extends Vertex> latentVertices, int attempts, KeanuRandom random) {
 
         int iteration = 0;
         while (isInImpossibleState()) {
@@ -211,12 +211,12 @@ public class BayesianNetwork {
         return ProbabilityCalculator.isImpossibleLogProb(getLogOfMasterP());
     }
 
-    public static void setFromSampleAndCascade(List<? extends IVertex> vertices) {
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {
         setFromSampleAndCascade(vertices, KeanuRandom.getDefaultRandom());
     }
 
-    public static void setFromSampleAndCascade(List<? extends IVertex> vertices, KeanuRandom random) {
-        for (IVertex<?> vertex : vertices) {
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices, KeanuRandom random) {
+        for (Vertex<?> vertex : vertices) {
             if (!(vertex instanceof Probabilistic)) {
                 throw new IllegalArgumentException("Cannot sample from a non-probabilistic vertex. Vertex is: " + vertex);
             }
@@ -225,18 +225,18 @@ public class BayesianNetwork {
         VertexValuePropagation.cascadeUpdate(vertices);
     }
 
-    private static <T> void setValueFromSample(IVertex<T> vertex, KeanuRandom random) {
+    private static <T> void setValueFromSample(Vertex<T> vertex, KeanuRandom random) {
         vertex.setValue(((Probabilistic<T>) vertex).sample(random));
     }
 
-    public List<IVertex<DoubleTensor>> getContinuousLatentVertices() {
+    public List<Vertex<DoubleTensor>> getContinuousLatentVertices() {
         return getLatentVertices().stream()
             .filter(v -> v.getValue() instanceof DoubleTensor)
-            .map(v -> (IVertex<DoubleTensor>) v)
+            .map(v -> (Vertex<DoubleTensor>) v)
             .collect(Collectors.toList());
     }
 
-    public List<IVertex> getDiscreteLatentVertices() {
+    public List<Vertex> getDiscreteLatentVertices() {
         return getLatentVertices().stream()
             .filter(v -> !(v.getValue() instanceof DoubleTensor))
             .collect(Collectors.toList());
@@ -252,7 +252,7 @@ public class BayesianNetwork {
 
     public void save(NetworkSaver networkSaver) {
         if (isSaveable()) {
-            for (IVertex vertex : TopologicalSort.sort(vertices)) {
+            for (Vertex vertex : TopologicalSort.sort(vertices)) {
                 vertex.save(networkSaver);
             }
         } else {
@@ -265,7 +265,7 @@ public class BayesianNetwork {
     }
 
     public void saveValues(NetworkSaver networkSaver) {
-        for (IVertex vertex : TopologicalSort.sort(vertices)) {
+        for (Vertex vertex : TopologicalSort.sort(vertices)) {
             vertex.saveValue(networkSaver);
         }
     }
@@ -277,18 +277,18 @@ public class BayesianNetwork {
      * @param degree degree of connections from the vertex to be included in the subgraph
      * @return a set of vertices within the specified degree from the given vertex
      */
-    public Set<IVertex> getSubgraph(IVertex vertex, int degree) {
+    public Set<Vertex> getSubgraph(Vertex vertex, int degree) {
 
-        Set<IVertex> subgraphVertices = new HashSet<>();
-        List<IVertex> verticesToProcessNow = new ArrayList<>();
+        Set<Vertex> subgraphVertices = new HashSet<>();
+        List<Vertex> verticesToProcessNow = new ArrayList<>();
         verticesToProcessNow.add(vertex);
         subgraphVertices.add(vertex);
 
         for (int distance = 0; distance < degree && !verticesToProcessNow.isEmpty(); distance++) {
-            List<IVertex> connectedVertices = new ArrayList<>();
+            List<Vertex> connectedVertices = new ArrayList<>();
 
-            for (IVertex v : verticesToProcessNow) {
-                Stream<IVertex> verticesToAdd = Stream.concat(v.getParents().stream(), v.getChildren().stream());
+            for (Vertex v : verticesToProcessNow) {
+                Stream<Vertex> verticesToAdd = Stream.concat(v.getParents().stream(), v.getChildren().stream());
                 verticesToAdd
                     .filter(a -> !subgraphVertices.contains(a))
                     .forEachOrdered(a -> {

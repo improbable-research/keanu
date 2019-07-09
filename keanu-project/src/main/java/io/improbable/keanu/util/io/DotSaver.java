@@ -4,8 +4,8 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -38,13 +38,13 @@ public class DotSaver implements NetworkSaver {
 
     private Set<VertexDotLabel> dotLabels = new HashSet<>();
     private Set<GraphEdge> graphEdges = new HashSet<>();
-    private Set<IVertex> vertices;
+    private Set<Vertex> vertices;
 
     public DotSaver(BayesianNetwork network) {
         this(new HashSet<>(network.getAllVertices()));
     }
 
-    public DotSaver(Set<IVertex> vertices) {
+    public DotSaver(Set<Vertex> vertices) {
         this.vertices = vertices;
     }
 
@@ -75,7 +75,7 @@ public class DotSaver implements NetworkSaver {
         graphEdges = new HashSet<>();
         Writer outputWriter = new OutputStreamWriter(output);
 
-        for (IVertex v : vertices) {
+        for (Vertex v : vertices) {
             if (saveValues) {
                 v.saveValue(this);
             } else {
@@ -106,7 +106,7 @@ public class DotSaver implements NetworkSaver {
         }
     }
 
-    private static void outputEdges(Collection<GraphEdge> edges, Writer outputWriter, Set<IVertex> verticesToOutput) throws IOException {
+    private static void outputEdges(Collection<GraphEdge> edges, Writer outputWriter, Set<Vertex> verticesToOutput) throws IOException {
         for (GraphEdge edge : edges) {
             if (verticesToOutput.contains(edge.getParentVertex()) && verticesToOutput.contains(edge.getChildVertex())) {
                 outputWriter.write(EdgeDotLabel.inDotFormat(edge) + "\n");
@@ -115,18 +115,18 @@ public class DotSaver implements NetworkSaver {
     }
 
     @Override
-    public void save(IVertex vertex) {
+    public void save(Vertex vertex) {
         dotLabels.add(new VertexDotLabel(vertex));
         graphEdges.addAll(getParentEdges(vertex));
     }
 
     @Override
     public void save(ConstantVertex vertex) {
-        saveValue((IVertex) vertex);
+        saveValue((Vertex) vertex);
     }
 
     @Override
-    public void saveValue(IVertex vertex) {
+    public void saveValue(Vertex vertex) {
         if (vertex.hasValue() && vertex.getValue() instanceof Tensor) {
             setDotLabelWithValue(vertex);
         } else {
@@ -152,7 +152,7 @@ public class DotSaver implements NetworkSaver {
         graphEdges.addAll(getParentEdges(vertex));
     }
 
-    private void setDotLabelWithValue(IVertex<? extends Tensor> vertex) {
+    private void setDotLabelWithValue(Vertex<? extends Tensor> vertex) {
         VertexDotLabel vertexDotLabel = new VertexDotLabel(vertex);
         if (vertex.hasValue() && vertex.getValue().isScalar()) {
             vertexDotLabel.setValue("" + vertex.getValue().scalar());
@@ -160,10 +160,10 @@ public class DotSaver implements NetworkSaver {
         dotLabels.add(vertexDotLabel);
     }
 
-    private Set<GraphEdge> getParentEdges(IVertex vertex) {
+    private Set<GraphEdge> getParentEdges(Vertex vertex) {
         Set<GraphEdge> edges = new HashSet<>();
         for (Object v : vertex.getParents()) {
-            edges.add(new GraphEdge((IVertex) v, vertex));
+            edges.add(new GraphEdge((Vertex) v, vertex));
         }
 
         // Check if any of the edges represent a connection between the vertex and its hyperparameter and annotate it accordingly.
@@ -172,10 +172,10 @@ public class DotSaver implements NetworkSaver {
 
         for (Method method : methods) {
             SaveVertexParam annotation = method.getAnnotation(SaveVertexParam.class);
-            if (annotation != null && IVertex.class.isAssignableFrom(method.getReturnType())) {
+            if (annotation != null && Vertex.class.isAssignableFrom(method.getReturnType())) {
                 String parentName = annotation.value();
                 try {
-                    IVertex parentVertex = (IVertex) method.invoke(vertex);
+                    Vertex parentVertex = (Vertex) method.invoke(vertex);
                     GraphEdge parentEdge = new GraphEdge(vertex, parentVertex);
                     GraphEdge foundEdge = edges.stream().filter(parentEdge::equals).findFirst()
                         .orElseThrow(() -> new IllegalStateException("Did not find parent edge " + parentName));

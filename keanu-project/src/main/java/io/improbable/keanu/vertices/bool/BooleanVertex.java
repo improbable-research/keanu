@@ -7,8 +7,8 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.TensorVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
@@ -86,7 +86,7 @@ public interface BooleanVertex extends
         return new EqualsVertex<>(this, rhs);
     }
 
-    default <T extends Tensor> BooleanVertex notEqualTo(IVertex<T> rhs) {
+    default <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);
     }
 
@@ -146,10 +146,10 @@ public interface BooleanVertex extends
     //// Boolean Ops
     /////////////
 
-    default BooleanVertex or(IVertex<BooleanTensor>... those) {
+    default BooleanVertex or(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new OrBinaryVertex(this, those[0]);
-        List<IVertex<BooleanTensor>> list = ImmutableList.<IVertex<BooleanTensor>>builder()
+        List<Vertex<BooleanTensor>> list = ImmutableList.<Vertex<BooleanTensor>>builder()
             .addAll(Arrays.asList(those))
             .add(this)
             .build();
@@ -172,10 +172,10 @@ public interface BooleanVertex extends
     }
 
 
-    default BooleanVertex and(IVertex<BooleanTensor>... those) {
+    default BooleanVertex and(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new AndBinaryVertex(this, those[0]);
-        List<IVertex<BooleanTensor>> list = ImmutableList.<IVertex<BooleanTensor>>builder()
+        List<Vertex<BooleanTensor>> list = ImmutableList.<Vertex<BooleanTensor>>builder()
             .addAll(Arrays.asList(those))
             .add(this)
             .build();
@@ -247,7 +247,7 @@ public interface BooleanVertex extends
         return null;
     }
 
-    static BooleanVertex not(IVertex<BooleanTensor> vertex) {
+    static BooleanVertex not(Vertex<BooleanTensor> vertex) {
         return new NotBinaryVertex(vertex);
     }
 

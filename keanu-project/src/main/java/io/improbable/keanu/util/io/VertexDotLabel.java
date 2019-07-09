@@ -2,20 +2,20 @@ package io.improbable.keanu.util.io;
 
 import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Objects;
 import java.util.Optional;
 
 public class VertexDotLabel {
-    private final IVertex vertex;
+    private final Vertex vertex;
     private String value = "";
     private String annotation = "";
     private String vertexLabel = "";
     private static final String DOT_LABEL_OPENING = "[label=\"";
     private static final String DOT_LABEL_CLOSING = "\"]";
 
-    public VertexDotLabel(IVertex vertex) {
+    public VertexDotLabel(Vertex vertex) {
         this.vertex = vertex;
         if (vertex.getLabel() != null) {
             vertexLabel = vertex.getLabel().getUnqualifiedName();

@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Collections;
@@ -10,11 +10,11 @@ import java.util.Map;
 
 public interface Differentiable {
 
-    default PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        if (((IVertex) this).isObserved()) {
+    default PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        if (((Vertex) this).isObserved()) {
             return PartialDerivative.EMPTY;
         } else {
-            return withRespectToSelf(((IVertex) this).getShape());
+            return withRespectToSelf(((Vertex) this).getShape());
         }
     }
 
@@ -24,7 +24,7 @@ public interface Differentiable {
         );
     }
 
-    default Map<IVertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    default Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         return Collections.emptyMap();
     }
 }

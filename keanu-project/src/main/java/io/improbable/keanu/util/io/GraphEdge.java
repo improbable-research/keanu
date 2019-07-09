@@ -1,6 +1,6 @@
 package io.improbable.keanu.util.io;
 
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -11,11 +11,11 @@ import java.util.Set;
  */
 public class GraphEdge {
 
-    private final IVertex parentVertex;
-    private final IVertex childVertex;
+    private final Vertex parentVertex;
+    private final Vertex childVertex;
     private Set<String> labels = new HashSet<>();
 
-    public GraphEdge(IVertex v1, IVertex v2) {
+    public GraphEdge(Vertex v1, Vertex v2) {
         if (v1.getId().compareTo(v2.getId()) < 0) {
             parentVertex = v1;
             childVertex = v2;
@@ -29,11 +29,11 @@ public class GraphEdge {
         labels.add(dotLabel);
     }
 
-    public IVertex getParentVertex() {
+    public Vertex getParentVertex() {
         return parentVertex;
     }
 
-    public IVertex getChildVertex() {
+    public Vertex getChildVertex() {
         return childVertex;
     }
 

@@ -8,7 +8,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -89,7 +89,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     }
 
     @Override
-    public void createConstant(IVertex visiting) {
+    public void createConstant(Vertex visiting) {
 
         String type = getAssigmentType(visiting);
         String lookupName = visiting.getReference().toStringReference();
@@ -104,7 +104,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     }
 
     @Override
-    public void createVariable(IVertex visiting) {
+    public void createVariable(Vertex visiting) {
 
         String variableType = getAssigmentType(visiting);
         String variableName = toSourceVariableName(visiting.getReference());
@@ -120,7 +120,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     }
 
     @Override
-    public void create(IVertex visiting) {
+    public void create(Vertex visiting) {
 
         if (isConstant(visiting)) {
             createConstant(visiting);
@@ -137,7 +137,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         lookup.put(visiting.getReference(), new KeanuCompiledVariable(name, true));
     }
 
-    private boolean isConstant(IVertex v) {
+    private boolean isConstant(Vertex v) {
         return v instanceof ConstantDoubleVertex || v instanceof ConstantIntegerVertex || v instanceof ConstantBooleanVertex;
     }
 
@@ -190,7 +190,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     }
 
     @Override
-    public void connect(Map<? extends IVertex<?>, ? extends IVertex<?>> connections) {
+    public void connect(Map<? extends Vertex<?>, ? extends Vertex<?>> connections) {
         connections.forEach((to, from) ->
             lookup.put(from.getReference(), lookup.get(to.getReference()))
         );

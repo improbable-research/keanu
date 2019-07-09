@@ -3,10 +3,10 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 
@@ -17,12 +17,12 @@ public class IfVertex<T> extends GenericTensorVertex<T> implements NonProbabilis
     private final static String ELSE_NAME = "else";
 
     private final BooleanVertex predicate;
-    private final IVertex<GenericTensor<T>> thn;
-    private final IVertex<GenericTensor<T>> els;
+    private final Vertex<GenericTensor<T>> thn;
+    private final Vertex<GenericTensor<T>> els;
 
     public IfVertex(@LoadVertexParam(PREDICATE_NAME) BooleanVertex predicate,
-                    @LoadVertexParam(THEN_NAME) IVertex<GenericTensor<T>> thn,
-                    @LoadVertexParam(ELSE_NAME) IVertex<GenericTensor<T>> els) {
+                    @LoadVertexParam(THEN_NAME) Vertex<GenericTensor<T>> thn,
+                    @LoadVertexParam(ELSE_NAME) Vertex<GenericTensor<T>> els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;
@@ -45,12 +45,12 @@ public class IfVertex<T> extends GenericTensorVertex<T> implements NonProbabilis
     }
 
     @SaveVertexParam(THEN_NAME)
-    public IVertex<GenericTensor<T>> getThn() {
+    public Vertex<GenericTensor<T>> getThn() {
         return thn;
     }
 
     @SaveVertexParam(ELSE_NAME)
-    public IVertex<GenericTensor<T>> getEls() {
+    public Vertex<GenericTensor<T>> getEls() {
         return els;
     }
 }

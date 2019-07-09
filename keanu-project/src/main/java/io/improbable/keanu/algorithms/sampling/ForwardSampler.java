@@ -6,9 +6,9 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.List;
 import java.util.Map;
@@ -22,11 +22,11 @@ public class ForwardSampler implements SamplingAlgorithm {
 
     private final BayesianNetwork network;
     private final List<? extends Variable> variablesToSampleFrom;
-    private final List<IVertex> topologicallySortedVertices;
+    private final List<Vertex> topologicallySortedVertices;
     private final KeanuRandom random;
     private final boolean calculateSampleProbability;
 
-    public ForwardSampler(BayesianNetwork network, List<? extends Variable> variablesToSampleFrom, List<IVertex> topologicallySortedVertices, KeanuRandom random, boolean calculateSampleProbability) {
+    public ForwardSampler(BayesianNetwork network, List<? extends Variable> variablesToSampleFrom, List<Vertex> topologicallySortedVertices, KeanuRandom random, boolean calculateSampleProbability) {
         this.network = network;
         this.variablesToSampleFrom = variablesToSampleFrom;
         this.topologicallySortedVertices = topologicallySortedVertices;
@@ -36,7 +36,7 @@ public class ForwardSampler implements SamplingAlgorithm {
 
     @Override
     public void step() {
-        for (IVertex vertex : topologicallySortedVertices) {
+        for (Vertex vertex : topologicallySortedVertices) {
             if (vertex instanceof Probabilistic) {
                 vertex.setValue(((Probabilistic) vertex).sample(random));
             } else if (vertex instanceof NonProbabilistic) {

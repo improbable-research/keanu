@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -13,16 +13,16 @@ import java.util.function.Predicate;
 
 public class BreadthFirstSearch {
 
-    public static boolean bfsWithFailureCondition(Collection<IVertex> vertices,
-                                                  Predicate<IVertex> failureCondition,
-                                                  Function<IVertex, Collection<IVertex>> nextVertices,
-                                                  Consumer<Collection<IVertex>> successfullyVisitedConsumer) {
+    public static boolean bfsWithFailureCondition(Collection<Vertex> vertices,
+                                                  Predicate<Vertex> failureCondition,
+                                                  Function<Vertex, Collection<Vertex>> nextVertices,
+                                                  Consumer<Collection<Vertex>> successfullyVisitedConsumer) {
 
-        Queue<IVertex> queue = new ArrayDeque<>(vertices);
-        Set<IVertex> visited = new HashSet<>(vertices);
+        Queue<Vertex> queue = new ArrayDeque<>(vertices);
+        Set<Vertex> visited = new HashSet<>(vertices);
 
         while (!queue.isEmpty()) {
-            IVertex visiting = queue.poll();
+            Vertex visiting = queue.poll();
 
             if (failureCondition.test(visiting)) {
                 return false;
@@ -35,11 +35,11 @@ public class BreadthFirstSearch {
         return true;
     }
 
-    private static void queueUnvisitedNextVertices(Collection<IVertex> nextVertices,
-                                                   Queue<IVertex> queue,
-                                                   Set<IVertex> visited) {
+    private static void queueUnvisitedNextVertices(Collection<Vertex> nextVertices,
+                                                   Queue<Vertex> queue,
+                                                   Set<Vertex> visited) {
 
-        for (IVertex next : nextVertices) {
+        for (Vertex next : nextVertices) {
             if (!visited.contains(next)) {
                 queue.offer(next);
                 visited.add(next);

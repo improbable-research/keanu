@@ -4,7 +4,7 @@ import com.google.protobuf.util.JsonFormat;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -55,7 +55,7 @@ public class JsonSaver implements NetworkSaver {
     }
 
     @Override
-    public void save(IVertex vertex) {
+    public void save(Vertex vertex) {
         protobufSaver.save(vertex);
     }
 
@@ -80,7 +80,7 @@ public class JsonSaver implements NetworkSaver {
     }
 
     @Override
-    public void saveValue(IVertex vertex) {
+    public void saveValue(Vertex vertex) {
         protobufSaver.save(vertex);
     }
 

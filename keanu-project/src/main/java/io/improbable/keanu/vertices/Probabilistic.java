@@ -30,9 +30,9 @@ public interface Probabilistic<T> extends Observable<T>, Samplable<T> {
      * For continuous variables this is called the PDF (probability density function).
      * For discrete variables this is called the PMF (probability mass function).
      */
-    Map<IVertex, DoubleTensor> dLogProb(T atValue, Set<? extends IVertex> withRespectTo);
+    Map<Vertex, DoubleTensor> dLogProb(T atValue, Set<? extends Vertex> withRespectTo);
 
-    default Map<IVertex, DoubleTensor> dLogProb(T atValue, IVertex... withRespectTo) {
+    default Map<Vertex, DoubleTensor> dLogProb(T atValue, Vertex... withRespectTo) {
         return dLogProb(atValue, new HashSet<>(Arrays.asList(withRespectTo)));
     }
 
@@ -42,11 +42,11 @@ public interface Probabilistic<T> extends Observable<T>, Samplable<T> {
         return logProb(getValue());
     }
 
-    default Map<IVertex, DoubleTensor> dLogProbAtValue(Set<? extends IVertex> withRespectTo) {
+    default Map<Vertex, DoubleTensor> dLogProbAtValue(Set<? extends Vertex> withRespectTo) {
         return dLogProb(getValue(), withRespectTo);
     }
 
-    default Map<IVertex, DoubleTensor> dLogProbAtValue(IVertex... withRespectTo) {
+    default Map<Vertex, DoubleTensor> dLogProbAtValue(Vertex... withRespectTo) {
         return dLogProb(getValue(), withRespectTo);
     }
 

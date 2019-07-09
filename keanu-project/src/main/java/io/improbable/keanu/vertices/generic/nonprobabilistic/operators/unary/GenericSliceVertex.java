@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.generic.GenericTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 
 import static io.improbable.keanu.tensor.TensorShape.removeDimension;
 
@@ -23,7 +23,7 @@ public class GenericSliceVertex<T> extends GenericTensorUnaryOpVertex<T, T> {
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
-    public GenericSliceVertex(@LoadVertexParam(INPUT_NAME) IVertex<GenericTensor<T>> inputVertex,
+    public GenericSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<GenericTensor<T>> inputVertex,
                               @LoadVertexParam(DIMENSION_NAME) int dimension,
                               @LoadVertexParam(INDEX_NAME) int index) {
         super(removeDimension(dimension, inputVertex.getShape()), inputVertex);

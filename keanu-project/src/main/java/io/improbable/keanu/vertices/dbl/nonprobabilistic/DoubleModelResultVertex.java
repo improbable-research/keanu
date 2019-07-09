@@ -2,9 +2,9 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -22,7 +22,7 @@ public class DoubleModelResultVertex extends VertexImpl<DoubleTensor> implements
     public DoubleModelResultVertex(ModelVertex model, VertexLabel label) {
         super(Tensor.SCALAR_SHAPE);
         this.delegate = new ModelResult<>(model, label);
-        setParents((IVertex) model);
+        setParents((Vertex) model);
     }
 
     @Override

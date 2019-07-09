@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.mcmc;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class RollbackAndCascadeOnRejection implements ProposalRejectionStrategy {
 
-    private Map<IVertex, Object> fromValues;
+    private Map<Vertex, Object> fromValues;
 
     @Override
     public void onProposalCreated(Proposal proposal) {
@@ -23,8 +23,8 @@ public class RollbackAndCascadeOnRejection implements ProposalRejectionStrategy 
         fromValues = new HashMap<>();
         for (Variable variable : proposal.getVariablesWithProposal()) {
 
-            if (variable instanceof IVertex) {
-                fromValues.put((IVertex) variable, variable.getValue());
+            if (variable instanceof Vertex) {
+                fromValues.put((Vertex) variable, variable.getValue());
             } else {
                 throw new IllegalArgumentException(this.getClass().getSimpleName() + " is to only be used with Keanu's Vertex");
             }
@@ -35,9 +35,9 @@ public class RollbackAndCascadeOnRejection implements ProposalRejectionStrategy 
     @Override
     public void onProposalRejected(Proposal proposal) {
 
-        for (Map.Entry<IVertex, Object> entry : fromValues.entrySet()) {
+        for (Map.Entry<Vertex, Object> entry : fromValues.entrySet()) {
             Object oldValue = entry.getValue();
-            IVertex vertex = entry.getKey();
+            Vertex vertex = entry.getKey();
             vertex.setValue(oldValue);
         }
         VertexValuePropagation.cascadeUpdate(fromValues.keySet());

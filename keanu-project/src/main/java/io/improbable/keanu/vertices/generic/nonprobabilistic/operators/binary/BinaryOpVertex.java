@@ -1,15 +1,15 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.generic.GenericVertex;
 
 public abstract class BinaryOpVertex<A, B, C> extends GenericVertex<C> implements NonProbabilistic<C> {
 
-    protected final IVertex<A> a;
-    protected final IVertex<B> b;
+    protected final Vertex<A> a;
+    protected final Vertex<B> b;
 
-    public BinaryOpVertex(IVertex<A> a, IVertex<B> b) {
+    public BinaryOpVertex(Vertex<A> a, Vertex<B> b) {
         this.a = a;
         this.b = b;
         setParents(a, b);

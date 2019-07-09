@@ -5,7 +5,7 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
@@ -481,7 +481,7 @@ public class KeanuCompiledGraphTest {
         assertCompiledIsSameAsVertexEvaluation(A, B, select, mux);
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(IVertex<?> A, IVertex<?> B, IVertex<?> C, IVertex<?> D) {
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C, Vertex<?> D) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(D.getConnectedGraph(), ImmutableList.of(D));
 
@@ -497,7 +497,7 @@ public class KeanuCompiledGraphTest {
         assertEquals(D.getValue(), result.get(D.getReference()));
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(IVertex<?> A, IVertex<?> B, IVertex<?> C) {
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
 
@@ -512,7 +512,7 @@ public class KeanuCompiledGraphTest {
         assertEquals(C.getValue(), result.get(C.getReference()));
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(IVertex<?> A, IVertex<?> B) {
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(B.getConnectedGraph(), ImmutableList.of(B));
 
