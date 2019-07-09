@@ -130,12 +130,14 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabili
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGetBooleanIndexVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerBroadcastVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPermuteVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerReshapeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex")
@@ -165,8 +167,8 @@ def ConstantBoolean(constant: tensor_arg_types, label: Optional[str]=None) -> Ve
     return Boolean(context.jvm_view().ConstantBooleanVertex, label, cast_to_boolean_tensor(constant))
 
 
-def NumericalEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, epsilon: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Boolean(context.jvm_view().NumericalEqualsVertex, label, cast_to_vertex(a), cast_to_vertex(b), cast_to_vertex(epsilon))
+def NumericalEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, epsilon: float, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().NumericalEqualsVertex, label, cast_to_vertex(a), cast_to_vertex(b), cast_to_double(epsilon))
 
 
 def AndBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -747,6 +749,10 @@ def IntegerDivision(left: vertex_constructor_param_types, right: vertex_construc
     return Integer(context.jvm_view().IntegerDivisionVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
+def IntegerGetBooleanIndex(input_vertex: vertex_constructor_param_types, indices: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerGetBooleanIndexVertex, label, cast_to_integer_vertex(input_vertex), cast_to_boolean_vertex(indices))
+
+
 def IntegerMax(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     Finds the maximum between two vertices
@@ -798,6 +804,10 @@ def IntegerAbs(input_vertex: vertex_constructor_param_types, label: Optional[str
     :param input_vertex: the vertex
     """
     return Integer(context.jvm_view().IntegerAbsVertex, label, cast_to_integer_vertex(input_vertex))
+
+
+def IntegerBroadcast(input_vertex: vertex_constructor_param_types, to_shape: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerBroadcastVertex, label, cast_to_integer_vertex(input_vertex), cast_to_long_array(to_shape))
 
 
 def IntegerPermute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], label: Optional[str]=None) -> Vertex:

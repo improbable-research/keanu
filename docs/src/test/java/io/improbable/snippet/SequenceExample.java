@@ -9,6 +9,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.util.io.ProtobufLoader;
 import io.improbable.keanu.util.io.ProtobufSaver;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
@@ -130,7 +131,7 @@ public class SequenceExample {
         // Keanu-Example.Sequence_Item_<<index>>.<<hash>>.<<vertex-label>>
         // where the <<hash>> is a unique identifier for the Sequence.
         // You can get all the vertices with a particular name, regardless of which SequenceItem they belong to.
-        List<Vertex> allXVertices = network.getVerticesIgnoringNamespace(x1Label.getUnqualifiedName());
+        List<IVertex> allXVertices = network.getVerticesIgnoringNamespace(x1Label.getUnqualifiedName());
 
         // You get vertices from specific sequence items
         // For instance here we retrieve a vertex from the last sequence item

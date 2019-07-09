@@ -166,6 +166,8 @@ class JavaVertexToPythonConverter {
             return "cast_to_double(" + pythonParameter + ")";
         } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
             return "cast_to_integer(" + pythonParameter + ")";
+        } else if (Number.class.isAssignableFrom(parameterType)) {
+            return "cast_to_double(" + pythonParameter + ")";
         } else if (String.class.isAssignableFrom(parameterType)) {
             return pythonParameter;
         } else if (Boolean.class.isAssignableFrom(parameterType)) {

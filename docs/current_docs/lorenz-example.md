@@ -451,7 +451,7 @@ public class LorenzTest {
         List<DoubleVertex> slice = graphTimeSteps.get(time);
 
         return slice.stream()
-            .map(Vertex::getValue)
+            .map(IVertex::getValue)
             .collect(Collectors.toList());
     }
 
