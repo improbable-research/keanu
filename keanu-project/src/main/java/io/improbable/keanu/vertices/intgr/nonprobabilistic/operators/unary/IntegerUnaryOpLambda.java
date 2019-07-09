@@ -3,30 +3,38 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexImpl;
+import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.function.Function;
 
-public class IntegerUnaryOpLambda<IN> extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public class IntegerUnaryOpLambda extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex, VertexUnaryOp<IntegerVertex> {
 
-    protected final Vertex<IN> inputVertex;
-    protected final Function<IN, IntegerTensor> op;
+    protected static final String INPUT_NAME = "inputVertex";
 
-    public IntegerUnaryOpLambda(long[] shape, Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
+    protected final IntegerVertex inputVertex;
+    protected final Function<IntegerTensor, IntegerTensor> op;
+
+    public IntegerUnaryOpLambda(long[] shape, IntegerVertex inputVertex, Function<IntegerTensor, IntegerTensor> op) {
         super(shape);
         this.inputVertex = inputVertex;
         this.op = op;
         setParents(inputVertex);
     }
 
-    public IntegerUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
+    public IntegerUnaryOpLambda(IntegerVertex inputVertex, Function<IntegerTensor, IntegerTensor> op) {
         this(inputVertex.getShape(), inputVertex, op);
     }
 
     @Override
     public IntegerTensor calculate() {
         return op.apply(inputVertex.getValue());
+    }
+
+    @SaveVertexParam(INPUT_NAME)
+    public IntegerVertex getInputVertex() {
+        return inputVertex;
     }
 }

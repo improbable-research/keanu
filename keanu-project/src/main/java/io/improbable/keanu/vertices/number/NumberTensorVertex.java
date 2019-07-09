@@ -1,13 +1,68 @@
 package io.improbable.keanu.vertices.number;
 
 import io.improbable.keanu.BaseNumberTensor;
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.vertices.TensorVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.CastNumberToBooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
 
-public interface NumberTensorVertex<T extends Number, TENSOR extends Tensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
     extends TensorVertex<T, TENSOR, VERTEX>, BaseNumberTensor<BooleanVertex, IntegerVertex, DoubleVertex, T, VERTEX> {
 
+    @Override
+    default BooleanVertex toBoolean() {
+        return new CastNumberToBooleanVertex<>(this);
+    }
+
+    @Override
+    default DoubleVertex toDouble() {
+        return new CastNumberToDoubleVertex<>(this);
+    }
+
+    @Override
+    default IntegerVertex toInteger() {
+        return new CastNumberToIntegerVertex<>(this);
+    }
+
+    IntegerVertex argMax(int axis);
+
+    IntegerVertex argMax();
+
+    IntegerVertex argMin(int axis);
+
+    IntegerVertex argMin();
+
+    @Override
+    default BooleanVertex equalsWithinEpsilon(VERTEX other, T epsilon) {
+        return new NumericalEqualsVertex<>(this, other, epsilon);
+    }
+
+    @Override
+    default BooleanVertex greaterThan(VERTEX rhs) {
+        return new GreaterThanVertex<>(this, rhs);
+    }
+
+    @Override
+    default BooleanVertex greaterThanOrEqual(VERTEX rhs) {
+        return new GreaterThanOrEqualVertex<>(this, rhs);
+    }
+
+    @Override
+    default BooleanVertex lessThan(VERTEX rhs) {
+        return new LessThanVertex<>(this, rhs);
+    }
+
+    @Override
+    default BooleanVertex lessThanOrEqual(VERTEX rhs) {
+        return new LessThanOrEqualVertex<>(this, rhs);
+    }
 }

@@ -26,7 +26,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.Boolea
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastToDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
@@ -72,7 +72,7 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastToIntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
@@ -167,7 +167,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(MaxVertex.class, fluentBinaryOp("max"));
         opMappers.put(MinVertex.class, fluentBinaryOp("min"));
 
-        opMappers.put(CastToDoubleVertex.class, fluentUnaryOp("toDouble"));
+        opMappers.put(CastNumberToDoubleVertex.class, fluentUnaryOp("toDouble"));
 
         opMappers.put(DoubleIfVertex.class, KeanuVertexToTensorOpMapper::doubleIfOp);
         opMappers.put(DoubleProxyVertex.class, KeanuVertexToTensorOpMapper::doubleProxyOp);
@@ -193,7 +193,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(IntegerMaxVertex.class, fluentBinaryOp("max"));
         opMappers.put(IntegerMinVertex.class, fluentBinaryOp("min"));
 
-        opMappers.put(CastToIntegerVertex.class, fluentUnaryOp("toInteger"));
+        opMappers.put(CastNumberToIntegerVertex.class, fluentUnaryOp("toInteger"));
 
         opMappers.put(IntegerIfVertex.class, KeanuVertexToTensorOpMapper::integerIfOp);
         opMappers.put(IntegerProxyVertex.class, KeanuVertexToTensorOpMapper::integerProxyOp);

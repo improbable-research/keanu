@@ -3,25 +3,28 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.function.BiFunction;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
 
-public class IntegerBinaryOpLambda<A, B> extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public class IntegerBinaryOpLambda extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
 
-    protected final Vertex<A> left;
-    protected final Vertex<B> right;
-    protected final BiFunction<A, B, IntegerTensor> op;
+    protected static final String LEFT_NAME = "left";
+    protected static final String RIGHT_NAME = "right";
+
+    protected final IntegerVertex left;
+    protected final IntegerVertex right;
+    protected final BiFunction<IntegerTensor, IntegerTensor, IntegerTensor> op;
 
     public IntegerBinaryOpLambda(long[] shape,
-                                 Vertex<A> left,
-                                 Vertex<B> right,
-                                 BiFunction<A, B, IntegerTensor> op) {
+                                 IntegerVertex left,
+                                 IntegerVertex right,
+                                 BiFunction<IntegerTensor, IntegerTensor, IntegerTensor> op) {
         super(shape);
         this.left = left;
         this.right = right;
@@ -29,12 +32,22 @@ public class IntegerBinaryOpLambda<A, B> extends VertexImpl<IntegerTensor> imple
         setParents(left, right);
     }
 
-    public IntegerBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, IntegerTensor> op) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right, op);
+    public IntegerBinaryOpLambda(IntegerVertex left, IntegerVertex right, BiFunction<IntegerTensor, IntegerTensor, IntegerTensor> op) {
+        this(getBroadcastResultShape(left.getShape(), right.getShape()), left, right, op);
     }
 
     @Override
     public IntegerTensor calculate() {
         return op.apply(left.getValue(), right.getValue());
+    }
+
+    @SaveVertexParam(LEFT_NAME)
+    public IntegerVertex getLeft() {
+        return left;
+    }
+
+    @SaveVertexParam(RIGHT_NAME)
+    public IntegerVertex getRight() {
+        return right;
     }
 }

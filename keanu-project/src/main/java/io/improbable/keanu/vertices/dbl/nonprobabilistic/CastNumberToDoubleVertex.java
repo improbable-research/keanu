@@ -1,35 +1,35 @@
-package io.improbable.keanu.vertices.intgr.nonprobabilistic;
+package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexUnaryOp;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-public class CastToIntegerVertex<T extends NumberTensor> extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, VertexUnaryOp<Vertex<T>> {
+public class CastNumberToDoubleVertex<T extends NumberTensor> extends VertexImpl<DoubleTensor> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexUnaryOp<Vertex<T>> {
 
     private final Vertex<T> inputVertex;
-    private static final String INPUT_NAME = "inputVertex";
+    private static final String INPUT_VERTEX_NAME = "inputVertex";
 
     @ExportVertexToPythonBindings
-    public CastToIntegerVertex(@LoadVertexParam(INPUT_NAME) Vertex<T> inputVertex) {
+    public CastNumberToDoubleVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<T> inputVertex) {
         super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
 
-    @Override
-    public IntegerTensor calculate() {
-        return inputVertex.getValue().toInteger();
-    }
-
-    @SaveVertexParam(INPUT_NAME)
+    @SaveVertexParam(INPUT_VERTEX_NAME)
     public Vertex<T> getInputVertex() {
         return inputVertex;
+    }
+
+    @Override
+    public DoubleTensor calculate() {
+        return inputVertex.getValue().toDouble();
     }
 }

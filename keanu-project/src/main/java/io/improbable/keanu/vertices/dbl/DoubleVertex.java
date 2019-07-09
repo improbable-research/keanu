@@ -54,7 +54,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastToIntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
 import io.improbable.keanu.vertices.number.FloatingPointTensorVertex;
 
 import java.util.List;
@@ -823,6 +823,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
 
     @Override
     default IntegerVertex toInteger() {
-        return new CastToIntegerVertex(this);
+        return new CastNumberToIntegerVertex(this);
     }
 }

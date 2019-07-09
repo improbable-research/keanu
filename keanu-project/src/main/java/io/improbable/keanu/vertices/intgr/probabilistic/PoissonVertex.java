@@ -17,7 +17,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastToDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -65,7 +65,7 @@ public class PoissonVertex extends VertexImpl<IntegerTensor> implements IntegerV
     }
 
     public PoissonVertex(Vertex<? extends NumberTensor> mu) {
-        this(mu.getShape(), new CastToDoubleVertex(mu));
+        this(mu.getShape(), new CastNumberToDoubleVertex(mu));
     }
 
     public PoissonVertex(double mu) {

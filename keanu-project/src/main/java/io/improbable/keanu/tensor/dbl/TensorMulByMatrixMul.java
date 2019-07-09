@@ -38,6 +38,17 @@ public class TensorMulByMatrixMul {
         return resultAsMatrix.reshape(resultShape);
     }
 
+    public static long[] getResultShape(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
+
+        List<Integer> leftDimsKept = getKeptDimensions(leftShape.length, dimsLeft);
+        List<Integer> rightDimsKept = getKeptDimensions(rightShape.length, dimsRight);
+
+        long[] leftKeptShape = getKeptShape(leftShape, leftDimsKept);
+        long[] rightKeptShape = getKeptShape(rightShape, rightDimsKept);
+
+        return Longs.concat(leftKeptShape, rightKeptShape);
+    }
+
     /**
      * Validates that the multiply dimensions match for the left shape and the right shape. Also, corrects for the
      * use of a negative dimension to represent dimensions from the right.
