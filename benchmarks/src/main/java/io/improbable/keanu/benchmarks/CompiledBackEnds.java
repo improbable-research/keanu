@@ -6,7 +6,7 @@ import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.keanu.KeanuComputableGraph;
 import io.improbable.keanu.backend.keanu.compiled.KeanuCompiledGraphBuilder;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -103,8 +103,8 @@ public class CompiledBackEnds {
 
     public ComputableGraph keaunuGraph(DoubleVertex output) {
 
-        List<Vertex> toposortedGraph = output.getConnectedGraph().stream()
-            .sorted(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()))
+        List<IVertex> toposortedGraph = output.getConnectedGraph().stream()
+            .sorted(Comparator.comparing(IVertex::getId, Comparator.naturalOrder()))
             .collect(Collectors.toList());
 
         return new KeanuComputableGraph(toposortedGraph, ImmutableSet.of(output));

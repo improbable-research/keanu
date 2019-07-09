@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.CauchyDistribution;
 import org.junit.Assert;
@@ -130,7 +130,7 @@ public class HalfCauchyVertexTest {
         scaleTensor.setValue(1.0);
 
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(scaleTensor);
-        Map<Vertex, DoubleTensor> actualDerivatives = tensorHalfCauchyVertex.dLogPdf(0.5, scaleTensor, tensorHalfCauchyVertex);
+        Map<IVertex, DoubleTensor> actualDerivatives = tensorHalfCauchyVertex.dLogPdf(0.5, scaleTensor, tensorHalfCauchyVertex);
 
         assertEquals(cauchyLogDiff.dPdscale, actualDerivatives.get(scaleTensor).scalar(), 1e-5);
         assertEquals(cauchyLogDiff.dPdx, actualDerivatives.get(tensorHalfCauchyVertex).scalar(), 1e-5);
@@ -221,7 +221,7 @@ public class HalfCauchyVertexTest {
     public void outOfBoundsGradientCalculation() {
         HalfCauchyVertex cauchyVertex = new HalfCauchyVertex(new long[]{2}, 5);
         DoubleTensor value = DoubleTensor.create(-5.0, 5.0);
-        Map<Vertex, DoubleTensor> actualDerivatives = cauchyVertex.dLogPdf(value, cauchyVertex);
+        Map<IVertex, DoubleTensor> actualDerivatives = cauchyVertex.dLogPdf(value, cauchyVertex);
         DoubleTensor derivative = actualDerivatives.get(cauchyVertex);
         Assert.assertEquals(0.0, derivative.getValue(0), 1e-6);
         Assert.assertTrue(derivative.getValue(1) != 0.);

@@ -4,8 +4,8 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.io.ProtobufLoader;
 import io.improbable.keanu.util.io.ProtobufSaver;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.SimpleVertexDictionary;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -75,7 +75,7 @@ public class SequenceLoaderTest {
             assertThat(sequenceItem.get(xProxyLabel), notNullValue());
         });
 
-        Vertex<? extends DoubleTensor> outputVertex = reconstructedSequence.getLastItem().get(xLabel);
+        IVertex<? extends DoubleTensor> outputVertex = reconstructedSequence.getLastItem().get(xLabel);
         double actualOutputValue = outputVertex.getValue().scalar();
         assertThat(actualOutputValue, is(4.0));
     }
@@ -171,7 +171,7 @@ public class SequenceLoaderTest {
         assertSequenceContains(sequence2, reconstructedSequence2, x2Label, x2ProxyLabel);
 
         BayesianNetwork reconstructedNetwork1 = sequence1.toBayesianNetwork();
-        Vertex reconstructedMasterOutput = reconstructedNetwork1.getVertexByLabel(outputLabel);
+        IVertex reconstructedMasterOutput = reconstructedNetwork1.getVertexByLabel(outputLabel);
         assertThat(reconstructedMasterOutput, notNullValue());
         assertThat(((DoubleTensor) reconstructedMasterOutput.getValue()).scalar(), is(16.0));
     }
@@ -185,7 +185,7 @@ public class SequenceLoaderTest {
             assertThat(sequenceItem.get(xProxyLabel), notNullValue());
         });
 
-        Vertex<? extends DoubleTensor> outputVertex2 = reconstructedSequence.getLastItem().get(xLabel);
+        IVertex<? extends DoubleTensor> outputVertex2 = reconstructedSequence.getLastItem().get(xLabel);
         double actualOutputValue2 = outputVertex2.getValue().scalar();
         assertThat(actualOutputValue2, is(4.0));
     }

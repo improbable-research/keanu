@@ -2,9 +2,9 @@ package io.improbable.keanu.backend;
 
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
-import io.improbable.keanu.vertices.Vertex;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class ProbabilisticGraphConverter {
     }
 
     private static Optional<VariableReference> addLogProbCalculation(ComputableGraphBuilder<?> graphBuilder,
-                                                                     List<Vertex> probabilisticVertices) {
+                                                                     List<IVertex> probabilisticVertices) {
         List<VariableReference> logProbOps = probabilisticVertices.stream()
             .map(visiting -> {
                 if (visiting instanceof LogProbGraphSupplier) {

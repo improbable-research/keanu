@@ -26,7 +26,7 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     }
 
     @Override
-    public T sumNumber(){
+    public T sumNumber() {
         return buffer.sum();
     }
 

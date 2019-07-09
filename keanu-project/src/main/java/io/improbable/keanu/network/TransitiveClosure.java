@@ -1,6 +1,6 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import lombok.Value;
 
 import java.util.Collections;
@@ -29,13 +29,13 @@ import static io.improbable.keanu.network.Propagation.getVertices;
 @Value
 public class TransitiveClosure {
 
-    private static final Predicate<Vertex> ADD_ALL = vertex -> true;
-    private static final Predicate<Vertex> PROBABILISTIC_OR_OBSERVED_ONLY = vertex -> vertex.isObserved() || vertex.isProbabilistic();
+    private static final Predicate<IVertex> ADD_ALL = vertex -> true;
+    private static final Predicate<IVertex> PROBABILISTIC_OR_OBSERVED_ONLY = vertex -> vertex.isObserved() || vertex.isProbabilistic();
 
-    private final Set<Vertex> allVertices;
-    private final Set<Vertex> latentAndObservedVertices;
+    private final Set<IVertex> allVertices;
+    private final Set<IVertex> latentAndObservedVertices;
 
-    private TransitiveClosure(Set<Vertex> allVertices) {
+    private TransitiveClosure(Set<IVertex> allVertices) {
         this.allVertices = allVertices;
         this.latentAndObservedVertices = allVertices.stream()
             .filter(PROBABILISTIC_OR_OBSERVED_ONLY)
@@ -47,7 +47,7 @@ public class TransitiveClosure {
      * @param includeNonProbabilistic false if only the probabilistic or observed vertices are wanted
      * @return All upstream vertices, not including non probabilistic if includeNonProbabilistic is false.
      */
-    public static TransitiveClosure getUpstreamVertices(Vertex<?> aVertex, boolean includeNonProbabilistic) {
+    public static TransitiveClosure getUpstreamVertices(IVertex<?> aVertex, boolean includeNonProbabilistic) {
         return getUpstreamVerticesForCollection(Collections.singletonList(aVertex), includeNonProbabilistic);
     }
 
@@ -56,7 +56,7 @@ public class TransitiveClosure {
      * @param includeNonProbabilistic false if only the probabilistic and observed are wanted
      * @return All downstream vertices, not including non probabilistic if includeNonProbabilistic is false.
      */
-    public static TransitiveClosure getDownstreamVertices(Vertex<?> aVertex, boolean includeNonProbabilistic) {
+    public static TransitiveClosure getDownstreamVertices(IVertex<?> aVertex, boolean includeNonProbabilistic) {
         return getDownstreamVerticesForCollection(Collections.singletonList(aVertex), includeNonProbabilistic);
     }
 
@@ -65,13 +65,13 @@ public class TransitiveClosure {
      * @param includeNonProbabilistic false if only the probabilistic or observed vertices are wanted
      * @return All upstream vertices, not including non probabilistic if includeNonProbabilistic is false.
      */
-    public static TransitiveClosure getUpstreamVerticesForCollection(List<Vertex> vertices, boolean includeNonProbabilistic) {
+    public static TransitiveClosure getUpstreamVerticesForCollection(List<IVertex> vertices, boolean includeNonProbabilistic) {
 
-        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
+        Predicate<IVertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
-        Set<Vertex> upstreamVertices = getVertices(
+        Set<IVertex> upstreamVertices = getVertices(
             vertices,
-            Vertex::getParents,
+            IVertex::getParents,
             v -> false,
             shouldAdd
         );
@@ -84,13 +84,13 @@ public class TransitiveClosure {
      * @param includeNonProbabilistic false if only the probabilistic or observed vertices are wanted
      * @return All upstream vertices, not including non probabilistic if includeNonProbabilistic is false.
      */
-    public static TransitiveClosure getDownstreamVerticesForCollection(List<Vertex> vertices, boolean includeNonProbabilistic) {
+    public static TransitiveClosure getDownstreamVerticesForCollection(List<IVertex> vertices, boolean includeNonProbabilistic) {
 
-        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
+        Predicate<IVertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
-        Set<Vertex> downstreamVertices = getVertices(
+        Set<IVertex> downstreamVertices = getVertices(
             vertices,
-            Vertex::getChildren,
+            IVertex::getChildren,
             v -> false,
             shouldAdd
         );

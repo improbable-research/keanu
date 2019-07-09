@@ -13,6 +13,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.network.TransitiveClosure;
 import io.improbable.keanu.util.status.StatusBar;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Vertex;
 import org.nd4j.base.Preconditions;
 
@@ -59,29 +60,29 @@ public class Forward implements PosteriorSamplingAlgorithm {
         List<? extends Variable> latentVariables = model.getLatentVariables();
         Preconditions.checkArgument(latentVariables.size() > 0, "Your model must contain latent variables in order to forward sample.");
 
-        List<Vertex> verticesToSampleFrom = new ArrayList<>();
+        List<IVertex> verticesToSampleFrom = new ArrayList<>();
         for (Variable variable : variablesToSampleFrom) {
-            Preconditions.checkArgument(variable instanceof Vertex, "The Forward Sampler only works for Variables of type Vertex. Received : " + variable);
-            verticesToSampleFrom.add((Vertex) variable);
+            Preconditions.checkArgument(variable instanceof IVertex, "The Forward Sampler only works for Variables of type Vertex. Received : " + variable);
+            verticesToSampleFrom.add((IVertex) variable);
         }
 
         BayesianNetwork network = checkSampleFromVariablesComeFromConnectedGraph(variablesToSampleFrom);
 
-        List<Vertex> observedVertices = network.getObservedVertices();
+        List<IVertex> observedVertices = network.getObservedVertices();
         checkUpstreamOfObservedDoesNotContainProbabilistic(observedVertices);
 
-        Set<Vertex> allDownstreamVertices = allDownstreamVertices(network.getLatentVertices());
-        Set<Vertex> transitiveClosureSampleFrom = TransitiveClosure.getUpstreamVerticesForCollection(verticesToSampleFrom, true).getAllVertices();
-        Set<Vertex> intersection = Sets.intersection(allDownstreamVertices, transitiveClosureSampleFrom);
+        Set<IVertex> allDownstreamVertices = allDownstreamVertices(network.getLatentVertices());
+        Set<IVertex> transitiveClosureSampleFrom = TransitiveClosure.getUpstreamVerticesForCollection(verticesToSampleFrom, true).getAllVertices();
+        Set<IVertex> intersection = Sets.intersection(allDownstreamVertices, transitiveClosureSampleFrom);
 
-        List<Vertex> sortedVertices = TopologicalSort.sort(intersection);
+        List<IVertex> sortedVertices = TopologicalSort.sort(intersection);
 
         return new ForwardSampler(network, verticesToSampleFrom, sortedVertices, random, calculateSampleProbability);
     }
 
     private BayesianNetwork checkSampleFromVariablesComeFromConnectedGraph(List<? extends Variable> variablesToSampleFrom) {
         Variable variable = variablesToSampleFrom.get(0);
-        Set<Vertex> connectedGraph = ((Vertex) variable).getConnectedGraph();
+        Set<IVertex> connectedGraph = ((IVertex) variable).getConnectedGraph();
 
         for (Variable var : variablesToSampleFrom) {
             if (!connectedGraph.contains(var)) {
@@ -91,13 +92,13 @@ public class Forward implements PosteriorSamplingAlgorithm {
         return new BayesianNetwork(connectedGraph);
     }
 
-    private Set<Vertex> allDownstreamVertices(List<Vertex> randomVertices) {
+    private Set<IVertex> allDownstreamVertices(List<IVertex> randomVertices) {
         return LambdaSection.getDownstreamLambdaSectionForCollection(randomVertices, true).getAllVertices();
     }
 
-    private void checkUpstreamOfObservedDoesNotContainProbabilistic(List<Vertex> observedVertices) {
+    private void checkUpstreamOfObservedDoesNotContainProbabilistic(List<IVertex> observedVertices) {
         LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSectionForCollection(observedVertices, false);
-        Set<Vertex> upstreamRandomVariables = upstreamLambdaSection.getAllVertices();
+        Set<IVertex> upstreamRandomVariables = upstreamLambdaSection.getAllVertices();
         if (upstreamRandomVariables.size() > 1) {
             throw new IllegalArgumentException("Forward sampler cannot be ran if observed variables have a random variable in their upstream lambda section");
         }

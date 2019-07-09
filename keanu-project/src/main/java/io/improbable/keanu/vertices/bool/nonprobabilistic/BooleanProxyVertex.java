@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -15,7 +16,7 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<BooleanVertex>, NonProbabilistic<BooleanTensor> {
+public class BooleanProxyVertex extends Vertex<BooleanTensor> implements BooleanVertex,  ProxyVertex<BooleanVertex>, NonProbabilistic<BooleanTensor> {
 
     private final static String LABEL_NAME = "label";
     private final static String PARENT_NAME = "parent";
@@ -46,7 +47,7 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
     }
 
     @Override
-    public <V extends Vertex<BooleanTensor>> V setLabel(VertexLabel label) {
+    public <V extends IVertex<BooleanTensor>> V setLabel(VertexLabel label) {
         if (this.getLabel() != null && !this.getLabel().getUnqualifiedName().equals(label.getUnqualifiedName())) {
             throw new RuntimeException("You should not change the label on a Proxy Vertex");
         }

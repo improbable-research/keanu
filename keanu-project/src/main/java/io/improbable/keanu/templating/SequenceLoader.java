@@ -2,7 +2,7 @@ package io.improbable.keanu.templating;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.VertexLabel;
 
 import java.util.Collection;
@@ -28,9 +28,9 @@ public class SequenceLoader {
     }
 
     private static Map<Integer, Sequence> loadSequences(BayesianNetwork network, boolean shouldLoadMultiple) {
-        List<Vertex> vertices = TopologicalSort.sort(network.getAllVertices());
+        List<IVertex> vertices = TopologicalSort.sort(network.getAllVertices());
         Map<Integer, Sequence> sequences = new HashMap<>();
-        for (Vertex vertex : vertices) {
+        for (IVertex vertex : vertices) {
             addVertexToSequences(vertex, sequences);
             if (!shouldLoadMultiple && sequences.size() > 1) {
                 throw new SequenceConstructionException("The provided BayesianNetwork contains more than one Sequence");
@@ -42,7 +42,7 @@ public class SequenceLoader {
         return sequences;
     }
 
-    private static void addVertexToSequences(Vertex<?> vertex, Map<Integer, Sequence> sequences) {
+    private static void addVertexToSequences(IVertex<?> vertex, Map<Integer, Sequence> sequences) {
         VertexLabel label = vertex.getLabel();
         if (label != null) {
             Optional<Integer> sequenceItemIndex = parseSequenceItemIndex(label);

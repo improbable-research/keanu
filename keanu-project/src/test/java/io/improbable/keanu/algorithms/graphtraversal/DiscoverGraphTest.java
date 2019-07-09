@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
@@ -51,7 +51,7 @@ public class DiscoverGraphTest {
 
     @Test
     public void getsCompleteGraphFromEverywhere() {
-        for (Vertex<?> v : allVertices) {
+        for (IVertex<?> v : allVertices) {
             assertFindsAllVertices(v);
         }
     }
@@ -71,15 +71,15 @@ public class DiscoverGraphTest {
             end = left.plus(right);
         }
 
-        Set<Vertex> connectedGraph = end.getConnectedGraph();
+        Set<IVertex> connectedGraph = end.getConnectedGraph();
 
         int expectedSize = 3 + 3 * links;
 
         assertEquals(expectedSize, connectedGraph.size());
     }
 
-    private void assertFindsAllVertices(Vertex<?> v) {
-        Set<Vertex> vertices = DiscoverGraph.getEntireGraph(v);
+    private void assertFindsAllVertices(IVertex<?> v) {
+        Set<IVertex> vertices = DiscoverGraph.getEntireGraph(v);
         assertEquals(vertices.size(), allVertices.size());
         assertTrue(vertices.containsAll(allVertices));
     }

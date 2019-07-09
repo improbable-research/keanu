@@ -4,10 +4,10 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -251,6 +251,20 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canCompileIntegerBroadcast() {
+        assertUnaryIntegerMatches(new long[]{2}, v -> v.broadcast(new long[]{2, 2}));
+    }
+
+    @Test
+    public void canCompileIntegerBooleanIndex() {
+        UniformIntVertex A = new UniformIntVertex(new long[]{4}, 0, 1);
+        BooleanVertex indices = new ConstantBooleanVertex(new boolean[]{true, true, false ,false});
+        IntegerVertex result = A.get(indices);
+
+        assertCompiledIsSameAsVertexEvaluation(A, indices, result);
+    }
+
+    @Test
     public void canCompileIntegerIf() {
         long[] shape = new long[]{4};
         BernoulliVertex predicate = new BernoulliVertex(shape, 0.5);
@@ -467,7 +481,7 @@ public class KeanuCompiledGraphTest {
         assertCompiledIsSameAsVertexEvaluation(A, B, select, mux);
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C, Vertex<?> D) {
+    private void assertCompiledIsSameAsVertexEvaluation(IVertex<?> A, IVertex<?> B, IVertex<?> C, IVertex<?> D) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(D.getConnectedGraph(), ImmutableList.of(D));
 
@@ -483,7 +497,7 @@ public class KeanuCompiledGraphTest {
         assertEquals(D.getValue(), result.get(D.getReference()));
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C) {
+    private void assertCompiledIsSameAsVertexEvaluation(IVertex<?> A, IVertex<?> B, IVertex<?> C) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
 
@@ -498,7 +512,7 @@ public class KeanuCompiledGraphTest {
         assertEquals(C.getValue(), result.get(C.getReference()));
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B) {
+    private void assertCompiledIsSameAsVertexEvaluation(IVertex<?> A, IVertex<?> B) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(B.getConnectedGraph(), ImmutableList.of(B));
 

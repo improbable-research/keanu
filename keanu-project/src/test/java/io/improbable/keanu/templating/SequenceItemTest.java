@@ -1,7 +1,7 @@
 package io.improbable.keanu.templating;
 
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
@@ -33,10 +33,10 @@ public class SequenceItemTest {
     private SequenceItem item;
 
     @Mock
-    private Vertex<?> vertex1;
+    private IVertex<?> vertex1;
 
     @Mock
-    private Vertex<?> vertex2;
+    private IVertex<?> vertex2;
 
     @Before
     public void createItem() throws Exception {
@@ -48,13 +48,13 @@ public class SequenceItemTest {
 
     @Test
     public void youCanGetAVertexByName() {
-        Vertex<?> vertex = item.get(VERTEX_LABEL_1);
+        IVertex<?> vertex = item.get(VERTEX_LABEL_1);
         assertThat(vertex, equalTo(this.vertex1));
     }
 
     @Test
     public void unlabelledVerticesCanAlsoBeGotIfYouKnowTheLabelToUse() {
-        Vertex<?> vertex = item.get(VERTEX_LABEL_2);
+        IVertex<?> vertex = item.get(VERTEX_LABEL_2);
         assertThat(vertex, equalTo(this.vertex2));
     }
 
@@ -67,7 +67,7 @@ public class SequenceItemTest {
         item.add(proxy2);
         item.add(proxy3);
 
-        Collection<Vertex<?>> proxies = item.getProxyVertices();
+        Collection<IVertex<?>> proxies = item.getProxyVertices();
         assertThat(proxies, containsInAnyOrder(proxy1, proxy2, proxy3));
     }
 

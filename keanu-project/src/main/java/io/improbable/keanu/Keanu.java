@@ -9,7 +9,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradi
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
@@ -144,7 +144,7 @@ public class Keanu {
          * @param vertices The vertices to create a Bayesian network from.
          * @return an {@link io.improbable.keanu.algorithms.variational.optimizer.Optimizer}
          */
-        public io.improbable.keanu.algorithms.variational.optimizer.Optimizer of(Collection<? extends Vertex> vertices) {
+        public io.improbable.keanu.algorithms.variational.optimizer.Optimizer of(Collection<? extends IVertex> vertices) {
             return of(new BayesianNetwork(vertices));
         }
 
@@ -171,7 +171,7 @@ public class Keanu {
          * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from.
          * @return an {@link io.improbable.keanu.algorithms.variational.optimizer.Optimizer}
          */
-        public io.improbable.keanu.algorithms.variational.optimizer.Optimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+        public io.improbable.keanu.algorithms.variational.optimizer.Optimizer ofConnectedGraph(IVertex<?> vertexFromNetwork) {
             return of(vertexFromNetwork.getConnectedGraph());
         }
 
@@ -198,7 +198,7 @@ public class Keanu {
              * @param vertices The vertices to create a Bayesian network from.
              * @return a {@link NonGradientOptimizer}
              */
-            public NonGradientOptimizer of(Collection<? extends Vertex> vertices) {
+            public NonGradientOptimizer of(Collection<? extends IVertex> vertices) {
                 return of(new BayesianNetwork(vertices));
             }
 
@@ -210,11 +210,11 @@ public class Keanu {
              * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
              * @return a {@link NonGradientOptimizer}
              */
-            public NonGradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+            public NonGradientOptimizer ofConnectedGraph(IVertex<?> vertexFromNetwork) {
                 return of(vertexFromNetwork.getConnectedGraph());
             }
 
-            public NonGradientOptimizer.NonGradientOptimizerBuilder builderFor(Collection<? extends Vertex> vertices) {
+            public NonGradientOptimizer.NonGradientOptimizerBuilder builderFor(Collection<? extends IVertex> vertices) {
                 return builderFor(new BayesianNetwork(vertices));
             }
 
@@ -247,7 +247,7 @@ public class Keanu {
              * @param vertices The vertices to create a Bayesian network from.
              * @return a {@link GradientOptimizer}
              */
-            public GradientOptimizer of(Collection<? extends Vertex> vertices) {
+            public GradientOptimizer of(Collection<? extends IVertex> vertices) {
                 return of(new BayesianNetwork(vertices));
             }
 
@@ -260,11 +260,11 @@ public class Keanu {
              * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
              * @return a {@link GradientOptimizer}
              */
-            public GradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+            public GradientOptimizer ofConnectedGraph(IVertex<?> vertexFromNetwork) {
                 return of(vertexFromNetwork.getConnectedGraph());
             }
 
-            public GradientOptimizer.GradientOptimizerBuilder builderFor(Set<Vertex> connectedGraph) {
+            public GradientOptimizer.GradientOptimizerBuilder builderFor(Set<IVertex> connectedGraph) {
                 return builderFor(new BayesianNetwork(connectedGraph));
             }
 
@@ -275,7 +275,7 @@ public class Keanu {
         }
 
         void initializeNetworkForOptimization(BayesianNetwork bayesianNetwork) {
-            List<Vertex> discreteLatentVertices = bayesianNetwork.getDiscreteLatentVertices();
+            List<IVertex> discreteLatentVertices = bayesianNetwork.getDiscreteLatentVertices();
             boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
 
             if (containsDiscreteLatents) {

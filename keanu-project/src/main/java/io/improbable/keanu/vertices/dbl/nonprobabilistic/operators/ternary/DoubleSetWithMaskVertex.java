@@ -5,12 +5,13 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMatch;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsAreScalar;
 
-public class DoubleSetWithMaskVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
+public class DoubleSetWithMaskVertex extends Vertex<DoubleTensor> implements DoubleVertex, NonProbabilistic<DoubleTensor> {
 
     private final static String OPERAND_NAME = "operand";
     private final static String MASK_NAME = "mask";

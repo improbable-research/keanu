@@ -1,6 +1,5 @@
 package io.improbable.keanu.e2e.foodpoisoning;
 
-
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;

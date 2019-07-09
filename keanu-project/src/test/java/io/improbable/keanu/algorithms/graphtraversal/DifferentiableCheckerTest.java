@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -23,19 +23,19 @@ import static org.mockito.Mockito.verify;
 
 public class DifferentiableCheckerTest {
 
-    private void assertMAPIsDifferentiable(Collection<Vertex> vertices) {
+    private void assertMAPIsDifferentiable(Collection<IVertex> vertices) {
         BayesianNetwork bayesianNetwork = new BayesianNetwork(vertices);
         boolean differentiable = DifferentiableChecker.isDifferentiableWrtLatents(bayesianNetwork.getLatentOrObservedVertices());
         assertTrue(differentiable);
     }
 
-    private void assertMAPNotDifferentiable(Collection<Vertex> vertices) {
+    private void assertMAPNotDifferentiable(Collection<IVertex> vertices) {
         BayesianNetwork bayesianNetwork = new BayesianNetwork(vertices);
         boolean differentiable = DifferentiableChecker.isDifferentiableWrtLatents(bayesianNetwork.getLatentOrObservedVertices());
         assertFalse(differentiable);
     }
 
-    private void assertMLEIsDifferentiable(Collection<Vertex> vertices) {
+    private void assertMLEIsDifferentiable(Collection<IVertex> vertices) {
         BayesianNetwork bayesianNetwork = new BayesianNetwork(vertices);
         boolean differentiable = DifferentiableChecker.isDifferentiableWrtLatents(bayesianNetwork.getObservedVertices());
         assertTrue(differentiable);

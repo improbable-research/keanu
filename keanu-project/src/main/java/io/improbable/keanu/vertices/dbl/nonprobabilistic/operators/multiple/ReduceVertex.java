@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -21,17 +22,17 @@ import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMatch;
 
-public class ReduceVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class ReduceVertex extends Vertex<DoubleTensor> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
-    private final List<? extends Vertex<DoubleTensor>> inputs;
+    private final List<? extends IVertex<DoubleTensor>> inputs;
     private final BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction;
     private final Supplier<PartialDerivative> forwardModeAutoDiffLambda;
-    private final Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda;
+    private final Function<PartialDerivative, Map<IVertex, PartialDerivative>> reverseModeAutoDiffLambda;
 
-    public ReduceVertex(long[] shape, Collection<? extends Vertex<DoubleTensor>> inputs,
+    public ReduceVertex(long[] shape, Collection<? extends IVertex<DoubleTensor>> inputs,
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
                         Supplier<PartialDerivative> forwardModeAutoDiffLambda,
-                        Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
+                        Function<PartialDerivative, Map<IVertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         super(shape);
         if (inputs.size() < 2) {
             throw new IllegalArgumentException("ReduceVertex should have at least two input vertices, called with " + inputs.size());
@@ -46,12 +47,12 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
 
     public ReduceVertex(long[] shape, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
                         Supplier<PartialDerivative> forwardModeAutoDiffLambda,
-                        Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda,
-                        Vertex<DoubleTensor>... input) {
+                        Function<PartialDerivative, Map<IVertex, PartialDerivative>> reverseModeAutoDiffLambda,
+                        IVertex<DoubleTensor>... input) {
         this(shape, Arrays.asList(input), reduceFunction, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
-    public ReduceVertex(long[] shape, Collection<? extends Vertex<DoubleTensor>> inputs,
+    public ReduceVertex(long[] shape, Collection<? extends IVertex<DoubleTensor>> inputs,
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction) {
         this(shape, inputs, reduceFunction, null, null);
     }
@@ -66,9 +67,9 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
      */
     public ReduceVertex(BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
                         Supplier<PartialDerivative> forwardModeAutoDiffLambda,
-                        Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda,
-                        Vertex<DoubleTensor>... input) {
-        this(checkAllShapesMatch(Arrays.stream(input).map(Vertex::getShape).collect(Collectors.toList())),
+                        Function<PartialDerivative, Map<IVertex, PartialDerivative>> reverseModeAutoDiffLambda,
+                        IVertex<DoubleTensor>... input) {
+        this(checkAllShapesMatch(Arrays.stream(input).map(IVertex::getShape).collect(Collectors.toList())),
             Arrays.asList(input), reduceFunction, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
@@ -78,20 +79,20 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
      * @param reduceFunction reduce function
      * @param inputs         input vertices to reduce
      */
-    public ReduceVertex(List<? extends Vertex<DoubleTensor>> inputs,
+    public ReduceVertex(List<? extends IVertex<DoubleTensor>> inputs,
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction) {
-        this(checkAllShapesMatch(inputs.stream().map(Vertex::getShape).collect(Collectors.toList())),
+        this(checkAllShapesMatch(inputs.stream().map(IVertex::getShape).collect(Collectors.toList())),
             inputs, reduceFunction, null, null
         );
     }
 
     @Override
     public DoubleTensor calculate() {
-        return applyReduce(Vertex::getValue);
+        return applyReduce(IVertex::getValue);
     }
 
-    private DoubleTensor applyReduce(Function<Vertex<DoubleTensor>, DoubleTensor> mapper) {
-        Iterator<? extends Vertex<DoubleTensor>> inputIterator = inputs.iterator();
+    private DoubleTensor applyReduce(Function<IVertex<DoubleTensor>, DoubleTensor> mapper) {
+        Iterator<? extends IVertex<DoubleTensor>> inputIterator = inputs.iterator();
 
         DoubleTensor result = inputIterator.next().getValue();
         while (inputIterator.hasNext()) {
@@ -102,7 +103,7 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         if (forwardModeAutoDiffLambda != null) {
             return forwardModeAutoDiffLambda.get();
         }
@@ -111,7 +112,7 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<IVertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         return reverseModeAutoDiffLambda.apply(derivativeOfOutputWithRespectToSelf);
     }
 }

@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Assert;
@@ -126,7 +126,7 @@ public class HalfGaussianVertexTest {
         sigmaTensor.setValue(1.0);
 
         HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(sigmaTensor);
-        Map<Vertex, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5, sigmaTensor, tensorGaussianVertex);
+        Map<IVertex, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5, sigmaTensor, tensorGaussianVertex);
 
         assertEquals(gaussianLogDiff.dPdsigma, actualDerivatives.get(sigmaTensor).scalar(), 1e-5);
         assertEquals(gaussianLogDiff.dPdx, actualDerivatives.get(tensorGaussianVertex).scalar(), 1e-5);
@@ -219,7 +219,7 @@ public class HalfGaussianVertexTest {
     public void outOfBoundsGradientCalculation() {
         HalfGaussianVertex gaussianVertex = new HalfGaussianVertex(new long[]{2}, 5);
         DoubleTensor value = DoubleTensor.create(-5.0, 5.0);
-        Map<Vertex, DoubleTensor> actualDerivatives = gaussianVertex.dLogPdf(value, gaussianVertex);
+        Map<IVertex, DoubleTensor> actualDerivatives = gaussianVertex.dLogPdf(value, gaussianVertex);
         DoubleTensor derivative = actualDerivatives.get(gaussianVertex);
         Assert.assertEquals(0.0, derivative.getValue(0), 1e-6);
         Assert.assertTrue(derivative.getValue(1) != 0.);

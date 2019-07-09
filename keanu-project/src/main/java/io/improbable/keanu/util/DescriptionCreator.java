@@ -1,6 +1,7 @@
 package io.improbable.keanu.util;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -70,11 +71,11 @@ public class DescriptionCreator {
      * @return An String equation describing how this vertex is calculated.<br>
      * E.g. "This Vertex = that + (three * Const(4))"
      */
-    public String createDescription(Vertex<?> vertex) {
+    public String createDescription(IVertex<?> vertex) {
         if (vertex == null) {
             return thisVertex + " = " + nullString;
         }
-        Collection<Vertex> parents = vertex.getParents();
+        Collection<IVertex> parents = vertex.getParents();
 
         if (parents.size() == 0) {
             StringBuilder builder = new StringBuilder(thisVertex);
@@ -88,7 +89,7 @@ public class DescriptionCreator {
         return thisLabel + " = " + generateDescription(vertex, false, false);
     }
 
-    private String generateDescription(Vertex<?> vertex, boolean allowLabels, boolean includeBrackets) {
+    private String generateDescription(IVertex<?> vertex, boolean allowLabels, boolean includeBrackets) {
         if (vertex == null) {
             return nullString;
         }
@@ -96,7 +97,7 @@ public class DescriptionCreator {
             return vertex.getLabel().toString();
         }
 
-        Collection<Vertex> parents = vertex.getParents();
+        Collection<IVertex> parents = vertex.getParents();
 
         if (parents.size() == 0) {
             return getLeafDescription(vertex);
@@ -117,7 +118,7 @@ public class DescriptionCreator {
 
     }
 
-    private String getDelimiterVertexDescription(Vertex<?> vertex, CharSequence delimiter, boolean includeBrackets) {
+    private String getDelimiterVertexDescription(IVertex<?> vertex, CharSequence delimiter, boolean includeBrackets) {
         Stream<String> parentStream = vertex
             .getParents()
             .stream()
@@ -137,7 +138,7 @@ public class DescriptionCreator {
         return builder.toString();
     }
 
-    private static String getLeafDescription(Vertex<?> vertex) {
+    private static String getLeafDescription(IVertex<?> vertex) {
         if (vertex.getLabel() != null) {
             return vertex.getLabel().toString();
         }
@@ -156,7 +157,7 @@ public class DescriptionCreator {
             .toString();
     }
 
-    private static Optional<String> tryGetScalarValue(Vertex<?> vertex) {
+    private static Optional<String> tryGetScalarValue(IVertex<?> vertex) {
         Tensor tensor = (Tensor) vertex.getValue();
         if (tensor.isScalar()) {
             return Optional.of(tensor.scalar().toString());
@@ -164,7 +165,7 @@ public class DescriptionCreator {
         return Optional.empty();
     }
 
-    private Optional<String> checkForIrregularExpressions(Vertex<?> vertex, boolean includeBrackets) {
+    private Optional<String> checkForIrregularExpressions(IVertex<?> vertex, boolean includeBrackets) {
         if (vertex instanceof BooleanIfVertex || vertex instanceof DoubleIfVertex || vertex instanceof IntegerIfVertex) {
             Optional<String> description = createIfStringDescription(vertex, includeBrackets);
             if (description.isPresent()) {
@@ -181,10 +182,10 @@ public class DescriptionCreator {
         return Optional.empty();
     }
 
-    private Optional<String> createIfStringDescription(Vertex<?> vertex, boolean includeBrackets) {
+    private Optional<String> createIfStringDescription(IVertex<?> vertex, boolean includeBrackets) {
         BooleanVertex predicate;
-        Vertex<?> thn;
-        Vertex<?> els;
+        IVertex<?> thn;
+        IVertex<?> els;
 
         if (vertex instanceof IntegerIfVertex) {
             predicate = ((IntegerIfVertex) vertex).getPredicate();
@@ -219,7 +220,7 @@ public class DescriptionCreator {
         return Optional.of(builder.toString());
     }
 
-    private Optional<String> tryCreateDescriptionFromSaveLoadAnnotations(Vertex vertex, boolean includeBrackets) {
+    private Optional<String> tryCreateDescriptionFromSaveLoadAnnotations(IVertex vertex, boolean includeBrackets) {
         Method[] classSaveLoadMethods = Arrays.stream(vertex.getClass().getMethods())
             .filter(method -> method.isAnnotationPresent(SaveVertexParam.class))
             .toArray(Method[]::new);
@@ -236,7 +237,7 @@ public class DescriptionCreator {
         try {
             for (Method method : classSaveLoadMethods) {
                 String paramName = method.getAnnotation(SaveVertexParam.class).value();
-                Vertex paramVertex = (Vertex) method.invoke(vertex);
+                IVertex paramVertex = (IVertex) method.invoke(vertex);
                 appendParamToBuilder(paramName, paramVertex, builder);
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -250,7 +251,7 @@ public class DescriptionCreator {
             .toString());
     }
 
-    private void appendParamToBuilder(String paramName, Vertex<?> paramVertex, StringBuilder builder) {
+    private void appendParamToBuilder(String paramName, IVertex<?> paramVertex, StringBuilder builder) {
         builder.append(paramName).append("=");
         builder.append(generateDescription(paramVertex, true, true));
         builder.append(", ");

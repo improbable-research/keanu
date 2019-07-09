@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.network.LambdaSection;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -19,13 +19,13 @@ public class MarkovBlanket {
      * @param aVertex the vertex to find the Markov Blanket for
      * @return A set of vertices that are affected by, or affect, a given vertex
      */
-    public static Set<Vertex> get(Vertex<?> aVertex) {
+    public static Set<IVertex> get(IVertex<?> aVertex) {
 
         LambdaSection parents = LambdaSection.getUpstreamLambdaSection(aVertex, false);
         LambdaSection children = LambdaSection.getDownstreamLambdaSection(aVertex, false);
-        Set<Vertex> childrensParents = getUpstreamProbabilisticVertices(children.getLatentAndObservedVertices());
+        Set<IVertex> childrensParents = getUpstreamProbabilisticVertices(children.getLatentAndObservedVertices());
 
-        Set<Vertex> blanket = new HashSet<>();
+        Set<IVertex> blanket = new HashSet<>();
         blanket.addAll(parents.getLatentAndObservedVertices());
         blanket.addAll(children.getLatentAndObservedVertices());
         blanket.addAll(childrensParents);
@@ -35,11 +35,11 @@ public class MarkovBlanket {
         return blanket;
     }
 
-    private static Set<Vertex> getUpstreamProbabilisticVertices(Collection<Vertex> vertices) {
+    private static Set<IVertex> getUpstreamProbabilisticVertices(Collection<IVertex> vertices) {
 
-        Set<Vertex> probabilistic = new HashSet<>();
+        Set<IVertex> probabilistic = new HashSet<>();
 
-        for (Vertex<?> vertex : vertices) {
+        for (IVertex<?> vertex : vertices) {
             LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(vertex, false);
             probabilistic.addAll(upstreamLambdaSection.getLatentAndObservedVertices());
         }

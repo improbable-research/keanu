@@ -4,10 +4,10 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -77,12 +77,12 @@ public class HalfGaussianVertex extends GaussianVertex {
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Map<Vertex, DoubleTensor> dLogProb = super.dLogProb(value, withRespectTo);
+    public Map<IVertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends IVertex> withRespectTo) {
+        Map<IVertex, DoubleTensor> dLogProb = super.dLogProb(value, withRespectTo);
         if (value.greaterThanOrEqual(MU_ZERO).allTrue()) {
             return dLogProb;
         } else {
-            for (Map.Entry<Vertex, DoubleTensor> entry : dLogProb.entrySet()) {
+            for (Map.Entry<IVertex, DoubleTensor> entry : dLogProb.entrySet()) {
                 DoubleTensor v = entry.getValue();
                 dLogProb.put(entry.getKey(), v.setWithMaskInPlace(value.lessThanMask(DoubleTensor.scalar(MU_ZERO)), 0.0));
             }

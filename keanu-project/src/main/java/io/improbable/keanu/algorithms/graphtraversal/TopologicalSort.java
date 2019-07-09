@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -23,19 +23,19 @@ public class TopologicalSort {
      * @param vertices the vertices to sort
      * @return a linear ordering of vertices by order of execution
      */
-    public static List<Vertex> sort(Collection<? extends Vertex> vertices) {
+    public static List<IVertex> sort(Collection<? extends IVertex> vertices) {
         return vertices
             .stream()
-            .sorted(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()))
+            .sorted(Comparator.comparing(IVertex::getId, Comparator.naturalOrder()))
             .collect(Collectors.toList());
     }
 
-    public static Map<Vertex, Set<Vertex>> mapDependencies(Collection<? extends Vertex> vertices) {
+    public static Map<IVertex, Set<IVertex>> mapDependencies(Collection<? extends IVertex> vertices) {
 
-        Map<Vertex, Set<Vertex>> deps = new HashMap<>();
-        Set<Vertex> verticesBeingSorted = new HashSet<>(vertices);
+        Map<IVertex, Set<IVertex>> deps = new HashMap<>();
+        Set<IVertex> verticesBeingSorted = new HashSet<>(vertices);
 
-        for (Vertex<?> v : vertices) {
+        for (IVertex<?> v : vertices) {
             if (!deps.containsKey(v)) {
                 insertParentDependencies(v, deps, verticesBeingSorted);
             }
@@ -44,7 +44,7 @@ public class TopologicalSort {
         return deps;
     }
 
-    private static void insertParentDependencies(Vertex<?> aVertex, Map<Vertex, Set<Vertex>> dependencies, Set<Vertex> verticesToCount) {
+    private static void insertParentDependencies(IVertex<?> aVertex, Map<IVertex, Set<IVertex>> dependencies, Set<IVertex> verticesToCount) {
 
         dependencies.computeIfAbsent(aVertex, v -> new HashSet<>());
 
@@ -54,7 +54,7 @@ public class TopologicalSort {
                 insertParentDependencies(parent, dependencies, verticesToCount);
             }
 
-            final Set<Vertex> parentDependencies = dependencies.get(parent);
+            final Set<IVertex> parentDependencies = dependencies.get(parent);
 
             dependencies.computeIfPresent(aVertex, (vertex, vertexDependencies) -> {
                 vertexDependencies.addAll(parentDependencies);

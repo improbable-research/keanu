@@ -13,12 +13,12 @@ import static org.mockito.Mockito.mock;
 
 public class SimpleVertexDictionaryTest {
 
-    Vertex vertex1 = mock(Vertex.class);
-    Vertex vertex2 = mock(Vertex.class);
+    IVertex vertex1 = mock(IVertex.class);
+    IVertex vertex2 = mock(IVertex.class);
     VertexLabel label1 = new VertexLabel("label 1");
     VertexLabel label2 = new VertexLabel("label 2");
 
-    Map<VertexLabel, Vertex<?>> map;
+    Map<VertexLabel, IVertex<?>> map;
     SimpleVertexDictionary dictionary;
 
     @Before
@@ -33,7 +33,7 @@ public class SimpleVertexDictionaryTest {
     @Test
     public void ifYouChangeTheUnderlyingMapItChangesTheDictionary() {
         VertexLabel label3 = new VertexLabel("label3");
-        Vertex<?> vertex3 = mock(Vertex.class);
+        IVertex<?> vertex3 = mock(IVertex.class);
         map.put(label3, vertex3);
         assertThat(dictionary.get(label3), sameInstance(vertex3));
     }
@@ -41,7 +41,7 @@ public class SimpleVertexDictionaryTest {
     @Test
     public void youCanCombineTwoVertexDictionaries() {
         VertexLabel label3 = new VertexLabel("label3");
-        Vertex<?> vertex3 = mock(Vertex.class);
+        IVertex<?> vertex3 = mock(IVertex.class);
         SimpleVertexDictionary dictionary2 = SimpleVertexDictionary.backedBy(ImmutableMap.of(label3, vertex3));
 
         VertexDictionary combinedDictionary = SimpleVertexDictionary.combine(dictionary, dictionary2);
@@ -53,7 +53,7 @@ public class SimpleVertexDictionaryTest {
     @Test
     public void youCanAddExtraEntriesAndGetANewDictionary() {
         VertexLabel label3 = new VertexLabel("label3");
-        Vertex<?> vertex3 = mock(Vertex.class);
+        IVertex<?> vertex3 = mock(IVertex.class);
         VertexDictionary newDictionary = dictionary.withExtraEntries(ImmutableMap.of(label3, vertex3));
 
         assertThat(newDictionary.get(label1), sameInstance(vertex1));

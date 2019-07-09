@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
 import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
@@ -14,24 +15,24 @@ import java.util.Set;
  */
 public class LambdaSectionSnapshot {
 
-    private final Map<Vertex, LambdaSection> affectedVariablesCache;
+    private final Map<IVertex, LambdaSection> affectedVariablesCache;
 
     public LambdaSectionSnapshot() {
         this.affectedVariablesCache = new HashMap<>();
     }
 
     public double logProb(Set<? extends Variable> variables) {
-        Set<Vertex> lambdaSectionUnion = getAllVerticesAffectedBy(variables);
+        Set<IVertex> lambdaSectionUnion = getAllVerticesAffectedBy(variables);
         return ProbabilityCalculator.calculateLogProbFor(lambdaSectionUnion);
     }
 
-    public Set<Vertex> getAllVerticesAffectedBy(Set<? extends Variable> variables) {
+    public Set<IVertex> getAllVerticesAffectedBy(Set<? extends Variable> variables) {
 
-        Set<Vertex> allAffectedVariables = new HashSet<>();
+        Set<IVertex> allAffectedVariables = new HashSet<>();
         for (Variable variable : variables) {
             if (variable instanceof Vertex) {
 
-                LambdaSection lambdaSection = createVariablesAffectedByCache((Vertex) variable);
+                LambdaSection lambdaSection = createVariablesAffectedByCache((IVertex) variable);
 
                 allAffectedVariables.addAll(lambdaSection.getAllVertices());
             } else {
@@ -50,7 +51,7 @@ public class LambdaSectionSnapshot {
      * @return A variable to Lambda Section map that represents the downstream Lambda Section for the latent vertex.
      * This Lambda Section may include all of the nonprobabilistic vertices if useCacheOnRejection is enabled.
      */
-    private LambdaSection createVariablesAffectedByCache(Vertex latent) {
+    private LambdaSection createVariablesAffectedByCache(IVertex latent) {
         return affectedVariablesCache.computeIfAbsent(
             latent,
             v -> LambdaSection.getDownstreamLambdaSection(v, true)

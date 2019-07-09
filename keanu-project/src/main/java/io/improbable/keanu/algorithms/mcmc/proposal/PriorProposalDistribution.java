@@ -2,8 +2,8 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,8 +37,8 @@ public class PriorProposalDistribution implements ProposalDistribution {
 
     private <T> void setFor(Variable<T, ?> variable, KeanuRandom random, Proposal proposal) {
 
-        if (variable instanceof Vertex && variable instanceof Probabilistic) {
-            Vertex<T> vertex = (Vertex<T>) variable;
+        if (variable instanceof IVertex && variable instanceof Probabilistic) {
+            IVertex<T> vertex = (IVertex<T>) variable;
             proposal.setProposal(variable, ((Probabilistic<T>) vertex).sample(random));
         } else {
             throw new IllegalArgumentException(this.getClass().getSimpleName() + " is to only be used with Keanu's Vertex");

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
-
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;

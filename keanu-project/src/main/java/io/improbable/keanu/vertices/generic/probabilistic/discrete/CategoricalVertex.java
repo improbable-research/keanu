@@ -6,9 +6,9 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
@@ -105,7 +105,7 @@ public class CategoricalVertex<CATEGORY> extends GenericTensorVertex<CATEGORY> i
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(GenericTensor<CATEGORY> value, Set<? extends Vertex> withRespectTo) {
+    public Map<IVertex, DoubleTensor> dLogProb(GenericTensor<CATEGORY> value, Set<? extends IVertex> withRespectTo) {
         return Collections.emptyMap();
     }
 
@@ -119,7 +119,7 @@ public class CategoricalVertex<CATEGORY> extends GenericTensorVertex<CATEGORY> i
 
     private static long[][] selectableValuesShapes(Map<?, DoubleVertex> selectableValues) {
         return selectableValues.values().stream()
-            .map(Vertex::getShape)
+            .map(IVertex::getShape)
             .toArray(long[][]::new);
     }
 }

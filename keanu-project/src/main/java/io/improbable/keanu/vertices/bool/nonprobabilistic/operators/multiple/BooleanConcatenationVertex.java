@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -14,7 +15,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class BooleanConcatenationVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
+public class BooleanConcatenationVertex extends Vertex<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
 
     private static final String DIMENSION_NAME = "dimension";
     private static final String OPERANDS_NAME = "operands";
@@ -28,7 +29,7 @@ public class BooleanConcatenationVertex extends BooleanVertex implements NonProb
      * @param operands  the input vertices to concatenate
      */
     public BooleanConcatenationVertex(int dimension, BooleanVertex... operands) {
-        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, operands)));
+        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, IVertex::getShape, operands)));
         this.dimension = dimension;
         this.operands = operands;
         setParents(operands);
@@ -36,24 +37,24 @@ public class BooleanConcatenationVertex extends BooleanVertex implements NonProb
 
     @ExportVertexToPythonBindings
     public BooleanConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
-                                      @LoadVertexParam(OPERANDS_NAME) Vertex[] input) {
+                                      @LoadVertexParam(OPERANDS_NAME) IVertex[] input) {
         this(dimension, convertVertexArrayToBooleanVertex(input));
     }
 
-    private static BooleanVertex[] convertVertexArrayToBooleanVertex(Vertex[] input) {
+    private static BooleanVertex[] convertVertexArrayToBooleanVertex(IVertex[] input) {
         return Arrays.stream(input).toArray(BooleanVertex[]::new);
     }
 
     @Override
     public BooleanTensor calculate() {
-        return op(extractFromInputs(BooleanTensor.class, Vertex::getValue, operands));
+        return op(extractFromInputs(BooleanTensor.class, IVertex::getValue, operands));
     }
 
     protected BooleanTensor op(BooleanTensor... inputs) {
         return BooleanTensor.concat(dimension, inputs);
     }
 
-    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<BooleanTensor>, T> func, BooleanVertex[] input) {
+    private static <T> T[] extractFromInputs(Class<T> clazz, Function<IVertex<BooleanTensor>, T> func, BooleanVertex[] input) {
         T[] extract = (T[]) Array.newInstance(clazz, input.length);
         for (int i = 0; i < input.length; i++) {
             extract[i] = func.apply(input[i]);

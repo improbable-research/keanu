@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,7 +94,7 @@ public class InverseGammaVertexTest {
         bTensor.setValue(1.0);
 
         InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(aTensor, bTensor);
-        Map<Vertex, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5, aTensor, bTensor, tensorInverseGammaVertex);
+        Map<IVertex, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5, aTensor, bTensor, tensorInverseGammaVertex);
 
         assertEquals(inverseGammaLogDiff.dPda, actualDerivatives.get(aTensor).scalar(), 1e-5);
         assertEquals(inverseGammaLogDiff.dPdb, actualDerivatives.get(bTensor).scalar(), 1e-5);

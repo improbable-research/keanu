@@ -6,6 +6,7 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -28,7 +29,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BetaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class BetaVertex extends Vertex<DoubleTensor> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
@@ -126,10 +127,10 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<IVertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends IVertex> withRespectTo) {
         Diffs dlnP = distribution().dLogProb(value);
 
-        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+        Map<IVertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
         if (withRespectTo.contains(alpha)) {
             dLogProbWrtParameters.put(alpha, dlnP.get(A).getValue());

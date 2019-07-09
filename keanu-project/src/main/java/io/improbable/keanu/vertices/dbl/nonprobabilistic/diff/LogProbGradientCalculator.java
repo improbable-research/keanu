@@ -3,8 +3,8 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 
 public class LogProbGradientCalculator {
 
-    private final Set<? extends Vertex<?>> logProbOfVertices;
-    private final Set<? extends Vertex<?>> wrtVertices;
+    private final Set<? extends IVertex<?>> logProbOfVertices;
+    private final Set<? extends IVertex<?>> wrtVertices;
 
-    private final Map<Vertex, Set<DoubleVertex>> parentToLatentLookup;
-    private final Map<Vertex, Set<DoubleVertex>> verticesWithNonzeroDiffWrtLatent;
+    private final Map<IVertex, Set<DoubleVertex>> parentToLatentLookup;
+    private final Map<IVertex, Set<DoubleVertex>> verticesWithNonzeroDiffWrtLatent;
 
-    public LogProbGradientCalculator(List<? extends Vertex> logProbOfVerticesList, List<? extends Vertex<?>> wrtVerticesList) {
-        this.logProbOfVertices = new HashSet<>((List<Vertex<?>>) logProbOfVerticesList);
+    public LogProbGradientCalculator(List<? extends IVertex> logProbOfVerticesList, List<? extends IVertex<?>> wrtVerticesList) {
+        this.logProbOfVertices = new HashSet<>((List<IVertex<?>>) logProbOfVerticesList);
         this.wrtVertices = new HashSet<>(wrtVerticesList);
 
         parentToLatentLookup = getParentsThatAreConnectedToWrtVertices(logProbOfVertices);
@@ -38,7 +38,7 @@ public class LogProbGradientCalculator {
     public Map<VertexId, DoubleTensor> getJointLogProbGradientWrtLatents() {
         LogProbGradients totalLogProbGradients = new LogProbGradients();
 
-        for (final Vertex<?> ofVertex : logProbOfVertices) {
+        for (final IVertex<?> ofVertex : logProbOfVertices) {
             LogProbGradients logProbGradientOfVertex = reverseModeLogProbGradientWrtLatents(ofVertex);
             totalLogProbGradients.add(logProbGradientOfVertex);
         }
@@ -55,7 +55,7 @@ public class LogProbGradientCalculator {
      * @param parentToWrtVertices a lookup
      * @return a map for a given vertex to a set of the wrt vertices that it is connected to
      */
-    private Map<Vertex, Set<DoubleVertex>> getVerticesWithNonzeroDiffWrt(Set<? extends Vertex<?>> ofVertices, Map<Vertex, Set<DoubleVertex>> parentToWrtVertices) {
+    private Map<IVertex, Set<DoubleVertex>> getVerticesWithNonzeroDiffWrt(Set<? extends IVertex<?>> ofVertices, Map<IVertex, Set<DoubleVertex>> parentToWrtVertices) {
         return ofVertices.stream()
             .collect(Collectors.toMap(
                 v -> v,
@@ -82,19 +82,19 @@ public class LogProbGradientCalculator {
      * @return a map for a given vertex to a set of vertices that are directly connected to the dLogProb result
      * of the ofVertices and a vertex that we are finding the gradient with respect to.
      */
-    private Map<Vertex, Set<DoubleVertex>> getParentsThatAreConnectedToWrtVertices(Set<? extends Vertex> ofVertices) {
+    private Map<IVertex, Set<DoubleVertex>> getParentsThatAreConnectedToWrtVertices(Set<? extends IVertex> ofVertices) {
 
-        Map<Vertex, Set<DoubleVertex>> probabilisticParentLookup = new HashMap<>();
+        Map<IVertex, Set<DoubleVertex>> probabilisticParentLookup = new HashMap<>();
 
-        for (Vertex<?> probabilisticVertex : ofVertices) {
+        for (IVertex<?> probabilisticVertex : ofVertices) {
 
-            Set<? extends Vertex> parents = probabilisticVertex.getParents();
+            Set<? extends IVertex> parents = probabilisticVertex.getParents();
 
-            for (Vertex parent : parents) {
+            for (IVertex parent : parents) {
 
                 LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(parent, false);
 
-                Set<Vertex> latentAndObservedVertices = upstreamLambdaSection.getLatentAndObservedVertices();
+                Set<IVertex> latentAndObservedVertices = upstreamLambdaSection.getLatentAndObservedVertices();
                 Set<DoubleVertex> latentVertices = latentAndObservedVertices.stream()
                     .filter(this::isLatentDoubleVertexAndInWrtTo)
                     .map(v -> (DoubleVertex) v)
@@ -109,7 +109,7 @@ public class LogProbGradientCalculator {
         return probabilisticParentLookup;
     }
 
-    private boolean isLatentDoubleVertexAndInWrtTo(Vertex v) {
+    private boolean isLatentDoubleVertexAndInWrtTo(IVertex v) {
         return !v.isObserved() && wrtVertices.contains(v) && v instanceof DoubleVertex;
     }
 
@@ -117,18 +117,18 @@ public class LogProbGradientCalculator {
      * @param ofVertex the vertex we are taking the derivative of
      * @return partial derivatives of the "ofVertex" wrt to any "this.wrtVertices" that it descends.
      */
-    private LogProbGradients reverseModeLogProbGradientWrtLatents(final Vertex ofVertex) {
+    private LogProbGradients reverseModeLogProbGradientWrtLatents(final IVertex ofVertex) {
         Preconditions.checkArgument(
             ofVertex instanceof Probabilistic<?>,
             "Cannot get logProb gradient on non-probabilistic vertex %s", ofVertex
         );
 
         Set<DoubleVertex> verticesWithNonzeroDiff = verticesWithNonzeroDiffWrtLatent.get(ofVertex);
-        final Map<Vertex, DoubleTensor> dlogProbOfVertexWrtVertices = ((Probabilistic<?>) ofVertex).dLogProbAtValue(verticesWithNonzeroDiff);
+        final Map<IVertex, DoubleTensor> dlogProbOfVertexWrtVertices = ((Probabilistic<?>) ofVertex).dLogProbAtValue(verticesWithNonzeroDiff);
 
         LogProbGradients dOfWrtLatentsAccumulated = new LogProbGradients();
 
-        for (Map.Entry<Vertex, DoubleTensor> dlogProbWrtVertex : dlogProbOfVertexWrtVertices.entrySet()) {
+        for (Map.Entry<IVertex, DoubleTensor> dlogProbWrtVertex : dlogProbOfVertexWrtVertices.entrySet()) {
 
             DoubleVertex vertexWithDiff = (DoubleVertex) dlogProbWrtVertex.getKey();
             DoubleTensor dLogProbOfWrtVertexWithDiff = dlogProbWrtVertex.getValue();

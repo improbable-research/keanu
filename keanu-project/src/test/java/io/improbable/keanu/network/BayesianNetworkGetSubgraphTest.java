@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
 import com.google.common.collect.ImmutableSet;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Vertex;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,31 +18,31 @@ import static org.mockito.Mockito.when;
 
 public class BayesianNetworkGetSubgraphTest {
 
-    private static Vertex v;
+    private static IVertex v;
     private static BayesianNetwork network;
-    private static Vertex grandChild;
-    private static Vertex child;
-    private static Vertex parent;
-    private static Vertex grandParent;
+    private static IVertex grandChild;
+    private static IVertex child;
+    private static IVertex parent;
+    private static IVertex grandParent;
 
     @BeforeClass
     public static void setUp() {
-        v = Mockito.mock(Vertex.class);
+        v = Mockito.mock(IVertex.class);
 
-        Set<Vertex> parents = new HashSet<>();
-        parent = Mockito.mock(Vertex.class);
+        Set<IVertex> parents = new HashSet<>();
+        parent = Mockito.mock(IVertex.class);
         parents.add(parent);
-        Set<Vertex> children = new HashSet<>();
-        child = Mockito.mock(Vertex.class);
+        Set<IVertex> children = new HashSet<>();
+        child = Mockito.mock(IVertex.class);
         children.add(child);
         when(v.getParents()).thenReturn(parents);
         when(v.getChildren()).thenReturn(children);
 
-        Set<Vertex> grandParents = new HashSet<>();
-        grandParent = Mockito.mock(Vertex.class);
+        Set<IVertex> grandParents = new HashSet<>();
+        grandParent = Mockito.mock(IVertex.class);
         grandParents.add(grandParent);
-        Set<Vertex> grandChildren = new HashSet<>();
-        grandChild = Mockito.mock(Vertex.class);
+        Set<IVertex> grandChildren = new HashSet<>();
+        grandChild = Mockito.mock(IVertex.class);
         grandChildren.add(grandChild);
         when(parent.getParents()).thenReturn(grandParents);
         when(child.getChildren()).thenReturn(grandChildren);
@@ -53,28 +54,28 @@ public class BayesianNetworkGetSubgraphTest {
 
     @Test
     public void aSubgraphOfDegreeZeroContainsOneVertex() {
-        Set<Vertex> degree0SubGraph = network.getSubgraph(v, 0);
+        Set<IVertex> degree0SubGraph = network.getSubgraph(v, 0);
         assertThat(degree0SubGraph, contains(v));
     }
 
     @Test
     public void aSubgraphOfDegreeOneContainsDegreeOneConnections() {
-        Set<Vertex> expectedDegree1Subgraph = ImmutableSet.of(v, parent, child);
-        Set<Vertex> degree1SubGraph = network.getSubgraph(v, 1);
+        Set<IVertex> expectedDegree1Subgraph = ImmutableSet.of(v, parent, child);
+        Set<IVertex> degree1SubGraph = network.getSubgraph(v, 1);
         assertThat(degree1SubGraph, containsInAnyOrder(expectedDegree1Subgraph.toArray()));
     }
 
     @Test
     public void aSubgraphOfDegreeTwoContainsDegreeOneAndTwoConnections() {
-        Set<Vertex> expectedDegree2Subgraph = ImmutableSet.of(v, parent, child, grandChild, grandParent);
-        Set<Vertex> degree2SubGraph = network.getSubgraph(v, 2);
+        Set<IVertex> expectedDegree2Subgraph = ImmutableSet.of(v, parent, child, grandChild, grandParent);
+        Set<IVertex> degree2SubGraph = network.getSubgraph(v, 2);
         assertThat(degree2SubGraph, containsInAnyOrder(expectedDegree2Subgraph.toArray()));
     }
 
     @Test
     public void getSubgraphDegreeInfinityReturnsTheEntireGraph() {
-        Set<Vertex> degreeInfinitySubgraph = network.getSubgraph(v, Integer.MAX_VALUE);
-        List<Vertex> allVertices = network.getAllVertices();
+        Set<IVertex> degreeInfinitySubgraph = network.getSubgraph(v, Integer.MAX_VALUE);
+        List<IVertex> allVertices = network.getAllVertices();
         assertThat(degreeInfinitySubgraph, containsInAnyOrder(allVertices.toArray()));
     }
 }

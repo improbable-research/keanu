@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
+public class DoubleIfVertex extends Vertex<DoubleTensor> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final BooleanVertex predicate;
     private final DoubleVertex thn;
@@ -53,7 +54,7 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
 
         PartialDerivative thnPartial = derivativeOfParentsWithRespectToInput.getOrDefault(thn, PartialDerivative.EMPTY);
         PartialDerivative elsPartial = derivativeOfParentsWithRespectToInput.getOrDefault(els, PartialDerivative.EMPTY);
@@ -79,8 +80,8 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+    public Map<IVertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<IVertex, PartialDerivative> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
         partials.put(thn, derivativeOfOutputWithRespectToSelf
             .multiplyAlongWrtDimensions(predicateValue.toDoubleMask()));

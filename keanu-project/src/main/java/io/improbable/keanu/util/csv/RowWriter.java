@@ -2,7 +2,7 @@ package io.improbable.keanu.util.csv;
 
 import com.opencsv.CSVWriter;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,14 +15,14 @@ public class RowWriter extends Writer {
 
     private static final String HEADER_STYLE = "[%s]";
 
-    private List<? extends Vertex<? extends Tensor>> vertices;
+    private List<? extends IVertex<? extends Tensor>> vertices;
 
-    public RowWriter(List<? extends Vertex<? extends Tensor>> vertices, String emptyValue) {
+    public RowWriter(List<? extends IVertex<? extends Tensor>> vertices, String emptyValue) {
         this.vertices = vertices;
         withEmptyValue(emptyValue);
     }
 
-    public RowWriter(List<? extends Vertex<? extends Tensor>> vertices) {
+    public RowWriter(List<? extends IVertex<? extends Tensor>> vertices) {
         this(vertices, DEFAULT_EMPTY_VALUE);
     }
 
@@ -31,7 +31,7 @@ public class RowWriter extends Writer {
         try (CSVWriter writer = prepareWriter(file)) {
             int maxSize = findLongestTensor(vertices);
 
-            for (Vertex<? extends Tensor> vertex : vertices) {
+            for (IVertex<? extends Tensor> vertex : vertices) {
                 List<String> row = new ArrayList<>();
                 List<Object> flatList = vertex.getValue().asFlatList();
                 for (int i = 0; i < maxSize; i++) {

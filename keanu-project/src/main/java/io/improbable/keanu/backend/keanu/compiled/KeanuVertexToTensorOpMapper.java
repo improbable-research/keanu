@@ -2,7 +2,7 @@ package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -79,12 +79,14 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGetBooleanIndexVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerBroadcastVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPermuteVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerReshapeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
@@ -185,6 +187,8 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(IntegerSliceVertex.class, KeanuVertexToTensorOpMapper::sliceIntegerOp);
         opMappers.put(IntegerPermuteVertex.class, KeanuVertexToTensorOpMapper::permuteIntegerOp);
         opMappers.put(IntegerTakeVertex.class, KeanuVertexToTensorOpMapper::takeIntegerOp);
+        opMappers.put(IntegerGetBooleanIndexVertex.class, fluentBinaryOp("get"));
+        opMappers.put(IntegerBroadcastVertex.class, KeanuVertexToTensorOpMapper::broadcastIntegerOp);
 
         opMappers.put(IntegerMaxVertex.class, fluentBinaryOp("max"));
         opMappers.put(IntegerMinVertex.class, fluentBinaryOp("min"));
@@ -240,7 +244,7 @@ public class KeanuVertexToTensorOpMapper {
          * @param lookup lookup other variable names and any metadata about them (e.g. mutable)
          * @return the right hand side of the assignment
          */
-        String apply(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup);
+        String apply(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup);
     }
 
     public static OpMapper getOpMapperFor(Class<?> clazz) {
@@ -263,8 +267,8 @@ public class KeanuVertexToTensorOpMapper {
     private static OpMapper fluentBinaryOp(String methodName, String inPlaceMethodName) {
         return (vertex, lookup) -> {
             VertexBinaryOp<?, ?> binaryOpVertex = (VertexBinaryOp<?, ?>) vertex;
-            Vertex<?> left = binaryOpVertex.getLeft();
-            Vertex<?> right = binaryOpVertex.getRight();
+            IVertex<?> left = binaryOpVertex.getLeft();
+            IVertex<?> right = binaryOpVertex.getRight();
 
             KeanuCompiledVariable leftVariable = lookup.get(left.getReference());
             KeanuCompiledVariable rightVariable = lookup.get(right.getReference());
@@ -292,7 +296,7 @@ public class KeanuVertexToTensorOpMapper {
     private static OpMapper fluentUnaryOp(String methodName, String inPlaceMethodName) {
         return (vertex, lookup) -> {
             VertexUnaryOp unaryOpVertex = (VertexUnaryOp) vertex;
-            Vertex<?> input = unaryOpVertex.getInputVertex();
+            IVertex<?> input = unaryOpVertex.getInputVertex();
 
             KeanuCompiledVariable inputVariable = lookup.get(input.getReference());
             boolean doInPlace = inputVariable.isMutable() && isLastChildByTopographicalSort(vertex, input) && ENABLE_IN_PLACE;
@@ -311,24 +315,24 @@ public class KeanuVertexToTensorOpMapper {
      * @param parent the parent vertex in question
      * @return true if the child is the last child of the parent by topographic sort order
      */
-    private static boolean isLastChildByTopographicalSort(Vertex<?> child, Vertex<?> parent) {
-        Optional<Vertex> last = parent.getChildren().stream()
-            .max(Comparator.comparing(Vertex::getId));
+    private static boolean isLastChildByTopographicalSort(IVertex<?> child, IVertex<?> parent) {
+        Optional<IVertex> last = parent.getChildren().stream()
+            .max(Comparator.comparing(IVertex::getId));
 
         return last
             .map(v -> v.getId().equals(child.getId()))
             .orElse(false);
     }
 
-    private static String constant(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String constant(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         throw new IllegalArgumentException("Constant should not be operation mapped");
     }
 
-    private static String setWithMaskDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String setWithMaskDoubleOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         DoubleSetWithMaskVertex setWithMaskVertex = (DoubleSetWithMaskVertex) vertex;
-        Vertex mask = setWithMaskVertex.getMask();
-        Vertex operand = setWithMaskVertex.getOperand();
-        Vertex setValue = setWithMaskVertex.getSetValue();
+        IVertex mask = setWithMaskVertex.getMask();
+        IVertex operand = setWithMaskVertex.getOperand();
+        IVertex setValue = setWithMaskVertex.getSetValue();
 
         String operandName = lookup.get(operand.getId()).getName();
         String maskName = lookup.get(mask.getId()).getName();
@@ -337,55 +341,65 @@ public class KeanuVertexToTensorOpMapper {
         return operandName + ".setWithMask(" + maskName + "," + setValueName + ".scalar())";
     }
 
-    private static String reshapeDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String reshapeDoubleOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         ReshapeVertex reshapeVertex = (ReshapeVertex) vertex;
         return reshapeOp(reshapeVertex.getProposedShape(), reshapeVertex.getInputVertex(), lookup);
     }
 
-    private static String reshapeIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String reshapeIntegerOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IntegerReshapeVertex reshapeVertex = (IntegerReshapeVertex) vertex;
         return reshapeOp(reshapeVertex.getProposedShape(), reshapeVertex.getInputVertex(), lookup);
     }
 
-    private static String reshapeBooleanOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String reshapeBooleanOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         BooleanReshapeVertex reshapeVertex = (BooleanReshapeVertex) vertex;
         return reshapeOp(reshapeVertex.getProposedShape(), reshapeVertex.getInputVertex(), lookup);
     }
 
-    private static String reshapeOp(long[] proposedShape, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String reshapeOp(long[] proposedShape, IVertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         String variableName = lookup.get(inputVertex.getId()).getName();
         return variableName + ".reshape(" + toJavaArrayCreation(proposedShape) + ")";
     }
 
-    private static String takeDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String takeDoubleOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         TakeVertex takeVertex = (TakeVertex) vertex;
         return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
     }
 
-    private static String takeIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String takeIntegerOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IntegerTakeVertex takeVertex = (IntegerTakeVertex) vertex;
         return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
     }
 
-    private static String takeBooleanOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String takeBooleanOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         BooleanTakeVertex takeVertex = (BooleanTakeVertex) vertex;
         return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
     }
 
-    private static String takeGenericOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String takeGenericOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         GenericTakeVertex takeVertex = (GenericTakeVertex) vertex;
         return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
     }
 
-    private static String takeOp(long[] index, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String takeOp(long[] index, IVertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         String variableName = lookup.get(inputVertex.getId()).getName();
         return variableName + ".take(" + toJavaArrayCreation(index) + ");";
     }
 
-    private static String notOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String broadcastIntegerOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        IntegerBroadcastVertex broadcastVertex = (IntegerBroadcastVertex) vertex;
+        return broadcastOp(broadcastVertex.getToShape(), broadcastVertex.getInputVertex(), lookup);
+    }
+
+    private static String broadcastOp(long[] toShape, IVertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        String variableName = lookup.get(inputVertex.getId()).getName();
+        return variableName + ".broadcast(" + toJavaArrayCreation(toShape) + ");";
+    }
+
+    private static String notOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         VertexBinaryOp<?, ?> binaryOpVertex = (VertexBinaryOp<?, ?>) vertex;
-        Vertex<?> left = binaryOpVertex.getLeft();
-        Vertex<?> right = binaryOpVertex.getRight();
+        IVertex<?> left = binaryOpVertex.getLeft();
+        IVertex<?> right = binaryOpVertex.getRight();
 
         KeanuCompiledVariable leftVariable = lookup.get(left.getReference());
         KeanuCompiledVariable rightVariable = lookup.get(right.getReference());
@@ -397,42 +411,42 @@ public class KeanuVertexToTensorOpMapper {
         return "new long[]{" + Arrays.stream(array).mapToObj(Long::toString).collect(Collectors.joining(",")) + "}";
     }
 
-    private static String sliceDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String sliceDoubleOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         SliceVertex sliceVertex = (SliceVertex) vertex;
         return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
     }
 
-    private static String sliceIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String sliceIntegerOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IntegerSliceVertex sliceVertex = (IntegerSliceVertex) vertex;
         return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
     }
 
-    private static String sliceBooleanOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String sliceBooleanOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         BooleanSliceVertex sliceVertex = (BooleanSliceVertex) vertex;
         return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
     }
 
-    private static String sliceGenericOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String sliceGenericOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         GenericSliceVertex sliceVertex = (GenericSliceVertex) vertex;
         return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
     }
 
-    private static String sliceOp(int dimension, long index, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String sliceOp(int dimension, long index, IVertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         String variableName = lookup.get(inputVertex.getId()).getName();
         return variableName + ".slice(" + dimension + "," + index + ")";
     }
 
-    private static String permuteDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String permuteDoubleOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         PermuteVertex permuteVertex = (PermuteVertex) vertex;
         return permuteOp(permuteVertex.getRearrange(), permuteVertex.getInputVertex(), lookup);
     }
 
-    private static String permuteIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String permuteIntegerOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IntegerPermuteVertex permuteVertex = (IntegerPermuteVertex) vertex;
         return permuteOp(permuteVertex.getRearrange(), permuteVertex.getInputVertex(), lookup);
     }
 
-    private static String permuteOp(int[] proposedShape, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String permuteOp(int[] proposedShape, IVertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         String variableName = lookup.get(inputVertex.getId()).getName();
         return variableName + ".permute(" + toJavaArrayCreation(proposedShape) + ")";
     }
@@ -441,7 +455,7 @@ public class KeanuVertexToTensorOpMapper {
         return "new int[]{" + Arrays.stream(array).mapToObj(Long::toString).collect(Collectors.joining(",")) + "}";
     }
 
-    private static String concatDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String concatDoubleOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         ConcatenationVertex concatenationVertex = (ConcatenationVertex) vertex;
         DoubleVertex[] operands = concatenationVertex.getOperands();
         int dimension = concatenationVertex.getDimension();
@@ -449,7 +463,7 @@ public class KeanuVertexToTensorOpMapper {
         return concatOp(dimension, operands, "DoubleTensor.concat", lookup);
     }
 
-    private static String concatIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String concatIntegerOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IntegerConcatenationVertex concatenationVertex = (IntegerConcatenationVertex) vertex;
         IntegerVertex[] operands = concatenationVertex.getOperands();
         int dimension = concatenationVertex.getDimension();
@@ -457,7 +471,7 @@ public class KeanuVertexToTensorOpMapper {
         return concatOp(dimension, operands, "IntegerTensor.concat", lookup);
     }
 
-    private static String concatBoolOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String concatBoolOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         BooleanConcatenationVertex concatenationVertex = (BooleanConcatenationVertex) vertex;
         BooleanVertex[] operands = concatenationVertex.getOperands();
         int dimension = concatenationVertex.getDimension();
@@ -466,7 +480,7 @@ public class KeanuVertexToTensorOpMapper {
     }
 
     private static String concatOp(int dimension,
-                                   Vertex[] operands,
+                                   IVertex[] operands,
                                    String concatOp,
                                    Map<VariableReference, KeanuCompiledVariable> lookup) {
 
@@ -478,7 +492,7 @@ public class KeanuVertexToTensorOpMapper {
 
     }
 
-    private static String sumDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String sumDoubleOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         SumVertex sumVertex = (SumVertex) vertex;
 
         int[] dimensions = sumVertex.getOverDimensions();
@@ -490,7 +504,7 @@ public class KeanuVertexToTensorOpMapper {
         );
     }
 
-    private static String sumIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String sumIntegerOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IntegerSumVertex sumVertex = (IntegerSumVertex) vertex;
 
         int[] dimensions = sumVertex.getOverDimensions();
@@ -520,7 +534,7 @@ public class KeanuVertexToTensorOpMapper {
         }
     }
 
-    private static String doubleIfOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String doubleIfOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         DoubleIfVertex ifVertex = (DoubleIfVertex) vertex;
 
         BooleanVertex predicate = ifVertex.getPredicate();
@@ -530,7 +544,7 @@ public class KeanuVertexToTensorOpMapper {
         return ifOp(predicate, thn, els, "doubleWhere", lookup);
     }
 
-    private static String integerIfOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String integerIfOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IntegerIfVertex ifVertex = (IntegerIfVertex) vertex;
 
         BooleanVertex predicate = ifVertex.getPredicate();
@@ -540,7 +554,7 @@ public class KeanuVertexToTensorOpMapper {
         return ifOp(predicate, thn, els, "integerWhere", lookup);
     }
 
-    private static String booleanIfOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String booleanIfOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         BooleanIfVertex ifVertex = (BooleanIfVertex) vertex;
 
         BooleanVertex predicate = ifVertex.getPredicate();
@@ -550,19 +564,19 @@ public class KeanuVertexToTensorOpMapper {
         return ifOp(predicate, thn, els, "booleanWhere", lookup);
     }
 
-    private static String genericIfOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String genericIfOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IfVertex ifVertex = (IfVertex) vertex;
 
         BooleanVertex predicate = ifVertex.getPredicate();
-        Vertex<? extends Tensor> thn = ifVertex.getThn();
-        Vertex<? extends Tensor> els = ifVertex.getEls();
+        IVertex<? extends Tensor> thn = ifVertex.getThn();
+        IVertex<? extends Tensor> els = ifVertex.getEls();
 
         return ifOp(predicate, thn, els, "where", lookup);
     }
 
-    private static String ifOp(Vertex predicate,
-                               Vertex thn,
-                               Vertex els,
+    private static String ifOp(IVertex predicate,
+                               IVertex thn,
+                               IVertex els,
                                String methodName,
                                Map<VariableReference, KeanuCompiledVariable> lookup) {
 
@@ -573,25 +587,25 @@ public class KeanuVertexToTensorOpMapper {
         return predicateName + "." + methodName + "(" + thnName + "," + elsName + ")";
     }
 
-    private static String doubleProxyOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String doubleProxyOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         DoubleProxyVertex proxyVertex = (DoubleProxyVertex) vertex;
         return lookup.get(proxyVertex.getParent().getId()).getName();
     }
 
-    private static String integerProxyOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String integerProxyOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IntegerProxyVertex proxyVertex = (IntegerProxyVertex) vertex;
         return lookup.get(proxyVertex.getParent().getId()).getName();
     }
 
-    private static String booleanProxyOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String booleanProxyOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         BooleanProxyVertex proxyVertex = (BooleanProxyVertex) vertex;
         return lookup.get(proxyVertex.getParent().getId()).getName();
     }
 
-    private static String numericalEqualsOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String numericalEqualsOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         NumericalEqualsVertex numericalEquals = (NumericalEqualsVertex) vertex;
-        Vertex a = numericalEquals.getA();
-        Vertex b = numericalEquals.getB();
+        IVertex a = numericalEquals.getA();
+        IVertex b = numericalEquals.getB();
         Number epsilon = numericalEquals.getEpsilon();
 
         String aName = lookup.get(a.getId()).getName();
@@ -600,7 +614,7 @@ public class KeanuVertexToTensorOpMapper {
         return aName + ".equalsWithinEpsilon(" + bName + "," + epsilon.toString() + ")";
     }
 
-    private static String assertOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String assertOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         AssertVertex assertVertex = (AssertVertex) vertex;
 
         KeanuCompiledVariable predicateVariable = lookup.get(assertVertex.getPredicate().getId());
@@ -611,7 +625,7 @@ public class KeanuVertexToTensorOpMapper {
             (assertVertex.getLabel() != null ? "\"" + escapeChars(assertVertex.getLabel().getQualifiedName()) + "\"" : "null") + ")";
     }
 
-    private static String printOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String printOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         PrintVertex printVertex = (PrintVertex) vertex;
         KeanuCompiledVariable parentVariable = lookup.get(printVertex.getParent().getId());
 
@@ -630,7 +644,7 @@ public class KeanuVertexToTensorOpMapper {
             .replace("\"", "\\\"");
     }
 
-    private static String multiplexerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String multiplexerOp(IVertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         MultiplexerVertex muxVertex = (MultiplexerVertex) vertex;
 
         KeanuCompiledVariable select = lookup.get(muxVertex.getSelectorControlVertex().getId());

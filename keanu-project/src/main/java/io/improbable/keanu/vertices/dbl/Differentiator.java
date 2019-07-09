@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
@@ -21,19 +21,19 @@ import java.util.Set;
 @UtilityClass
 public class Differentiator {
 
-    public static <V extends Vertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, V... of) {
+    public static <V extends IVertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, V... of) {
         return forwardModeAutoDiff(wrt, new HashSet<>(Arrays.asList(of)));
     }
 
-    public static <V extends Vertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, Collection<V> of) {
+    public static <V extends IVertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, Collection<V> of) {
 
-        PriorityQueue<V> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
+        PriorityQueue<V> priorityQueue = new PriorityQueue<>(Comparator.comparing(IVertex::getId, Comparator.naturalOrder()));
         priorityQueue.add(wrt);
 
-        HashSet<Vertex> alreadyQueued = new HashSet<>();
+        HashSet<IVertex> alreadyQueued = new HashSet<>();
         alreadyQueued.add(wrt);
 
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+        Map<IVertex, PartialDerivative> partials = new HashMap<>();
         Map<VertexId, PartialDerivative> ofWrt = new HashMap<>();
 
         while (!priorityQueue.isEmpty()) {
@@ -47,7 +47,7 @@ public class Differentiator {
                 continue;
             }
 
-            for (Vertex child : (Set<Vertex<?>>) visiting.getChildren()) {
+            for (IVertex child : (Set<IVertex<?>>) visiting.getChildren()) {
                 if (!child.isProbabilistic() && !alreadyQueued.contains(child) && child.isDifferentiable()) {
                     priorityQueue.offer((V) child);
                     alreadyQueued.add(child);
@@ -58,7 +58,7 @@ public class Differentiator {
         return new PartialsWithRespectTo(wrt, ofWrt);
     }
 
-    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Set<? extends Vertex<?>> wrt) {
+    public static PartialsOf reverseModeAutoDiff(IVertex ofVertex, Set<? extends IVertex<?>> wrt) {
         if (ofVertex.isObserved()) {
             return new PartialsOf(ofVertex, Collections.emptyMap());
         } else {
@@ -66,26 +66,26 @@ public class Differentiator {
         }
     }
 
-    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Vertex<?>... wrt) {
+    public static PartialsOf reverseModeAutoDiff(IVertex ofVertex, IVertex<?>... wrt) {
         return reverseModeAutoDiff(ofVertex, new HashSet<>(Arrays.asList(wrt)));
     }
 
-    public static PartialsOf reverseModeAutoDiff(Vertex<?> ofVertex, PartialDerivative dWrtOfVertex, Set<? extends Vertex<?>> wrt) {
+    public static PartialsOf reverseModeAutoDiff(IVertex<?> ofVertex, PartialDerivative dWrtOfVertex, Set<? extends IVertex<?>> wrt) {
 
         ensureGraphValuesAndShapesAreSet(ofVertex);
 
-        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.<Vertex, VertexId>comparing(Vertex::getId, Comparator.naturalOrder()).reversed());
+        PriorityQueue<IVertex> priorityQueue = new PriorityQueue<>(Comparator.<IVertex, VertexId>comparing(IVertex::getId, Comparator.naturalOrder()).reversed());
         priorityQueue.add(ofVertex);
 
-        HashSet<Vertex> alreadyQueued = new HashSet<>();
+        HashSet<IVertex> alreadyQueued = new HashSet<>();
         alreadyQueued.add(ofVertex);
 
-        Map<Vertex, PartialDerivative> dwrtOf = new HashMap<>();
+        Map<IVertex, PartialDerivative> dwrtOf = new HashMap<>();
         dwrtOf.put(ofVertex, dWrtOfVertex);
 
         Map<VertexId, PartialDerivative> wrtOf = new HashMap<>();
 
-        Vertex<?> visiting;
+        IVertex<?> visiting;
         while ((visiting = priorityQueue.poll()) != null) {
 
             if (wrt.contains(visiting)) {
@@ -102,10 +102,10 @@ public class Differentiator {
 
                     if (derivativeOfOutputWrtVisiting != null) {
 
-                        Map<Vertex, PartialDerivative> partialDerivatives = visitingDifferentiable.reverseModeAutoDifferentiation(derivativeOfOutputWrtVisiting);
+                        Map<IVertex, PartialDerivative> partialDerivatives = visitingDifferentiable.reverseModeAutoDifferentiation(derivativeOfOutputWrtVisiting);
                         collectPartials(partialDerivatives, dwrtOf);
 
-                        for (Vertex parent : visiting.getParents()) {
+                        for (IVertex parent : visiting.getParents()) {
                             if (!alreadyQueued.contains(parent) && parent.isDifferentiable()) {
                                 priorityQueue.offer(parent);
                                 alreadyQueued.add(parent);
@@ -121,16 +121,16 @@ public class Differentiator {
         return new PartialsOf(ofVertex, wrtOf);
     }
 
-    private static void ensureGraphValuesAndShapesAreSet(Vertex<?> vertex) {
+    private static void ensureGraphValuesAndShapesAreSet(IVertex<?> vertex) {
         vertex.getValue();
     }
 
-    private static void collectPartials(Map<Vertex, PartialDerivative> partialDerivatives,
-                                        Map<Vertex, PartialDerivative> dwrtOf) {
+    private static void collectPartials(Map<IVertex, PartialDerivative> partialDerivatives,
+                                        Map<IVertex, PartialDerivative> dwrtOf) {
 
-        for (Map.Entry<Vertex, PartialDerivative> v : partialDerivatives.entrySet()) {
+        for (Map.Entry<IVertex, PartialDerivative> v : partialDerivatives.entrySet()) {
 
-            Vertex wrtVertex = v.getKey();
+            IVertex wrtVertex = v.getKey();
             PartialDerivative dwrtV = v.getValue();
 
             if (dwrtOf.containsKey(wrtVertex)) {

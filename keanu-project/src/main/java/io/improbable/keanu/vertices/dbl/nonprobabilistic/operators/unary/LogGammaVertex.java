@@ -2,8 +2,8 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
@@ -29,14 +29,14 @@ public class LogGammaVertex extends DoubleUnaryOpVertex implements Differentiabl
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
         return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(inputVertex.getValue().digamma());
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+    public Map<IVertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<IVertex, PartialDerivative> partials = new HashMap<>();
         PartialDerivative dOutputsWrtInputVertex =
             derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(inputVertex.getValue().digamma());
         partials.put(inputVertex, dOutputsWrtInputVertex);

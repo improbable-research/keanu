@@ -2,8 +2,8 @@ package io.improbable.keanu.vertices.bool.probabilistic;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Map;
 import java.util.Set;
@@ -22,15 +22,15 @@ public interface ProbabilisticBoolean extends Probabilistic<BooleanTensor> {
         return logProb(value);
     }
 
-    default Map<Vertex, DoubleTensor> dLogPmf(boolean value, Set<Vertex> withRespectTo) {
+    default Map<IVertex, DoubleTensor> dLogPmf(boolean value, Set<IVertex> withRespectTo) {
         return dLogPmf(BooleanTensor.scalar(value), withRespectTo);
     }
 
-    default Map<Vertex, DoubleTensor> dLogPmf(boolean[] values, Set<Vertex> withRespectTo) {
+    default Map<IVertex, DoubleTensor> dLogPmf(boolean[] values, Set<IVertex> withRespectTo) {
         return dLogPmf(BooleanTensor.create(values), withRespectTo);
     }
 
-    default Map<Vertex, DoubleTensor> dLogPmf(BooleanTensor value, Set<Vertex> withRespectTo) {
+    default Map<IVertex, DoubleTensor> dLogPmf(BooleanTensor value, Set<IVertex> withRespectTo) {
         return dLogProb(value, withRespectTo);
     }
 }

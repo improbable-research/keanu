@@ -2,9 +2,9 @@ package io.improbable.keanu.backend;
 
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.LambdaSection;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -20,24 +20,24 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
     /**
      * @param visiting create this vertex as a constant in the computable graph that is being built.
      */
-    void createConstant(Vertex visiting);
+    void createConstant(IVertex visiting);
 
     /**
      * @param visiting create this vertex as a variable in the computable graph that is being built.
      */
-    void createVariable(Vertex visiting);
+    void createVariable(IVertex visiting);
 
     /**
      * @param visiting create this vertex in the compiled graph that is being built.
      */
-    void create(Vertex visiting);
+    void create(IVertex visiting);
 
     /**
      * @param connections tells the graph builder that any time a vertex is referenced in a connection to reroute it
      *                    to another vertex. This is used to hook up proxy vertices that aren't actually connected to
      *                    parents until they are being added to a graph with this builder.
      */
-    void connect(Map<? extends Vertex<?>, ? extends Vertex<?>> connections);
+    void connect(Map<? extends IVertex<?>, ? extends IVertex<?>> connections);
 
     /**
      * @param output a variable reference to a variable that should be used as an output. This lets the builder know that
@@ -68,9 +68,9 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
      * @param outputs  explicitly specified outputs. This allows the builder to prune operations not needed in order
      *                 to provide the outputs.
      */
-    default void convert(Collection<? extends Vertex> vertices, Collection<? extends Vertex> outputs) {
+    default void convert(Collection<? extends IVertex> vertices, Collection<? extends IVertex> outputs) {
 
-        Set<Vertex> outputsUpstreamLambdaSection = outputs.stream()
+        Set<IVertex> outputsUpstreamLambdaSection = outputs.stream()
             .flatMap(
                 output -> LambdaSection
                     .getUpstreamLambdaSection(output, true)
@@ -78,26 +78,26 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
             )
             .collect(Collectors.toSet());
 
-        List<? extends Vertex> requiredVertices = vertices.stream()
+        List<? extends IVertex> requiredVertices = vertices.stream()
             .filter(outputsUpstreamLambdaSection::contains)
             .collect(Collectors.toList());
 
         convert(requiredVertices);
-        outputs.stream().map(Vertex::getReference).forEach(this::registerOutput);
+        outputs.stream().map(IVertex::getReference).forEach(this::registerOutput);
     }
 
     /**
      * @param vertices vertices that represent a graph to create a computable graph from.
      */
-    default void convert(Collection<? extends Vertex> vertices) {
+    default void convert(Collection<? extends IVertex> vertices) {
 
-        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(
-            Comparator.comparing(Vertex::getId, Comparator.naturalOrder())
+        PriorityQueue<IVertex> priorityQueue = new PriorityQueue<>(
+            Comparator.comparing(IVertex::getId, Comparator.naturalOrder())
         );
 
         priorityQueue.addAll(vertices);
 
-        Vertex visiting;
+        IVertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
 
             if (visiting instanceof LogProbGraph.PlaceholderVertex) {

@@ -2,6 +2,7 @@ package io.improbable.keanu.network;
 
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexState;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -21,8 +22,8 @@ public class NetworkSnapshotTest {
 
     @Test
     public void itInspectsTheVerticesState() {
-        Vertex v1 = mock(Vertex.class);
-        Vertex v2 = mock(Vertex.class);
+        IVertex v1 = mock(IVertex.class);
+        IVertex v2 = mock(IVertex.class);
 
         NetworkSnapshot.create(ImmutableSet.of(v1, v2));
         verify(v1).getState();
@@ -54,7 +55,7 @@ public class NetworkSnapshotTest {
     public void itRestoresTheValueOfAnUnobservedVertex() {
         DoubleTensor originalValue = DoubleTensor.create(1., 2., 3.);
         DoubleTensor otherValue = DoubleTensor.create(4., 5., 6.);
-        Vertex vertex = new GaussianVertex(1., 0.);
+        IVertex vertex = new GaussianVertex(1., 0.);
         vertex.setValue(originalValue);
         NetworkSnapshot snapshot = NetworkSnapshot.create(ImmutableSet.of(vertex));
 
@@ -71,7 +72,7 @@ public class NetworkSnapshotTest {
     public void itRestoresTheValueOfAnObservedVertex() {
         DoubleTensor originalValue = DoubleTensor.create(1., 2., 3.);
         DoubleTensor otherValue = DoubleTensor.create(4., 5., 6.);
-        Vertex vertex = new GaussianVertex(1., 0.);
+        IVertex vertex = new GaussianVertex(1., 0.);
 
         vertex.observe(originalValue);
         assertThat(vertex.getValue(), equalTo(originalValue));
@@ -92,7 +93,7 @@ public class NetworkSnapshotTest {
     public void itRestoresTheObservedStatusOfAnObservedVertex() {
         DoubleTensor originalValue = DoubleTensor.create(1., 2., 3.);
         DoubleTensor otherValue = DoubleTensor.create(4., 5., 6.);
-        Vertex vertex = new GaussianVertex(1., 0.);
+        IVertex vertex = new GaussianVertex(1., 0.);
 
         vertex.observe(originalValue);
         assertThat(vertex.getValue(), equalTo(originalValue));

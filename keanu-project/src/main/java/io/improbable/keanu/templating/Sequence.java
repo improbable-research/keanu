@@ -1,7 +1,7 @@
 package io.improbable.keanu.templating;
 
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class Sequence implements Iterable<SequenceItem> {
         if (containedItems.size() == 0) {
             throw new RuntimeException("Bayesian Network construction failed because the Sequence contains no SequenceItems");
         }
-        Optional<Vertex<?>> seedVertex = containedItems
+        Optional<IVertex<?>> seedVertex = containedItems
             .get(0)
             .getContents()
             .values()

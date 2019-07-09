@@ -1,5 +1,7 @@
 package io.improbable.keanu.network;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -32,7 +34,7 @@ public class BayesianNetworkTest {
     public ExpectedException thrown = ExpectedException.none();
 
     BayesianNetwork network;
-    Set<Vertex> connectedGraph;
+    Set<IVertex> connectedGraph;
     BooleanVertex input1;
     BooleanVertex input2;
     BooleanVertex output;
@@ -75,7 +77,7 @@ public class BayesianNetworkTest {
         BooleanVertex b = new BernoulliVertex(0.5);
         BooleanVertex ored = a.or(b);
         BooleanVertex unlabelled = ored.or(a);
-        Vertex retrieved;
+        IVertex retrieved;
         VertexLabel labelA = new VertexLabel(LABEL_A);
         VertexLabel labelB = new VertexLabel(LABEL_B);
         VertexLabel labelOr = new VertexLabel(LABEL_ORED);
@@ -105,7 +107,7 @@ public class BayesianNetworkTest {
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
     }
 
-    private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {
+    private class TestNonSaveableVertex extends Vertex<DoubleTensor> implements DoubleVertex, NonSaveableVertex {
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});
         }
@@ -142,7 +144,7 @@ public class BayesianNetworkTest {
         BooleanVertex c = new BernoulliVertex(0.5);
 
         BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
-        List<Vertex> verticesInNamespace = net.getVerticesInNamespace("root");
+        List<IVertex> verticesInNamespace = net.getVerticesInNamespace("root");
 
         assertThat(verticesInNamespace.size(), equalTo(3));
         assertTrue(verticesInNamespace.containsAll(Arrays.asList(a0, a1, b0)));
@@ -156,7 +158,7 @@ public class BayesianNetworkTest {
         BooleanVertex c = new BernoulliVertex(0.5);
 
         BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
-        List<Vertex> verticesInNamespace = net.getVerticesIgnoringNamespace("0");
+        List<IVertex> verticesInNamespace = net.getVerticesIgnoringNamespace("0");
 
         assertThat(verticesInNamespace.size(), equalTo(2));
         assertTrue(verticesInNamespace.containsAll(Arrays.asList(a0, b0)));

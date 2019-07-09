@@ -2,29 +2,30 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
-public abstract class BooleanUnaryOpVertex<T extends Tensor> extends BooleanVertex implements NonProbabilistic<BooleanTensor>, VertexUnaryOp<Vertex<T>> {
+public abstract class BooleanUnaryOpVertex<T extends Tensor> extends Vertex<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexUnaryOp<IVertex<T>> {
 
-    protected final Vertex<T> a;
+    protected final IVertex<T> a;
     protected final static String INPUT_NAME = "inputVertex";
 
-    public BooleanUnaryOpVertex(Vertex<T> a) {
+    public BooleanUnaryOpVertex(IVertex<T> a) {
         this(a.getShape(), a);
     }
 
-    public BooleanUnaryOpVertex(long[] shape, Vertex<T> a) {
+    public BooleanUnaryOpVertex(long[] shape, IVertex<T> a) {
         super(shape);
         this.a = a;
         setParents(a);
     }
 
     @SaveVertexParam(INPUT_NAME)
-    public Vertex<T> getInputVertex() {
+    public IVertex<T> getInputVertex() {
         return a;
     }
 

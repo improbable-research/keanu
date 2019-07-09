@@ -8,7 +8,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradi
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -55,7 +55,7 @@ public class LambdaModelVertexTest {
     @Test
     public void canRunAModelInAModel() {
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, IVertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
@@ -72,7 +72,7 @@ public class LambdaModelVertexTest {
     @Test
     public void canRunEvalOnTheOutputsToRecalculateTheModel() {
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, IVertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
@@ -92,7 +92,7 @@ public class LambdaModelVertexTest {
     @Test
     public void canRunAModelInAModelWithDifferentOutputTypes() {
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, IVertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValuesMultipleTypes);
         IntegerVertex suggestedFactorSuncream = model.getIntegerModelOutputVertex(new VertexLabel("suggestedFactorSuncream"));
@@ -110,7 +110,7 @@ public class LambdaModelVertexTest {
         int numSamples = 50;
         GaussianVertex probabilisticInput = new GaussianVertex(21., 1.);
         weatherModel.setInputToModel(probabilisticInput);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), probabilisticInput);
+        Map<VertexLabel, IVertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), probabilisticInput);
 
         ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
@@ -132,7 +132,7 @@ public class LambdaModelVertexTest {
         inputToModel = inputToModelOne.plus(inputToModelTwo);
         weatherModel.setInputToModel(inputToModel);
 
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, IVertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
@@ -154,7 +154,7 @@ public class LambdaModelVertexTest {
         inputToModel = new GaussianVertex(25., 5);
         weatherModel.setInputToModel(inputToModel);
 
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, IVertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));

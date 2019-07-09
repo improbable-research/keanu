@@ -7,10 +7,11 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class IntegerIfVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
+public class IntegerIfVertex extends Vertex<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
 
     protected static final String PREDICATE_NAME = "predicate";
     protected static final String THEN_NAME = "then";

@@ -1,18 +1,17 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
-
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.generic.GenericVertex;
 
 public abstract class UnaryOpVertex<IN, OUT> extends GenericVertex<OUT> implements NonProbabilistic<OUT> {
 
     protected static final String INPUT_NAME = "inputVertex";
 
-    protected final Vertex<IN> inputVertex;
+    protected final IVertex<IN> inputVertex;
 
-    public UnaryOpVertex(long[] shape, Vertex<IN> inputVertex) {
+    public UnaryOpVertex(long[] shape, IVertex<IN> inputVertex) {
         super(shape);
         this.inputVertex = inputVertex;
         setParents(inputVertex);
@@ -26,7 +25,7 @@ public abstract class UnaryOpVertex<IN, OUT> extends GenericVertex<OUT> implemen
     protected abstract OUT op(IN a);
 
     @SaveVertexParam(INPUT_NAME)
-    public Vertex<IN> getInputVertex() {
+    public IVertex<IN> getInputVertex() {
         return inputVertex;
     }
 }

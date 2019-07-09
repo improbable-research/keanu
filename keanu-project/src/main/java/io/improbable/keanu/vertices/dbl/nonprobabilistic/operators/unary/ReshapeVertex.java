@@ -3,9 +3,9 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
@@ -29,7 +29,7 @@ public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
         long[] newPartialShape = TensorShape.concat(
@@ -41,8 +41,8 @@ public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> reshapedDerivatives = new HashMap<>();
+    public Map<IVertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<IVertex, PartialDerivative> reshapedDerivatives = new HashMap<>();
 
         long[] newPartialShape = TensorShape.concat(
             derivativeOfOutputWithRespectToSelf.getOfShape(getShape()),

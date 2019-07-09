@@ -5,6 +5,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Samplable;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class KDEVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, Samplable<DoubleTensor> {
+public class KDEVertex extends Vertex<DoubleTensor> implements DoubleVertex,  Differentiable, ProbabilisticDouble, Samplable<DoubleTensor> {
 
     private final double bandwidth;
     private DoubleTensor samples;
@@ -77,8 +78,8 @@ public class KDEVertex extends DoubleVertex implements Differentiable, Probabili
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Map<Vertex, DoubleTensor> partialDerivatives = new HashMap<>();
+    public Map<IVertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends IVertex> withRespectTo) {
+        Map<IVertex, DoubleTensor> partialDerivatives = new HashMap<>();
 
         if (withRespectTo.contains(this)) {
             DoubleTensor dlnPdfs = dPdx(value).divInPlace(pdf(value));

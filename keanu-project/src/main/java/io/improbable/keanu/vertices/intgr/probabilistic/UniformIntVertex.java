@@ -6,6 +6,7 @@ import io.improbable.keanu.distributions.discrete.UniformInt;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -23,7 +24,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
+public class UniformIntVertex extends Vertex<IntegerTensor> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
     private IntegerVertex min;
     private IntegerVertex max;
@@ -109,7 +110,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<IVertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends IVertex> withRespectTo) {
         throw new UnsupportedOperationException();
     }
 

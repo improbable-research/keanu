@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.utility;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -10,12 +11,12 @@ import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 
-public class AssertVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
+public class AssertVertex extends Vertex<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
 
     private static final String PREDICATE_NAME = "predicate";
     private static final String ERROR_MESSAGE_NAME = "error";
 
-    private final Vertex<? extends BooleanTensor> predicate;
+    private final IVertex<? extends BooleanTensor> predicate;
     private final String errorMessage;
 
     /**
@@ -26,7 +27,7 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
      * @throws AssertionError if any element of the predicate is false when calculated.
      */
     @ExportVertexToPythonBindings
-    public AssertVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
+    public AssertVertex(@LoadVertexParam(PREDICATE_NAME) IVertex<? extends BooleanTensor> predicate,
                         @LoadVertexParam(ERROR_MESSAGE_NAME) String errorMessage) {
         super(predicate.getShape());
         this.predicate = predicate;
@@ -34,7 +35,7 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
         setParents(predicate);
     }
 
-    public AssertVertex(Vertex<? extends BooleanTensor> predicate) {
+    public AssertVertex(IVertex<? extends BooleanTensor> predicate) {
         this(predicate, "");
     }
 
@@ -64,7 +65,7 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
     }
 
     @SaveVertexParam(PREDICATE_NAME)
-    public Vertex<? extends BooleanTensor> getPredicate() {
+    public IVertex<? extends BooleanTensor> getPredicate() {
         return predicate;
     }
 

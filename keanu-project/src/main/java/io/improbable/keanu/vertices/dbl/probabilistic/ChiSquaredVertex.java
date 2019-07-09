@@ -5,6 +5,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -24,7 +25,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class ChiSquaredVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class ChiSquaredVertex extends Vertex<DoubleTensor> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private IntegerVertex k;
     private static final String K_NAME = "k";
@@ -93,7 +94,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<IVertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends IVertex> withRespectTo) {
         throw new UnsupportedOperationException();
     }
 

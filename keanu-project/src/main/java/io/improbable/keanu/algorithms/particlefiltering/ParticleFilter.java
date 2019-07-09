@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +27,7 @@ import java.util.Set;
  * (https://www.lancaster.ac.uk/pg/turnerl/PartileFiltering.pdf).
  */
 public class ParticleFilter {
-    private Collection<? extends Vertex> vertices;
+    private Collection<? extends IVertex> vertices;
     private int numParticles;
     private int resamplingCycles;
     private double resamplingProportion;
@@ -40,15 +40,15 @@ public class ParticleFilter {
      * @param vertex vertex to retrieve connected graph from
      * @return this
      */
-    public static ParticleFilterBuilder ofVertexInGraph(Vertex vertex) {
+    public static ParticleFilterBuilder ofVertexInGraph(IVertex vertex) {
         return new ParticleFilterBuilder(vertex.getConnectedGraph());
     }
 
-    public static ParticleFilterBuilder ofGraph(Collection<? extends Vertex> vertices) {
+    public static ParticleFilterBuilder ofGraph(Collection<? extends IVertex> vertices) {
         return new ParticleFilterBuilder(vertices);
     }
 
-    public ParticleFilter(Collection<? extends Vertex> vertices,
+    public ParticleFilter(Collection<? extends IVertex> vertices,
                           int numParticles,
                           int resamplingCycles,
                           double resamplingProportion,
@@ -78,21 +78,21 @@ public class ParticleFilter {
     }
 
     private void sort() {
-        Map<Vertex, Set<Vertex>> obsVertIncrDependencies = LatentIncrementSort.sort(this.vertices);
-        List<Vertex> observedVertexOrder = new ArrayList<>(obsVertIncrDependencies.keySet());
+        Map<IVertex, Set<IVertex>> obsVertIncrDependencies = LatentIncrementSort.sort(this.vertices);
+        List<IVertex> observedVertexOrder = new ArrayList<>(obsVertIncrDependencies.keySet());
         List<Particle> particles = createEmptyParticles(this.numParticles);
 
         for (int i = 0; i < observedVertexOrder.size(); i++) {
-            Vertex<?> nextObsVertex = observedVertexOrder.get(i);
-            Set<Vertex> vertexDeps = obsVertIncrDependencies.get(nextObsVertex);
+            IVertex<?> nextObsVertex = observedVertexOrder.get(i);
+            Set<IVertex> vertexDeps = obsVertIncrDependencies.get(nextObsVertex);
             particles = updateParticles(nextObsVertex, vertexDeps, particles);
         }
 
         this.particles = particles;
     }
 
-    private List<Particle> updateParticles(Vertex<?> nextObservedVertex,
-                                           Set<Vertex> vertexDeps,
+    private List<Particle> updateParticles(IVertex<?> nextObservedVertex,
+                                           Set<IVertex> vertexDeps,
                                            List<Particle> particles) {
 
         List<Particle> updatedParticles = sampleAndCopy(particles, numParticles);
@@ -121,12 +121,12 @@ public class ParticleFilter {
     }
 
     private void addObservedVertexToParticles(List<Particle> particles,
-                                              Vertex<?> observedVertex,
-                                              Set<Vertex> vertexDependencies) {
+                                              IVertex<?> observedVertex,
+                                              Set<IVertex> vertexDependencies) {
 
         for (Particle particle : particles) {
             particle.addObservedVertex(observedVertex);
-            for (Vertex<?> latentVertex : vertexDependencies) {
+            for (IVertex<?> latentVertex : vertexDependencies) {
                 sampleValueAndAddToParticle(latentVertex, particle);
             }
 
@@ -134,7 +134,7 @@ public class ParticleFilter {
         }
     }
 
-    private <T> void sampleValueAndAddToParticle(Vertex<T> vertex, Particle particle) {
+    private <T> void sampleValueAndAddToParticle(IVertex<T> vertex, Particle particle) {
         T sample = ((Probabilistic<T>) vertex).sample(random);
         particle.addLatentVertex(vertex, sample);
     }

@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.gradient.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.junit.Before;
@@ -122,7 +122,7 @@ public class BetaVertexTest {
         betaTensor.setValue(3.0);
 
         BetaVertex tensorBetaVertex = new BetaVertex(alphaTensor, betaTensor);
-        Map<Vertex, DoubleTensor> actualDerivatives = tensorBetaVertex.dLogPdf(0.5, alphaTensor, betaTensor, tensorBetaVertex);
+        Map<IVertex, DoubleTensor> actualDerivatives = tensorBetaVertex.dLogPdf(0.5, alphaTensor, betaTensor, tensorBetaVertex);
 
         assertEquals(betaLogDiff.dPdalpha, actualDerivatives.get(alphaTensor).scalar(), 1e-5);
         assertEquals(betaLogDiff.dPdbeta, actualDerivatives.get(betaTensor).scalar(), 1e-5);

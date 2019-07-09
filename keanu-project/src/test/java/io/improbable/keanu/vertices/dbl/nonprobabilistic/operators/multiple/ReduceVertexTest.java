@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +18,7 @@ public class ReduceVertexTest {
     int maxValue = 12;
     int total = 0;
 
-    List<Vertex<DoubleTensor>> verts = new LinkedList<>();
+    List<IVertex<DoubleTensor>> verts = new LinkedList<>();
 
     @Before
     public void prepare() {

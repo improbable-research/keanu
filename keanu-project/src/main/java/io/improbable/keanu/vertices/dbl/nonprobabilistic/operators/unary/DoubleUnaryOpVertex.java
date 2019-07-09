@@ -3,10 +3,11 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, VertexUnaryOp<DoubleVertex> {
+public abstract class DoubleUnaryOpVertex extends Vertex<DoubleTensor> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexUnaryOp<DoubleVertex> {
 
     protected final DoubleVertex inputVertex;
     protected static final String INPUT_VERTEX_NAME = "inputVertex";

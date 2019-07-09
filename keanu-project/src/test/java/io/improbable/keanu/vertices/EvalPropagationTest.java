@@ -21,15 +21,15 @@ public class EvalPropagationTest {
 
     @Test
     public void doesNotDoUnnecessaryOperationsOnEval() {
-        assertDoesNotDoUnnecessaryOperations(Vertex::eval);
+        assertDoesNotDoUnnecessaryOperations(IVertex::eval);
     }
 
     @Test
     public void doesNotDoUnnecessaryOperationsOnLazyEval() {
-        assertDoesNotDoUnnecessaryOperations(Vertex::lazyEval);
+        assertDoesNotDoUnnecessaryOperations(IVertex::lazyEval);
     }
 
-    private void assertDoesNotDoUnnecessaryOperations(Consumer<Vertex> evalFunction) {
+    private void assertDoesNotDoUnnecessaryOperations(Consumer<IVertex> evalFunction) {
 
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
@@ -49,15 +49,15 @@ public class EvalPropagationTest {
 
     @Test
     public void doesNotPropagateThroughProbabilisticVerticesOnEval() {
-        assertDoesNotPropagateThroughProbabilisticVertices(Vertex::eval);
+        assertDoesNotPropagateThroughProbabilisticVertices(IVertex::eval);
     }
 
     @Test
     public void doesNotPropagateThroughProbabilisticVerticesOnLazyEval() {
-        assertDoesNotPropagateThroughProbabilisticVertices(Vertex::lazyEval);
+        assertDoesNotPropagateThroughProbabilisticVertices(IVertex::lazyEval);
     }
 
-    private void assertDoesNotPropagateThroughProbabilisticVertices(Consumer<Vertex> evalFunction) {
+    private void assertDoesNotPropagateThroughProbabilisticVertices(Consumer<IVertex> evalFunction) {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
         DoubleVertex start = new GaussianVertex(0, 1);
@@ -79,15 +79,15 @@ public class EvalPropagationTest {
 
     @Test
     public void doesNotDoUnnecessaryOperationsOnVerticesThatShareParentsOnEval() {
-        assertDoesNotDoUnnecessaryOperationsOnVerticesThatShareParents(Vertex::eval);
+        assertDoesNotDoUnnecessaryOperationsOnVerticesThatShareParents(IVertex::eval);
     }
 
     @Test
     public void doesNotDoUnnecessaryOperationsOnVerticesThatShareParentsOnLazyEval() {
-        assertDoesNotDoUnnecessaryOperationsOnVerticesThatShareParents(Vertex::lazyEval);
+        assertDoesNotDoUnnecessaryOperationsOnVerticesThatShareParents(IVertex::lazyEval);
     }
 
-    private void assertDoesNotDoUnnecessaryOperationsOnVerticesThatShareParents(Consumer<Vertex> evalFunction) {
+    private void assertDoesNotDoUnnecessaryOperationsOnVerticesThatShareParents(Consumer<IVertex> evalFunction) {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
 
@@ -122,7 +122,7 @@ public class EvalPropagationTest {
         }
 
         @Override
-        public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        public PartialDerivative forwardModeAutoDifferentiation(Map<IVertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
             return null;
         }
     }

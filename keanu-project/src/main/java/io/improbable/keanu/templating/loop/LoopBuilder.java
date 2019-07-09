@@ -5,7 +5,7 @@ import io.improbable.keanu.templating.Sequence;
 import io.improbable.keanu.templating.SequenceBuilder;
 import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -25,7 +25,7 @@ public class LoopBuilder {
     private int maxLoopCount = Loop.DEFAULT_MAX_COUNT;
     private boolean throwWhenMaxCountIsReached = true;
 
-    <V extends Vertex<?>> LoopBuilder(VertexDictionary initialState) {
+    <V extends IVertex<?>> LoopBuilder(VertexDictionary initialState) {
         this.initialState = initialState;
     }
 
@@ -102,10 +102,10 @@ public class LoopBuilder {
         }
 
         private VertexDictionary setInitialState(VertexDictionary initialState) {
-            Vertex valueOutWhenAlwaysTrue;
+            IVertex valueOutWhenAlwaysTrue;
 
             try {
-                Vertex<?> outputVertex = initialState.get(Loop.VALUE_OUT_LABEL);
+                IVertex<?> outputVertex = initialState.get(Loop.VALUE_OUT_LABEL);
                 valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL.withExtraNamespace("Loop_" + this.hashCode()));
                 valueOutWhenAlwaysTrue.setParents(outputVertex);
             } catch (NoSuchElementException e) {

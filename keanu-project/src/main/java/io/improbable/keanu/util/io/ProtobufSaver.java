@@ -7,6 +7,7 @@ import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -83,7 +84,7 @@ public class ProtobufSaver implements NetworkSaver {
     }
 
     @Override
-    public void save(Vertex vertex) {
+    public void save(IVertex vertex) {
         if (vertex instanceof NonSaveableVertex) {
             throw new IllegalArgumentException("Trying to save a vertex that isn't Saveable");
         }
@@ -91,7 +92,7 @@ public class ProtobufSaver implements NetworkSaver {
         graphBuilder.addVertices(buildVertex(vertex));
     }
 
-    private SavedBayesNet.Vertex buildVertex(Vertex vertex) {
+    private SavedBayesNet.Vertex buildVertex(IVertex vertex) {
         SavedBayesNet.Vertex.Builder vertexBuilder = SavedBayesNet.Vertex.newBuilder();
 
         if (vertex.getLabel() != null) {
@@ -107,7 +108,7 @@ public class ProtobufSaver implements NetworkSaver {
     }
 
     private void saveParams(SavedBayesNet.Vertex.Builder vertexBuilder,
-                            Vertex vertex) {
+                            IVertex vertex) {
         Map<String, Pair<Method, Boolean>> parentRetrievalMethodMap = getParentRetrievalMethodMap(vertex);
 
         String[] parentNames = parentRetrievalMethodMap.keySet().toArray(new String[0]);
@@ -122,7 +123,7 @@ public class ProtobufSaver implements NetworkSaver {
         }
     }
 
-    private Map<String, Pair<Method, Boolean>> getParentRetrievalMethodMap(Vertex vertex) {
+    private Map<String, Pair<Method, Boolean>> getParentRetrievalMethodMap(IVertex vertex) {
         Class vertexClass = vertex.getClass();
         Method[] methods = vertexClass.getMethods();
         Map<String, Pair<Method, Boolean>> parentRetrievalMethodMap = new HashMap<>();
@@ -138,7 +139,7 @@ public class ProtobufSaver implements NetworkSaver {
         return parentRetrievalMethodMap;
     }
 
-    private SavedBayesNet.NamedParam getEncodedParam(Vertex vertex, String paramName, Method getParamMethod, boolean isNullable) {
+    private SavedBayesNet.NamedParam getEncodedParam(IVertex vertex, String paramName, Method getParamMethod, boolean isNullable) {
         Object param;
 
         try {
@@ -159,8 +160,8 @@ public class ProtobufSaver implements NetworkSaver {
     }
 
     private SavedBayesNet.NamedParam getTypedParam(String paramName, Object param) {
-        if (Vertex.class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, (Vertex) param);
+        if (IVertex.class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, (IVertex) param);
         } else if (DoubleTensor.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, builder -> builder.setDoubleTensorParam(getTensor((DoubleTensor) param)));
         } else if (IntegerTensor.class.isAssignableFrom(param.getClass())) {
@@ -179,8 +180,8 @@ public class ProtobufSaver implements NetworkSaver {
             return getParam(paramName, builder -> builder.setBoolParam((boolean) param));
         } else if (Long[].class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (long[]) param);
-        } else if (Vertex[].class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, (Vertex[]) param);
+        } else if (IVertex[].class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, (IVertex[]) param);
         } else if (Integer[].class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (int[]) param);
         } else {
@@ -198,7 +199,7 @@ public class ProtobufSaver implements NetworkSaver {
         return paramBuilder.build();
     }
 
-    private SavedBayesNet.NamedParam getParam(String paramName, Vertex parent) {
+    private SavedBayesNet.NamedParam getParam(String paramName, IVertex parent) {
         return getParam(paramName,
             builder -> builder.setParentVertex(
                 SavedBayesNet.VertexID.newBuilder().setId(parent.getId().toString())
@@ -218,9 +219,9 @@ public class ProtobufSaver implements NetworkSaver {
                 SavedBayesNet.IntArray.newBuilder().addAllValues(Ints.asList(param))));
     }
 
-    private SavedBayesNet.NamedParam getParam(String paramName, Vertex[] param) {
+    private SavedBayesNet.NamedParam getParam(String paramName, IVertex[] param) {
         SavedBayesNet.VertexArray.Builder vertexArray = SavedBayesNet.VertexArray.newBuilder();
-        for (Vertex vertex : param) {
+        for (IVertex vertex : param) {
             vertexArray.addValues(SavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()));
         }
 
@@ -249,7 +250,7 @@ public class ProtobufSaver implements NetworkSaver {
     }
 
     @Override
-    public void saveValue(Vertex vertex) {
+    public void saveValue(IVertex vertex) {
         if (vertex.hasValue()) {
             SavedBayesNet.StoredValue value = getValue(vertex, vertex.getValue().toString());
             graphBuilder.addDefaultState(value);
@@ -280,7 +281,7 @@ public class ProtobufSaver implements NetworkSaver {
         }
     }
 
-    private SavedBayesNet.StoredValue getValue(Vertex vertex, String formattedValue) {
+    private SavedBayesNet.StoredValue getValue(IVertex vertex, String formattedValue) {
         SavedBayesNet.GenericTensor savedValue = SavedBayesNet.GenericTensor.newBuilder()
             .addAllShape(Longs.asList(vertex.getShape()))
             .addValues(formattedValue)
@@ -324,7 +325,7 @@ public class ProtobufSaver implements NetworkSaver {
         return getStoredValue(vertex, value);
     }
 
-    private SavedBayesNet.StoredValue getStoredValue(Vertex vertex, SavedBayesNet.VertexValue value) {
+    private SavedBayesNet.StoredValue getStoredValue(IVertex vertex, SavedBayesNet.VertexValue value) {
         return SavedBayesNet.StoredValue.newBuilder()
             .setId(SavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()).build())
             .setValue(value)

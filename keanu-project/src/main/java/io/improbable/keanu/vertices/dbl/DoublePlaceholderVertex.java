@@ -4,8 +4,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.Vertex;
 
-public class DoublePlaceholderVertex extends DoubleVertex implements LogProbGraph.PlaceholderVertex, NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
+public class DoublePlaceholderVertex extends Vertex<DoubleTensor> implements DoubleVertex, LogProbGraph.PlaceholderVertex, NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
 
     private final DoubleVertex defaultVertex;
 

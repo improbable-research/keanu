@@ -19,7 +19,7 @@ public class LogProbGraph {
      */
     @Getter
     @Singular
-    private final Map<Vertex<?>, Vertex<?>> inputs;
+    private final Map<IVertex<?>, IVertex<?>> inputs;
 
     /**
      * A vertex representing the result of log probability computation
@@ -27,8 +27,8 @@ public class LogProbGraph {
     @Getter
     private final DoubleVertex logProbOutput;
 
-    public <T> Vertex<T> getPlaceholder(Vertex<T> input) {
-        return (Vertex<T>) inputs.get(input);
+    public <T> IVertex<T> getPlaceholder(IVertex<T> input) {
+        return (IVertex<T>) inputs.get(input);
     }
 
     public interface PlaceholderVertex {

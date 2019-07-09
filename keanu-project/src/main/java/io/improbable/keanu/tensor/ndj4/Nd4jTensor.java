@@ -1,10 +1,10 @@
 package io.improbable.keanu.tensor.ndj4;
 
-
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
+import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
@@ -54,7 +54,7 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
             }
         }
 
-        if(indices.isEmpty()){
+        if (indices.isEmpty()) {
             return create(Nd4j.empty(tensor.dataType()));
         }
 
@@ -70,7 +70,8 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
 
     @Override
     public TENSOR broadcast(long... toShape) {
-        return create(tensor.broadcast(toShape));
+        DataType type = tensor.dataType();
+        return create(tensor.castTo(DataType.DOUBLE).broadcast(toShape).castTo(type));
     }
 
     @Override

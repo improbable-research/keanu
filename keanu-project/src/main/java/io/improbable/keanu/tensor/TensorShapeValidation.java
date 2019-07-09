@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor;
 
-
 import com.google.common.base.Preconditions;
 
 import java.util.Arrays;

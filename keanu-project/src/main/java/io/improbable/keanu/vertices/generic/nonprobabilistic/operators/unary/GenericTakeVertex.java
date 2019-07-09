@@ -3,9 +3,9 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.generic.GenericTensor;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
 
 public class GenericTakeVertex<T> extends GenericTensorUnaryOpVertex<T, T> {
 
@@ -18,7 +18,7 @@ public class GenericTakeVertex<T> extends GenericTensorUnaryOpVertex<T, T> {
      * @param inputVertex the input vertex
      * @param index       the index of extraction
      */
-    public GenericTakeVertex(@LoadVertexParam(INPUT_NAME) Vertex<GenericTensor<T>> inputVertex,
+    public GenericTakeVertex(@LoadVertexParam(INPUT_NAME) IVertex<GenericTensor<T>> inputVertex,
                              @LoadVertexParam(INDEX_NAME) long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);

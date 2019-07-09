@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-
 import io.improbable.keanu.algorithms.Variable;
 
 import java.util.Collections;

@@ -6,13 +6,13 @@ package io.improbable.keanu.vertices;
  */
 public class LogProbGraphValueFeeder {
 
-    public static <T> void feedValue(LogProbGraph logProbGraph, Vertex<T> input, T value) {
-        Vertex<T> placeholderVertex = logProbGraph.getPlaceholder(input);
+    public static <T> void feedValue(LogProbGraph logProbGraph, IVertex<T> input, T value) {
+        IVertex<T> placeholderVertex = logProbGraph.getPlaceholder(input);
         placeholderVertex.setValue(value);
     }
 
-    public static <T> void feedValueAndCascade(LogProbGraph logProbGraph, Vertex<T> input, T value) {
-        Vertex<T> placeholderVertex = logProbGraph.getPlaceholder(input);
+    public static <T> void feedValueAndCascade(LogProbGraph logProbGraph, IVertex<T> input, T value) {
+        IVertex<T> placeholderVertex = logProbGraph.getPlaceholder(input);
         placeholderVertex.setAndCascade(value);
     }
 }

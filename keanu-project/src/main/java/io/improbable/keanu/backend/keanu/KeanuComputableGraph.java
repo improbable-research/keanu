@@ -2,8 +2,8 @@ package io.improbable.keanu.backend.keanu;
 
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +17,16 @@ import static java.util.stream.Collectors.toMap;
  */
 public class KeanuComputableGraph implements ComputableGraph {
 
-    private final Map<VariableReference, Vertex> vertexLookup;
-    private final List<Vertex> topoSortedGraph;
-    private final Set<Vertex> outputs;
+    private final Map<VariableReference, IVertex> vertexLookup;
+    private final List<IVertex> topoSortedGraph;
+    private final Set<IVertex> outputs;
 
-    public KeanuComputableGraph(List<Vertex> topoSortedGraph, Set<Vertex> outputs) {
+    public KeanuComputableGraph(List<IVertex> topoSortedGraph, Set<IVertex> outputs) {
         this.topoSortedGraph = new ArrayList<>(topoSortedGraph);
         this.outputs = outputs;
 
         this.vertexLookup = topoSortedGraph.stream()
-            .collect(toMap(Vertex::getReference, v -> v));
+            .collect(toMap(IVertex::getReference, v -> v));
     }
 
     @Override
@@ -38,7 +38,7 @@ public class KeanuComputableGraph implements ComputableGraph {
 
         for (int i = 0; i < topoSortedGraph.size(); i++) {
 
-            final Vertex vertex = topoSortedGraph.get(i);
+            final IVertex vertex = topoSortedGraph.get(i);
 
             if (!vertex.isProbabilistic() && !vertex.isObserved()) {
                 vertex.setValue(((NonProbabilistic) vertex).calculate());
@@ -46,7 +46,7 @@ public class KeanuComputableGraph implements ComputableGraph {
         }
 
         return outputs.stream()
-            .collect(toMap(Vertex::getReference, v -> (Object) v.getValue()));
+            .collect(toMap(IVertex::getReference, v -> (Object) v.getValue()));
     }
 
     @Override

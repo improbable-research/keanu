@@ -4,7 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -31,7 +31,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 @Slf4j
 public class DotSaverTest {
 
-    private static Vertex complexResultVertex;
+    private static IVertex complexResultVertex;
     private static DotSaver complexNetDotSaver;
     private static ByteArrayOutputStream outputWriter;
     private static final String resourcesFolder = "dotFiles";
@@ -118,7 +118,7 @@ public class DotSaverTest {
         DoubleVertex observedGammaVertex = new GammaVertex(2, 3);
         observedGammaVertex.observe(2.5);
         DoubleVertex gammaMultipliedVertex = observedGammaVertex.times(new ConstantDoubleVertex(4));
-        Vertex resultVertex = gammaMultipliedVertex.plus(unobservedGaussianVertex);
+        IVertex resultVertex = gammaMultipliedVertex.plus(unobservedGaussianVertex);
         gammaMultipliedVertex.setLabel("Gamma Multiplied");
         DotSaver dotSaver = new DotSaver(new BayesianNetwork(resultVertex.getConnectedGraph()));
         dotSaver.save(outputWriter, true);

@@ -1,6 +1,6 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.VertexState;
 
 import java.util.Collection;
@@ -13,15 +13,15 @@ import java.util.Set;
  */
 public class NetworkSnapshot {
 
-    public static NetworkSnapshot create(Set<? extends Vertex> vertices) {
+    public static NetworkSnapshot create(Set<? extends IVertex> vertices) {
         return new NetworkSnapshot(vertices);
     }
 
-    private final Map<Vertex, VertexState> vertexStates;
+    private final Map<IVertex, VertexState> vertexStates;
 
-    private NetworkSnapshot(Collection<? extends Vertex> vertices) {
+    private NetworkSnapshot(Collection<? extends IVertex> vertices) {
         vertexStates = new HashMap<>();
-        for (Vertex v : vertices) {
+        for (IVertex v : vertices) {
             vertexStates.put(v, v.getState());
         }
     }
@@ -30,7 +30,7 @@ public class NetworkSnapshot {
      * Revert the state of the network to the previously saved state
      */
     public void apply() {
-        for (Vertex v : vertexStates.keySet()) {
+        for (IVertex v : vertexStates.keySet()) {
             v.setState(vertexStates.get(v));
         }
     }

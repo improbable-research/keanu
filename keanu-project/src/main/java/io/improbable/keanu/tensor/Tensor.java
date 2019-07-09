@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor;
 
-
 import io.improbable.keanu.BaseTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

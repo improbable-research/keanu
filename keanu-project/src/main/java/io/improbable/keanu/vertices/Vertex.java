@@ -1,13 +1,13 @@
 package io.improbable.keanu.vertices;
 
 import com.google.common.collect.ImmutableSet;
-import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
@@ -21,13 +21,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexState<T>> {
+public abstract class Vertex<T> implements IVertex<T> {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
 
-    private Set<Vertex> children = new TreeSet<>(Comparator.comparing(Vertex::getId));
-    private Set<Vertex> parents = Collections.emptySet();
+    private Set<IVertex> children = new TreeSet<>(Comparator.comparing(IVertex::getId));
+    private Set<IVertex> parents = Collections.emptySet();
     private VertexState<T> state;
     private VertexLabel label = null;
 
@@ -47,12 +47,12 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
      * @param <V>   vertex type
      * @return this
      */
-    public <V extends Vertex<T>> V setLabel(VertexLabel label) {
+    public <V extends IVertex<T>> V setLabel(VertexLabel label) {
         this.label = label;
         return (V) this;
     }
 
-    public <V extends Vertex<T>> V setLabel(String label) {
+    public <V extends IVertex<T>> V setLabel(String label) {
         return this.setLabel(new VertexLabel(label));
     }
 
@@ -60,7 +60,7 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
         return this.label;
     }
 
-    public <V extends Vertex<T>> V removeLabel() {
+    public <V extends IVertex<T>> V removeLabel() {
         this.label = null;
         return (V) this;
     }
@@ -166,13 +166,13 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
         return getShape().length;
     }
 
-    public <V extends Vertex<T>> V print() {
+    public <V extends IVertex<T>> V print() {
         new PrintVertex<>(this);
         return (V) this;
     }
 
 
-    public <V extends Vertex<T>> V print(final String message, final boolean printData) {
+    public <V extends IVertex<T>> V print(final String message, final boolean printData) {
         new PrintVertex<>(this, message, printData);
         return (V) this;
     }
@@ -206,7 +206,7 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
         state = new VertexState<>(value, true);
     }
 
-    private static boolean isObservable(Class<? extends Vertex> v) {
+    private static boolean isObservable(Class<? extends IVertex> v) {
         boolean isProbabilistic = Probabilistic.class.isAssignableFrom(v);
         boolean isNotDoubleOrIntegerVertex = !IntegerVertex.class.isAssignableFrom(v) && !DoubleVertex.class.isAssignableFrom(v);
 
@@ -248,33 +248,38 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
         return id.getIndentation();
     }
 
-    public Set<Vertex> getChildren() {
+    public Set<IVertex> getChildren() {
         return Collections.unmodifiableSet(children);
     }
 
-    public void addChild(Vertex<?> v) {
+    public void addChild(IVertex<?> v) {
         children.add(v);
     }
 
-    public void setParents(Collection<? extends Vertex> parents) {
+    public void setParents(Collection<? extends IVertex> parents) {
         this.parents = Collections.emptySet();
         addParents(parents);
     }
 
-    public void setParents(Vertex<?>... parents) {
+    public void setParents(IVertex<?>... parents) {
         setParents(Arrays.asList(parents));
     }
 
-    public void addParents(Collection<? extends Vertex> parents) {
-        this.parents = ImmutableSet.<Vertex>builder().addAll(this.getParents()).addAll(parents).build();
+    public void addParents(Collection<? extends IVertex> parents) {
+
+        this.parents = ImmutableSet.<IVertex>builder()
+            .addAll(getParents())
+            .addAll(parents)
+            .build();
+
         parents.forEach(p -> p.addChild(this));
     }
 
-    public void addParent(Vertex<?> parent) {
+    public void addParent(IVertex<?> parent) {
         addParents(ImmutableSet.of(parent));
     }
 
-    public Set<Vertex> getParents() {
+    public Set<IVertex> getParents() {
         return parents;
     }
 
@@ -287,9 +292,9 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Vertex<?> vertex = (Vertex<?>) o;
+        IVertex<?> vertex = (IVertex<?>) o;
 
-        return this.id.equals(vertex.id);
+        return this.id.equals(vertex.getId());
     }
 
     @Override
@@ -297,7 +302,7 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
         return id.hashCode();
     }
 
-    public Set<Vertex> getConnectedGraph() {
+    public Set<IVertex> getConnectedGraph() {
         return DiscoverGraph.getEntireGraph(this);
     }
 
@@ -321,10 +326,26 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
     }
 
     public void saveValue(NetworkSaver netSaver) {
-        netSaver.saveValue(this);
+        if (this instanceof DoubleVertex) {
+            netSaver.saveValue((DoubleVertex) this);
+        } else if (this instanceof IntegerVertex) {
+            netSaver.saveValue((IntegerVertex) this);
+        } else if (this instanceof BooleanVertex) {
+            netSaver.saveValue((BooleanVertex) this);
+        } else {
+            netSaver.saveValue(this);
+        }
     }
 
     public void loadValue(NetworkLoader loader) {
-        loader.loadValue(this);
+        if (this instanceof DoubleVertex) {
+            loader.loadValue((DoubleVertex) this);
+        } else if (this instanceof IntegerVertex) {
+            loader.loadValue((IntegerVertex) this);
+        } else if (this instanceof BooleanVertex) {
+            loader.loadValue((BooleanVertex) this);
+        } else {
+            loader.loadValue(this);
+        }
     }
 }

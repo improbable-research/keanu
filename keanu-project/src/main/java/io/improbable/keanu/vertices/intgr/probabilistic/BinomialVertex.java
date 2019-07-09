@@ -6,6 +6,7 @@ import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -25,7 +26,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
+public class BinomialVertex extends Vertex<IntegerTensor> implements IntegerVertex,   ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
@@ -92,7 +93,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<IVertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends IVertex> withRespectTo) {
         return Collections.emptyMap();
     }
 

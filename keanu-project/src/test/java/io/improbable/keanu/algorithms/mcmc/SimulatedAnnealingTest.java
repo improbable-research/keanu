@@ -7,7 +7,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
@@ -59,6 +59,6 @@ public class SimulatedAnnealingTest {
         graphOptimizer.maxAPosteriori();
 
         return new SimpleNetworkState(network.getLatentVertices().stream()
-            .collect(Collectors.toMap(Vertex::getId, Vertex::getValue)));
+            .collect(Collectors.toMap(IVertex::getId, IVertex::getValue)));
     }
 }

@@ -2,10 +2,10 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.generic.GenericVertex;
 
 import java.io.PrintStream;
@@ -24,14 +24,14 @@ public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic
 
     private static final String PRINT_DATA = "printData";
 
-    private final Vertex<T> parent;
+    private final IVertex<T> parent;
 
     private final String message;
 
     private final boolean printData;
 
     @ExportVertexToPythonBindings
-    public PrintVertex(@LoadVertexParam(PARENT) Vertex<T> parent,
+    public PrintVertex(@LoadVertexParam(PARENT) IVertex<T> parent,
                        @LoadVertexParam(MESSAGE) final String message,
                        @LoadVertexParam(PRINT_DATA) boolean printData) {
         super(parent.getShape());
@@ -41,7 +41,7 @@ public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic
         setParents(parent);
     }
 
-    public PrintVertex(Vertex<T> parent) {
+    public PrintVertex(IVertex<T> parent) {
         this(parent, "Calculated Vertex:\n", true);
     }
 
@@ -57,7 +57,7 @@ public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic
     }
 
     @SaveVertexParam(PARENT)
-    public Vertex<T> getParent() {
+    public IVertex<T> getParent() {
         return parent;
     }
 

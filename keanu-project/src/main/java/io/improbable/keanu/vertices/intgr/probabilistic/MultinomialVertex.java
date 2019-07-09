@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
@@ -48,7 +49,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
  * therefore k = 3
  * and the result shape is (2, 2, 3), which is (2, 2) broadcasted with (2) and k appended.
  */
-public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
+public class MultinomialVertex extends Vertex<IntegerTensor> implements IntegerVertex,   ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
@@ -121,7 +122,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<IVertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends IVertex> withRespectTo) {
         throw new UnsupportedOperationException();
     }
 

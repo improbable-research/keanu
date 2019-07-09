@@ -318,9 +318,9 @@ public class TensorShape {
     }
 
     public static long convertFromFlatIndexToPermutedFlatIndex(long fromFlatIndex,
-                                                              long[] shape, long[] stride,
-                                                              long[] permutedShape, long[] permutedStride,
-                                                              int[] rearrange) {
+                                                               long[] shape, long[] stride,
+                                                               long[] permutedShape, long[] permutedStride,
+                                                               int[] rearrange) {
         long[] shapeIndices = getShapeIndices(shape, stride, fromFlatIndex);
 
         long[] permutedIndex = getPermutedIndices(shapeIndices, rearrange);

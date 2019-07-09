@@ -9,7 +9,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.HalfCauchyVertex;
@@ -107,7 +107,7 @@ public class RadonHierarchicalRegression {
         return new SubModel(gradient, intercept);
     }
 
-    private NetworkSamples sampleWithNUTS(BayesianNetwork bayesianNetwork, List<Vertex> sampleFrom) {
+    private NetworkSamples sampleWithNUTS(BayesianNetwork bayesianNetwork, List<IVertex> sampleFrom) {
 
         int sampleCount = 1000;
         KeanuProbabilisticModelWithGradient probabilisticModel = new KeanuProbabilisticModelWithGradient(bayesianNetwork);

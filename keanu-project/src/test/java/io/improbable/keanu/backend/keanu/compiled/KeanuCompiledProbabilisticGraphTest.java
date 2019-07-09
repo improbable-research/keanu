@@ -2,7 +2,7 @@ package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -62,7 +62,7 @@ public class KeanuCompiledProbabilisticGraphTest {
             .convert(bayesianNetwork);
 
         Map<VariableReference, Object> inputs = bayesianNetwork.getLatentVertices().stream()
-            .collect(Collectors.toMap(Vertex::getReference, Vertex::getValue));
+            .collect(Collectors.toMap(IVertex::getReference, IVertex::getValue));
 
         double logProb = probabilisticGraph.logProb(inputs);
 
