@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
-public class ConstantBooleanVertex extends VertexImpl<BooleanTensor> implements BooleanVertex, ConstantVertex, NonProbabilistic<BooleanTensor> {
+public class ConstantBooleanVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, ConstantVertex, NonProbabilistic<BooleanTensor> {
 
     public static final BooleanVertex TRUE = new ConstantBooleanVertex(true);
     public static final BooleanVertex FALSE = new ConstantBooleanVertex(false);

@@ -11,20 +11,20 @@ import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-public class CastNumberToDoubleVertex<T extends NumberTensor> extends VertexImpl<DoubleTensor> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexUnaryOp<Vertex<T>> {
+public class CastNumberToDoubleVertex<T extends NumberTensor> extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexUnaryOp<Vertex<T, ?>> {
 
-    private final Vertex<T> inputVertex;
+    private final Vertex<T, ?> inputVertex;
     private static final String INPUT_VERTEX_NAME = "inputVertex";
 
     @ExportVertexToPythonBindings
-    public CastNumberToDoubleVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<T> inputVertex) {
+    public CastNumberToDoubleVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<T, ?> inputVertex) {
         super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
 
     @SaveVertexParam(INPUT_VERTEX_NAME)
-    public Vertex<T> getInputVertex() {
+    public Vertex<T, ?> getInputVertex() {
         return inputVertex;
     }
 

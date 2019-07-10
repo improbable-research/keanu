@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.model.ModelVertex;
 /**
  * A non-probabilistic boolean vertex whose value is extracted from an upstream model vertex.
  */
-public class BooleanModelResultVertex extends VertexImpl<BooleanTensor> implements BooleanVertex, ModelResultProvider<BooleanTensor>, NonProbabilistic<BooleanTensor>, NonSaveableVertex {
+public class BooleanModelResultVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, ModelResultProvider<BooleanTensor>, NonProbabilistic<BooleanTensor>, NonSaveableVertex {
 
     private final ModelResult<BooleanTensor> delegate;
 

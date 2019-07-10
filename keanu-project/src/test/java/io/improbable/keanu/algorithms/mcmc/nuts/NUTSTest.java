@@ -10,7 +10,7 @@ import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
 import org.junit.Assert;
@@ -91,7 +91,7 @@ public class NUTSTest {
             sampleCount
         );
 
-        Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
+        DoubleVertex vertex = simpleGaussian.getContinuousLatentVertices().get(0);
         List<DoubleTensor> nutsSamples = posteriorSamples.get(vertex).asList();
 
         MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, nutsSamples);
@@ -114,8 +114,8 @@ public class NUTSTest {
             sampleCount
         ).drop(sampleCount / 4);
 
-        Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
-        Vertex<DoubleTensor> B = bayesNet.getContinuousLatentVertices().get(1);
+        DoubleVertex A = bayesNet.getContinuousLatentVertices().get(0);
+        DoubleVertex B = bayesNet.getContinuousLatentVertices().get(1);
 
         MCMCTestDistributions.samplesMatchesSumOfGaussians(44.0, posteriorSamples.get(A).asList(), posteriorSamples.get(B).asList());
     }
@@ -137,8 +137,8 @@ public class NUTSTest {
             sampleCount
         );
 
-        Vertex<DoubleTensor> A = donutBayesNet.getContinuousLatentVertices().get(0);
-        Vertex<DoubleTensor> B = donutBayesNet.getContinuousLatentVertices().get(1);
+        DoubleVertex A = donutBayesNet.getContinuousLatentVertices().get(0);
+        DoubleVertex B = donutBayesNet.getContinuousLatentVertices().get(1);
 
         MCMCTestDistributions.samplesMatch2DDonut(samples.get(A).asList(), samples.get(B).asList());
     }
@@ -209,7 +209,7 @@ public class NUTSTest {
             20
         );
 
-        Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
+        DoubleVertex vertex = simpleGaussian.getContinuousLatentVertices().get(0);
 
         List<DoubleTensor> samples = posteriorSamples.get(vertex).asList();
 

@@ -22,7 +22,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class ConcatenationVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor> {
+public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final static String DIMENSION_NAME = "dimension";
     private final static String OPERANDS_NAME = "operands";
@@ -161,7 +161,7 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor> implements Dou
         return DoubleTensor.concat(dimension, inputs);
     }
 
-    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor>, T> func, DoubleVertex[] operands) {
+    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor, DoubleVertex>, T> func, DoubleVertex[] operands) {
         T[] extract = (T[]) Array.newInstance(clazz, operands.length);
         for (int i = 0; i < operands.length; i++) {
             extract[i] = func.apply(operands[i]);

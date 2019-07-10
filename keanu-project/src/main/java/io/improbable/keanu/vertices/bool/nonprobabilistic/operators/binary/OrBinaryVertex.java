@@ -10,8 +10,8 @@ import io.improbable.keanu.vertices.Vertex;
 public class OrBinaryVertex extends BooleanBinaryOpVertex<BooleanTensor, BooleanTensor> {
 
     @ExportVertexToPythonBindings
-    public OrBinaryVertex(@LoadVertexParam(A_NAME) Vertex<BooleanTensor> a,
-                          @LoadVertexParam(B_NAME) Vertex<BooleanTensor> b) {
+    public OrBinaryVertex(@LoadVertexParam(A_NAME) Vertex<BooleanTensor, ?> a,
+                          @LoadVertexParam(B_NAME) Vertex<BooleanTensor, ?> b) {
         super(a, b);
     }
 

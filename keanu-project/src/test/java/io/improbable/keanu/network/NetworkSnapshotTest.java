@@ -35,8 +35,8 @@ public class NetworkSnapshotTest {
     public void itSetsTheStateOfAVertex() {
         VertexState<Object> s1 = VertexState.nullState();
         VertexState<Object> s2 = VertexState.nullState();
-        VertexImpl<Object> v1 = mock(VertexImpl.class);
-        VertexImpl<Object> v2 = mock(VertexImpl.class);
+        VertexImpl<Object, ?> v1 = mock(VertexImpl.class);
+        VertexImpl<Object, ?> v2 = mock(VertexImpl.class);
         when(v1.getState()).thenReturn(s1);
         when(v2.getState()).thenReturn(s2);
         doCallRealMethod().when(v1).setState(any(VertexState.class));

@@ -12,7 +12,7 @@ import java.util.Map;
 public class PartialsOf {
 
     @Getter
-    private final Vertex<?> of;
+    private final Vertex<?, ?> of;
 
     private final Map<VertexId, PartialDerivative> partials;
 

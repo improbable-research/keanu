@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-public abstract class DoubleUnaryOpVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexUnaryOp<DoubleVertex> {
+public abstract class DoubleUnaryOpVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexUnaryOp<DoubleVertex> {
 
     protected final DoubleVertex inputVertex;
     protected static final String INPUT_VERTEX_NAME = "inputVertex";

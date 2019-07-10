@@ -26,7 +26,7 @@ public class SequenceItem implements VertexDictionary {
     private static final String NAME_PREFIX = "Sequence_Item_";
     private static Pattern NAME_REGEX = Pattern.compile(NAME_PREFIX + "-?[\\d]+$");
 
-    private Map<VertexLabel, Vertex<?>> contents;
+    private Map<VertexLabel, Vertex<?, ?>> contents;
     private int index;
     private int uniqueSequenceIdentifier;
     private String sequenceName;
@@ -42,23 +42,23 @@ public class SequenceItem implements VertexDictionary {
         this.sequenceName = sequenceName;
     }
 
-    public <T extends Vertex<?>> void addAll(T... vertices) {
+    public <T extends Vertex<?, ?>> void addAll(T... vertices) {
         addAll(ImmutableList.copyOf(vertices));
     }
 
-    public <T extends Vertex<?>> void addAll(Collection<T> vertices) {
+    public <T extends Vertex<?, ?>> void addAll(Collection<T> vertices) {
         vertices.forEach(v -> add(v));
     }
 
-    public <T extends Vertex<?>> void addAll(Map<VertexLabel, T> vertices) {
+    public <T extends Vertex<?, ?>> void addAll(Map<VertexLabel, T> vertices) {
         vertices.entrySet().forEach(v -> add(v.getKey(), v.getValue()));
     }
 
-    public <T extends Vertex<?>> T add(T v) {
+    public <T extends Vertex<?, ?>> T add(T v) {
         return add(v.getLabel(), v);
     }
 
-    public <T extends Vertex<?>> T add(VertexLabel label, T v) {
+    public <T extends Vertex<?, ?>> T add(VertexLabel label, T v) {
         if (label == null) {
             throw new SequenceConstructionException("Vertex " + v + " must contain a label in order to be added to a sequence item");
         }
@@ -79,7 +79,7 @@ public class SequenceItem implements VertexDictionary {
      * @return Returns a map of vertex labels to vertices, which covers all of the vertices that have been explicitly
      * added to this sequence item.
      */
-    public Map<VertexLabel, Vertex<?>> getContents() {
+    public Map<VertexLabel, Vertex<?, ?>> getContents() {
         return copyOf(this.contents);
     }
 
@@ -106,8 +106,8 @@ public class SequenceItem implements VertexDictionary {
     }
 
     @Override
-    public <V extends Vertex<?>> V get(VertexLabel label) {
-        Vertex<?> vertex = contents.getOrDefault(label, contents.get(scoped(label)));
+    public <V extends Vertex<?, ?>> V get(VertexLabel label) {
+        Vertex<?, ?> vertex = contents.getOrDefault(label, contents.get(scoped(label)));
 
         if (vertex == null) {
             throw new IllegalArgumentException("Cannot find VertexLabel " + label);
@@ -116,14 +116,14 @@ public class SequenceItem implements VertexDictionary {
     }
 
     @Override
-    public SequenceItem withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
+    public SequenceItem withExtraEntries(Map<VertexLabel, Vertex<?, ?>> extraEntries) {
         SequenceItem item = new SequenceItem(this.index, this.uniqueSequenceIdentifier, this.sequenceName);
         item.addAll(contents);
         item.addAll(extraEntries);
         return item;
     }
 
-    public Collection<Vertex<?>> getProxyVertices() {
+    public Collection<Vertex<?, ?>> getProxyVertices() {
         return contents.values().stream()
             .filter(v -> v instanceof ProxyVertex)
             .collect(Collectors.toList());
@@ -198,11 +198,11 @@ public class SequenceItem implements VertexDictionary {
         return addProxyFor(label, shape, BooleanProxyVertex::new);
     }
 
-    private <T extends Vertex<?>> T addProxyFor(VertexLabel label, Function<VertexLabel, T> factoryMethod) {
+    private <T extends Vertex<?, ?>> T addProxyFor(VertexLabel label, Function<VertexLabel, T> factoryMethod) {
         return addProxyFor(label, null, (shape, vertexLabel) -> factoryMethod.apply(vertexLabel));
     }
 
-    private <T extends Vertex<?>> T addProxyFor(VertexLabel label, long[] shape, BiFunction<long[], VertexLabel, T> factoryMethod) {
+    private <T extends Vertex<?, ?>> T addProxyFor(VertexLabel label, long[] shape, BiFunction<long[], VertexLabel, T> factoryMethod) {
         VertexLabel proxyLabel = SequenceBuilder.proxyLabelFor(label);
         T newVertex = factoryMethod.apply(shape, proxyLabel);
         this.add(newVertex);

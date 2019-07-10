@@ -17,7 +17,7 @@ public interface ModelVertex<T> extends NonProbabilistic<T> {
 
     void run();
 
-    Map<VertexLabel, Vertex<? extends Tensor>> updateValues();
+    Map<VertexLabel, Vertex<? extends Tensor, ?>> updateValues();
 
     boolean hasCalculated();
 

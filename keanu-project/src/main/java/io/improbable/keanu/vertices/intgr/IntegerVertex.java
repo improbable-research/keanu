@@ -5,6 +5,7 @@ import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
@@ -12,7 +13,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerBinaryOpVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGetBooleanIndexVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
@@ -78,6 +78,10 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     //////////////////////////
     ////  Tensor Operations
     //////////////////////////
+
+    default IntegerVertex asTyped(NonProbabilisticVertex<IntegerTensor, IntegerVertex> vertex) {
+        return new IntegerVertexWrapper(vertex);
+    }
 
     static IntegerVertex concat(int dimension, IntegerVertex... toConcat) {
         return new IntegerConcatenationVertex(dimension, toConcat);
@@ -163,19 +167,15 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     ////  Number Tensor Operations
     //////////////////////////
 
-    @Override
-    default IntegerVertex minus(IntegerVertex that) {
-        return new IntegerDifferenceVertex(this, that);
-    }
 
     @Override
     default IntegerVertex minus(int value) {
-        return new IntegerDifferenceVertex(this, new ConstantIntegerVertex(value));
+        return minus(new ConstantIntegerVertex(value));
     }
 
     @Override
     default IntegerVertex minus(Integer value) {
-        return new IntegerDifferenceVertex(this, new ConstantIntegerVertex(value));
+        return minus(new ConstantIntegerVertex(value));
     }
 
     @Override

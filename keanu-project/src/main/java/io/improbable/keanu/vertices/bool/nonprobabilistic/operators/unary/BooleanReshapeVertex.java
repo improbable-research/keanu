@@ -4,17 +4,17 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 /**
  * Returns the supplied vertex with a new shape of the same length
  **/
-public class BooleanReshapeVertex extends BooleanUnaryOpVertex<BooleanTensor> {
+public class BooleanReshapeVertex extends BooleanUnaryOpVertex {
 
     private final static String PROPOSED_SHAPE_NAME = "proposedShape";
 
     @ExportVertexToPythonBindings
-    public BooleanReshapeVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
+    public BooleanReshapeVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex,
                                 @LoadVertexParam(PROPOSED_SHAPE_NAME) long... proposedShape) {
         super(proposedShape, inputVertex);
     }

@@ -25,10 +25,10 @@ import static org.junit.Assert.assertTrue;
 public class WriteCsvTest {
 
     private NetworkSamples samples;
-    private List<Vertex<DoubleTensor>> rowTensors = new ArrayList<>();
-    private List<Vertex<DoubleTensor>> columnTensors = new ArrayList<>();
-    private List<Vertex<DoubleTensor>> scalarTensors = new ArrayList<>();
-    private List<Vertex<IntegerTensor>> integerColumnTensors = new ArrayList<>();
+    private List<Vertex<DoubleTensor, ?>> rowTensors = new ArrayList<>();
+    private List<Vertex<DoubleTensor, ?>> columnTensors = new ArrayList<>();
+    private List<Vertex<DoubleTensor, ?>> scalarTensors = new ArrayList<>();
+    private List<Vertex<IntegerTensor, ?>> integerColumnTensors = new ArrayList<>();
 
     @Before
     public void setup() {

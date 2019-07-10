@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 import java.util.function.BiFunction;
 
 public class BooleanBinaryOpLambda extends BooleanBinaryOpVertex<BooleanTensor, BooleanTensor>
-    implements NonSaveableVertex, VertexBinaryOp<Vertex<BooleanTensor>, Vertex<BooleanTensor>> {
+    implements NonSaveableVertex, VertexBinaryOp<Vertex<BooleanTensor, ?>, Vertex<BooleanTensor, ?>> {
 
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> boolOp;
 

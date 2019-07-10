@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -216,7 +217,7 @@ public class BayesianNetwork {
     }
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices, KeanuRandom random) {
-        for (Vertex<?> vertex : vertices) {
+        for (Vertex<?, ?> vertex : vertices) {
             if (!(vertex instanceof Probabilistic)) {
                 throw new IllegalArgumentException("Cannot sample from a non-probabilistic vertex. Vertex is: " + vertex);
             }
@@ -225,14 +226,14 @@ public class BayesianNetwork {
         VertexValuePropagation.cascadeUpdate(vertices);
     }
 
-    private static <T> void setValueFromSample(Vertex<T> vertex, KeanuRandom random) {
+    private static <T> void setValueFromSample(Vertex<T, ?> vertex, KeanuRandom random) {
         vertex.setValue(((Probabilistic<T>) vertex).sample(random));
     }
 
-    public List<Vertex<DoubleTensor>> getContinuousLatentVertices() {
+    public List<DoubleVertex> getContinuousLatentVertices() {
         return getLatentVertices().stream()
-            .filter(v -> v.getValue() instanceof DoubleTensor)
-            .map(v -> (Vertex<DoubleTensor>) v)
+            .filter(v -> v instanceof DoubleVertex)
+            .map(v -> (DoubleVertex) v)
             .collect(Collectors.toList());
     }
 

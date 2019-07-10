@@ -23,7 +23,7 @@ public class GenericSliceVertex<T> extends GenericTensorUnaryOpVertex<T, T> {
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
-    public GenericSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<GenericTensor<T>> inputVertex,
+    public GenericSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<GenericTensor<T>, ?> inputVertex,
                               @LoadVertexParam(DIMENSION_NAME) int dimension,
                               @LoadVertexParam(INDEX_NAME) int index) {
         super(removeDimension(dimension, inputVertex.getShape()), inputVertex);

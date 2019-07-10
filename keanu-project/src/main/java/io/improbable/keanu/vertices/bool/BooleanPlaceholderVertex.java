@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 
-public class BooleanPlaceholderVertex extends VertexImpl<BooleanTensor> implements BooleanVertex,  LogProbGraph.PlaceholderVertex, NonProbabilistic<BooleanTensor>, Differentiable, NonSaveableVertex {
+public class BooleanPlaceholderVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex,  LogProbGraph.PlaceholderVertex, NonProbabilistic<BooleanTensor>, Differentiable, NonSaveableVertex {
 
     private final BooleanVertex defaultVertex;
 

@@ -49,7 +49,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
  * therefore k = 3
  * and the result shape is (2, 2, 3), which is (2, 2) broadcasted with (2) and k appended.
  */
-public class MultinomialVertex extends VertexImpl<IntegerTensor> implements IntegerVertex,   ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
+public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex,   ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
     private final DoubleVertex p;
     private final IntegerVertex n;

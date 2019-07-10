@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.model.ModelVertex;
 /**
  * A non-probabilistic integer vertex whose value is extracted from an upstream model vertex.
  */
-public class IntegerModelResultVertex extends VertexImpl<IntegerTensor> implements IntegerVertex,   ModelResultProvider<IntegerTensor>, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public class IntegerModelResultVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex,   ModelResultProvider<IntegerTensor>, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
 
     private final ModelResult<IntegerTensor> delegate;
 

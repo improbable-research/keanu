@@ -185,7 +185,7 @@ public class ProtobufLoader implements NetworkLoader {
         }
     }
 
-    private <T> Vertex<T> createVertexFromProtoBuf(SavedBayesNet.Vertex vertex,
+    private <T> Vertex<T, ?> createVertexFromProtoBuf(SavedBayesNet.Vertex vertex,
                                                    Map<SavedBayesNet.VertexID, Vertex> existingVertices) {
         Class vertexClass;
         try {

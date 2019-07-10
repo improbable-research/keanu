@@ -78,8 +78,8 @@ public class Loop {
      * @param <V>    the input type
      * @return a builder object
      */
-    public static <V extends Vertex<?>> LoopBuilder withInitialConditions(V first, V... others) {
-        Map<VertexLabel, Vertex<?>> map = buildMapForBaseCase(first, others);
+    public static <V extends Vertex<?, ?>> LoopBuilder withInitialConditions(V first, V... others) {
+        Map<VertexLabel, Vertex<?, ?>> map = buildMapForBaseCase(first, others);
         return withInitialConditions(SimpleVertexDictionary.backedBy(map));
     }
 
@@ -93,8 +93,8 @@ public class Loop {
         return new LoopBuilder(initialState);
     }
 
-    private static <V extends Vertex<?>> Map<VertexLabel, Vertex<?>> buildMapForBaseCase(V first, V[] others) {
-        ImmutableMap.Builder<VertexLabel, Vertex<?>> baseCaseMap = ImmutableMap.builder();
+    private static <V extends Vertex<?, ?>> Map<VertexLabel, Vertex<?, ?>> buildMapForBaseCase(V first, V[] others) {
+        ImmutableMap.Builder<VertexLabel, Vertex<?, ?>> baseCaseMap = ImmutableMap.builder();
         baseCaseMap.put(VALUE_OUT_LABEL, first);
         for (V vertex : others) {
             VertexLabel label = vertex.getLabel();
@@ -115,7 +115,7 @@ public class Loop {
      * @return the output of the Loop (i.e. the output Vertex from the final SequenceItem)
      * @throws LoopDidNotTerminateException if the loop was too short and hit its maximum unrolled size
      */
-    public <V extends Vertex<?>> V getOutput() throws LoopDidNotTerminateException {
+    public <V extends Vertex<?, ?>> V getOutput() throws LoopDidNotTerminateException {
         SequenceItem finalItem = sequence.getLastItem();
         checkIfMaxCountHasBeenReached(finalItem);
         return finalItem.get(VALUE_OUT_LABEL);

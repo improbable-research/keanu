@@ -1,7 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import org.junit.Test;
@@ -13,9 +11,9 @@ import static org.junit.Assert.assertEquals;
 
 public class BooleanMultipleOperatorTest {
 
-    private List<Vertex<BooleanTensor>> allTrue = buildVertexList(15, 15);
-    private List<Vertex<BooleanTensor>> allMixed = buildVertexList(18, 10);
-    private List<Vertex<BooleanTensor>> allFalse = buildVertexList(15, 0);
+    private List<BooleanVertex> allTrue = buildVertexList(15, 15);
+    private List<BooleanVertex> allMixed = buildVertexList(18, 10);
+    private List<BooleanVertex> allFalse = buildVertexList(15, 0);
 
     @Test
     public void testMultipleAnd() {
@@ -41,8 +39,8 @@ public class BooleanMultipleOperatorTest {
         assertEquals(false, orFalse.eval().scalar());
     }
 
-    private List<Vertex<BooleanTensor>> buildVertexList(int numberOfVertices, int numberThatAreTrue) {
-        List<Vertex<BooleanTensor>> list = new LinkedList<>();
+    private List<BooleanVertex> buildVertexList(int numberOfVertices, int numberThatAreTrue) {
+        List<BooleanVertex> list = new LinkedList<>();
 
         for (int i = 0; i < numberThatAreTrue; i++) {
             list.add(new BernoulliVertex(1.0));

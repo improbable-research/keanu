@@ -107,7 +107,7 @@ public class BayesianNetworkTest {
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
     }
 
-    private class TestNonSaveableVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, NonSaveableVertex {
+    private class TestNonSaveableVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonSaveableVertex {
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});
         }
@@ -166,10 +166,10 @@ public class BayesianNetworkTest {
 
     @Test
     public void throwsIfVertexWithLabelIsNotInBayesianNetwork() {
-        BernoulliVertex vertexInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_A);
+        BooleanVertex vertexInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_A);
         BayesianNetwork network = new BayesianNetwork(vertexInNetwork.getConnectedGraph());
 
-        BernoulliVertex vertexNotInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_B);
+        BooleanVertex vertexNotInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_B);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(String.format("Vertex with label %s was not found in BayesianNetwork", LABEL_B));

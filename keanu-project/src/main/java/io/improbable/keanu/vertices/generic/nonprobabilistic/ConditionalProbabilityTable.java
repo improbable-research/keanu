@@ -25,15 +25,15 @@ public class ConditionalProbabilityTable {
     private static final String WHEN_CONDITION_SIZE_MISMATCH = "The 'when' condition size does not match input count";
 
     @SafeVarargs
-    public static CPTRawBuilder of(Vertex<? extends Tensor<?, ?>>... inputs) {
+    public static CPTRawBuilder of(Vertex<? extends Tensor<?, ?>, ?>... inputs) {
         return new CPTRawBuilder(Arrays.asList(inputs));
     }
 
     public static class CPTRawBuilder {
 
-        private final List<Vertex<? extends Tensor<?, ?>>> inputs;
+        private final List<Vertex<? extends Tensor<?, ?>, ?>> inputs;
 
-        public CPTRawBuilder(List<Vertex<? extends Tensor<?, ?>>> inputs) {
+        public CPTRawBuilder(List<Vertex<? extends Tensor<?, ?>, ?>> inputs) {
             this.inputs = inputs;
         }
 
@@ -48,15 +48,15 @@ public class ConditionalProbabilityTable {
     public static class CPTWhenRawBuilder {
 
         private final CPTCondition condition;
-        private final List<Vertex<? extends Tensor<?, ?>>> inputs;
+        private final List<Vertex<? extends Tensor<?, ?>, ?>> inputs;
 
-        public CPTWhenRawBuilder(List<?> condition, List<Vertex<? extends Tensor<?, ?>>> inputs) {
+        public CPTWhenRawBuilder(List<?> condition, List<Vertex<? extends Tensor<?, ?>, ?>> inputs) {
             this.condition = new CPTCondition(condition);
             this.inputs = inputs;
         }
 
-        public <T> CPTBuilder<T> then(Vertex<GenericTensor<T>> thn) {
-            Map<CPTCondition, Vertex<GenericTensor<T>>> conditions = new HashMap<>();
+        public <T> CPTBuilder<T> then(Vertex<GenericTensor<T>, ?> thn) {
+            Map<CPTCondition, Vertex<GenericTensor<T>, ?>> conditions = new HashMap<>();
             conditions.put(condition, thn);
             return new CPTBuilder<>(inputs, conditions);
         }
@@ -93,10 +93,10 @@ public class ConditionalProbabilityTable {
     }
 
     public static class DoubleCPTBuilder {
-        private final List<Vertex<? extends Tensor<?, ?>>> inputs;
+        private final List<Vertex<? extends Tensor<?, ?>, ?>> inputs;
         private final Map<CPTCondition, DoubleVertex> conditions;
 
-        public DoubleCPTBuilder(List<Vertex<? extends Tensor<?, ?>>> inputs, Map<CPTCondition, DoubleVertex> conditions) {
+        public DoubleCPTBuilder(List<Vertex<? extends Tensor<?, ?>, ?>> inputs, Map<CPTCondition, DoubleVertex> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
@@ -138,10 +138,10 @@ public class ConditionalProbabilityTable {
     }
 
     public static class BooleanCPTBuilder {
-        private final List<Vertex<? extends Tensor<?, ?>>> inputs;
+        private final List<Vertex<? extends Tensor<?, ?>, ?>> inputs;
         private final Map<CPTCondition, BooleanVertex> conditions;
 
-        public BooleanCPTBuilder(List<Vertex<? extends Tensor<?, ?>>> inputs, Map<CPTCondition, BooleanVertex> conditions) {
+        public BooleanCPTBuilder(List<Vertex<? extends Tensor<?, ?>, ?>> inputs, Map<CPTCondition, BooleanVertex> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
@@ -183,10 +183,10 @@ public class ConditionalProbabilityTable {
     }
 
     public static class IntegerCPTBuilder {
-        private final List<Vertex<? extends Tensor<?, ?>>> inputs;
+        private final List<Vertex<? extends Tensor<?, ?>, ?>> inputs;
         private final Map<CPTCondition, IntegerVertex> conditions;
 
-        public IntegerCPTBuilder(List<Vertex<? extends Tensor<?, ?>>> inputs, Map<CPTCondition, IntegerVertex> conditions) {
+        public IntegerCPTBuilder(List<Vertex<? extends Tensor<?, ?>, ?>> inputs, Map<CPTCondition, IntegerVertex> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
@@ -228,10 +228,10 @@ public class ConditionalProbabilityTable {
     }
 
     public static class CPTBuilder<T> {
-        private final List<Vertex<? extends Tensor<?, ?>>> inputs;
-        private final Map<CPTCondition, Vertex<GenericTensor<T>>> conditions;
+        private final List<Vertex<? extends Tensor<?, ?>, ?>> inputs;
+        private final Map<CPTCondition, Vertex<GenericTensor<T>, ?>> conditions;
 
-        public CPTBuilder(List<Vertex<? extends Tensor<?, ?>>> inputs, Map<CPTCondition, Vertex<GenericTensor<T>>> conditions) {
+        public CPTBuilder(List<Vertex<? extends Tensor<?, ?>, ?>> inputs, Map<CPTCondition, Vertex<GenericTensor<T>, ?>> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
@@ -243,7 +243,7 @@ public class ConditionalProbabilityTable {
             return new CPTWhenBuilder<>(new CPTCondition(ImmutableList.copyOf(condition)), this);
         }
 
-        public CPTVertex<T> orDefault(Vertex<GenericTensor<T>> defaultResult) {
+        public CPTVertex<T> orDefault(Vertex<GenericTensor<T>, ?> defaultResult) {
             return new CPTVertex<>(inputs, conditions, defaultResult);
         }
 
@@ -257,7 +257,7 @@ public class ConditionalProbabilityTable {
                 this.builder = builder;
             }
 
-            public CPTBuilder<T> then(Vertex<GenericTensor<T>> thn) {
+            public CPTBuilder<T> then(Vertex<GenericTensor<T>, ?> thn) {
                 builder.conditions.put(condition, thn);
                 return builder;
             }

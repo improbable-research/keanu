@@ -9,9 +9,9 @@ public abstract class UnaryOpVertex<IN, OUT> extends GenericVertex<OUT> implemen
 
     protected static final String INPUT_NAME = "inputVertex";
 
-    protected final Vertex<IN> inputVertex;
+    protected final Vertex<IN, ?> inputVertex;
 
-    public UnaryOpVertex(long[] shape, Vertex<IN> inputVertex) {
+    public UnaryOpVertex(long[] shape, Vertex<IN, ?> inputVertex) {
         super(shape);
         this.inputVertex = inputVertex;
         setParents(inputVertex);
@@ -25,7 +25,7 @@ public abstract class UnaryOpVertex<IN, OUT> extends GenericVertex<OUT> implemen
     protected abstract OUT op(IN a);
 
     @SaveVertexParam(INPUT_NAME)
-    public Vertex<IN> getInputVertex() {
+    public Vertex<IN, ?> getInputVertex() {
         return inputVertex;
     }
 }

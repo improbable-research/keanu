@@ -26,7 +26,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BernoulliVertex extends VertexImpl<BooleanTensor> implements BooleanVertex, ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor>, LogProbGraphSupplier {
+public class BernoulliVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex probTrue;
     private final static String PROBTRUE_NAME = "probTrue";

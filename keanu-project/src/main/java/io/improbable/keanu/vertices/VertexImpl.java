@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-public abstract class VertexImpl<T> implements Vertex<T> {
+public abstract class VertexImpl<T, VERTEX extends Vertex<T, VERTEX>> implements Vertex<T, VERTEX> {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
@@ -44,15 +44,14 @@ public abstract class VertexImpl<T> implements Vertex<T> {
      * Set a label for this vertex.  This allows easy retrieval of this vertex using nothing but a label name.
      *
      * @param label The label to apply to this vertex.  Uniqueness is only enforced on instantiation of a Bayes Net
-     * @param <V>   vertex type
      * @return this
      */
-    public <V extends Vertex<T>> V setLabel(VertexLabel label) {
+    public VERTEX setLabel(VertexLabel label) {
         this.label = label;
-        return (V) this;
+        return (VERTEX) this;
     }
 
-    public <V extends Vertex<T>> V setLabel(String label) {
+    public VERTEX setLabel(String label) {
         return this.setLabel(new VertexLabel(label));
     }
 
@@ -60,9 +59,9 @@ public abstract class VertexImpl<T> implements Vertex<T> {
         return this.label;
     }
 
-    public <V extends Vertex<T>> V removeLabel() {
+    public VERTEX removeLabel() {
         this.label = null;
-        return (V) this;
+        return (VERTEX) this;
     }
 
     /**
@@ -166,15 +165,15 @@ public abstract class VertexImpl<T> implements Vertex<T> {
         return getShape().length;
     }
 
-    public <V extends Vertex<T>> V print() {
+    public VERTEX print() {
         new PrintVertex<>(this);
-        return (V) this;
+        return (VERTEX) this;
     }
 
 
-    public <V extends Vertex<T>> V print(final String message, final boolean printData) {
+    public VERTEX print(final String message, final boolean printData) {
         new PrintVertex<>(this, message, printData);
-        return (V) this;
+        return (VERTEX) this;
     }
 
     /**
@@ -252,7 +251,7 @@ public abstract class VertexImpl<T> implements Vertex<T> {
         return Collections.unmodifiableSet(children);
     }
 
-    public void addChild(Vertex<?> v) {
+    public void addChild(Vertex<?, ?> v) {
         children.add(v);
     }
 
@@ -261,7 +260,7 @@ public abstract class VertexImpl<T> implements Vertex<T> {
         addParents(parents);
     }
 
-    public void setParents(Vertex<?>... parents) {
+    public void setParents(Vertex<?, ?>... parents) {
         setParents(Arrays.asList(parents));
     }
 
@@ -275,7 +274,7 @@ public abstract class VertexImpl<T> implements Vertex<T> {
         parents.forEach(p -> p.addChild(this));
     }
 
-    public void addParent(Vertex<?> parent) {
+    public void addParent(Vertex<?, ?> parent) {
         addParents(ImmutableSet.of(parent));
     }
 
@@ -292,7 +291,7 @@ public abstract class VertexImpl<T> implements Vertex<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Vertex<?> vertex = (Vertex<?>) o;
+        Vertex vertex = (Vertex) o;
 
         return this.id.equals(vertex.getId());
     }

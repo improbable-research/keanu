@@ -33,10 +33,10 @@ public class SequenceItemTest {
     private SequenceItem item;
 
     @Mock
-    private Vertex<?> vertex1;
+    private Vertex<?, ?> vertex1;
 
     @Mock
-    private Vertex<?> vertex2;
+    private Vertex<?, ?> vertex2;
 
     @Before
     public void createItem() throws Exception {
@@ -48,13 +48,13 @@ public class SequenceItemTest {
 
     @Test
     public void youCanGetAVertexByName() {
-        Vertex<?> vertex = item.get(VERTEX_LABEL_1);
+        Vertex<?, ?> vertex = item.get(VERTEX_LABEL_1);
         assertThat(vertex, equalTo(this.vertex1));
     }
 
     @Test
     public void unlabelledVerticesCanAlsoBeGotIfYouKnowTheLabelToUse() {
-        Vertex<?> vertex = item.get(VERTEX_LABEL_2);
+        Vertex<?, ?> vertex = item.get(VERTEX_LABEL_2);
         assertThat(vertex, equalTo(this.vertex2));
     }
 
@@ -67,7 +67,7 @@ public class SequenceItemTest {
         item.add(proxy2);
         item.add(proxy3);
 
-        Collection<Vertex<?>> proxies = item.getProxyVertices();
+        Collection<Vertex<?, ?>> proxies = item.getProxyVertices();
         assertThat(proxies, containsInAnyOrder(proxy1, proxy2, proxy3));
     }
 

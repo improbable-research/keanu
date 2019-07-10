@@ -12,14 +12,14 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.Map;
 import java.util.function.Function;
 
-public class DoubleUnaryOpLambda<IN> extends VertexImpl<DoubleTensor> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class DoubleUnaryOpLambda<IN> extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
-    private final Vertex<IN> inputVertex;
+    private final Vertex<IN, ?> inputVertex;
     private final Function<IN, DoubleTensor> op;
     private final Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda;
     private final Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda;
 
-    public DoubleUnaryOpLambda(long[] shape, Vertex<IN> inputVertex,
+    public DoubleUnaryOpLambda(long[] shape, Vertex<IN, ?> inputVertex,
                                Function<IN, DoubleTensor> op,
                                Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
                                Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
@@ -31,18 +31,18 @@ public class DoubleUnaryOpLambda<IN> extends VertexImpl<DoubleTensor> implements
         setParents(inputVertex);
     }
 
-    public DoubleUnaryOpLambda(long[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op) {
+    public DoubleUnaryOpLambda(long[] shape, Vertex<IN, ?> inputVertex, Function<IN, DoubleTensor> op) {
         this(shape, inputVertex, op, null, null);
     }
 
-    public DoubleUnaryOpLambda(Vertex<IN> inputVertex,
+    public DoubleUnaryOpLambda(Vertex<IN, ?> inputVertex,
                                Function<IN, DoubleTensor> op,
                                Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
                                Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         this(inputVertex.getShape(), inputVertex, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
-    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op) {
+    public DoubleUnaryOpLambda(Vertex<IN, ?> inputVertex, Function<IN, DoubleTensor> op) {
         this(inputVertex.getShape(), inputVertex, op, null, null);
     }
 

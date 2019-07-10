@@ -24,14 +24,14 @@ public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic
 
     private static final String PRINT_DATA = "printData";
 
-    private final Vertex<T> parent;
+    private final Vertex<T, ?> parent;
 
     private final String message;
 
     private final boolean printData;
 
     @ExportVertexToPythonBindings
-    public PrintVertex(@LoadVertexParam(PARENT) Vertex<T> parent,
+    public PrintVertex(@LoadVertexParam(PARENT) Vertex<T, ?> parent,
                        @LoadVertexParam(MESSAGE) final String message,
                        @LoadVertexParam(PRINT_DATA) boolean printData) {
         super(parent.getShape());
@@ -41,7 +41,7 @@ public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic
         setParents(parent);
     }
 
-    public PrintVertex(Vertex<T> parent) {
+    public PrintVertex(Vertex<T, ?> parent) {
         this(parent, "Calculated Vertex:\n", true);
     }
 
@@ -57,7 +57,7 @@ public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic
     }
 
     @SaveVertexParam(PARENT)
-    public Vertex<T> getParent() {
+    public Vertex<T, ?> getParent() {
         return parent;
     }
 

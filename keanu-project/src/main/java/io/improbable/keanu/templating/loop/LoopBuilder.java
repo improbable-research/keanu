@@ -105,7 +105,7 @@ public class LoopBuilder {
             Vertex valueOutWhenAlwaysTrue;
 
             try {
-                Vertex<?> outputVertex = initialState.get(Loop.VALUE_OUT_LABEL);
+                Vertex<?, ?> outputVertex = initialState.get(Loop.VALUE_OUT_LABEL);
                 valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL.withExtraNamespace("Loop_" + this.hashCode()));
                 valueOutWhenAlwaysTrue.setParents(outputVertex);
             } catch (NoSuchElementException e) {

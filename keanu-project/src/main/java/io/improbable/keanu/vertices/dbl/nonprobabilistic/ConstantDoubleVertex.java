@@ -16,7 +16,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.Collections;
 import java.util.Map;
 
-public class ConstantDoubleVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, ConstantVertex {
+public class ConstantDoubleVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, ConstantVertex {
 
     private final static String CONSTANT_NAME = "constant";
 

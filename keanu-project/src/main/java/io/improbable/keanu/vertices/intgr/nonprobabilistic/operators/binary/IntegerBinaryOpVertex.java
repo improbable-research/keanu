@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
-public abstract class IntegerBinaryOpVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, VertexBinaryOp<IntegerVertex, IntegerVertex> {
+public abstract class IntegerBinaryOpVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor>, VertexBinaryOp<IntegerVertex, IntegerVertex> {
 
     protected final IntegerVertex left;
     protected final IntegerVertex right;

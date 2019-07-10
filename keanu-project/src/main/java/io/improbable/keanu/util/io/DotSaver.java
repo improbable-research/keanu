@@ -152,7 +152,7 @@ public class DotSaver implements NetworkSaver {
         graphEdges.addAll(getParentEdges(vertex));
     }
 
-    private void setDotLabelWithValue(Vertex<? extends Tensor> vertex) {
+    private void setDotLabelWithValue(Vertex<? extends Tensor, ?> vertex) {
         VertexDotLabel vertexDotLabel = new VertexDotLabel(vertex);
         if (vertex.hasValue() && vertex.getValue().isScalar()) {
             vertexDotLabel.setValue("" + vertex.getValue().scalar());

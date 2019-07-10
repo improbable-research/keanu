@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 
-public class IntegerGetBooleanIndexVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, VertexBinaryOp<IntegerVertex, BooleanVertex> {
+public class IntegerGetBooleanIndexVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor>, VertexBinaryOp<IntegerVertex, BooleanVertex> {
 
     private static final String INDICES = "indices";
     private static final String INPUT_NAME = "inputVertex";

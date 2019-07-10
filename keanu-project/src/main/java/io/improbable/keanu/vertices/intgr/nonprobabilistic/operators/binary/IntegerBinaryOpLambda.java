@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
 
-public class IntegerBinaryOpLambda extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public class IntegerBinaryOpLambda extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
 
     protected static final String LEFT_NAME = "left";
     protected static final String RIGHT_NAME = "right";

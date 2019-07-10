@@ -18,7 +18,7 @@ public class GenericTakeVertex<T> extends GenericTensorUnaryOpVertex<T, T> {
      * @param inputVertex the input vertex
      * @param index       the index of extraction
      */
-    public GenericTakeVertex(@LoadVertexParam(INPUT_NAME) Vertex<GenericTensor<T>> inputVertex,
+    public GenericTakeVertex(@LoadVertexParam(INPUT_NAME) Vertex<GenericTensor<T>, ?> inputVertex,
                              @LoadVertexParam(INDEX_NAME) long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);

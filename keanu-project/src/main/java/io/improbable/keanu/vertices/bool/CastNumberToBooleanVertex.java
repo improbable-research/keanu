@@ -10,20 +10,20 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 
-public class CastNumberToBooleanVertex<T extends NumberTensor> extends VertexImpl<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexUnaryOp<Vertex<T>> {
+public class CastNumberToBooleanVertex<T extends NumberTensor> extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexUnaryOp<Vertex<T, ?>> {
 
-    private final Vertex<T> inputVertex;
+    private final Vertex<T, ?> inputVertex;
     private static final String INPUT_VERTEX_NAME = "inputVertex";
 
     @ExportVertexToPythonBindings
-    public CastNumberToBooleanVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<T> inputVertex) {
+    public CastNumberToBooleanVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<T, ?> inputVertex) {
         super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
 
     @SaveVertexParam(INPUT_VERTEX_NAME)
-    public Vertex<T> getInputVertex() {
+    public Vertex<T, ?> getInputVertex() {
         return inputVertex;
     }
 

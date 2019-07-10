@@ -47,7 +47,7 @@ public class Differentiator {
                 continue;
             }
 
-            for (Vertex child : (Set<Vertex<?>>) visiting.getChildren()) {
+            for (Vertex child : (Set<Vertex<?, ?>>) visiting.getChildren()) {
                 if (!child.isProbabilistic() && !alreadyQueued.contains(child) && child.isDifferentiable()) {
                     priorityQueue.offer((V) child);
                     alreadyQueued.add(child);
@@ -58,7 +58,7 @@ public class Differentiator {
         return new PartialsWithRespectTo(wrt, ofWrt);
     }
 
-    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Set<? extends Vertex<?>> wrt) {
+    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Set<? extends Vertex<?, ?>> wrt) {
         if (ofVertex.isObserved()) {
             return new PartialsOf(ofVertex, Collections.emptyMap());
         } else {
@@ -66,11 +66,11 @@ public class Differentiator {
         }
     }
 
-    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Vertex<?>... wrt) {
+    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Vertex<?, ?>... wrt) {
         return reverseModeAutoDiff(ofVertex, new HashSet<>(Arrays.asList(wrt)));
     }
 
-    public static PartialsOf reverseModeAutoDiff(Vertex<?> ofVertex, PartialDerivative dWrtOfVertex, Set<? extends Vertex<?>> wrt) {
+    public static PartialsOf reverseModeAutoDiff(Vertex<?, ?> ofVertex, PartialDerivative dWrtOfVertex, Set<? extends Vertex<?, ?>> wrt) {
 
         ensureGraphValuesAndShapesAreSet(ofVertex);
 
@@ -85,7 +85,7 @@ public class Differentiator {
 
         Map<VertexId, PartialDerivative> wrtOf = new HashMap<>();
 
-        Vertex<?> visiting;
+        Vertex<?, ?> visiting;
         while ((visiting = priorityQueue.poll()) != null) {
 
             if (wrt.contains(visiting)) {
@@ -121,7 +121,7 @@ public class Differentiator {
         return new PartialsOf(ofVertex, wrtOf);
     }
 
-    private static void ensureGraphValuesAndShapesAreSet(Vertex<?> vertex) {
+    private static void ensureGraphValuesAndShapesAreSet(Vertex<?, ?> vertex) {
         vertex.getValue();
     }
 

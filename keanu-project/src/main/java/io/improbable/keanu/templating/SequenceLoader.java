@@ -42,7 +42,7 @@ public class SequenceLoader {
         return sequences;
     }
 
-    private static void addVertexToSequences(Vertex<?> vertex, Map<Integer, Sequence> sequences) {
+    private static void addVertexToSequences(Vertex<?, ?> vertex, Map<Integer, Sequence> sequences) {
         VertexLabel label = vertex.getLabel();
         if (label != null) {
             Optional<Integer> sequenceItemIndex = parseSequenceItemIndex(label);

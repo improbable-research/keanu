@@ -51,7 +51,7 @@ public class DiscoverGraphTest {
 
     @Test
     public void getsCompleteGraphFromEverywhere() {
-        for (Vertex<?> v : allVertices) {
+        for (Vertex<?, ?> v : allVertices) {
             assertFindsAllVertices(v);
         }
     }
@@ -78,7 +78,7 @@ public class DiscoverGraphTest {
         assertEquals(expectedSize, connectedGraph.size());
     }
 
-    private void assertFindsAllVertices(Vertex<?> v) {
+    private void assertFindsAllVertices(Vertex<?, ?> v) {
         Set<Vertex> vertices = DiscoverGraph.getEntireGraph(v);
         assertEquals(vertices.size(), allVertices.size());
         assertTrue(vertices.containsAll(allVertices));

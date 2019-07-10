@@ -9,8 +9,8 @@ public class BinaryOpLambda<A, B, C> extends BinaryOpVertex<A, B, C> implements 
 
     private BiFunction<A, B, C> op;
 
-    public BinaryOpLambda(Vertex<A> a,
-                          Vertex<B> b,
+    public BinaryOpLambda(Vertex<A, ?> a,
+                          Vertex<B, ?> b,
                           BiFunction<A, B, C> op) {
         super(a, b);
         this.op = op;

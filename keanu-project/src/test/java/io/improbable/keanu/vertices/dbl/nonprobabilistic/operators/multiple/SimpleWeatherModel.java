@@ -48,7 +48,7 @@ public class SimpleWeatherModel {
         );
     }
 
-    public void modelExecution(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+    public void modelExecution(Map<VertexLabel, Vertex<? extends Tensor, ?>> inputs) {
         double temperature = (Double) inputs.get(new VertexLabel("Temperature")).getValue().asFlatArray()[0];
         try {
             double chanceOfRain = blackBoxRainModel(temperature);
@@ -60,8 +60,8 @@ public class SimpleWeatherModel {
         }
     }
 
-    public Map<VertexLabel, Vertex<? extends Tensor>> updateValues() {
-        Map<VertexLabel, Vertex<? extends Tensor>> modelOutput = new HashMap<>();
+    public Map<VertexLabel, Vertex<? extends Tensor, ?>> updateValues() {
+        Map<VertexLabel, Vertex<? extends Tensor, ?>> modelOutput = new HashMap<>();
 
         try {
             double chanceOfRainResult = Double.parseDouble(getRainReader().readLine());
@@ -75,8 +75,8 @@ public class SimpleWeatherModel {
         return modelOutput;
     }
 
-    public Map<VertexLabel, Vertex<? extends Tensor>> updateValuesMultipleTypes() {
-        Map<VertexLabel, Vertex<? extends Tensor>> modelOutput = new HashMap<>();
+    public Map<VertexLabel, Vertex<? extends Tensor, ?>> updateValuesMultipleTypes() {
+        Map<VertexLabel, Vertex<? extends Tensor, ?>> modelOutput = new HashMap<>();
 
         try {
             int chanceOfRainResult = (int) Double.parseDouble(getSuggestedFactorSuncreamReader().readLine());

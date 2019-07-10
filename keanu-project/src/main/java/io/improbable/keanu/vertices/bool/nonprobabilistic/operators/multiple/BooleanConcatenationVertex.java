@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class BooleanConcatenationVertex extends VertexImpl<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
+public class BooleanConcatenationVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
 
     private static final String DIMENSION_NAME = "dimension";
     private static final String OPERANDS_NAME = "operands";
@@ -54,7 +54,7 @@ public class BooleanConcatenationVertex extends VertexImpl<BooleanTensor> implem
         return BooleanTensor.concat(dimension, inputs);
     }
 
-    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<BooleanTensor>, T> func, BooleanVertex[] input) {
+    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<BooleanTensor, BooleanVertex>, T> func, BooleanVertex[] input) {
         T[] extract = (T[]) Array.newInstance(clazz, input.length);
         for (int i = 0; i < input.length; i++) {
             extract[i] = func.apply(input[i]);

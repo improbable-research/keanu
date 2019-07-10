@@ -79,7 +79,7 @@ public class LatentIncrementSortTest {
             dependencies.get(g6).contains(g5) &&
             dependencies.get(g6).contains(sigma5));
 
-        List<Vertex<?>> expectedOrder = Arrays.asList(g1, g3, g6);
+        List<Vertex<?, ?>> expectedOrder = Arrays.asList(g1, g3, g6);
         int idx = 0;
         for (Map.Entry<Vertex, Set<Vertex>> entry : dependencies.entrySet()) {
             assertEquals(entry.getKey(), expectedOrder.get(idx));

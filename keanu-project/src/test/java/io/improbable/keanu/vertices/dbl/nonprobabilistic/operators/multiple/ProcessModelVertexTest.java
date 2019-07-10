@@ -61,7 +61,7 @@ public class ProcessModelVertexTest {
     @Test
     public void canRunAModelInAModel() {
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor, ?>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         // An example of what running a real Python model would look like
         String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
@@ -81,7 +81,7 @@ public class ProcessModelVertexTest {
     @Test
     public void canRunEvalOnTheOutputsToRecalculateTheModel() {
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor, ?>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
 
@@ -102,7 +102,7 @@ public class ProcessModelVertexTest {
     @Test
     public void canRunAModelInAModelWithDifferentOutputTypes() {
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor, ?>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValuesMultipleTypes);
 
@@ -122,7 +122,7 @@ public class ProcessModelVertexTest {
         int numSamples = 50;
         GaussianVertex probabilisticInput = new GaussianVertex(21., 1.);
         weatherModel.setInputToModel(probabilisticInput);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), probabilisticInput);
+        Map<VertexLabel, Vertex<? extends Tensor, ?>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), probabilisticInput);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
 
@@ -146,7 +146,7 @@ public class ProcessModelVertexTest {
         inputToModel = inputToModelOne.plus(inputToModelTwo);
         weatherModel.setInputToModel(inputToModel);
 
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor, ?>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
@@ -167,7 +167,7 @@ public class ProcessModelVertexTest {
     public void modelWorksAsPartOfSampling() {
         inputToModel = new GaussianVertex(25, 5);
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor, ?>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
 
@@ -192,8 +192,8 @@ public class ProcessModelVertexTest {
         Assert.assertEquals(29., averagePosteriorInput, 0.3);
     }
 
-    private String formatCommandForExecution(Map<VertexLabel, Vertex<? extends Tensor>> inputs, String command) {
-        for (Map.Entry<VertexLabel, Vertex<? extends Tensor>> input : inputs.entrySet()) {
+    private String formatCommandForExecution(Map<VertexLabel, Vertex<? extends Tensor, ?>> inputs, String command) {
+        for (Map.Entry<VertexLabel, Vertex<? extends Tensor, ?>> input : inputs.entrySet()) {
             String argument = "{" + input.getKey().toString() + "}";
             command = command.replaceAll(Pattern.quote(argument), input.getValue().getValue().scalar().toString());
         }

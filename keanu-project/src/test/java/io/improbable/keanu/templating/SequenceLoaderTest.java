@@ -75,7 +75,7 @@ public class SequenceLoaderTest {
             assertThat(sequenceItem.get(xProxyLabel), notNullValue());
         });
 
-        Vertex<? extends DoubleTensor> outputVertex = reconstructedSequence.getLastItem().get(xLabel);
+        Vertex<? extends DoubleTensor, ?> outputVertex = reconstructedSequence.getLastItem().get(xLabel);
         double actualOutputValue = outputVertex.getValue().scalar();
         assertThat(actualOutputValue, is(4.0));
     }
@@ -185,7 +185,7 @@ public class SequenceLoaderTest {
             assertThat(sequenceItem.get(xProxyLabel), notNullValue());
         });
 
-        Vertex<? extends DoubleTensor> outputVertex2 = reconstructedSequence.getLastItem().get(xLabel);
+        Vertex<? extends DoubleTensor, ?> outputVertex2 = reconstructedSequence.getLastItem().get(xLabel);
         double actualOutputValue2 = outputVertex2.getValue().scalar();
         assertThat(actualOutputValue2, is(4.0));
     }

@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.function.Function;
 
-public class IntegerApplyVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public class IntegerApplyVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
 
     protected final IntegerVertex inputVertex;
     protected final Function<Integer, Integer> op;

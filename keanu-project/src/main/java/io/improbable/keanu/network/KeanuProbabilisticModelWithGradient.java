@@ -4,6 +4,7 @@ import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class KeanuProbabilisticModelWithGradient extends KeanuProbabilisticModel
     public KeanuProbabilisticModelWithGradient(BayesianNetwork bayesianNetwork) {
         super(bayesianNetwork);
 
-        List<Vertex<DoubleTensor>> continuousLatentVertices = bayesianNetwork.getContinuousLatentVertices();
+        List<DoubleVertex> continuousLatentVertices = bayesianNetwork.getContinuousLatentVertices();
 
         this.logProbGradientCalculator = new LogProbGradientCalculator(
             bayesianNetwork.getLatentOrObservedVertices(),

@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.function.Function;
 
-public class IntegerUnaryOpLambda extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex, VertexUnaryOp<IntegerVertex> {
+public class IntegerUnaryOpLambda extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex, VertexUnaryOp<IntegerVertex> {
 
     protected static final String INPUT_NAME = "inputVertex";
 

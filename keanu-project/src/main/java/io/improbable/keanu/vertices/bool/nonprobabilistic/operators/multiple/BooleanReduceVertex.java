@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class BooleanReduceVertex extends VertexImpl<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor>, NonSaveableVertex {
-    private final List<? extends Vertex<BooleanTensor>> inputs;
+public class BooleanReduceVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, NonProbabilistic<BooleanTensor>, NonSaveableVertex {
+    private final List<? extends Vertex<BooleanTensor, BooleanVertex>> inputs;
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
-    public BooleanReduceVertex(long[] shape, Collection<? extends Vertex<BooleanTensor>> input,
+    public BooleanReduceVertex(long[] shape, Collection<? extends Vertex<BooleanTensor, BooleanVertex>> input,
                                BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
         super(shape);
         if (input.size() < 2) {
@@ -31,7 +31,7 @@ public class BooleanReduceVertex extends VertexImpl<BooleanTensor> implements Bo
         setParents(inputs);
     }
 
-    public BooleanReduceVertex(long[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
+    public BooleanReduceVertex(long[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor, BooleanVertex>... input) {
         this(shape, Arrays.asList(input), f);
     }
 
@@ -40,8 +40,8 @@ public class BooleanReduceVertex extends VertexImpl<BooleanTensor> implements Bo
         return applyReduce(Vertex::getValue);
     }
 
-    private BooleanTensor applyReduce(Function<Vertex<BooleanTensor>, BooleanTensor> mapper) {
-        Iterator<? extends Vertex<BooleanTensor>> vertices = inputs.iterator();
+    private BooleanTensor applyReduce(Function<Vertex<BooleanTensor, BooleanVertex>, BooleanTensor> mapper) {
+        Iterator<? extends Vertex<BooleanTensor, BooleanVertex>> vertices = inputs.iterator();
 
         BooleanTensor c = mapper.apply(vertices.next());
         while (vertices.hasNext()) {

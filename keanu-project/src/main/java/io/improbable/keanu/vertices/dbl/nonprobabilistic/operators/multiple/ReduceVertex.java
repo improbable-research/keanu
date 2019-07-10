@@ -22,14 +22,14 @@ import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMatch;
 
-public class ReduceVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class ReduceVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
-    private final List<? extends Vertex<DoubleTensor>> inputs;
+    private final List<DoubleVertex> inputs;
     private final BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction;
     private final Supplier<PartialDerivative> forwardModeAutoDiffLambda;
     private final Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda;
 
-    public ReduceVertex(long[] shape, Collection<? extends Vertex<DoubleTensor>> inputs,
+    public ReduceVertex(long[] shape, Collection<DoubleVertex> inputs,
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
                         Supplier<PartialDerivative> forwardModeAutoDiffLambda,
                         Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
@@ -48,11 +48,11 @@ public class ReduceVertex extends VertexImpl<DoubleTensor> implements DoubleVert
     public ReduceVertex(long[] shape, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
                         Supplier<PartialDerivative> forwardModeAutoDiffLambda,
                         Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda,
-                        Vertex<DoubleTensor>... input) {
+                        DoubleVertex... input) {
         this(shape, Arrays.asList(input), reduceFunction, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
-    public ReduceVertex(long[] shape, Collection<? extends Vertex<DoubleTensor>> inputs,
+    public ReduceVertex(long[] shape, Collection<DoubleVertex> inputs,
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction) {
         this(shape, inputs, reduceFunction, null, null);
     }
@@ -68,7 +68,7 @@ public class ReduceVertex extends VertexImpl<DoubleTensor> implements DoubleVert
     public ReduceVertex(BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
                         Supplier<PartialDerivative> forwardModeAutoDiffLambda,
                         Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda,
-                        Vertex<DoubleTensor>... input) {
+                        DoubleVertex... input) {
         this(checkAllShapesMatch(Arrays.stream(input).map(Vertex::getShape).collect(Collectors.toList())),
             Arrays.asList(input), reduceFunction, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
@@ -79,7 +79,7 @@ public class ReduceVertex extends VertexImpl<DoubleTensor> implements DoubleVert
      * @param reduceFunction reduce function
      * @param inputs         input vertices to reduce
      */
-    public ReduceVertex(List<? extends Vertex<DoubleTensor>> inputs,
+    public ReduceVertex(List<DoubleVertex> inputs,
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction) {
         this(checkAllShapesMatch(inputs.stream().map(Vertex::getShape).collect(Collectors.toList())),
             inputs, reduceFunction, null, null
@@ -91,8 +91,8 @@ public class ReduceVertex extends VertexImpl<DoubleTensor> implements DoubleVert
         return applyReduce(Vertex::getValue);
     }
 
-    private DoubleTensor applyReduce(Function<Vertex<DoubleTensor>, DoubleTensor> mapper) {
-        Iterator<? extends Vertex<DoubleTensor>> inputIterator = inputs.iterator();
+    private DoubleTensor applyReduce(Function<DoubleVertex, DoubleTensor> mapper) {
+        Iterator<DoubleVertex> inputIterator = inputs.iterator();
 
         DoubleTensor result = inputIterator.next().getValue();
         while (inputIterator.hasNext()) {

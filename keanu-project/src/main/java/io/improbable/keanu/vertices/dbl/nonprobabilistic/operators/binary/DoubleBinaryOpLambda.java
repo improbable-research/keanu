@@ -15,17 +15,17 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
-public class DoubleBinaryOpLambda<A, B> extends VertexImpl<DoubleTensor> implements DoubleVertex,  Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class DoubleBinaryOpLambda<A, B> extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
-    protected final Vertex<A> left;
-    protected final Vertex<B> right;
+    protected final Vertex<A, ?> left;
+    protected final Vertex<B, ?> right;
     protected final BiFunction<A, B, DoubleTensor> op;
     protected final Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda;
     protected final Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda;
 
     public DoubleBinaryOpLambda(long[] shape,
-                                Vertex<A> left,
-                                Vertex<B> right,
+                                Vertex<A, ?> left,
+                                Vertex<B, ?> right,
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
                                 Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
@@ -38,19 +38,19 @@ public class DoubleBinaryOpLambda<A, B> extends VertexImpl<DoubleTensor> impleme
         setParents(left, right);
     }
 
-    public DoubleBinaryOpLambda(long[] shape, Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
+    public DoubleBinaryOpLambda(long[] shape, Vertex<A, ?> left, Vertex<B, ?> right, BiFunction<A, B, DoubleTensor> op) {
         this(shape, left, right, op, null, null);
     }
 
-    public DoubleBinaryOpLambda(Vertex<A> left,
-                                Vertex<B> right,
+    public DoubleBinaryOpLambda(Vertex<A, ?> left,
+                                Vertex<B, ?> right,
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
                                 Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
-    public DoubleBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
+    public DoubleBinaryOpLambda(Vertex<A, ?> left, Vertex<B, ?> right, BiFunction<A, B, DoubleTensor> op) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right, op, null, null);
     }
 

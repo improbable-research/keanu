@@ -9,15 +9,15 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-public interface Vertex<T> extends Observable<T>, Variable<T, VertexState<T>> {
+public interface Vertex<T, VERTEX extends Vertex<T, VERTEX>> extends Observable<T>, Variable<T, VertexState<T>> {
 
-    <V extends Vertex<T>> V setLabel(VertexLabel label);
+    VERTEX setLabel(VertexLabel label);
 
-    <V extends Vertex<T>> V setLabel(String label);
+    VERTEX setLabel(String label);
 
     VertexLabel getLabel();
 
-    <V extends Vertex<T>> V removeLabel();
+    VERTEX removeLabel();
 
     T lazyEval();
 
@@ -45,9 +45,9 @@ public interface Vertex<T> extends Observable<T>, Variable<T, VertexState<T>> {
 
     int getRank();
 
-    <V extends Vertex<T>> V print();
+    VERTEX print();
 
-    <V extends Vertex<T>> V print(final String message, final boolean printData);
+    VERTEX print(final String message, final boolean printData);
 
     void setAndCascade(T value);
 
@@ -69,15 +69,15 @@ public interface Vertex<T> extends Observable<T>, Variable<T, VertexState<T>> {
 
     Set<Vertex> getChildren();
 
-    void addChild(Vertex<?> v);
+    void addChild(Vertex<?, ?> v);
 
     void setParents(Collection<? extends Vertex> parents);
 
-    void setParents(Vertex<?>... parents);
+    void setParents(Vertex<?, ?>... parents);
 
     void addParents(Collection<? extends Vertex> parents);
 
-    void addParent(Vertex<?> parent);
+    void addParent(Vertex<?, ?> parent);
 
     Set<Vertex> getParents();
 

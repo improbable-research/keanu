@@ -456,7 +456,7 @@ public class ProtobufTest {
         return savedModel;
     }
 
-    private class TestNonSaveableVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, NonSaveableVertex {
+    private class TestNonSaveableVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonSaveableVertex {
 
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});

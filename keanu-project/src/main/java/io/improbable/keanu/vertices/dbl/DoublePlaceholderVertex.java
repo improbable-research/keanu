@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.VertexImpl;
 
-public class DoublePlaceholderVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, LogProbGraph.PlaceholderVertex, NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
+public class DoublePlaceholderVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, LogProbGraph.PlaceholderVertex, NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
 
     private final DoubleVertex defaultVertex;
 

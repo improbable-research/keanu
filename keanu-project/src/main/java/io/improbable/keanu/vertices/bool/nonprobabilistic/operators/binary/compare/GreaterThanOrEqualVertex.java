@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.Boole
 public class GreaterThanOrEqualVertex<A extends NumberTensor, B extends NumberTensor> extends BooleanBinaryOpVertex<A, B> {
 
     @ExportVertexToPythonBindings
-    public GreaterThanOrEqualVertex(@LoadVertexParam(A_NAME) Vertex<A> a, @LoadVertexParam(B_NAME) Vertex<B> b) {
+    public GreaterThanOrEqualVertex(@LoadVertexParam(A_NAME) Vertex<A, ?> a, @LoadVertexParam(B_NAME) Vertex<B, ?> b) {
         super(a, b);
     }
 

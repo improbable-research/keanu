@@ -266,14 +266,14 @@ public class DirichletVertexTest {
         }
     }
 
-    private static <V extends Vertex<DoubleTensor> & Probabilistic<DoubleTensor>> void sampleMethodMatchesLogProbMethodMultiVariateDirichlet(V vertexUnderTest,
-                                                                                                                                             double from,
-                                                                                                                                             double to,
-                                                                                                                                             double bucketSize,
-                                                                                                                                             double maxError,
-                                                                                                                                             int sampleCount,
-                                                                                                                                             KeanuRandom random,
-                                                                                                                                             double bucketVolume) {
+    private static <V extends Vertex<DoubleTensor, ?> & Probabilistic<DoubleTensor>> void sampleMethodMatchesLogProbMethodMultiVariateDirichlet(V vertexUnderTest,
+                                                                                                                                                double from,
+                                                                                                                                                double to,
+                                                                                                                                                double bucketSize,
+                                                                                                                                                double maxError,
+                                                                                                                                                int sampleCount,
+                                                                                                                                                KeanuRandom random,
+                                                                                                                                                double bucketVolume) {
         double bucketCount = ((to - from) / bucketSize);
         double halfBucket = bucketSize / 2;
 

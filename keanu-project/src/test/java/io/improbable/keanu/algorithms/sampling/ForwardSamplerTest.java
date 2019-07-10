@@ -265,7 +265,7 @@ public class ForwardSamplerTest {
         assertEquals(0.0, averageA, 0.1);
     }
 
-    public static class IDTrackerVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, Differentiable, ProbabilisticDouble {
+    public static class IDTrackerVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble {
 
         private final List<VertexId> ids;
 

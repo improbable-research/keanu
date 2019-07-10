@@ -465,7 +465,7 @@ public class KeanuCompiledGraphTest {
     @Test(expected = GraphAssertionException.class)
     public void canCompileAssertVertexWithLabel() {
         DoubleVertex A = new HalfGaussianVertex(new long[]{2, 2}, 1);
-        AssertVertex assertVertex = A.lessThan(ConstantVertex.of(0.0)).assertTrue().setLabel("test label\n");
+        BooleanVertex assertVertex = A.lessThan(ConstantVertex.of(0.0)).assertTrue().setLabel("test label\n");
         assertCompiledIsSameAsVertexEvaluation(A, assertVertex);
     }
 
@@ -481,7 +481,7 @@ public class KeanuCompiledGraphTest {
         assertCompiledIsSameAsVertexEvaluation(A, B, select, mux);
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C, Vertex<?> D) {
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?, ?> A, Vertex<?, ?> B, Vertex<?, ?> C, Vertex<?, ?> D) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(D.getConnectedGraph(), ImmutableList.of(D));
 
@@ -497,7 +497,7 @@ public class KeanuCompiledGraphTest {
         assertEquals(D.getValue(), result.get(D.getReference()));
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C) {
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?, ?> A, Vertex<?, ?> B, Vertex<?, ?> C) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
 
@@ -512,7 +512,7 @@ public class KeanuCompiledGraphTest {
         assertEquals(C.getValue(), result.get(C.getReference()));
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B) {
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?, ?> A, Vertex<?, ?> B) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(B.getConnectedGraph(), ImmutableList.of(B));
 

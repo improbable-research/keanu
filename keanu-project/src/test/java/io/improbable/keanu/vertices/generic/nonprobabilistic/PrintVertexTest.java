@@ -93,7 +93,7 @@ public class PrintVertexTest {
     @Test
     public void whenPrintVertexHasAChildThenChildCanGetGrandParentsValue() {
         // this use case is quite unlikely, the Print vertex is meant to hang off its parent but not have any children
-        final Vertex<DoubleTensor> realParent = new ConstantDoubleVertex(30);
+        final DoubleVertex realParent = new ConstantDoubleVertex(30);
         final PrintVertex<DoubleTensor> sut = new PrintVertex<>(realParent);
 
         final UnaryOpVertex<DoubleTensor, DoubleTensor> child = new PlusOneOp(new long[]{1, 1}, sut);
@@ -124,7 +124,7 @@ public class PrintVertexTest {
 
     @Test
     public void whenRunningMetropolisHastingsThenSamplesArePrinted() {
-        final Vertex<DoubleTensor> temperature = new UniformVertex(20., 30.);
+        final DoubleVertex temperature = new UniformVertex(20., 30.);
 
         new PrintVertex<>(temperature);
 
@@ -165,7 +165,7 @@ public class PrintVertexTest {
 
     @Test
     public void whenSavingAndLoadingThenVertexStateIsRestored() throws IOException {
-        final Vertex<DoubleTensor> realParent = new ConstantDoubleVertex(30);
+        final DoubleVertex realParent = new ConstantDoubleVertex(30);
         final PrintVertex<DoubleTensor> sut = new PrintVertex<>(realParent, "my vertex\n", true);
 
         final BayesianNetwork net = new BayesianNetwork(sut.getConnectedGraph());
@@ -187,7 +187,7 @@ public class PrintVertexTest {
     }
 
     private static class PlusOneOp extends UnaryOpVertex<DoubleTensor, DoubleTensor> implements NonSaveableVertex {
-        public PlusOneOp(final long[] shape, final Vertex<DoubleTensor> inputVertex) {
+        public PlusOneOp(final long[] shape, final Vertex<DoubleTensor, ?> inputVertex) {
             super(shape, inputVertex);
         }
 

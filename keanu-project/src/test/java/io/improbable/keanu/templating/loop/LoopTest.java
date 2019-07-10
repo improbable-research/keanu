@@ -40,7 +40,7 @@ public class LoopTest {
             .withInitialConditions(startValue)
             .iterateWhile(flip)
             .apply(increment);
-        Vertex<?> output = loop.getOutput();
+        Vertex<?, ?> output = loop.getOutput();
         assertThat(output, instanceOf(DoubleVertex.class));
     }
 
@@ -125,15 +125,15 @@ public class LoopTest {
             .iterateWhile(alwaysTrue)
             .apply(increment);
 
-        Vertex<?> outputFromFirstLoop = loop.getOutput();
+        Vertex<?, ?> outputFromFirstLoop = loop.getOutput();
 
         Loop loop2 = Loop
-            .withInitialConditions((Vertex<?>) loop.getOutput())
+            .withInitialConditions((Vertex<?, ?>) loop.getOutput())
             .doNotThrowWhenMaxCountIsReached()
             .iterateWhile(alwaysTrue)
             .apply(increment);
 
-        Vertex<?> output = loop2.getOutput();
+        Vertex<?, ?> output = loop2.getOutput();
 
         new BayesianNetwork(output.getConnectedGraph());
     }

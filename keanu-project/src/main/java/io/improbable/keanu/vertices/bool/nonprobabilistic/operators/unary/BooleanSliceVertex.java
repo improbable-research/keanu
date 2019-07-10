@@ -4,12 +4,11 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 import static io.improbable.keanu.tensor.TensorShape.removeDimension;
 
-public class BooleanSliceVertex extends BooleanUnaryOpVertex<BooleanTensor> {
+public class BooleanSliceVertex extends BooleanUnaryOpVertex {
 
     private final static String DIMENSION_NAME = "dimension";
     private final static String INDEX_NAME = "index";
@@ -25,7 +24,7 @@ public class BooleanSliceVertex extends BooleanUnaryOpVertex<BooleanTensor> {
      * @param index       the index of extraction
      */
     @ExportVertexToPythonBindings
-    public BooleanSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
+    public BooleanSliceVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex,
                               @LoadVertexParam(DIMENSION_NAME) int dimension,
                               @LoadVertexParam(INDEX_NAME) long index) {
         super(removeDimension(dimension, inputVertex.getShape()), inputVertex);

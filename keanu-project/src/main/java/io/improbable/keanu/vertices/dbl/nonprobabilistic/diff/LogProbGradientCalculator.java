@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 
 public class LogProbGradientCalculator {
 
-    private final Set<? extends Vertex<?>> logProbOfVertices;
-    private final Set<? extends Vertex<?>> wrtVertices;
+    private final Set<? extends Vertex<?, ?>> logProbOfVertices;
+    private final Set<? extends Vertex<?, ?>> wrtVertices;
 
     private final Map<Vertex, Set<DoubleVertex>> parentToLatentLookup;
     private final Map<Vertex, Set<DoubleVertex>> verticesWithNonzeroDiffWrtLatent;
 
-    public LogProbGradientCalculator(List<? extends Vertex> logProbOfVerticesList, List<? extends Vertex<?>> wrtVerticesList) {
-        this.logProbOfVertices = new HashSet<>((List<Vertex<?>>) logProbOfVerticesList);
+    public LogProbGradientCalculator(List<? extends Vertex> logProbOfVerticesList, List<? extends Vertex<?, ?>> wrtVerticesList) {
+        this.logProbOfVertices = new HashSet<>((List<Vertex<?, ?>>) logProbOfVerticesList);
         this.wrtVertices = new HashSet<>(wrtVerticesList);
 
         parentToLatentLookup = getParentsThatAreConnectedToWrtVertices(logProbOfVertices);
@@ -38,7 +38,7 @@ public class LogProbGradientCalculator {
     public Map<VertexId, DoubleTensor> getJointLogProbGradientWrtLatents() {
         LogProbGradients totalLogProbGradients = new LogProbGradients();
 
-        for (final Vertex<?> ofVertex : logProbOfVertices) {
+        for (final Vertex<?, ?> ofVertex : logProbOfVertices) {
             LogProbGradients logProbGradientOfVertex = reverseModeLogProbGradientWrtLatents(ofVertex);
             totalLogProbGradients.add(logProbGradientOfVertex);
         }
@@ -55,7 +55,7 @@ public class LogProbGradientCalculator {
      * @param parentToWrtVertices a lookup
      * @return a map for a given vertex to a set of the wrt vertices that it is connected to
      */
-    private Map<Vertex, Set<DoubleVertex>> getVerticesWithNonzeroDiffWrt(Set<? extends Vertex<?>> ofVertices, Map<Vertex, Set<DoubleVertex>> parentToWrtVertices) {
+    private Map<Vertex, Set<DoubleVertex>> getVerticesWithNonzeroDiffWrt(Set<? extends Vertex<?, ?>> ofVertices, Map<Vertex, Set<DoubleVertex>> parentToWrtVertices) {
         return ofVertices.stream()
             .collect(Collectors.toMap(
                 v -> v,
@@ -86,7 +86,7 @@ public class LogProbGradientCalculator {
 
         Map<Vertex, Set<DoubleVertex>> probabilisticParentLookup = new HashMap<>();
 
-        for (Vertex<?> probabilisticVertex : ofVertices) {
+        for (Vertex<?, ?> probabilisticVertex : ofVertices) {
 
             Set<? extends Vertex> parents = probabilisticVertex.getParents();
 

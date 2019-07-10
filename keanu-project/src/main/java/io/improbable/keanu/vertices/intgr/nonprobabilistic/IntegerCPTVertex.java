@@ -12,13 +12,13 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import java.util.List;
 import java.util.Map;
 
-public class IntegerCPTVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public class IntegerCPTVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
 
-    private final List<Vertex<? extends Tensor<?, ?>>> inputs;
+    private final List<Vertex<? extends Tensor<?, ?>, ?>> inputs;
     private final Map<CPTCondition, IntegerVertex> conditions;
     private final IntegerVertex defaultResult;
 
-    public IntegerCPTVertex(List<Vertex<? extends Tensor<?, ?>>> inputs,
+    public IntegerCPTVertex(List<Vertex<? extends Tensor<?, ?>, ?>> inputs,
                             Map<CPTCondition, IntegerVertex> conditions,
                             IntegerVertex defaultResult) {
         super(defaultResult.getShape());

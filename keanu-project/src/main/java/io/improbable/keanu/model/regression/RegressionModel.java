@@ -59,7 +59,7 @@ public class RegressionModel<OUTPUT> implements PredictiveModel<DoubleTensor, OU
         return modelGraph.getWeightVertex();
     }
 
-    public Vertex<OUTPUT> getOutputVertex() {
+    public Vertex<OUTPUT, ?> getOutputVertex() {
         return modelGraph.getOutputVertex();
     }
 

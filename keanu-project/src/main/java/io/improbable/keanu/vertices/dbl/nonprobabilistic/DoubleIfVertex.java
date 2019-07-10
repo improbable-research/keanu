@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class DoubleIfVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor> {
+public class DoubleIfVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final BooleanVertex predicate;
     private final DoubleVertex thn;

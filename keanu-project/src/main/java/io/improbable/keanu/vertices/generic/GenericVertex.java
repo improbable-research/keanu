@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.generic;
 
 import io.improbable.keanu.vertices.VertexImpl;
 
-public abstract class GenericVertex<T> extends VertexImpl<T> {
+public abstract class GenericVertex<T> extends VertexImpl<T, GenericVertex<T>> {
 
     public GenericVertex() {
         super();

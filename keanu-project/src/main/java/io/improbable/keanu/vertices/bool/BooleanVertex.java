@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.TensorVertex;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
@@ -98,10 +97,10 @@ public interface BooleanVertex extends
         return null;
     }
 
-    class BooleanDiagVertex extends BooleanUnaryOpVertex<BooleanTensor> {
+    class BooleanDiagVertex extends BooleanUnaryOpVertex {
 
         @ExportVertexToPythonBindings
-        public BooleanDiagVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex) {
+        public BooleanDiagVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
             super(inputVertex);
         }
 
@@ -120,14 +119,14 @@ public interface BooleanVertex extends
         return new BooleanReshapeVertex(this, proposedShape);
     }
 
-    class BooleanPermuteVertex extends BooleanUnaryOpVertex<BooleanTensor> {
+    class BooleanPermuteVertex extends BooleanUnaryOpVertex {
         private static final String REARRANGE = "arrange";
 
         @Getter(onMethod = @__({@SaveVertexParam(REARRANGE)}))
         private final int[] rearrange;
 
         @ExportVertexToPythonBindings
-        public BooleanPermuteVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
+        public BooleanPermuteVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex,
                                     @LoadVertexParam(REARRANGE) int[] rearrange) {
             super(inputVertex);
             this.rearrange = rearrange;
@@ -144,14 +143,14 @@ public interface BooleanVertex extends
         return new BooleanPermuteVertex(this, rearrange);
     }
 
-    class BooleanBroadcastVertex extends BooleanUnaryOpVertex<BooleanTensor> {
+    class BooleanBroadcastVertex extends BooleanUnaryOpVertex {
         private static final String TO_SHAPE = "toShape";
 
         @Getter(onMethod = @__({@SaveVertexParam(TO_SHAPE)}))
         private final long[] toShape;
 
         @ExportVertexToPythonBindings
-        public BooleanBroadcastVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
+        public BooleanBroadcastVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex,
                                       @LoadVertexParam(TO_SHAPE) long[] toShape) {
             super(inputVertex);
             this.toShape = toShape;
@@ -188,10 +187,10 @@ public interface BooleanVertex extends
         return elementwiseEquals(new ConstantBooleanVertex(value));
     }
 
-    class BooleanGetBooleanIndexVertex extends BooleanUnaryOpVertex<BooleanTensor> {
+    class BooleanGetBooleanIndexVertex extends BooleanUnaryOpVertex {
 
         @ExportVertexToPythonBindings
-        public BooleanGetBooleanIndexVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex) {
+        public BooleanGetBooleanIndexVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
             super(inputVertex);
         }
 
@@ -219,10 +218,10 @@ public interface BooleanVertex extends
     //// Boolean Ops
     /////////////
 
-    default BooleanVertex or(Vertex<BooleanTensor>... those) {
+    default BooleanVertex or(BooleanVertex... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new OrBinaryVertex(this, those[0]);
-        List<Vertex<BooleanTensor>> list = ImmutableList.<Vertex<BooleanTensor>>builder()
+        List<BooleanVertex> list = ImmutableList.<BooleanVertex>builder()
             .addAll(Arrays.asList(those))
             .add(this)
             .build();
@@ -245,10 +244,10 @@ public interface BooleanVertex extends
     }
 
 
-    default BooleanVertex and(Vertex<BooleanTensor>... those) {
+    default BooleanVertex and(BooleanVertex... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new AndBinaryVertex(this, those[0]);
-        List<Vertex<BooleanTensor>> list = ImmutableList.<Vertex<BooleanTensor>>builder()
+        List<BooleanVertex> list = ImmutableList.<BooleanVertex>builder()
             .addAll(Arrays.asList(those))
             .add(this)
             .build();
@@ -270,7 +269,7 @@ public interface BooleanVertex extends
         return BooleanVertex.not(this);
     }
 
-    class BooleanDoubleWhereVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, NonProbabilistic<DoubleTensor> {
+    class BooleanDoubleWhereVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor> {
         private static final String INPUT_NAME = "inputName";
         private static final String TRUE_VALUE = "trueValue";
         private static final String FALSE_VALUE = "falseValue";
@@ -304,7 +303,7 @@ public interface BooleanVertex extends
         return new BooleanDoubleWhereVertex(this, trueValue, falseValue);
     }
 
-    class BooleanIntegerWhereVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
+    class BooleanIntegerWhereVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
         private static final String INPUT_NAME = "inputName";
         private static final String TRUE_VALUE = "trueValue";
         private static final String FALSE_VALUE = "falseValue";
@@ -338,7 +337,7 @@ public interface BooleanVertex extends
         return new BooleanIntegerWhereVertex(this, trueValue, falseValue);
     }
 
-    class BooleanBooleanWhereVertex extends VertexImpl<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
+    class BooleanBooleanWhereVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
         private static final String INPUT_NAME = "inputName";
         private static final String TRUE_VALUE = "trueValue";
         private static final String FALSE_VALUE = "falseValue";
@@ -372,10 +371,10 @@ public interface BooleanVertex extends
         return new BooleanBooleanWhereVertex(this, trueValue, falseValue);
     }
 
-    class AllTrueVertex extends BooleanUnaryOpVertex<BooleanTensor> {
+    class AllTrueVertex extends BooleanUnaryOpVertex {
 
         @ExportVertexToPythonBindings
-        public AllTrueVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex) {
+        public AllTrueVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
             super(inputVertex);
         }
 
@@ -390,10 +389,10 @@ public interface BooleanVertex extends
         return new AllTrueVertex(this);
     }
 
-    class AllFalseVertex extends BooleanUnaryOpVertex<BooleanTensor> {
+    class AllFalseVertex extends BooleanUnaryOpVertex {
 
         @ExportVertexToPythonBindings
-        public AllFalseVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex) {
+        public AllFalseVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
             super(inputVertex);
         }
 
@@ -408,10 +407,10 @@ public interface BooleanVertex extends
         return new AllFalseVertex(this);
     }
 
-    class AnyTrueVertex extends BooleanUnaryOpVertex<BooleanTensor> {
+    class AnyTrueVertex extends BooleanUnaryOpVertex {
 
         @ExportVertexToPythonBindings
-        public AnyTrueVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex) {
+        public AnyTrueVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
             super(inputVertex);
         }
 
@@ -426,10 +425,10 @@ public interface BooleanVertex extends
         return new AnyTrueVertex(this);
     }
 
-    class AnyFalseVertex extends BooleanUnaryOpVertex<BooleanTensor> {
+    class AnyFalseVertex extends BooleanUnaryOpVertex {
 
         @ExportVertexToPythonBindings
-        public AnyFalseVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex) {
+        public AnyFalseVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
             super(inputVertex);
         }
 
@@ -444,7 +443,7 @@ public interface BooleanVertex extends
         return new AnyFalseVertex(this);
     }
 
-    class BooleanToDoubleMaskVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, NonProbabilistic<DoubleTensor> {
+    class BooleanToDoubleMaskVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor> {
         private static final String INPUT_NAME = "inputName";
 
         @Getter(onMethod = @__({@SaveVertexParam(INPUT_NAME)}))
@@ -466,7 +465,7 @@ public interface BooleanVertex extends
         return new BooleanToDoubleMaskVertex(this);
     }
 
-    class BooleanToIntegerMaskVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
+    class BooleanToIntegerMaskVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
         private static final String INPUT_NAME = "inputName";
 
         @Getter(onMethod = @__({@SaveVertexParam(INPUT_NAME)}))
@@ -488,7 +487,7 @@ public interface BooleanVertex extends
         return new BooleanToIntegerMaskVertex(this);
     }
 
-    static BooleanVertex not(Vertex<BooleanTensor> vertex) {
+    static BooleanVertex not(BooleanVertex vertex) {
         return new NotBinaryVertex(vertex);
     }
 

@@ -190,7 +190,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     }
 
     @Override
-    public void connect(Map<? extends Vertex<?>, ? extends Vertex<?>> connections) {
+    public void connect(Map<? extends Vertex<?, ?>, ? extends Vertex<?, ?>> connections) {
         connections.forEach((to, from) ->
             lookup.put(from.getReference(), lookup.get(to.getReference()))
         );

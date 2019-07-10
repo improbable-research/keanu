@@ -63,8 +63,8 @@ public class RadonHierarchicalRegression {
             throw new IllegalArgumentException("Not enough data for " + numberOfModels + " models!");
         }
 
-        GaussianVertex muIntercept = new GaussianVertex(0, 1.0).setLabel("MuIntercept");
-        GaussianVertex muGradient = new GaussianVertex(0, 1.0).setLabel("MuGradient");
+        DoubleVertex muIntercept = new GaussianVertex(0, 1.0).setLabel("MuIntercept");
+        DoubleVertex muGradient = new GaussianVertex(0, 1.0).setLabel("MuGradient");
 
         DoubleVertex sigmaIntercept = new HalfCauchyVertex(1.0).setLabel("SigmaIntercept");
         DoubleVertex sigmaGradient = new HalfCauchyVertex(1.0).setLabel("SigmaGradient");

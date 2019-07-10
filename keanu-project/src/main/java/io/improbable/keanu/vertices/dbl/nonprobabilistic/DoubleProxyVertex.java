@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class DoubleProxyVertex extends VertexImpl<DoubleTensor> implements DoubleVertex,  Differentiable, ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
+public class DoubleProxyVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
 
     private static final String LABEL_PARAM_NAME = "label";
     private static final String PARENT_NAME = "parent";
@@ -52,7 +52,7 @@ public class DoubleProxyVertex extends VertexImpl<DoubleTensor> implements Doubl
     }
 
     @Override
-    public <V extends Vertex<DoubleTensor>> V setLabel(VertexLabel label) {
+    public DoubleVertex setLabel(VertexLabel label) {
         if (this.getLabel() != null && !this.getLabel().getUnqualifiedName().equals(label.getUnqualifiedName())) {
             throw new RuntimeException("You should not change the label on a Proxy Vertex");
         }

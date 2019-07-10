@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class IntegerConcatenationVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
+public class IntegerConcatenationVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
 
     private final static String DIMENSION_NAME = "dimension";
     private final static String OPERANDS_NAME = "operands";
@@ -55,7 +55,7 @@ public class IntegerConcatenationVertex extends VertexImpl<IntegerTensor> implem
         return IntegerTensor.concat(dimension, inputs);
     }
 
-    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<IntegerTensor>, T> func, IntegerVertex[] input) {
+    private static <T> T[] extractFromInputs(Class<T> clazz, Function<IntegerVertex, T> func, IntegerVertex[] input) {
         T[] extract = (T[]) Array.newInstance(clazz, input.length);
         for (int i = 0; i < input.length; i++) {
             extract[i] = func.apply(input[i]);

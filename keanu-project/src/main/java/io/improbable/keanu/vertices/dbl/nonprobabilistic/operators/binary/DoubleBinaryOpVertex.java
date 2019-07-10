@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
-public abstract class DoubleBinaryOpVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexBinaryOp<DoubleVertex, DoubleVertex> {
+public abstract class DoubleBinaryOpVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexBinaryOp<DoubleVertex, DoubleVertex> {
 
     protected final DoubleVertex left;
     protected final DoubleVertex right;

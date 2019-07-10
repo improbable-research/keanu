@@ -15,13 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DoubleCPTVertex extends VertexImpl<DoubleTensor> implements DoubleVertex,  Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class DoubleCPTVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
-    private final List<Vertex<? extends Tensor<?, ?>>> inputs;
+    private final List<Vertex<? extends Tensor<?, ?>, ?>> inputs;
     private final Map<CPTCondition, DoubleVertex> conditions;
     private final DoubleVertex defaultResult;
 
-    public DoubleCPTVertex(List<Vertex<? extends Tensor<?, ?>>> inputs,
+    public DoubleCPTVertex(List<Vertex<? extends Tensor<?, ?>, ?>> inputs,
                            Map<CPTCondition, DoubleVertex> conditions,
                            DoubleVertex defaultResult) {
         super(defaultResult.getShape());

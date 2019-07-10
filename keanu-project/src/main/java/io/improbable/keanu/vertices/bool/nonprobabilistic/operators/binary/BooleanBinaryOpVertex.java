@@ -12,19 +12,19 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
 public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor>
-    extends VertexImpl<BooleanTensor>
-    implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexBinaryOp<Vertex<A>, Vertex<B>> {
+    extends VertexImpl<BooleanTensor, BooleanVertex>
+    implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexBinaryOp<Vertex<A, ?>, Vertex<B, ?>> {
 
-    protected final Vertex<A> left;
-    protected final Vertex<B> right;
+    protected final Vertex<A, ?> left;
+    protected final Vertex<B, ?> right;
     protected final static String A_NAME = "left";
     protected final static String B_NAME = "right";
 
-    public BooleanBinaryOpVertex(Vertex<A> left, Vertex<B> right) {
+    public BooleanBinaryOpVertex(Vertex<A, ?> left, Vertex<B, ?> right) {
         this(getBroadcastResultShape(left.getShape(), right.getShape()), left, right);
     }
 
-    public BooleanBinaryOpVertex(long[] shape, Vertex<A> left, Vertex<B> right) {
+    public BooleanBinaryOpVertex(long[] shape, Vertex<A, ?> left, Vertex<B, ?> right) {
         super(shape);
         this.left = left;
         this.right = right;
@@ -33,13 +33,13 @@ public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor>
 
     @Override
     @SaveVertexParam(A_NAME)
-    public Vertex<A> getLeft() {
+    public Vertex<A, ?> getLeft() {
         return left;
     }
 
     @Override
     @SaveVertexParam(B_NAME)
-    public Vertex<B> getRight() {
+    public Vertex<B, ?> getRight() {
         return right;
     }
 

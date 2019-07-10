@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class IntegerIfVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
+public class IntegerIfVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
 
     protected static final String PREDICATE_NAME = "predicate";
     protected static final String THEN_NAME = "then";

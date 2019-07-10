@@ -13,8 +13,8 @@ public class CPTCondition {
 
     private final List<?> conditions;
 
-    public static CPTCondition from(List<Vertex<? extends Tensor<?, ?>>> inputs,
-                                    Function<Vertex<? extends Tensor<?, ?>>, ?> mapper) {
+    public static CPTCondition from(List<Vertex<? extends Tensor<?, ?>, ?>> inputs,
+                                    Function<Vertex<? extends Tensor<?, ?>, ?>, ?> mapper) {
 
 
         List<?> condition = inputs.stream().map(mapper).collect(Collectors.toList());

@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.Boole
 public class NotEqualsVertex<A extends Tensor, B extends Tensor> extends BooleanBinaryOpVertex<A, B> {
 
     @ExportVertexToPythonBindings
-    public NotEqualsVertex(@LoadVertexParam(A_NAME) Vertex<A> a, @LoadVertexParam(B_NAME) Vertex<B> b) {
+    public NotEqualsVertex(@LoadVertexParam(A_NAME) Vertex<A, ?> a, @LoadVertexParam(B_NAME) Vertex<B, ?> b) {
         super(a, b);
     }
 

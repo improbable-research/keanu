@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMatch;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsAreScalar;
 
-public class DoubleSetWithMaskVertex extends VertexImpl<DoubleTensor> implements DoubleVertex, NonProbabilistic<DoubleTensor> {
+public class DoubleSetWithMaskVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor> {
 
     private final static String OPERAND_NAME = "operand";
     private final static String MASK_NAME = "mask";

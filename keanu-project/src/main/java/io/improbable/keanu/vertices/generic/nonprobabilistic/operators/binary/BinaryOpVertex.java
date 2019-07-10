@@ -6,10 +6,10 @@ import io.improbable.keanu.vertices.generic.GenericVertex;
 
 public abstract class BinaryOpVertex<A, B, C> extends GenericVertex<C> implements NonProbabilistic<C> {
 
-    protected final Vertex<A> a;
-    protected final Vertex<B> b;
+    protected final Vertex<A, ?> a;
+    protected final Vertex<B, ?> b;
 
-    public BinaryOpVertex(Vertex<A> a, Vertex<B> b) {
+    public BinaryOpVertex(Vertex<A, ?> a, Vertex<B, ?> b) {
         this.a = a;
         this.b = b;
         setParents(a, b);

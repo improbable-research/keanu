@@ -10,9 +10,9 @@ public abstract class GenericTensorUnaryOpVertex<IN, OUT> extends GenericTensorV
 
     protected static final String INPUT_NAME = "inputVertex";
 
-    protected final Vertex<GenericTensor<IN>> inputVertex;
+    protected final Vertex<GenericTensor<IN>, ?> inputVertex;
 
-    public GenericTensorUnaryOpVertex(long[] shape, Vertex<GenericTensor<IN>> inputVertex) {
+    public GenericTensorUnaryOpVertex(long[] shape, Vertex<GenericTensor<IN>, ?> inputVertex) {
         super(shape);
         this.inputVertex = inputVertex;
         setParents(inputVertex);
@@ -26,7 +26,7 @@ public abstract class GenericTensorUnaryOpVertex<IN, OUT> extends GenericTensorV
     protected abstract GenericTensor<OUT> op(GenericTensor<IN> a);
 
     @SaveVertexParam(INPUT_NAME)
-    public Vertex<GenericTensor<IN>> getInputVertex() {
+    public Vertex<GenericTensor<IN>, ?> getInputVertex() {
         return inputVertex;
     }
 }

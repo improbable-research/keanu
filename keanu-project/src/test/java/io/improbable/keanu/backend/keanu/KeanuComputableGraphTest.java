@@ -17,8 +17,8 @@ import static junit.framework.TestCase.assertEquals;
 
 public class KeanuComputableGraphTest {
 
-    private GaussianVertex A;
-    private GaussianVertex B;
+    private DoubleVertex A;
+    private DoubleVertex B;
 
     private static final String A_LABEL = "A";
     private static final String B_LABEL = "B";

@@ -28,7 +28,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class PoissonVertex extends VertexImpl<IntegerTensor> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
+public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex mu;
     private static final String MU_NAME = "mu";
@@ -64,8 +64,8 @@ public class PoissonVertex extends VertexImpl<IntegerTensor> implements IntegerV
         this(mu.getShape(), mu);
     }
 
-    public PoissonVertex(Vertex<? extends NumberTensor> mu) {
-        this(mu.getShape(), new CastNumberToDoubleVertex(mu));
+    public PoissonVertex(Vertex<? extends NumberTensor, ?> mu) {
+        this(mu.getShape(), new CastNumberToDoubleVertex<>(mu));
     }
 
     public PoissonVertex(double mu) {
