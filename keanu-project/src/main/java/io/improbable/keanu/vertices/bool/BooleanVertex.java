@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
@@ -27,6 +26,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.Boolea
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.utility.AssertVertex;
 import lombok.Getter;
 
@@ -116,54 +116,6 @@ public interface BooleanVertex extends
     @Override
     default BooleanVertex diag() {
         return new BooleanDiagVertex(this);
-    }
-
-    class BooleanPermuteVertex extends BooleanUnaryOpVertex {
-        private static final String REARRANGE = "arrange";
-
-        @Getter(onMethod = @__({@SaveVertexParam(REARRANGE)}))
-        private final int[] rearrange;
-
-        @ExportVertexToPythonBindings
-        public BooleanPermuteVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex,
-                                    @LoadVertexParam(REARRANGE) int[] rearrange) {
-            super(inputVertex);
-            this.rearrange = rearrange;
-        }
-
-        @Override
-        protected BooleanTensor op(BooleanTensor l) {
-            return l.permute(rearrange);
-        }
-    }
-
-    @Override
-    default BooleanVertex permute(int... rearrange) {
-        return new BooleanPermuteVertex(this, rearrange);
-    }
-
-    class BooleanBroadcastVertex extends BooleanUnaryOpVertex {
-        private static final String TO_SHAPE = "toShape";
-
-        @Getter(onMethod = @__({@SaveVertexParam(TO_SHAPE)}))
-        private final long[] toShape;
-
-        @ExportVertexToPythonBindings
-        public BooleanBroadcastVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex,
-                                      @LoadVertexParam(TO_SHAPE) long[] toShape) {
-            super(inputVertex);
-            this.toShape = toShape;
-        }
-
-        @Override
-        protected BooleanTensor op(BooleanTensor l) {
-            return l.broadcast(toShape);
-        }
-    }
-
-    @Override
-    default BooleanVertex broadcast(long... toShape) {
-        return new BooleanBroadcastVertex(this, toShape);
     }
 
     @Override

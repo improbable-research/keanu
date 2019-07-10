@@ -1,12 +1,13 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -15,23 +16,23 @@ import java.util.Map;
 import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 
-public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable {
+public class PermuteVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
+    extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
-    private final static String REARRANGE_NAME = "rearrange";
-
+    private static final String REARRANGE = "rearrange";
     private final int[] rearrange;
     private final int[] invertedRearrange;
 
     @ExportVertexToPythonBindings
-    public PermuteVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
-                         @LoadVertexParam(REARRANGE_NAME) int... rearrange) {
+    public PermuteVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
+                         @LoadVertexParam(REARRANGE) int... rearrange) {
         super(getPermutedIndices(inputVertex.getShape(), rearrange), inputVertex);
         this.rearrange = rearrange;
         this.invertedRearrange = invertedPermute(rearrange);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor value) {
+    protected TENSOR op(TENSOR value) {
         return value.permute(rearrange);
     }
 
@@ -83,8 +84,14 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
         return permuteToApply;
     }
 
-    @SaveVertexParam(REARRANGE_NAME)
+    @SaveVertexParam(REARRANGE)
     public int[] getRearrange() {
         return rearrange;
     }
+
+    @Override
+    public boolean isDifferentiable() {
+        return inputVertex.isDifferentiable();
+    }
+
 }

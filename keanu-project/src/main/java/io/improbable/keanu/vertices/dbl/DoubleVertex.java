@@ -44,7 +44,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGamm
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.PermuteVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
@@ -121,21 +120,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
      */
     static ConcatenationVertex concat(int dimension, DoubleVertex... toConcat) {
         return new ConcatenationVertex(dimension, toConcat);
-    }
-
-    @Override
-    default PermuteVertex permute(int... rearrange) {
-        return new PermuteVertex(this, rearrange);
-    }
-
-    @Override
-    default DoubleVertex broadcast(long... toShape) {
-        return null;
-    }
-
-    @Override
-    default PermuteVertex transpose() {
-        return new PermuteVertex(this, 1, 0);
     }
 
     @Override

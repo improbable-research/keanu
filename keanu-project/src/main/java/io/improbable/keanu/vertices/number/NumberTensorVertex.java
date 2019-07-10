@@ -7,6 +7,7 @@ import io.improbable.keanu.kotlin.NumberOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
+import io.improbable.keanu.vertices.tensor.BinaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.CastNumberToBooleanVertex;

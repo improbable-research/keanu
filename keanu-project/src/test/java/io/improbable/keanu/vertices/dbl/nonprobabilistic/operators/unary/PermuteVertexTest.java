@@ -20,7 +20,7 @@ public class PermuteVertexTest {
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3));
 
-        PermuteVertex transpose = new PermuteVertex(a, 1, 0);
+        DoubleVertex transpose = a.permute(1, 0);
 
         Assert.assertArrayEquals(new long[]{3, 2}, transpose.getShape());
         Assert.assertArrayEquals(a.getValue().transpose().asFlatDoubleArray(), transpose.getValue().asFlatDoubleArray(), 1e-6);
@@ -49,7 +49,7 @@ public class PermuteVertexTest {
 
         DoubleVertex c = a.times(b);
 
-        PermuteVertex permute = new PermuteVertex(c, 2, 0, 1);
+        DoubleVertex permute = c.permute(2, 0, 1);
 
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(a, permute).of(permute);
         DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(permute, a).withRespectTo(a);
@@ -69,7 +69,7 @@ public class PermuteVertexTest {
 
         DoubleVertex c = a.times(b);
 
-        PermuteVertex permute = new PermuteVertex(c, 3, 2, 0, 1);
+        DoubleVertex permute = c.permute(3, 2, 0, 1);
 
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(a, permute).of(permute);
         DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(permute, a).withRespectTo(a);
@@ -91,7 +91,7 @@ public class PermuteVertexTest {
 
         DoubleVertex sum = C.sum(2);
 
-        PermuteVertex permute = sum.permute(1, 0);
+        DoubleVertex permute = sum.permute(1, 0);
 
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, permute).of(permute);
         DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(permute, ImmutableSet.of(A)).withRespectTo(A);
@@ -133,8 +133,8 @@ public class PermuteVertexTest {
 
         MultiplicationVertex C = A.times(B);
 
-        PermuteVertex permute = C.permute(2, 0, 1);
-        PermuteVertex revertThePermute = permute.permute(1, 2, 0);
+        DoubleVertex permute = C.permute(2, 0, 1);
+        DoubleVertex revertThePermute = permute.permute(1, 2, 0);
 
         assertThat(C.getValue(), valuesAndShapesMatch(revertThePermute.getValue()));
 

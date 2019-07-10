@@ -1,9 +1,8 @@
-package io.improbable.keanu.vertices.number;
+package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexImpl;
 

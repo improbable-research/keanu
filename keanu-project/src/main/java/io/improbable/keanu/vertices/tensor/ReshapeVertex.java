@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
-import io.improbable.keanu.vertices.number.UnaryTensorOpVertex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,4 +63,10 @@ public class ReshapeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
     public long[] getProposedShape() {
         return getShape();
     }
+
+    @Override
+    public boolean isDifferentiable(){
+        return inputVertex.isDifferentiable();
+    }
+
 }

@@ -103,7 +103,7 @@ public abstract class VertexImpl<T, VERTEX extends Vertex<T, VERTEX>> implements
     /**
      * @return True if the vertex is differentiable, false otherwise.
      */
-    public final boolean isDifferentiable() {
+    public boolean isDifferentiable() {
         return this instanceof Differentiable;
     }
 

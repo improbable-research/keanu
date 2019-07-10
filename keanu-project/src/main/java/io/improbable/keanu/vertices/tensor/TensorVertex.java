@@ -17,6 +17,14 @@ public interface TensorVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extend
         return asTyped(new ReshapeVertex<>(this, proposedShape));
     }
 
+    default VERTEX permute(int... rearrange) {
+        return asTyped(new PermuteVertex<>(this, rearrange));
+    }
+
+    default VERTEX broadcast(long... toShape) {
+        return asTyped(new BroadcastVertex<>(this, toShape));
+    }
+
     default BooleanVertex elementwiseEquals(VERTEX that) {
         return new EqualsVertex<>(this, that);
     }
