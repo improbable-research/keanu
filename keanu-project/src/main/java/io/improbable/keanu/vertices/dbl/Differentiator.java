@@ -21,11 +21,11 @@ import java.util.Set;
 @UtilityClass
 public class Differentiator {
 
-    public static <V extends Vertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, V... of) {
+    public static <V extends Vertex> PartialsWithRespectTo forwardModeAutoDiff(V wrt, V... of) {
         return forwardModeAutoDiff(wrt, new HashSet<>(Arrays.asList(of)));
     }
 
-    public static <V extends Vertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, Collection<V> of) {
+    public static <V extends Vertex> PartialsWithRespectTo forwardModeAutoDiff(V wrt, Collection<V> of) {
 
         PriorityQueue<V> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.add(wrt);
@@ -39,7 +39,7 @@ public class Differentiator {
         while (!priorityQueue.isEmpty()) {
             V visiting = priorityQueue.poll();
 
-            PartialDerivative partialOfVisiting = visiting.forwardModeAutoDifferentiation(partials);
+            PartialDerivative partialOfVisiting = ((Differentiable) visiting).forwardModeAutoDifferentiation(partials);
             partials.put(visiting, partialOfVisiting);
 
             if (of.contains(visiting)) {

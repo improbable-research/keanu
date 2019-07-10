@@ -10,19 +10,17 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.TensorVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.XorBinaryVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanReshapeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanUnaryOpVertex;
@@ -76,6 +74,11 @@ public interface BooleanVertex extends
     //// Tensor Ops
     /////////////
 
+
+    default BooleanVertex asTyped(NonProbabilisticVertex<BooleanTensor, BooleanVertex> vertex) {
+        return new BooleanVertexWrapper(vertex);
+    }
+
     static BooleanVertex concat(int dimension, BooleanVertex... toConcat) {
         return new BooleanConcatenationVertex(dimension, toConcat);
     }
@@ -113,10 +116,6 @@ public interface BooleanVertex extends
     @Override
     default BooleanVertex diag() {
         return new BooleanDiagVertex(this);
-    }
-
-    default BooleanVertex reshape(long... proposedShape) {
-        return new BooleanReshapeVertex(this, proposedShape);
     }
 
     class BooleanPermuteVertex extends BooleanUnaryOpVertex {
@@ -168,18 +167,8 @@ public interface BooleanVertex extends
     }
 
     @Override
-    default BooleanVertex notEqualTo(BooleanVertex that) {
-        return new NotEqualsVertex<>(this, that);
-    }
-
-    @Override
     default BooleanVertex notEqualTo(Boolean value) {
         return notEqualTo(new ConstantBooleanVertex(value));
-    }
-
-    @Override
-    default BooleanVertex elementwiseEquals(BooleanVertex that) {
-        return new EqualsVertex<>(this, that);
     }
 
     @Override

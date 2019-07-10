@@ -13,7 +13,7 @@ public class IntegerReshapeVertexTest {
         IntegerVertex a = new PoissonVertex(new long[]{2, 2}, 0.5);
         a.setValue(IntegerTensor.create(new int[]{1, 2, 3, 4}, 2, 2));
 
-        IntegerReshapeVertex reshapeVertex = new IntegerReshapeVertex(a, 4, 1);
+        IntegerVertex reshapeVertex = a.reshape(4, 1);
         reshapeVertex.getValue();
 
         Assert.assertArrayEquals(new long[]{4, 1}, reshapeVertex.getShape());

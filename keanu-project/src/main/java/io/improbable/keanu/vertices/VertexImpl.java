@@ -289,7 +289,7 @@ public abstract class VertexImpl<T, VERTEX extends Vertex<T, VERTEX>> implements
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Vertex)) return false;
 
         Vertex vertex = (Vertex) o;
 

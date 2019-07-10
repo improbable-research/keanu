@@ -21,7 +21,7 @@ public class ReshapeVertexTest {
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
-        ReshapeVertex reshapeVertex = new ReshapeVertex(a, 4, 1);
+        DoubleVertex reshapeVertex = a.reshape(4, 1);
         reshapeVertex.getValue();
 
         Assert.assertArrayEquals(new long[]{4, 1}, reshapeVertex.getShape());
@@ -38,7 +38,7 @@ public class ReshapeVertexTest {
 
         MatrixMultiplicationVertex N = (MatrixMultiplicationVertex) m.matrixMultiply(alpha);
 
-        ReshapeVertex reshapedN = new ReshapeVertex(N, 4, 1);
+        DoubleVertex reshapedN = N.reshape(4, 1);
 
         DoubleTensor dReshapedNWrtmForward = Differentiator.forwardModeAutoDiff(m, reshapedN).of(reshapedN);
         DoubleTensor dReshapedNWrtmBackward = Differentiator.reverseModeAutoDiff(reshapedN, ImmutableSet.of(m, alpha)).withRespectTo(m);
@@ -65,7 +65,7 @@ public class ReshapeVertexTest {
         double[] nWrtMpartialsBeforeReshape = dNdm.asFlatDoubleArray();
         double[] nWrtApartialsBeforeReshape = dNda.asFlatDoubleArray();
 
-        ReshapeVertex reshapedN = new ReshapeVertex(N, 4, 1);
+        DoubleVertex reshapedN = N.reshape(4, 1);
         DoubleTensor reshapedPartialWrtM = Differentiator.reverseModeAutoDiff(reshapedN, m).withRespectTo(m);
         DoubleTensor reshapedPartialWrtA = Differentiator.reverseModeAutoDiff(reshapedN, a).withRespectTo(a);
 
@@ -114,7 +114,7 @@ public class ReshapeVertexTest {
         DoubleVertex C = A.plus(B);
 
         DoubleVertex D = C.reshape(4, 2, 2);
-        ReshapeVertex E = D.reshape(4, 4);
+        DoubleVertex E = D.reshape(4, 4);
 
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, E).of(E);
         PartialsOf backward = Differentiator.reverseModeAutoDiff(E, ImmutableSet.of(A, B));
@@ -126,7 +126,7 @@ public class ReshapeVertexTest {
     @Test
     public void changesMatchGradient() {
         UniformVertex inputVertex = new UniformVertex(new long[]{4, 4}, -10.0, 10.0);
-        ReshapeVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
+        DoubleVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-10, 1e-10);
     }

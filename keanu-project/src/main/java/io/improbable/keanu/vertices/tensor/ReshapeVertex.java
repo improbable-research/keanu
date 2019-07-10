@@ -1,30 +1,32 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.number.UnaryTensorOpVertex;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable {
+public class ReshapeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
+    extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
-    private static final String PROPOSED_SHAPE_NAME = "proposedShape";
+    private static final String SHAPE_NAME = "proposedShape";
 
     @ExportVertexToPythonBindings
-    public ReshapeVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
-                         @LoadVertexParam(PROPOSED_SHAPE_NAME) long... proposedShape) {
+    public ReshapeVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
+                         @LoadVertexParam(SHAPE_NAME) long... proposedShape) {
         super(proposedShape, inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor value) {
+    protected TENSOR op(TENSOR value) {
         return value.reshape(getShape());
     }
 
@@ -58,7 +60,7 @@ public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable
         return reshapedDerivatives;
     }
 
-    @SaveVertexParam(PROPOSED_SHAPE_NAME)
+    @SaveVertexParam(SHAPE_NAME)
     public long[] getProposedShape() {
         return getShape();
     }

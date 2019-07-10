@@ -1,9 +1,9 @@
-package io.improbable.keanu.vertices.intgr;
+package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
@@ -11,23 +11,25 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexState;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class IntegerVertexWrapper implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public class DoubleVertexWrapper implements DoubleVertex, NonProbabilistic<DoubleTensor>, NonSaveableVertex, Differentiable {
 
-    private final NonProbabilisticVertex<IntegerTensor, IntegerVertex> vertex;
+    private final NonProbabilisticVertex<DoubleTensor, DoubleVertex> vertex;
 
-    public IntegerVertex setLabel(VertexLabel label) {
+    public DoubleVertex setLabel(VertexLabel label) {
         vertex.setLabel(label);
         return this;
     }
 
-    public IntegerVertex setLabel(String label) {
+    public DoubleVertex setLabel(String label) {
         vertex.setLabel(label);
         return this;
     }
@@ -37,18 +39,18 @@ public class IntegerVertexWrapper implements IntegerVertex, NonProbabilistic<Int
         return vertex.getLabel();
     }
 
-    public IntegerVertex removeLabel() {
+    public DoubleVertex removeLabel() {
         vertex.removeLabel();
         return this;
     }
 
     @Override
-    public IntegerTensor lazyEval() {
+    public DoubleTensor lazyEval() {
         return vertex.lazyEval();
     }
 
     @Override
-    public IntegerTensor eval() {
+    public DoubleTensor eval() {
         return vertex.eval();
     }
 
@@ -62,21 +64,21 @@ public class IntegerVertexWrapper implements IntegerVertex, NonProbabilistic<Int
         return vertex.isDifferentiable();
     }
 
-    public void setValue(IntegerTensor value) {
+    public void setValue(DoubleTensor value) {
         vertex.setValue(value);
     }
 
     @Override
-    public IntegerTensor getValue() {
+    public DoubleTensor getValue() {
         return vertex.getValue();
     }
 
     @Override
-    public VertexState<IntegerTensor> getState() {
+    public VertexState<DoubleTensor> getState() {
         return vertex.getState();
     }
 
-    public void setState(VertexState<IntegerTensor> newState) {
+    public void setState(VertexState<DoubleTensor> newState) {
         vertex.setState(newState);
     }
 
@@ -105,21 +107,21 @@ public class IntegerVertexWrapper implements IntegerVertex, NonProbabilistic<Int
         return vertex.getRank();
     }
 
-    public IntegerVertex print() {
+    public DoubleVertex print() {
         vertex.print();
         return this;
     }
 
-    public IntegerVertex print(String message, boolean printData) {
+    public DoubleVertex print(String message, boolean printData) {
         vertex.print(message, printData);
         return this;
     }
 
-    public void setAndCascade(IntegerTensor value) {
+    public void setAndCascade(DoubleTensor value) {
         vertex.setAndCascade(value);
     }
 
-    public void observe(IntegerTensor value) {
+    public void observe(DoubleTensor value) {
         vertex.observe(value);
     }
 
@@ -139,7 +141,7 @@ public class IntegerVertexWrapper implements IntegerVertex, NonProbabilistic<Int
     }
 
     @Override
-    public Optional<IntegerTensor> getObservedValue() {
+    public Optional<DoubleTensor> getObservedValue() {
         return vertex.getObservedValue();
     }
 
@@ -219,8 +221,18 @@ public class IntegerVertexWrapper implements IntegerVertex, NonProbabilistic<Int
     }
 
     @Override
-    public IntegerTensor calculate() {
+    public DoubleTensor calculate() {
         return vertex.calculate();
+    }
+
+    @Override
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        return ((Differentiable) vertex).reverseModeAutoDifferentiation(derivativeOfOutputWithRespectToSelf);
+    }
+
+    @Override
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        return ((Differentiable) vertex).forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
     }
 
     @Override

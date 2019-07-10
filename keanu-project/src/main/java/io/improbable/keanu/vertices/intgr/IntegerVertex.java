@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
@@ -27,7 +26,6 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerBroadcastVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPermuteVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerProductVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerReshapeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
@@ -130,11 +128,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default IntegerVertex reshape(long... proposedShape) {
-        return new IntegerReshapeVertex(this, proposedShape);
-    }
-
-    @Override
     default IntegerVertex permute(int... rearrange) {
         return new IntegerPermuteVertex(this, rearrange);
     }
@@ -145,17 +138,8 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default BooleanVertex elementwiseEquals(IntegerVertex rhs) {
-        return new EqualsVertex<>(this, rhs);
-    }
-
-    @Override
     default BooleanVertex elementwiseEquals(Integer value) {
         return elementwiseEquals(new ConstantIntegerVertex(value));
-    }
-
-    default BooleanVertex notEqualTo(IntegerVertex rhs) {
-        return new NotEqualsVertex<>(this, rhs);
     }
 
     @Override

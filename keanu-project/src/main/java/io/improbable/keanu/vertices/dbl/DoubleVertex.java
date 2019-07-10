@@ -8,7 +8,6 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
@@ -46,7 +45,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.PermuteVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
@@ -112,7 +110,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
 
     @Override
     default DoubleVertex asTyped(NonProbabilisticVertex<DoubleTensor, DoubleVertex> vertex) {
-        return null;
+        return new DoubleVertexWrapper(vertex);
     }
 
     /**
@@ -123,11 +121,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
      */
     static ConcatenationVertex concat(int dimension, DoubleVertex... toConcat) {
         return new ConcatenationVertex(dimension, toConcat);
-    }
-
-    @Override
-    default ReshapeVertex reshape(long... proposedShape) {
-        return new ReshapeVertex(this, proposedShape);
     }
 
     @Override
@@ -176,13 +169,8 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default BooleanVertex elementwiseEquals(DoubleVertex rhs) {
-        return new EqualsVertex<>(this, rhs);
-    }
-
-    @Override
     default BooleanVertex elementwiseEquals(Double value) {
-        return new EqualsVertex<>(this, new ConstantDoubleVertex(value));
+        return elementwiseEquals(new ConstantDoubleVertex(value));
     }
 
     @Override

@@ -13,7 +13,7 @@ public class BooleanReshapeVertexTest {
         BooleanVertex a = new BernoulliVertex(0.5);
         a.setValue(BooleanTensor.create(new boolean[]{true, true, false, false}, 2, 2));
 
-        BooleanReshapeVertex reshapeVertex = new BooleanReshapeVertex(a, 4, 1);
+        BooleanVertex reshapeVertex = a.reshape(4, 1);
         reshapeVertex.getValue();
 
         Assert.assertArrayEquals(new long[]{4, 1}, reshapeVertex.getShape());

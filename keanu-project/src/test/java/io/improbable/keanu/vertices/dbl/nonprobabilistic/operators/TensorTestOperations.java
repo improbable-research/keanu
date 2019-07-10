@@ -15,7 +15,7 @@ import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static org.junit.Assert.assertThat;
 
 public class TensorTestOperations {
-    public static <T extends DoubleVertex & Differentiable>
+    public static <T extends DoubleVertex>
     void finiteDifferenceMatchesForwardAndReverseModeGradient(List<T> inputVertices,
                                                               T outputVertex,
                                                               double incrementAmount,
@@ -30,7 +30,7 @@ public class TensorTestOperations {
         finiteDifferenceMatchesReverseModeGradient(inputVertices, outputVertex, incrementAmount, delta);
     }
 
-    public static <T extends DoubleVertex & Differentiable>
+    public static <T extends DoubleVertex>
     void finiteDifferenceMatchesForwardModeGradient(List<T> inputVertices,
                                                     T outputVertex,
                                                     double incrementAmount,
@@ -39,7 +39,7 @@ public class TensorTestOperations {
             runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, true));
     }
 
-    public static <T extends DoubleVertex & Differentiable>
+    public static <T extends DoubleVertex>
     void finiteDifferenceMatchesReverseModeGradient(List<T> inputVertices,
                                                     T outputVertex,
                                                     double incrementAmount,
@@ -48,7 +48,7 @@ public class TensorTestOperations {
             runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, false));
     }
 
-    private static <T extends DoubleVertex & Differentiable>
+    private static <T extends DoubleVertex>
     void runGradientTestOnSingleInput(T inputVertex,
                                       T outputVertex,
                                       double incrementAmount,
@@ -74,7 +74,7 @@ public class TensorTestOperations {
         }
     }
 
-    private static <T extends DoubleVertex & Differentiable>
+    private static <T extends DoubleVertex>
     DoubleTensor dOutputWrtInput(T outputVertex, T inputVertex, boolean isForwardMode) {
         if (isForwardMode) {
             return Differentiator.forwardModeAutoDiff(inputVertex, outputVertex).of(outputVertex);
