@@ -151,26 +151,26 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesAllTrue() {
-        assertFalse(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).allTrue());
-        assertTrue(BooleanTensor.create(new boolean[]{true, true, true, true}, new long[]{2, 2}).allTrue());
+        assertFalse(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).allTrue().scalar());
+        assertTrue(BooleanTensor.create(new boolean[]{true, true, true, true}, new long[]{2, 2}).allTrue().scalar());
     }
 
     @Test
     public void doesAllFalse() {
-        assertFalse(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).allFalse());
-        assertTrue(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse());
+        assertFalse(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).allFalse().scalar());
+        assertTrue(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse().scalar());
     }
 
     @Test
     public void doesAnyTrue() {
-        assertTrue(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).anyTrue());
-        assertFalse(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).anyTrue());
+        assertTrue(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).anyTrue().scalar());
+        assertFalse(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).anyTrue().scalar());
     }
 
     @Test
     public void doesAnyFalse() {
-        assertTrue(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).anyTrue());
-        assertFalse(BooleanTensor.create(new boolean[]{true, true, true, true}, new long[]{2, 2}).anyFalse());
+        assertTrue(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).anyTrue().scalar());
+        assertFalse(BooleanTensor.create(new boolean[]{true, true, true, true}, new long[]{2, 2}).anyFalse().scalar());
     }
 
     @Test
@@ -180,7 +180,7 @@ public class JVMBooleanTensorTest {
         BooleanTensor notAllTheSame = allTheSame.duplicate();
         notAllTheSame.setValue(!value, 1, 1);
 
-        assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
+        assertThat(allTheSame.elementwiseEquals(value).allTrue().scalar(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
     }
 

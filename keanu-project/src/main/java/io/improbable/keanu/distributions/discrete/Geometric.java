@@ -82,7 +82,7 @@ public class Geometric implements DiscreteDistribution {
     }
 
     private boolean checkParameterIsValid() {
-        return p.greaterThan(0.0).allTrue() && p.lessThan(1.0).allTrue();
+        return p.greaterThan(0.0).allTrue().scalar() && p.lessThan(1.0).allTrue().scalar();
     }
 
 }

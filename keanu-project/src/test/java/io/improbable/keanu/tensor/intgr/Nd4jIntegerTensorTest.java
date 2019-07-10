@@ -444,7 +444,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor notAllTheSame = allTheSame.duplicate();
         notAllTheSame.setValue(otherValue, 1, 1);
 
-        assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
+        assertThat(allTheSame.elementwiseEquals(value).allTrue().scalar(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
     }
 

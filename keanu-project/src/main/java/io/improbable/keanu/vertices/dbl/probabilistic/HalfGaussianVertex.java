@@ -47,7 +47,7 @@ public class HalfGaussianVertex extends GaussianVertex {
 
     @Override
     public double logProb(DoubleTensor value) {
-        if (value.greaterThanOrEqual(MU_ZERO).allTrue()) {
+        if (value.greaterThanOrEqual(MU_ZERO).allTrue().scalar()) {
             return super.logProb(value) + LOG_TWO * value.getLength();
         }
         return Double.NEGATIVE_INFINITY;
@@ -79,7 +79,7 @@ public class HalfGaussianVertex extends GaussianVertex {
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Map<Vertex, DoubleTensor> dLogProb = super.dLogProb(value, withRespectTo);
-        if (value.greaterThanOrEqual(MU_ZERO).allTrue()) {
+        if (value.greaterThanOrEqual(MU_ZERO).allTrue().scalar()) {
             return dLogProb;
         } else {
             for (Map.Entry<Vertex, DoubleTensor> entry : dLogProb.entrySet()) {

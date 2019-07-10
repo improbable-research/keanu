@@ -509,7 +509,7 @@ public class DoubleTensorTest {
         DoubleTensor notAllTheSame = allTheSame.duplicate();
         notAllTheSame.setValue(otherValue, 1, 1);
 
-        assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
+        assertThat(allTheSame.elementwiseEquals(value).allTrue().scalar(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
     }
 
@@ -541,10 +541,10 @@ public class DoubleTensorTest {
         DoubleTensor a = DoubleTensor.create(aData, new long[]{2, 2, 2, 2, 2});
         DoubleTensor b = DoubleTensor.create(bData, new long[]{2, 2, 2, 2, 2});
         DoubleTensor c = DoubleTensor.create(cData, new long[]{2, 2, 2, 2, 2});
-        assertTrue("equals with epsilon should be true", a.equalsWithinEpsilon(b, 0.5).allTrue());
-        assertTrue("equals with epsilon should be true (inverted order)", b.equalsWithinEpsilon(a, 0.5).allTrue());
-        assertTrue("equals with epsilon should be not true (max delta is 0.4)", !a.equalsWithinEpsilon(b, 0.2).allTrue());
-        assertTrue("equals with epsilon should be not true (max delta is 1.0)", !a.equalsWithinEpsilon(c, 0.5).allTrue());
+        assertTrue("equals with epsilon should be true", a.equalsWithinEpsilon(b, 0.5).allTrue().scalar());
+        assertTrue("equals with epsilon should be true (inverted order)", b.equalsWithinEpsilon(a, 0.5).allTrue().scalar());
+        assertTrue("equals with epsilon should be not true (max delta is 0.4)", !a.equalsWithinEpsilon(b, 0.2).allTrue().scalar());
+        assertTrue("equals with epsilon should be not true (max delta is 1.0)", !a.equalsWithinEpsilon(c, 0.5).allTrue().scalar());
     }
 
     @Test
@@ -1738,7 +1738,7 @@ public class DoubleTensorTest {
         DoubleTensor output = tensorOp.apply(input);
         DoubleTensor expected = DoubleTensor.create(expectedBuffer, input.getShape());
 
-        assertTrue(expected.equalsWithinEpsilon(output, 1e-6).allTrue());
+        assertTrue(expected.equalsWithinEpsilon(output, 1e-6).allTrue().scalar());
     }
 
     @Test

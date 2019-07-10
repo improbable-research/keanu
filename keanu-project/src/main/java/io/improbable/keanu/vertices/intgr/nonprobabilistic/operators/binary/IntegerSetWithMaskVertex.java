@@ -15,7 +15,7 @@ public class IntegerSetWithMaskVertex extends IntegerBinaryOpVertex {
     @ExportVertexToPythonBindings
     public IntegerSetWithMaskVertex(@LoadVertexParam(LEFT_NAME) IntegerVertex left,
                                     @LoadVertexParam(RIGHT_NAME) IntegerVertex mask,
-                                    @LoadVertexParam(REPLACE_WITH_VALUE) int replaceWithValue) {
+                                    @LoadVertexParam(REPLACE_WITH_VALUE) Integer replaceWithValue) {
         super(left, mask);
         this.replaceWithValue = replaceWithValue;
     }

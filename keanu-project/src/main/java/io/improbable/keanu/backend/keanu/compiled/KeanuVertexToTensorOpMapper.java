@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.XorBinaryVertex;
@@ -196,6 +196,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(CastNumberToIntegerVertex.class, fluentUnaryOp("toInteger"));
 
         opMappers.put(IntegerIfVertex.class, KeanuVertexToTensorOpMapper::integerIfOp);
+        opMappers.put(IntegerVertex.IntegerDiagVertex.class, fluentUnaryOp("diag"));
         opMappers.put(IntegerProxyVertex.class, KeanuVertexToTensorOpMapper::integerProxyOp);
 
         //Booleans ops
@@ -218,6 +219,10 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(XorBinaryVertex.class, fluentUnaryOp("xor"));
 
         opMappers.put(CastToBooleanVertex.class, fluentUnaryOp("toBoolean"));
+
+        opMappers.put(BooleanVertex.BooleanDiagVertex.class, fluentUnaryOp("diag"));
+        opMappers.put(BooleanVertex.BooleanToIntegerMaskVertex.class, fluentUnaryOp("toIntegerMask"));
+        opMappers.put(BooleanVertex.BooleanToDoubleMaskVertex.class, fluentUnaryOp("toDoubleMask"));
 
         opMappers.put(BooleanIfVertex.class, KeanuVertexToTensorOpMapper::booleanIfOp);
         opMappers.put(BooleanProxyVertex.class, KeanuVertexToTensorOpMapper::booleanProxyOp);

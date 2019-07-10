@@ -14,7 +14,7 @@ public class ThrowValueException<T, TENSOR extends Tensor<T, TENSOR>> implements
 
     @Override
     public TENSOR handle(TENSOR tensor, BooleanTensor result) {
-        if (!result.allTrue()) {
+        if (!result.allTrue().scalar()) {
             throw new TensorValueException(message, result);
         }
         return tensor;

@@ -46,7 +46,7 @@ public class HalfCauchyVertex extends CauchyVertex {
 
     @Override
     public double logProb(DoubleTensor value) {
-        if (value.greaterThanOrEqual(LOC_ZERO).allTrue()) {
+        if (value.greaterThanOrEqual(LOC_ZERO).allTrue().scalar()) {
             return super.logProb(value) + LOG_TWO * value.getLength();
         }
         return Double.NEGATIVE_INFINITY;
@@ -78,7 +78,7 @@ public class HalfCauchyVertex extends CauchyVertex {
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Map<Vertex, DoubleTensor> logProb = super.dLogProb(value, withRespectTo);
-        if (value.greaterThanOrEqual(LOC_ZERO).allTrue()) {
+        if (value.greaterThanOrEqual(LOC_ZERO).allTrue().scalar()) {
             return logProb;
         } else {
             for (Map.Entry<Vertex, DoubleTensor> entry : logProb.entrySet()) {

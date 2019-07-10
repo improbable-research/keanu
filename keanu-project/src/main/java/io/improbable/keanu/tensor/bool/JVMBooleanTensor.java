@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.bool;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.BaseTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
@@ -152,7 +153,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    public <T, TENSOR extends Tensor<T, TENSOR>> TENSOR where(TENSOR trueValue, TENSOR falseValue) {
+    public <T, TENSOR extends Tensor< T, TENSOR>> TENSOR where(TENSOR trueValue, TENSOR falseValue) {
         if (trueValue instanceof DoubleTensor && falseValue instanceof DoubleTensor) {
             return (TENSOR) doubleWhere((DoubleTensor) trueValue, (DoubleTensor) falseValue);
         } else if (trueValue instanceof IntegerTensor && falseValue instanceof IntegerTensor) {
@@ -210,33 +211,33 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    public boolean allTrue() {
+    public BooleanTensor allTrue() {
         for (int i = 0; i < buffer.getLength(); i++) {
             if (!buffer.get(i)) {
-                return false;
+                return new JVMBooleanTensor(false);
             }
         }
-        return true;
+        return new JVMBooleanTensor(true);
     }
 
     @Override
-    public boolean allFalse() {
+    public BooleanTensor allFalse() {
         for (int i = 0; i < buffer.getLength(); i++) {
             if (buffer.get(i)) {
-                return false;
+                return new JVMBooleanTensor(false);
             }
         }
-        return true;
+        return new JVMBooleanTensor(true);
     }
 
     @Override
-    public boolean anyTrue() {
-        return !allFalse();
+    public BooleanTensor anyTrue() {
+        return allFalse().notInPlace();
     }
 
     @Override
-    public boolean anyFalse() {
-        return !allTrue();
+    public BooleanTensor anyFalse() {
+        return allTrue().notInPlace();
     }
 
     @Override

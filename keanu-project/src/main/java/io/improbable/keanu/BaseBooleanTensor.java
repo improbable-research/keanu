@@ -1,7 +1,5 @@
 package io.improbable.keanu;
 
-import io.improbable.keanu.tensor.Tensor;
-
 public interface BaseBooleanTensor<
     BOOLEAN extends BaseTensor<BOOLEAN, Boolean, BOOLEAN>,
     INTEGER extends BaseNumberTensor<BOOLEAN, INTEGER, DOUBLE, Integer, INTEGER>,
@@ -25,9 +23,7 @@ public interface BaseBooleanTensor<
     INTEGER integerWhere(INTEGER trueValue, INTEGER falseValue);
 
     BOOLEAN booleanWhere(BOOLEAN trueValue, BOOLEAN falseValue);
-
-    <T, TENSOR extends Tensor<T, TENSOR>> TENSOR where(TENSOR trueValue, TENSOR falseValue);
-
+    
     BOOLEAN allTrue();
 
     BOOLEAN allFalse();

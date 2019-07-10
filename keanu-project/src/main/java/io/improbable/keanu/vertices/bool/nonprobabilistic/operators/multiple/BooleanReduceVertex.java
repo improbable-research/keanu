@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class BooleanReduceVertex extends VertexImpl<BooleanTensor> implements BooleanVertex,  NonProbabilistic<BooleanTensor>, NonSaveableVertex {
+public class BooleanReduceVertex extends VertexImpl<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor>, NonSaveableVertex {
     private final List<? extends Vertex<BooleanTensor>> inputs;
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
@@ -30,7 +30,6 @@ public class BooleanReduceVertex extends VertexImpl<BooleanTensor> implements Bo
         this.reduceFunction = reduceFunction;
         setParents(inputs);
     }
-
 
     public BooleanReduceVertex(long[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
         this(shape, Arrays.asList(input), f);

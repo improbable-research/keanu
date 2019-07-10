@@ -60,9 +60,9 @@ public class DoubleIfVertex extends VertexImpl<DoubleTensor> implements DoubleVe
         PartialDerivative elsPartial = derivativeOfParentsWithRespectToInput.getOrDefault(els, PartialDerivative.EMPTY);
         BooleanTensor predicateValue = predicate.getValue();
 
-        if (predicateValue.allTrue()) {
+        if (predicateValue.allTrue().scalar()) {
             return thnPartial;
-        } else if (predicateValue.allFalse()) {
+        } else if (predicateValue.allFalse().scalar()) {
             return elsPartial;
         } else {
             return thnPartial.multiplyAlongOfDimensions(predicateValue.toDoubleMask())

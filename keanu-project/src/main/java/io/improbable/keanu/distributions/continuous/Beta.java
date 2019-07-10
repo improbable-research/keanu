@@ -32,7 +32,7 @@ public class Beta implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        Preconditions.checkArgument(alpha.greaterThan(0.).allTrue() && beta.greaterThan(0.).allTrue(),
+        Preconditions.checkArgument(alpha.greaterThan(0.).allTrue().scalar() && beta.greaterThan(0.).allTrue().scalar(),
             "alpha and beta must be positive. alpha: " + alpha + " beta: " + beta);
 
         final DoubleTensor y1 = random.nextGamma(shape, DoubleTensor.scalar(1.0), alpha);

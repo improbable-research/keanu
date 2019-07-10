@@ -48,7 +48,7 @@ public class Categorical<CATEGORY> implements Distribution<GenericTensor<CATEGOR
 
             sampleValuesSetSoFar.orInPlace(maskForUnassignedSampleValues);
 
-            if (sampleValuesSetSoFar.allTrue()) {
+            if (sampleValuesSetSoFar.allTrue().scalar()) {
                 break;
             }
         }
@@ -71,7 +71,7 @@ public class Categorical<CATEGORY> implements Distribution<GenericTensor<CATEGOR
     }
 
     private boolean containsNonPositiveEntry(DoubleTensor sumOfProbabilities) {
-        return !sumOfProbabilities.lessThanOrEqual(0.).allFalse();
+        return !sumOfProbabilities.lessThanOrEqual(0.).allFalse().scalar();
     }
 
     private DoubleTensor getSumOfProbabilities(long[] shape) {

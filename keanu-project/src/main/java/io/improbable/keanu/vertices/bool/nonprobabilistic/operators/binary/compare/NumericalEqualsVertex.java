@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
+package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;

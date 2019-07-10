@@ -67,7 +67,7 @@ public class Pareto implements ContinuousDistribution {
     }
 
     private boolean checkParamsAreValid() {
-        return location.greaterThan(0.0).allTrue() && scale.greaterThan(0.0).allTrue();
+        return location.greaterThan(0.0).allTrue().scalar() && scale.greaterThan(0.0).allTrue().scalar();
     }
 
     private DoubleTensor setProbToZeroForInvalidX(DoubleTensor x, DoubleTensor result) {

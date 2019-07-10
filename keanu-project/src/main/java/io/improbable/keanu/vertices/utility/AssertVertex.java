@@ -46,7 +46,7 @@ public class AssertVertex extends VertexImpl<BooleanTensor> implements BooleanVe
     }
 
     public static BooleanTensor assertion(BooleanTensor predicateValue, String errorMessage, String labelQualifiedName) {
-        if (!predicateValue.allTrue()) {
+        if (!predicateValue.allTrue().scalar()) {
             throw new GraphAssertionException(buildAssertMessage(errorMessage, labelQualifiedName));
         }
         return predicateValue;

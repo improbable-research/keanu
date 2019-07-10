@@ -11,7 +11,9 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
-public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> extends VertexImpl<BooleanTensor> implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexBinaryOp<Vertex<A>, Vertex<B>> {
+public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor>
+    extends VertexImpl<BooleanTensor>
+    implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexBinaryOp<Vertex<A>, Vertex<B>> {
 
     protected final Vertex<A> left;
     protected final Vertex<B> right;
@@ -43,7 +45,7 @@ public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> 
 
     @Override
     public boolean contradictsObservation() {
-        return isObserved() && !op(left.getValue(), right.getValue()).elementwiseEquals(getValue()).allTrue();
+        return isObserved() && !op(left.getValue(), right.getValue()).elementwiseEquals(getValue()).allTrue().scalar();
     }
 
     @Override

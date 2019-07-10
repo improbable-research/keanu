@@ -26,7 +26,7 @@ public class Triangular implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        Preconditions.checkArgument(c.greaterThanOrEqual(xMin).allTrue() && c.lessThanOrEqual(xMax).allTrue(),
+        Preconditions.checkArgument(c.greaterThanOrEqual(xMin).allTrue().scalar() && c.lessThanOrEqual(xMax).allTrue().scalar(),
             "center must be between xMin and xMax. c: " + c + " xMin: " + xMin + " xMax: " + xMax);
 
         final DoubleTensor p = random.nextDouble(shape);

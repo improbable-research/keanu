@@ -34,6 +34,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpVertex;
 import io.improbable.keanu.vertices.number.FixedPointTensorVertex;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.function.Function;
@@ -350,10 +351,13 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
 
     class IntegerCumSumVertex extends IntegerUnaryOpVertex {
         private final static String REQUESTED_DIMENSION = "requestedDimension";
+
+        @Getter(onMethod = @__({@SaveVertexParam(REQUESTED_DIMENSION)}))
         private final int requestedDimension;
 
         @ExportVertexToPythonBindings
-        public IntegerCumSumVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex, int requestedDimension) {
+        public IntegerCumSumVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
+                                   @LoadVertexParam(REQUESTED_DIMENSION) int requestedDimension) {
             super(inputVertex.getShape(), inputVertex);
             this.requestedDimension = requestedDimension;
         }
@@ -361,11 +365,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         @Override
         protected IntegerTensor op(IntegerTensor value) {
             return value.cumSum(requestedDimension);
-        }
-
-        @SaveVertexParam(REQUESTED_DIMENSION)
-        public int getRequestedDimension() {
-            return requestedDimension;
         }
     }
 
@@ -389,7 +388,8 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         private final int requestedDimension;
 
         @ExportVertexToPythonBindings
-        public IntegerCumProdVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex, int requestedDimension) {
+        public IntegerCumProdVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
+                                    @LoadVertexParam(REQUESTED_DIMENSION) int requestedDimension) {
             super(inputVertex.getShape(), inputVertex);
             this.requestedDimension = requestedDimension;
         }

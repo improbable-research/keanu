@@ -29,7 +29,7 @@ public class Cauchy implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        Preconditions.checkArgument(scale.greaterThan(0.).allTrue(),
+        Preconditions.checkArgument(scale.greaterThan(0.).allTrue().scalar(),
             "scale must be greater than 0. scale: " + scale);
 
         DoubleTensor unityCauchy = random.nextDouble(shape);

@@ -123,7 +123,7 @@ public class Loop {
 
     private void checkIfMaxCountHasBeenReached(SequenceItem item) throws LoopDidNotTerminateException {
         BooleanVertex stillLooping = item.get(STILL_LOOPING_LABEL);
-        if (!stillLooping.getValue().allFalse()) {
+        if (!stillLooping.getValue().allFalse().scalar()) {
             String errorMessage = "Loop has exceeded its max count " + sequence.size();
             if (throwWhenMaxCountIsReached) {
                 throw new LoopDidNotTerminateException(errorMessage);
