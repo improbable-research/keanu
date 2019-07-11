@@ -1,13 +1,14 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -15,12 +16,14 @@ import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShape.removeDimension;
 
-public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
+public class SliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
+    extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
+
+    private final static String DIMENSION_NAME = "dimension";
+    private final static String INDEX_NAME = "index";
 
     private final int dimension;
     private final long index;
-    private final static String DIMENSION_NAME = "dimension";
-    private final static String INDEX_NAME = "index";
 
     /**
      * Takes the slice along a given dimension and index of a vertex
@@ -30,7 +33,7 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
      * @param index       the index of extraction
      */
     @ExportVertexToPythonBindings
-    public SliceVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
+    public SliceVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
                        @LoadVertexParam(DIMENSION_NAME) int dimension,
                        @LoadVertexParam(INDEX_NAME) long index) {
         super(removeDimension(dimension, inputVertex.getShape()), inputVertex);
@@ -39,7 +42,7 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor value) {
+    protected TENSOR op(TENSOR value) {
         return value.slice(dimension, index);
     }
 
@@ -89,13 +92,18 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
         return outputTensor;
     }
 
+    @Override
+    public boolean isDifferentiable() {
+        return inputVertex.isDifferentiable();
+    }
+
     @SaveVertexParam(DIMENSION_NAME)
     public int getDimension() {
-        return dimension;
+        return this.dimension;
     }
 
     @SaveVertexParam(INDEX_NAME)
     public long getIndex() {
-        return index;
+        return this.index;
     }
 }

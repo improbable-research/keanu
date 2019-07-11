@@ -1,14 +1,8 @@
 package io.improbable.keanu.vertices.number;
 
 import io.improbable.keanu.BaseNumberTensor;
-import io.improbable.keanu.annotation.DisplayInformationForOutput;
-import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.kotlin.NumberOperators;
 import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.NonProbabilisticVertex;
-import io.improbable.keanu.vertices.tensor.BinaryTensorOpVertex;
-import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.CastNumberToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
@@ -20,26 +14,12 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
+import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 
 public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
     extends TensorVertex<T, TENSOR, VERTEX>, BaseNumberTensor<BooleanVertex, IntegerVertex, DoubleVertex, T, VERTEX>, NumberOperators<VERTEX> {
 
-
-    @DisplayInformationForOutput(displayName = "-")
-    class NumberDifferenceVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
-        extends BinaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX> {
-
-        @ExportVertexToPythonBindings
-        public NumberDifferenceVertex(@LoadVertexParam(LEFT_NAME) TensorVertex<T, TENSOR, VERTEX> left,
-                                      @LoadVertexParam(RIGHT_NAME) TensorVertex<T, TENSOR, VERTEX> right) {
-            super(left, right);
-        }
-
-        @Override
-        protected TENSOR op(TENSOR l, TENSOR r) {
-            return l.minus(r);
-        }
-    }
 
     @Override
     default VERTEX minus(VERTEX that) {

@@ -15,11 +15,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.MultiplexerVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
@@ -258,7 +257,7 @@ public class KeanuCompiledGraphTest {
     @Test
     public void canCompileIntegerBooleanIndex() {
         UniformIntVertex A = new UniformIntVertex(new long[]{4}, 0, 1);
-        BooleanVertex indices = new ConstantBooleanVertex(new boolean[]{true, true, false ,false});
+        BooleanVertex indices = new ConstantBooleanVertex(new boolean[]{true, true, false, false});
         IntegerVertex result = A.get(indices);
 
         assertCompiledIsSameAsVertexEvaluation(A, indices, result);
@@ -405,7 +404,7 @@ public class KeanuCompiledGraphTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
 
         CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
-        GenericTakeVertex<TestEnum> C = A.take(1);
+        GenericTensorVertex<TestEnum> C = A.take(1);
 
         assertCompiledIsSameAsVertexEvaluation(A, C);
     }
@@ -418,7 +417,7 @@ public class KeanuCompiledGraphTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
 
         CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
-        GenericSliceVertex<TestEnum> C = A.slice(0, 1);
+        GenericTensorVertex<TestEnum> C = A.slice(0, 1);
 
         assertCompiledIsSameAsVertexEvaluation(A, C);
     }

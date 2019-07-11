@@ -24,7 +24,7 @@ public class TakeVertexTest {
 
         DoubleVertex N = m.multiply(alpha);
 
-        TakeVertex take = new TakeVertex(N, 0, 0);
+        DoubleVertex take = N.take(0, 0);
         DoubleTensor takePartial = Differentiator.forwardModeAutoDiff(m, take).of(take);
         DoubleTensor takePartialReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(m);
 
@@ -34,7 +34,7 @@ public class TakeVertexTest {
         assertArrayEquals(takePartial.getShape(), takePartialReverse.getShape());
         assertArrayEquals(takePartial.asFlatDoubleArray(), takePartialReverse.asFlatDoubleArray(), 1e-6);
 
-        TakeVertex take2 = new TakeVertex(N, 0, 1);
+        DoubleVertex take2 = N.take(0, 1);
         DoubleTensor takePartial2 = Differentiator.forwardModeAutoDiff(m, take2).of(take2);
         DoubleTensor takePartial2Reverse = Differentiator.reverseModeAutoDiff(take2, m, alpha).withRespectTo(m);
 
@@ -56,7 +56,7 @@ public class TakeVertexTest {
 
         DoubleVertex N = m.matrixMultiply(alpha);
 
-        TakeVertex take = new TakeVertex(N, 0, 0);
+        DoubleVertex take = N.take(0, 0);
 
         DoubleTensor takePartial = Differentiator.forwardModeAutoDiff(m, take).of(take);
         DoubleTensor takePartialReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(m);
@@ -66,7 +66,7 @@ public class TakeVertexTest {
         assertArrayEquals(takePartial.getShape(), takePartialReverse.getShape());
         assertArrayEquals(takePartial.asFlatDoubleArray(), takePartialReverse.asFlatDoubleArray(), 1e-6);
 
-        TakeVertex take2 = new TakeVertex(N, 0, 1);
+        DoubleVertex take2 = N.take(0, 1);
 
         DoubleTensor takePartial2 = Differentiator.forwardModeAutoDiff(m, take2).of(take2);
         DoubleTensor takePartial2Reverse = Differentiator.reverseModeAutoDiff(take2, m, alpha).withRespectTo(m);
@@ -104,7 +104,7 @@ public class TakeVertexTest {
         //y = L x N = (beta x alpha) x (alpha x m)
         DoubleVertex y = L.matrixMultiply(N);
 
-        TakeVertex take = new TakeVertex(y, 0, 0);
+        DoubleVertex take = y.take(0, 0);
         DoubleTensor takeDiff = Differentiator.forwardModeAutoDiff(alpha, take).of(take);
         DoubleTensor takeDiffReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(alpha);
 

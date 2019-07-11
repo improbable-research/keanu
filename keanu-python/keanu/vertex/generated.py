@@ -42,11 +42,11 @@ def cast_to_vertex(input: vertex_constructor_param_types) -> Vertex:
     return do_inferred_vertex_cast({bool: ConstantBoolean, int: ConstantInteger, float: ConstantDouble}, input)
 
 
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.CastNumberToBooleanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.XorBinaryVertex")
@@ -56,13 +56,21 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilis
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanBooleanWhereVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanReshapeVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanSliceVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanTakeVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanDoubleWhereVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanIntegerWhereVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToDoubleMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToIntegerMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllFalseVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllTrueVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyFalseVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyTrueVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanDiagVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastToDoubleVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex")
@@ -93,14 +101,10 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.PermuteVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.BetaVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
@@ -123,32 +127,49 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.TriangularVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.CastToIntegerVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGetBooleanIndexVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanOrEqualMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerLessThanMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerLessThanOrEqualMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMatrixMultiplyVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerModVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerSetWithMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerTensorMultiplyVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerBroadcastVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPermuteVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerReshapeVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumProdVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumSumVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerDiagVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMaxUnaryVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMinUnaryVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerProductVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.GeometricVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.MultinomialVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.BroadcastVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.PermuteVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.ReshapeVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.SliceVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.TakeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.utility.AssertVertex")
+
+
+def CastNumberToBoolean(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().CastNumberToBooleanVertex, label, cast_to_vertex(input_vertex))
 
 
 def BooleanIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -165,10 +186,6 @@ def CastToBoolean(input_vertex: vertex_constructor_param_types, label: Optional[
 
 def ConstantBoolean(constant: tensor_arg_types, label: Optional[str]=None) -> Vertex:
     return Boolean(context.jvm_view().ConstantBooleanVertex, label, cast_to_boolean_tensor(constant))
-
-
-def NumericalEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, epsilon: float, label: Optional[str]=None) -> Vertex:
-    return Boolean(context.jvm_view().NumericalEqualsVertex, label, cast_to_vertex(a), cast_to_vertex(b), cast_to_double(epsilon))
 
 
 def AndBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -207,37 +224,56 @@ def NotEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_typ
     return Boolean(context.jvm_view().NotEqualsVertex, label, cast_to_vertex(a), cast_to_vertex(b))
 
 
+def NumericalEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, epsilon: float, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().NumericalEqualsVertex, label, cast_to_vertex(a), cast_to_vertex(b), cast_to_double(epsilon))
+
+
+def BooleanBooleanWhere(input_vertex: vertex_constructor_param_types, true_value: vertex_constructor_param_types, false_value: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().BooleanBooleanWhereVertex, label, cast_to_boolean_vertex(input_vertex), cast_to_boolean_vertex(true_value), cast_to_boolean_vertex(false_value))
+
+
 def BooleanConcatenation(dimension: int, input: Collection[Vertex], label: Optional[str]=None) -> Vertex:
     return Boolean(context.jvm_view().BooleanConcatenationVertex, label, cast_to_integer(dimension), cast_to_vertex_array(input))
 
 
-def BooleanReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Boolean(context.jvm_view().BooleanReshapeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(proposed_shape))
+def BooleanDoubleWhere(input_vertex: vertex_constructor_param_types, true_value: vertex_constructor_param_types, false_value: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Double(context.jvm_view().BooleanDoubleWhereVertex, label, cast_to_boolean_vertex(input_vertex), cast_to_double_vertex(true_value), cast_to_double_vertex(false_value))
 
 
-def BooleanSlice(input_vertex: vertex_constructor_param_types, dimension: int, index: int, label: Optional[str]=None) -> Vertex:
-    """
-    Takes the slice along a given dimension and index of a vertex
-    
-    :param input_vertex: the input vertex
-    :param dimension: the dimension to extract along
-    :param index: the index of extraction
-    """
-    return Boolean(context.jvm_view().BooleanSliceVertex, label, cast_to_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
+def BooleanIntegerWhere(input_vertex: vertex_constructor_param_types, true_value: vertex_constructor_param_types, false_value: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().BooleanIntegerWhereVertex, label, cast_to_boolean_vertex(input_vertex), cast_to_integer_vertex(true_value), cast_to_integer_vertex(false_value))
 
 
-def BooleanTake(input_vertex: vertex_constructor_param_types, index: Collection[int], label: Optional[str]=None) -> Vertex:
-    """
-    A vertex that extracts a scalar at a given index
-    
-    :param input_vertex: the input vertex to extract from
-    :param index: the index to extract at
-    """
-    return Boolean(context.jvm_view().BooleanTakeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(index))
+def BooleanToDoubleMask(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Double(context.jvm_view().BooleanToDoubleMaskVertex, label, cast_to_boolean_vertex(input_vertex))
+
+
+def BooleanToIntegerMask(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().BooleanToIntegerMaskVertex, label, cast_to_boolean_vertex(input_vertex))
+
+
+def AllFalse(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().AllFalseVertex, label, cast_to_boolean_vertex(input_vertex))
+
+
+def AllTrue(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().AllTrueVertex, label, cast_to_boolean_vertex(input_vertex))
+
+
+def AnyFalse(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().AnyFalseVertex, label, cast_to_boolean_vertex(input_vertex))
+
+
+def AnyTrue(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().AnyTrueVertex, label, cast_to_boolean_vertex(input_vertex))
+
+
+def BooleanDiag(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().BooleanDiagVertex, label, cast_to_boolean_vertex(input_vertex))
 
 
 def NotBinary(a: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Boolean(context.jvm_view().NotBinaryVertex, label, cast_to_vertex(a))
+    return Boolean(context.jvm_view().NotBinaryVertex, label, cast_to_boolean_vertex(a))
 
 
 def Bernoulli(prob_true: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -250,8 +286,8 @@ def Bernoulli(prob_true: vertex_constructor_param_types, label: Optional[str]=No
     return Boolean(context.jvm_view().BernoulliVertex, label, cast_to_double_vertex(prob_true))
 
 
-def CastToDouble(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().CastToDoubleVertex, label, cast_to_vertex(input_vertex))
+def CastNumberToDouble(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Double(context.jvm_view().CastNumberToDoubleVertex, label, cast_to_vertex(input_vertex))
 
 
 def ConstantDouble(constant: tensor_arg_types, label: Optional[str]=None) -> Vertex:
@@ -480,14 +516,6 @@ def MatrixInverse(input_vertex: vertex_constructor_param_types, label: Optional[
     return Double(context.jvm_view().MatrixInverseVertex, label, cast_to_double_vertex(input_vertex))
 
 
-def Permute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().PermuteVertex, label, cast_to_double_vertex(input_vertex), cast_to_int_array(rearrange))
-
-
-def Reshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().ReshapeVertex, label, cast_to_double_vertex(input_vertex), cast_to_long_array(proposed_shape))
-
-
 def Round(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     Applies the Rounding operator to a vertex.
@@ -517,17 +545,6 @@ def Sin(input_vertex: vertex_constructor_param_types, label: Optional[str]=None)
     return Double(context.jvm_view().SinVertex, label, cast_to_double_vertex(input_vertex))
 
 
-def Slice(input_vertex: vertex_constructor_param_types, dimension: int, index: int, label: Optional[str]=None) -> Vertex:
-    """
-    Takes the slice along a given dimension and index of a vertex
-    
-    :param input_vertex: the input vertex
-    :param dimension: the dimension to extract along
-    :param index: the index of extraction
-    """
-    return Double(context.jvm_view().SliceVertex, label, cast_to_double_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
-
-
 def Sum(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     Performs a sum across all dimensions
@@ -535,16 +552,6 @@ def Sum(input_vertex: vertex_constructor_param_types, label: Optional[str]=None)
     :param input_vertex: the vertex to have its values summed
     """
     return Double(context.jvm_view().SumVertex, label, cast_to_double_vertex(input_vertex))
-
-
-def Take(input_vertex: vertex_constructor_param_types, index: Collection[int], label: Optional[str]=None) -> Vertex:
-    """
-    A vertex that extracts a scalar at a given index
-    
-    :param input_vertex: the input vertex to extract from
-    :param index: the index to extract at
-    """
-    return Double(context.jvm_view().TakeVertex, label, cast_to_double_vertex(input_vertex), cast_to_long_array(index))
 
 
 def Tan(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -703,8 +710,8 @@ def Print(parent: vertex_constructor_param_types, message: str, print_data: bool
     return Vertex(context.jvm_view().PrintVertex, label, cast_to_vertex(parent), message, cast_to_boolean(print_data))
 
 
-def CastToInteger(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().CastToIntegerVertex, label, cast_to_vertex(input_vertex))
+def CastNumberToInteger(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().CastNumberToIntegerVertex, label, cast_to_vertex(input_vertex))
 
 
 def ConstantInteger(constant: tensor_arg_types, label: Optional[str]=None) -> Vertex:
@@ -729,16 +736,6 @@ def IntegerAddition(left: vertex_constructor_param_types, right: vertex_construc
     return Integer(context.jvm_view().IntegerAdditionVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerDifference(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Subtracts one vertex from another
-    
-    :param left: the vertex to be subtracted from
-    :param right: the vertex to subtract
-    """
-    return Integer(context.jvm_view().IntegerDifferenceVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
 def IntegerDivision(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     Divides one vertex by another
@@ -749,8 +746,24 @@ def IntegerDivision(left: vertex_constructor_param_types, right: vertex_construc
     return Integer(context.jvm_view().IntegerDivisionVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerGetBooleanIndex(input_vertex: vertex_constructor_param_types, indices: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerGetBooleanIndexVertex, label, cast_to_integer_vertex(input_vertex), cast_to_boolean_vertex(indices))
+def IntegerGreaterThanMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerGreaterThanMaskVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
+
+
+def IntegerGreaterThanOrEqualMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerGreaterThanOrEqualMaskVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
+
+
+def IntegerLessThanMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerLessThanMaskVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
+
+
+def IntegerLessThanOrEqualMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerLessThanOrEqualMaskVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
+
+
+def IntegerMatrixMultiply(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerMatrixMultiplyVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
 def IntegerMax(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -773,6 +786,10 @@ def IntegerMin(left: vertex_constructor_param_types, right: vertex_constructor_p
     return Integer(context.jvm_view().IntegerMinVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
+def IntegerMod(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerModVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
+
+
 def IntegerMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     Multiplies one vertex by another
@@ -793,6 +810,14 @@ def IntegerPower(left: vertex_constructor_param_types, right: vertex_constructor
     return Integer(context.jvm_view().IntegerPowerVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
+def IntegerSetWithMask(left: vertex_constructor_param_types, mask: vertex_constructor_param_types, replace_with_value: int, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerSetWithMaskVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(mask), cast_to_integer(replace_with_value))
+
+
+def IntegerTensorMultiply(left: vertex_constructor_param_types, right: vertex_constructor_param_types, dims_left: Collection[int], dims_right: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerTensorMultiplyVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right), cast_to_int_array(dims_left), cast_to_int_array(dims_right))
+
+
 def IntegerConcatenation(dimension: int, input: Collection[Vertex], label: Optional[str]=None) -> Vertex:
     return Integer(context.jvm_view().IntegerConcatenationVertex, label, cast_to_integer(dimension), cast_to_vertex_array(input))
 
@@ -806,27 +831,28 @@ def IntegerAbs(input_vertex: vertex_constructor_param_types, label: Optional[str
     return Integer(context.jvm_view().IntegerAbsVertex, label, cast_to_integer_vertex(input_vertex))
 
 
-def IntegerBroadcast(input_vertex: vertex_constructor_param_types, to_shape: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerBroadcastVertex, label, cast_to_integer_vertex(input_vertex), cast_to_long_array(to_shape))
+def IntegerCumProd(input_vertex: vertex_constructor_param_types, requested_dimension: int, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerCumProdVertex, label, cast_to_integer_vertex(input_vertex), cast_to_integer(requested_dimension))
 
 
-def IntegerPermute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerPermuteVertex, label, cast_to_integer_vertex(input_vertex), cast_to_int_array(rearrange))
+def IntegerCumSum(input_vertex: vertex_constructor_param_types, requested_dimension: int, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerCumSumVertex, label, cast_to_integer_vertex(input_vertex), cast_to_integer(requested_dimension))
 
 
-def IntegerReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerReshapeVertex, label, cast_to_integer_vertex(input_vertex), cast_to_long_array(proposed_shape))
+def IntegerDiag(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerDiagVertex, label, cast_to_integer_vertex(input_vertex))
 
 
-def IntegerSlice(input_vertex: vertex_constructor_param_types, dimension: int, index: int, label: Optional[str]=None) -> Vertex:
-    """
-    Takes the slice along a given dimension and index of a vertex
-    
-    :param input_vertex: the input vertex
-    :param dimension: the dimension to extract along
-    :param index: the index of extraction
-    """
-    return Integer(context.jvm_view().IntegerSliceVertex, label, cast_to_integer_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
+def IntegerMaxUnary(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerMaxUnaryVertex, label, cast_to_integer_vertex(input_vertex))
+
+
+def IntegerMinUnary(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerMinUnaryVertex, label, cast_to_integer_vertex(input_vertex))
+
+
+def IntegerProduct(input_vertex: vertex_constructor_param_types, over_dimensions: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerProductVertex, label, cast_to_integer_vertex(input_vertex), cast_to_int_array(over_dimensions))
 
 
 def IntegerSum(input_vertex: vertex_constructor_param_types, over_dimensions: Collection[int], label: Optional[str]=None) -> Vertex:
@@ -837,16 +863,6 @@ def IntegerSum(input_vertex: vertex_constructor_param_types, over_dimensions: Co
     :param over_dimensions: the dimensions to sum over
     """
     return Integer(context.jvm_view().IntegerSumVertex, label, cast_to_integer_vertex(input_vertex), cast_to_int_array(over_dimensions))
-
-
-def IntegerTake(input_vertex: vertex_constructor_param_types, index: Collection[int], label: Optional[str]=None) -> Vertex:
-    """
-    A vertex that extracts a scalar at a given index
-    
-    :param input_vertex: the input vertex to extract from
-    :param index: the index to extract at
-    """
-    return Integer(context.jvm_view().IntegerTakeVertex, label, cast_to_integer_vertex(input_vertex), cast_to_long_array(index))
 
 
 def Binomial(p: vertex_constructor_param_types, n: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -875,6 +891,37 @@ def UniformInt(min: vertex_constructor_param_types, max: vertex_constructor_para
     return Integer(context.jvm_view().UniformIntVertex, label, cast_to_integer_vertex(min), cast_to_integer_vertex(max))
 
 
+def NumberDifference(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().NumberDifferenceVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def Broadcast(input_vertex: vertex_constructor_param_types, to_shape: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().BroadcastVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(to_shape))
+
+
+def Permute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().PermuteVertex, label, cast_to_vertex(input_vertex), cast_to_int_array(rearrange))
+
+
+def Reshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().ReshapeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(proposed_shape))
+
+
+def Slice(input_vertex: vertex_constructor_param_types, dimension: int, index: int, label: Optional[str]=None) -> Vertex:
+    """
+    Takes the slice along a given dimension and index of a vertex
+    
+    :param input_vertex: the input vertex
+    :param dimension: the dimension to extract along
+    :param index: the index of extraction
+    """
+    return Vertex(context.jvm_view().SliceVertex, label, cast_to_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
+
+
+def Take(input_vertex: vertex_constructor_param_types, index: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().TakeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(index))
+
+
 def Assert(predicate: vertex_constructor_param_types, error_message: str, label: Optional[str]=None) -> Vertex:
     """
     A vertex that asserts a {@link BooleanVertex} is all true on calculation.
@@ -882,4 +929,4 @@ def Assert(predicate: vertex_constructor_param_types, error_message: str, label:
     :param predicate: the predicate to evaluate
     :param error_message: a message to include in the {@link AssertionError}
     """
-    return Boolean(context.jvm_view().AssertVertex, label, cast_to_vertex(predicate), error_message)
+    return Boolean(context.jvm_view().AssertVertex, label, cast_to_boolean_vertex(predicate), error_message)

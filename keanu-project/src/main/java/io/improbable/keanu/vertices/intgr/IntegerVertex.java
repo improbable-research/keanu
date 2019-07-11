@@ -1,20 +1,21 @@
 package io.improbable.keanu.vertices.intgr;
 
-import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
-import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
-import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerBinaryOpVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGetBooleanIndexVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanMaskVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanOrEqualMaskVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerLessThanMaskVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerLessThanOrEqualMaskVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMatrixMultiplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerModVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerSetWithMaskVertex;
@@ -22,19 +23,18 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerApplyVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumProdVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumSumVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerDiagVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMaxUnaryVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMinUnaryVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerProductVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpVertex;
 import io.improbable.keanu.vertices.number.FixedPointTensorVertex;
-import lombok.Getter;
 
 import java.util.List;
 import java.util.function.Function;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.getMatrixMultiplicationResultingShape;
 
 public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPointTensorVertex<Integer, IntegerTensor, IntegerVertex> {
 
@@ -83,40 +83,13 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default IntegerVertex take(long... index) {
-        return new IntegerTakeVertex(this, index);
-    }
-
-    @Override
     default List<IntegerVertex> split(int dimension, long... splitAtIndices) {
         return null;
-    }
-
-    class IntegerDiagVertex extends IntegerUnaryOpVertex {
-        @ExportVertexToPythonBindings
-        public IntegerDiagVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex) {
-            super(inputVertex.getShape(), inputVertex);
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor value) {
-            return value.diag();
-        }
     }
 
     @Override
     default IntegerVertex diag() {
         return new IntegerDiagVertex(this);
-    }
-
-    @Override
-    default IntegerVertex get(BooleanVertex booleanIndex) {
-        return new IntegerGetBooleanIndexVertex(this, booleanIndex);
-    }
-
-    @Override
-    default IntegerVertex slice(int dimension, long index) {
-        return new IntegerSliceVertex(this, dimension, index);
     }
 
     @Override
@@ -320,25 +293,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return new IntegerSumVertex(this, sumOverDimensions);
     }
 
-    class IntegerCumSumVertex extends IntegerUnaryOpVertex {
-        private final static String REQUESTED_DIMENSION = "requestedDimension";
-
-        @Getter(onMethod = @__({@SaveVertexParam(REQUESTED_DIMENSION)}))
-        private final int requestedDimension;
-
-        @ExportVertexToPythonBindings
-        public IntegerCumSumVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
-                                   @LoadVertexParam(REQUESTED_DIMENSION) int requestedDimension) {
-            super(inputVertex.getShape(), inputVertex);
-            this.requestedDimension = requestedDimension;
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor value) {
-            return value.cumSum(requestedDimension);
-        }
-    }
-
     @Override
     default IntegerVertex cumSum(int requestedDimension) {
         return new IntegerCumSumVertex(this, requestedDimension);
@@ -354,28 +308,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return new IntegerProductVertex(this, overDimensions);
     }
 
-    class IntegerCumProdVertex extends IntegerUnaryOpVertex {
-        private final static String REQUESTED_DIMENSION = "requestedDimension";
-        private final int requestedDimension;
-
-        @ExportVertexToPythonBindings
-        public IntegerCumProdVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
-                                    @LoadVertexParam(REQUESTED_DIMENSION) int requestedDimension) {
-            super(inputVertex.getShape(), inputVertex);
-            this.requestedDimension = requestedDimension;
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor value) {
-            return value.cumProd(requestedDimension);
-        }
-
-        @SaveVertexParam(REQUESTED_DIMENSION)
-        public int getRequestedDimension() {
-            return requestedDimension;
-        }
-    }
-
     @Override
     default IntegerVertex cumProd(int requestedDimension) {
         return new IntegerCumProdVertex(this, requestedDimension);
@@ -389,18 +321,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return new IntegerMaxVertex(a, b);
     }
 
-    class IntegerMaxUnaryVertex extends IntegerUnaryOpVertex {
-        @ExportVertexToPythonBindings
-        public IntegerMaxUnaryVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex) {
-            super(inputVertex.getShape(), inputVertex);
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor value) {
-            return value.max();
-        }
-    }
-
     @Override
     default IntegerVertex max() {
         return new IntegerMaxUnaryVertex(this);
@@ -409,18 +329,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     @Override
     default IntegerVertex max(IntegerVertex that) {
         return max(this, that);
-    }
-
-    class IntegerMinUnaryVertex extends IntegerUnaryOpVertex {
-        @ExportVertexToPythonBindings
-        public IntegerMinUnaryVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex) {
-            super(inputVertex.getShape(), inputVertex);
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor value) {
-            return value.min();
-        }
     }
 
     @Override
@@ -436,18 +344,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     @Override
     default IntegerVertex clamp(IntegerVertex min, IntegerVertex max) {
         return null;
-    }
-
-    class IntegerMatrixMultiplyVertex extends IntegerBinaryOpVertex {
-        @ExportVertexToPythonBindings
-        public IntegerMatrixMultiplyVertex(@LoadVertexParam(LEFT_NAME) IntegerVertex left, @LoadVertexParam(RIGHT_NAME) IntegerVertex right) {
-            super(getMatrixMultiplicationResultingShape(left.getShape(), right.getShape()), left, right);
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
-            return l.matrixMultiply(r);
-        }
     }
 
     @Override
@@ -488,35 +384,9 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return greaterThanOrEqual((new ConstantIntegerVertex(value)));
     }
 
-    class IntegerGreaterThanMaskVertex extends IntegerBinaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public IntegerGreaterThanMaskVertex(@LoadVertexParam(LEFT_NAME) IntegerVertex left, @LoadVertexParam(RIGHT_NAME) IntegerVertex right) {
-            super(left, right);
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
-            return l.greaterThanMask(r);
-        }
-    }
-
     @Override
     default IntegerVertex greaterThanMask(IntegerVertex greaterThanThis) {
         return new IntegerGreaterThanMaskVertex(this, greaterThanThis);
-    }
-
-    class IntegerGreaterThanOrEqualMaskVertex extends IntegerBinaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public IntegerGreaterThanOrEqualMaskVertex(@LoadVertexParam(LEFT_NAME) IntegerVertex left, @LoadVertexParam(RIGHT_NAME) IntegerVertex right) {
-            super(left, right);
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
-            return l.greaterThanOrEqualToMask(r);
-        }
     }
 
     @Override
@@ -524,35 +394,9 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return new IntegerGreaterThanOrEqualMaskVertex(this, greaterThanOrEqualThis);
     }
 
-    class IntegerLessThanMaskVertex extends IntegerBinaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public IntegerLessThanMaskVertex(@LoadVertexParam(LEFT_NAME) IntegerVertex left, @LoadVertexParam(RIGHT_NAME) IntegerVertex right) {
-            super(left, right);
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
-            return l.lessThanMask(r);
-        }
-    }
-
     @Override
     default IntegerVertex lessThanMask(IntegerVertex lessThanThis) {
         return new IntegerLessThanMaskVertex(this, lessThanThis);
-    }
-
-    class IntegerLessThanOrEqualMaskVertex extends IntegerBinaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public IntegerLessThanOrEqualMaskVertex(@LoadVertexParam(LEFT_NAME) IntegerVertex left, @LoadVertexParam(RIGHT_NAME) IntegerVertex right) {
-            super(left, right);
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
-            return l.lessThanOrEqualToMask(r);
-        }
     }
 
     @Override
@@ -563,19 +407,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     //////////////////////////
     ////  Fixed Point Tensor Operations
     //////////////////////////
-
-    class IntegerModVertex extends IntegerBinaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public IntegerModVertex(@LoadVertexParam(LEFT_NAME) IntegerVertex left, @LoadVertexParam(RIGHT_NAME) IntegerVertex right) {
-            super(left, right);
-        }
-
-        @Override
-        protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
-            return l.mod(r);
-        }
-    }
 
     @Override
     default IntegerVertex mod(Integer that) {

@@ -9,8 +9,8 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
 import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 
@@ -26,7 +26,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 import static java.util.stream.Collectors.toMap;
 
 
-public class CategoricalVertex<CATEGORY> extends GenericTensorVertex<CATEGORY> implements Probabilistic<GenericTensor<CATEGORY>>, NonSaveableVertex {
+public class CategoricalVertex<CATEGORY> extends VertexImpl<GenericTensor<CATEGORY>, GenericTensorVertex<CATEGORY>> implements GenericTensorVertex<CATEGORY>, Probabilistic<GenericTensor<CATEGORY>>, NonSaveableVertex {
 
     private final Map<CATEGORY, DoubleVertex> selectableValues;
 
@@ -60,7 +60,7 @@ public class CategoricalVertex<CATEGORY> extends GenericTensorVertex<CATEGORY> i
             .collect(
                 toMap(
                     categories::get,
-                    index -> new TakeVertex(vertex, index)
+                    vertex::take
                 )
             );
         return new CategoricalVertex<>(selectableValues);

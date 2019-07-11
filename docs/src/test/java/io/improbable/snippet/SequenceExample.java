@@ -64,7 +64,7 @@ public class SequenceExample {
             .fromIterator(allMyData.iterator())
             .withFactory((item, csvMyData) -> {
 
-                ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x).setLabel(xLabel);
+                DoubleVertex x = new ConstantDoubleVertex(csvMyData.x).setLabel(xLabel);
                 DoubleVertex y = m.multiply(x).plus(b).setLabel(yLabel);
 
                 DoubleVertex yObserved = new GaussianVertex(y, 1);

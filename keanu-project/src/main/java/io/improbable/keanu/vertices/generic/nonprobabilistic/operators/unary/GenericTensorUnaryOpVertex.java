@@ -4,9 +4,10 @@ import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 
-public abstract class GenericTensorUnaryOpVertex<IN, OUT> extends GenericTensorVertex<OUT> implements NonProbabilistic<GenericTensor<OUT>> {
+public abstract class GenericTensorUnaryOpVertex<IN, OUT> extends VertexImpl<GenericTensor<OUT>, GenericTensorVertex<OUT>> implements GenericTensorVertex<OUT>, NonProbabilistic<GenericTensor<OUT>> {
 
     protected static final String INPUT_NAME = "inputVertex";
 

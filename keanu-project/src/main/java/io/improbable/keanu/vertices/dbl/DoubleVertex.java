@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
@@ -47,9 +46,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixI
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
@@ -123,11 +120,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default TakeVertex take(long... index) {
-        return new TakeVertex(this, index);
-    }
-
-    @Override
     default List<DoubleVertex> split(int dimension, long... splitAtIndices) {
         return null;
     }
@@ -138,16 +130,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default DoubleVertex get(BooleanVertex booleanIndex) {
-        return null;
-    }
-
-    @Override
-    default SliceVertex slice(int dimension, long index) {
-        return new SliceVertex(this, dimension, index);
-    }
-
-    @Override
     default DoubleVertex slice(Slicer slicer) {
         return null;
     }
@@ -155,11 +137,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     @Override
     default BooleanVertex elementwiseEquals(Double value) {
         return elementwiseEquals(new ConstantDoubleVertex(value));
-    }
-
-    @Override
-    default BooleanVertex notEqualTo(DoubleVertex that) {
-        return new NotEqualsVertex<>(this, that);
     }
 
     @Override
@@ -801,6 +778,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
 
     @Override
     default IntegerVertex toInteger() {
-        return new CastNumberToIntegerVertex(this);
+        return new CastNumberToIntegerVertex<>(this);
     }
 }

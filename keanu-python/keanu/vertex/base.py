@@ -276,8 +276,8 @@ class Integer(Vertex):
     def __op_based_on_other_type(self, other: vertex_operation_param_types, op: Callable,
                                  integer_op_ctr: Callable) -> 'Vertex':
         if is_floating_type(other):
-            # Equivalent to kn.vertex.generated.CastToDouble(self).__add__(other) for add
-            return op(kn.vertex.generated.CastToDouble(self))
+            # Equivalent to kn.vertex.generated.CastNumberToDouble(self).__add__(other) for add
+            return op(kn.vertex.generated.CastNumberToDouble(self))
         else:
             return integer_op_ctr(other)
 
@@ -294,12 +294,12 @@ class Integer(Vertex):
     def __sub__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
             other, lambda casted_to_double: casted_to_double.__sub__(other), lambda other_holder: kn.vertex.generated.
-            IntegerDifference(self, other_holder))
+            NumberDifference(self, other_holder))
 
     def __rsub__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
             other, lambda casted_to_double: casted_to_double.__rsub__(other), lambda other_holder: kn.vertex.generated.
-            IntegerDifference(other_holder, self))
+            NumberDifference(other_holder, self))
 
     def __mul__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
@@ -320,10 +320,10 @@ class Integer(Vertex):
                                              other_holder: kn.vertex.generated.IntegerPower(other_holder, self))
 
     def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.CastToDouble(self).__truediv__(other)
+        return kn.vertex.generated.CastNumberToDouble(self).__truediv__(other)
 
     def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.CastToDouble(self).__rtruediv__(other)
+        return kn.vertex.generated.CastNumberToDouble(self).__rtruediv__(other)
 
     def __floordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
@@ -374,5 +374,5 @@ def is_floating_type(other: vertex_operation_param_types) -> bool:
 
 def cast_to_double_vertex_if_integer_vertex(vertex: vertex_operation_param_types) -> vertex_operation_param_types:
     if type(vertex) == Integer:
-        return kn.vertex.generated.CastToDouble(vertex)
+        return kn.vertex.generated.CastNumberToDouble(vertex)
     return vertex

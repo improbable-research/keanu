@@ -11,7 +11,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsWithRespec
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
@@ -499,7 +498,7 @@ public class ConcatenationVertexTest {
         UniformVertex inputB = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         UniformVertex inputC = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         ConcatenationVertex concatenationVertex = new ConcatenationVertex(0, inputA, inputB, inputC);
-        SliceVertex outputVertex = concatenationVertex.slice(1, 0);
+        DoubleVertex outputVertex = concatenationVertex.slice(1, 0);
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB, inputC), outputVertex, 10.0, 1e-10);
     }
 

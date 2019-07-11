@@ -22,7 +22,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Multip
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
-import io.improbable.keanu.vertices.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -44,7 +44,7 @@ public class DescriptionCreator {
         delimiters.put(AdditionVertex.class, " + ");
         delimiters.put(IntegerAdditionVertex.class, " + ");
         delimiters.put(DifferenceVertex.class, " - ");
-        delimiters.put(NumberTensorVertex.NumberDifferenceVertex.class, " - ");
+        delimiters.put(NumberDifferenceVertex.class, " - ");
         delimiters.put(MultiplicationVertex.class, " * ");
         delimiters.put(IntegerMultiplicationVertex.class, " * ");
         delimiters.put(DivisionVertex.class, " / ");

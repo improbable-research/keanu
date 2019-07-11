@@ -6,11 +6,12 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.generic.GenericVertex;
 
 import java.io.PrintStream;
 
-public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic<T> {
+public class PrintVertex<T> extends VertexImpl<T, GenericVertex<T>> implements GenericVertex<T>, NonProbabilistic<T> {
 
     public static void setPrintStream(PrintStream printStream) {
         PrintVertex.printStream = Preconditions.checkNotNull(printStream);

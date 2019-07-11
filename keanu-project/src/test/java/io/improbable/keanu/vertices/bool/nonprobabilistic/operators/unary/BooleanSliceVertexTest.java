@@ -19,27 +19,27 @@ public class BooleanSliceVertexTest {
 
     @Test
     public void canGetTensorAlongDimensionOfRank2() {
-        BooleanSliceVertex rowOne = new BooleanSliceVertex(matrixA, 0, 0);
+        BooleanVertex rowOne = matrixA.slice(0, 0);
 
         Assert.assertArrayEquals(new double[]{1, 1, 0}, rowOne.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{3}, rowOne.getShape());
 
-        BooleanSliceVertex rowTwo = new BooleanSliceVertex(matrixA, 0, 1);
+        BooleanVertex rowTwo = matrixA.slice(0, 1);
 
         Assert.assertArrayEquals(new double[]{0, 1, 1}, rowTwo.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{3}, rowTwo.getShape());
 
-        BooleanSliceVertex columnOne = new BooleanSliceVertex(matrixA, 1, 0);
+        BooleanVertex columnOne = matrixA.slice(1, 0);
 
         Assert.assertArrayEquals(new double[]{1, 0}, columnOne.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2}, columnOne.getShape());
 
-        BooleanSliceVertex columnTwo = new BooleanSliceVertex(matrixA, 1, 1);
+        BooleanVertex columnTwo = matrixA.slice(1, 1);
 
         Assert.assertArrayEquals(new double[]{1, 1}, columnTwo.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2}, columnTwo.getShape());
 
-        BooleanSliceVertex columnThree = new BooleanSliceVertex(matrixA, 1, 2);
+        BooleanVertex columnThree = matrixA.slice(1, 2);
 
         Assert.assertArrayEquals(new double[]{0, 1}, columnThree.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2}, columnThree.getShape());
@@ -50,15 +50,15 @@ public class BooleanSliceVertexTest {
         BooleanVertex cube = new ConstantBooleanVertex(false);
         cube.setValue(BooleanTensor.create(new boolean[]{true, true, false, false, true, true, false, false}, 2, 2, 2));
 
-        BooleanSliceVertex dimenZeroFace = new BooleanSliceVertex(cube, 0, 0);
+        BooleanVertex dimenZeroFace = cube.slice(0, 0);
         Assert.assertArrayEquals(new double[]{1, 1, 0, 0}, dimenZeroFace.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2, 2}, dimenZeroFace.getShape());
 
-        BooleanSliceVertex dimenOneFace = new BooleanSliceVertex(cube, 1, 0);
+        BooleanVertex dimenOneFace = cube.slice(1, 0);
         Assert.assertArrayEquals(new double[]{1, 1, 1, 1}, dimenOneFace.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2, 2}, dimenOneFace.getShape());
 
-        BooleanSliceVertex dimenTwoFace = new BooleanSliceVertex(cube, 2, 0);
+        BooleanVertex dimenTwoFace = cube.slice(2, 0);
         Assert.assertArrayEquals(new double[]{1, 0, 1, 0}, dimenTwoFace.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2, 2}, dimenTwoFace.getShape());
     }

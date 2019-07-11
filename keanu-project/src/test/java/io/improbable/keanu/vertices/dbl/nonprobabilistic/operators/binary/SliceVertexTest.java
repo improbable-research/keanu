@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
@@ -29,10 +28,10 @@ public class SliceVertexTest {
     @Test
     public void canDoAutodiffAcrossSliceAndConcat() {
         GaussianVertex latent = new GaussianVertex(new long[]{4, 1}, 0.0, 1.0);
-        SliceVertex slices[] = new SliceVertex[4];
+        DoubleVertex[] slices = new DoubleVertex[4];
 
         for (int i = 0; i < slices.length; i++) {
-            slices[i] = new SliceVertex(latent, 0, i);
+            slices[i] = latent.slice(0, i);
         }
 
         ConcatenationVertex concatenationVertex = new ConcatenationVertex(0, slices);
@@ -46,27 +45,27 @@ public class SliceVertexTest {
 
     @Test
     public void canGetTensorAlongDimensionOfRank2() {
-        SliceVertex rowOne = new SliceVertex(matrixA, 0, 0);
+        DoubleVertex rowOne = matrixA.slice(0, 0);
 
         Assert.assertArrayEquals(new double[]{1, 2, 3}, rowOne.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{3}, rowOne.getShape());
 
-        SliceVertex rowTwo = new SliceVertex(matrixA, 0, 1);
+        DoubleVertex rowTwo = matrixA.slice(0, 1);
 
         Assert.assertArrayEquals(new double[]{4, 5, 6}, rowTwo.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{3}, rowTwo.getShape());
 
-        SliceVertex columnOne = new SliceVertex(matrixA, 1, 0);
+        DoubleVertex columnOne = matrixA.slice(1, 0);
 
         Assert.assertArrayEquals(new double[]{1, 4}, columnOne.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2}, columnOne.getShape());
 
-        SliceVertex columnTwo = new SliceVertex(matrixA, 1, 1);
+        DoubleVertex columnTwo = matrixA.slice(1, 1);
 
         Assert.assertArrayEquals(new double[]{2, 5}, columnTwo.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2}, columnTwo.getShape());
 
-        SliceVertex columnThree = new SliceVertex(matrixA, 1, 2);
+        DoubleVertex columnThree = matrixA.slice(1, 2);
 
         Assert.assertArrayEquals(new double[]{3, 6}, columnThree.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2}, columnThree.getShape());
@@ -77,8 +76,8 @@ public class SliceVertexTest {
         DoubleVertex m = new UniformVertex(0, 10);
         m.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
-        SliceVertex columnZero = new SliceVertex(m, 0, 0);
-        SliceVertex elementZero = new SliceVertex(columnZero, 0, 0);
+        DoubleVertex columnZero = m.slice(0, 0);
+        DoubleVertex elementZero = columnZero.slice(0, 0);
 
         assertEquals(elementZero.getValue().scalar(), 1, 1e-6);
     }
@@ -112,7 +111,7 @@ public class SliceVertexTest {
 
         DoubleVertex N = m.matrixMultiply(alpha);
 
-        SliceVertex sliceN = new SliceVertex(N, dim, ind);
+        DoubleVertex sliceN = N.slice(dim, ind);
 
         DoubleTensor dSliceNWrtmForward = Differentiator.forwardModeAutoDiff(m, sliceN).of(sliceN);
 
@@ -140,7 +139,7 @@ public class SliceVertexTest {
 
         DoubleVertex N = m.matrixMultiply(alpha);
 
-        SliceVertex sliceN = new SliceVertex(N, 1, 1);
+        DoubleVertex sliceN = N.slice(1, 1);
 
         DoubleTensor originalPartial = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m);
         DoubleTensor slicePartial = Differentiator.reverseModeAutoDiff(sliceN, m).withRespectTo(m);
@@ -157,15 +156,15 @@ public class SliceVertexTest {
         DoubleVertex cube = new UniformVertex(0, 10);
         cube.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2}));
 
-        SliceVertex dimenZeroFace = new SliceVertex(cube, 0, 0);
+        DoubleVertex dimenZeroFace = cube.slice(0, 0);
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, dimenZeroFace.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2, 2}, dimenZeroFace.getShape());
 
-        SliceVertex dimenOneFace = new SliceVertex(cube, 1, 0);
+        DoubleVertex dimenOneFace = cube.slice(1, 0);
         Assert.assertArrayEquals(new double[]{1, 2, 5, 6}, dimenOneFace.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2, 2}, dimenOneFace.getShape());
 
-        SliceVertex dimenTwoFace = new SliceVertex(cube, 2, 0);
+        DoubleVertex dimenTwoFace = cube.slice(2, 0);
         Assert.assertArrayEquals(new double[]{1, 3, 5, 7}, dimenTwoFace.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new long[]{2, 2}, dimenTwoFace.getShape());
     }
@@ -173,7 +172,7 @@ public class SliceVertexTest {
     @Test
     public void changesMatchGradient() {
         UniformVertex cube = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
-        SliceVertex slice = new SliceVertex(cube, 2, 0);
+        DoubleVertex slice = cube.slice(2, 0);
         MultiplicationVertex result = slice.times(
             new ConstantDoubleVertex(new double[]{1., 2., 3., 4., 5., 6., 7., 8.}, new long[]{2, 2, 2})
         );

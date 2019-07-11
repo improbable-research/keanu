@@ -1,24 +1,23 @@
 package io.improbable.keanu.vertices.generic;
 
 import io.improbable.keanu.tensor.generic.GenericTensor;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericTensorVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 
-public abstract class GenericTensorVertex<T> extends GenericVertex<GenericTensor<T>> {
+public interface GenericTensorVertex<T> extends TensorVertex<T, GenericTensor<T>, GenericTensorVertex<T>> {
 
-    public GenericTensorVertex() {
-        super();
+    default GenericTensorVertex<T> asTyped(NonProbabilisticVertex<GenericTensor<T>, GenericTensorVertex<T>> vertex) {
+        return new GenericVertexWrapper<>(vertex);
     }
 
-    public GenericTensorVertex(long[] shape) {
-        super(shape);
+    default BooleanVertex elementwiseEquals(T that) {
+        return elementwiseEquals(new ConstantGenericTensorVertex<>(that));
     }
 
-    public GenericTakeVertex<T> take(long... index) {
-        return new GenericTakeVertex<>(this, index);
+    default BooleanVertex notEqualTo(T that) {
+        return notEqualTo(new ConstantGenericTensorVertex<>(that));
     }
 
-    public GenericSliceVertex<T> slice(int dimension, int index) {
-        return new GenericSliceVertex<>(this, dimension, index);
-    }
 }

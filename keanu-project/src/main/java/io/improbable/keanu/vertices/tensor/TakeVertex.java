@@ -1,50 +1,38 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
+public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
+    extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
-    private static final String INDEX_NAME = "index";
-    private final long[] index;
+    private static final String INDEX = "index";
+    private long[] index;
 
-    /**
-     * A vertex that extracts a scalar at a given index
-     *
-     * @param inputVertex the input vertex to extract from
-     * @param index       the index to extract at
-     */
     @ExportVertexToPythonBindings
-    public TakeVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
-                      @LoadVertexParam(INDEX_NAME) long... index) {
-        super(Tensor.SCALAR_SHAPE, inputVertex);
+    public TakeVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
+                      @LoadVertexParam(INDEX) long... index) {
+        super(new long[0], inputVertex);
         this.index = index;
-        TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
-    }
-
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return DoubleTensor.scalar(value.getValue(index));
     }
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
-        DoubleTensor newValue = this.getValue();
+        TENSOR newValue = this.getValue();
 
         DoubleTensor atIndexTensor = takeFromPartial(derivativeOfParentWithRespectToInputs.get(), index);
         int desiredRank = atIndexTensor.getRank() + newValue.getRank();
@@ -85,8 +73,18 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
         return reshapedDerivatives;
     }
 
-    @SaveVertexParam(INDEX_NAME)
+    @Override
+    protected TENSOR op(TENSOR value) {
+        return value.take(index);
+    }
+
+    @Override
+    public boolean isDifferentiable() {
+        return inputVertex.isDifferentiable();
+    }
+
+    @SaveVertexParam(INDEX)
     public long[] getIndex() {
-        return index;
+        return this.index;
     }
 }

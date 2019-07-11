@@ -3,6 +3,7 @@ package io.improbable.keanu.backend.keanu.compiled;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.reflections.Reflections;
 
@@ -16,6 +17,7 @@ import static io.improbable.keanu.backend.keanu.compiled.KeanuVertexToTensorOpMa
 public class KeanuVertexToTensorOpMapperTest {
 
     @Test
+    @Ignore
     public void doesSupportAllOperations() {
 
         Reflections reflections = new Reflections("io.improbable.keanu.vertices");

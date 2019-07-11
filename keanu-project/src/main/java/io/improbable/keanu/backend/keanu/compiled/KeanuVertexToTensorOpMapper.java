@@ -21,8 +21,9 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanSliceVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanTakeVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToDoubleMaskVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToIntegerMaskVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanDiagVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
@@ -59,15 +60,11 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixI
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.MultiplexerVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
@@ -75,20 +72,21 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGetBooleanIndexVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerDiagVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
-import io.improbable.keanu.vertices.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
 import io.improbable.keanu.vertices.tensor.BroadcastVertex;
+import io.improbable.keanu.vertices.tensor.GetBooleanIndexVertex;
 import io.improbable.keanu.vertices.tensor.PermuteVertex;
 import io.improbable.keanu.vertices.tensor.ReshapeVertex;
+import io.improbable.keanu.vertices.tensor.SliceVertex;
+import io.improbable.keanu.vertices.tensor.TakeVertex;
 import io.improbable.keanu.vertices.utility.AssertVertex;
 
 import java.util.Arrays;
@@ -123,9 +121,12 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(ReshapeVertex.class, KeanuVertexToTensorOpMapper::reshapeOp);
         opMappers.put(PermuteVertex.class, KeanuVertexToTensorOpMapper::permuteOp);
         opMappers.put(BroadcastVertex.class, KeanuVertexToTensorOpMapper::broadcastOp);
+        opMappers.put(TakeVertex.class, KeanuVertexToTensorOpMapper::takeOp);
+        opMappers.put(SliceVertex.class, KeanuVertexToTensorOpMapper::sliceOp);
+        opMappers.put(GetBooleanIndexVertex.class, fluentBinaryOp("get"));
 
         //Number ops
-        opMappers.put(NumberTensorVertex.NumberDifferenceVertex.class, fluentBinaryOp("minus", "minusInPlace"));
+        opMappers.put(NumberDifferenceVertex.class, fluentBinaryOp("minus", "minusInPlace"));
 
         //Double ops
         opMappers.put(AdditionVertex.class, fluentBinaryOp("plus", "plusInPlace"));
@@ -163,8 +164,6 @@ public class KeanuVertexToTensorOpMapper {
 
         opMappers.put(ConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatDoubleOp);
         opMappers.put(SumVertex.class, KeanuVertexToTensorOpMapper::sumDoubleOp);
-        opMappers.put(SliceVertex.class, KeanuVertexToTensorOpMapper::sliceDoubleOp);
-        opMappers.put(TakeVertex.class, KeanuVertexToTensorOpMapper::takeDoubleOp);
 
         opMappers.put(MaxVertex.class, fluentBinaryOp("max"));
         opMappers.put(MinVertex.class, fluentBinaryOp("min"));
@@ -184,9 +183,6 @@ public class KeanuVertexToTensorOpMapper {
 
         opMappers.put(IntegerConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatIntegerOp);
         opMappers.put(IntegerSumVertex.class, KeanuVertexToTensorOpMapper::sumIntegerOp);
-        opMappers.put(IntegerSliceVertex.class, KeanuVertexToTensorOpMapper::sliceIntegerOp);
-        opMappers.put(IntegerTakeVertex.class, KeanuVertexToTensorOpMapper::takeIntegerOp);
-        opMappers.put(IntegerGetBooleanIndexVertex.class, fluentBinaryOp("get"));
 
         opMappers.put(IntegerMaxVertex.class, fluentBinaryOp("max"));
         opMappers.put(IntegerMinVertex.class, fluentBinaryOp("min"));
@@ -194,13 +190,11 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(CastNumberToIntegerVertex.class, fluentUnaryOp("toInteger"));
 
         opMappers.put(IntegerIfVertex.class, KeanuVertexToTensorOpMapper::integerIfOp);
-        opMappers.put(IntegerVertex.IntegerDiagVertex.class, fluentUnaryOp("diag"));
+        opMappers.put(IntegerDiagVertex.class, fluentUnaryOp("diag"));
         opMappers.put(IntegerProxyVertex.class, KeanuVertexToTensorOpMapper::integerProxyOp);
 
         //Booleans ops
         opMappers.put(BooleanConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatBoolOp);
-        opMappers.put(BooleanSliceVertex.class, KeanuVertexToTensorOpMapper::sliceBooleanOp);
-        opMappers.put(BooleanTakeVertex.class, KeanuVertexToTensorOpMapper::takeBooleanOp);
 
         opMappers.put(GreaterThanOrEqualVertex.class, fluentBinaryOp("greaterThanOrEqual"));
         opMappers.put(GreaterThanVertex.class, fluentBinaryOp("greaterThan"));
@@ -217,9 +211,9 @@ public class KeanuVertexToTensorOpMapper {
 
         opMappers.put(CastToBooleanVertex.class, fluentUnaryOp("toBoolean"));
 
-        opMappers.put(BooleanVertex.BooleanDiagVertex.class, fluentUnaryOp("diag"));
-        opMappers.put(BooleanVertex.BooleanToIntegerMaskVertex.class, fluentUnaryOp("toIntegerMask"));
-        opMappers.put(BooleanVertex.BooleanToDoubleMaskVertex.class, fluentUnaryOp("toDoubleMask"));
+        opMappers.put(BooleanDiagVertex.class, fluentUnaryOp("diag"));
+        opMappers.put(BooleanToIntegerMaskVertex.class, fluentUnaryOp("toIntegerMask"));
+        opMappers.put(BooleanToDoubleMaskVertex.class, fluentUnaryOp("toDoubleMask"));
 
         opMappers.put(BooleanIfVertex.class, KeanuVertexToTensorOpMapper::booleanIfOp);
         opMappers.put(BooleanProxyVertex.class, KeanuVertexToTensorOpMapper::booleanProxyOp);
@@ -231,8 +225,6 @@ public class KeanuVertexToTensorOpMapper {
 
         //Generic ops
         opMappers.put(IfVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
-        opMappers.put(GenericSliceVertex.class, KeanuVertexToTensorOpMapper::sliceGenericOp);
-        opMappers.put(GenericTakeVertex.class, KeanuVertexToTensorOpMapper::takeGenericOp);
         opMappers.put(MultiplexerVertex.class, KeanuVertexToTensorOpMapper::multiplexerOp);
 
         //Debug ops
@@ -349,29 +341,10 @@ public class KeanuVertexToTensorOpMapper {
         return variableName + ".reshape(" + toJavaArrayCreation(reshapeVertex.getProposedShape()) + ")";
     }
 
-    private static String takeDoubleOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String takeOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         TakeVertex takeVertex = (TakeVertex) vertex;
-        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
-    }
-
-    private static String takeIntegerOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        IntegerTakeVertex takeVertex = (IntegerTakeVertex) vertex;
-        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
-    }
-
-    private static String takeBooleanOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        BooleanTakeVertex takeVertex = (BooleanTakeVertex) vertex;
-        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
-    }
-
-    private static String takeGenericOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        GenericTakeVertex takeVertex = (GenericTakeVertex) vertex;
-        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
-    }
-
-    private static String takeOp(long[] index, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        String variableName = lookup.get(inputVertex.getId()).getName();
-        return variableName + ".take(" + toJavaArrayCreation(index) + ");";
+        String variableName = lookup.get(takeVertex.getInputVertex().getId()).getName();
+        return variableName + ".take(" + toJavaArrayCreation(takeVertex.getIndex()) + ");";
     }
 
     private static String broadcastOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
@@ -395,29 +368,10 @@ public class KeanuVertexToTensorOpMapper {
         return "new long[]{" + Arrays.stream(array).mapToObj(Long::toString).collect(Collectors.joining(",")) + "}";
     }
 
-    private static String sliceDoubleOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String sliceOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         SliceVertex sliceVertex = (SliceVertex) vertex;
-        return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
-    }
-
-    private static String sliceIntegerOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        IntegerSliceVertex sliceVertex = (IntegerSliceVertex) vertex;
-        return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
-    }
-
-    private static String sliceBooleanOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        BooleanSliceVertex sliceVertex = (BooleanSliceVertex) vertex;
-        return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
-    }
-
-    private static String sliceGenericOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        GenericSliceVertex sliceVertex = (GenericSliceVertex) vertex;
-        return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
-    }
-
-    private static String sliceOp(int dimension, long index, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        String variableName = lookup.get(inputVertex.getId()).getName();
-        return variableName + ".slice(" + dimension + "," + index + ")";
+        String variableName = lookup.get(sliceVertex.getInputVertex().getId()).getName();
+        return variableName + ".slice(" + sliceVertex.getDimension() + "," + sliceVertex.getIndex() + ")";
     }
 
     private static String permuteOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {

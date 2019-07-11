@@ -186,6 +186,11 @@ class JavaVertexToPythonConverter {
     }
 
     String getDocString() {
-        return docStringMap.get(javaConstructor.getName()).getAsString();
+        String name = javaConstructor.getName();
+        try {
+            return docStringMap.get(name).getAsString();
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not find " + name + " docString map");
+        }
     }
 }

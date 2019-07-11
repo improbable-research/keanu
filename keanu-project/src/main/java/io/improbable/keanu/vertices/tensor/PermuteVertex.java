@@ -20,6 +20,7 @@ public class PermuteVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
     extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
     private static final String REARRANGE = "rearrange";
+
     private final int[] rearrange;
     private final int[] invertedRearrange;
 
@@ -84,14 +85,13 @@ public class PermuteVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
         return permuteToApply;
     }
 
-    @SaveVertexParam(REARRANGE)
-    public int[] getRearrange() {
-        return rearrange;
-    }
-
     @Override
     public boolean isDifferentiable() {
         return inputVertex.isDifferentiable();
     }
 
+    @SaveVertexParam(REARRANGE)
+    public int[] getRearrange() {
+        return this.rearrange;
+    }
 }

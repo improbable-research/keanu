@@ -2,33 +2,32 @@ package io.improbable.keanu.vertices.bool;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.BaseBooleanTensor;
-import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.kotlin.BooleanOperators;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
-import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
-import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.XorBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanBooleanWhereVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanDoubleWhereVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanIntegerWhereVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToDoubleMaskVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToIntegerMaskVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanSliceVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanTakeVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanUnaryOpVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllFalseVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllTrueVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyFalseVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyTrueVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanDiagVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.utility.AssertVertex;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -91,26 +90,9 @@ public interface BooleanVertex extends
         return new AssertVertex(this, errorMessage);
     }
 
-    default BooleanVertex take(long... index) {
-        return new BooleanTakeVertex(this, index);
-    }
-
     @Override
     default List<BooleanVertex> split(int dimension, long... splitAtIndices) {
         return null;
-    }
-
-    class BooleanDiagVertex extends BooleanUnaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public BooleanDiagVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
-            super(inputVertex);
-        }
-
-        @Override
-        protected BooleanTensor op(BooleanTensor l) {
-            return l.diag();
-        }
     }
 
     @Override
@@ -126,28 +108,6 @@ public interface BooleanVertex extends
     @Override
     default BooleanVertex elementwiseEquals(Boolean value) {
         return elementwiseEquals(new ConstantBooleanVertex(value));
-    }
-
-    class BooleanGetBooleanIndexVertex extends BooleanUnaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public BooleanGetBooleanIndexVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
-            super(inputVertex);
-        }
-
-        @Override
-        protected BooleanTensor op(BooleanTensor l) {
-            return l.get(l);
-        }
-    }
-
-    @Override
-    default BooleanVertex get(BooleanVertex booleanIndex) {
-        return new BooleanGetBooleanIndexVertex(booleanIndex);
-    }
-
-    default BooleanVertex slice(int dimension, long index) {
-        return new BooleanSliceVertex(this, dimension, index);
     }
 
     @Override
@@ -210,67 +170,9 @@ public interface BooleanVertex extends
         return BooleanVertex.not(this);
     }
 
-    class BooleanDoubleWhereVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor> {
-        private static final String INPUT_NAME = "inputName";
-        private static final String TRUE_VALUE = "trueValue";
-        private static final String FALSE_VALUE = "falseValue";
-
-        @Getter(onMethod = @__({@SaveVertexParam(INPUT_NAME)}))
-        private final BooleanVertex inputVertex;
-
-        @Getter(onMethod = @__({@SaveVertexParam(TRUE_VALUE)}))
-        private final DoubleVertex trueValue;
-
-        @Getter(onMethod = @__({@SaveVertexParam(FALSE_VALUE)}))
-        private final DoubleVertex falseValue;
-
-        @ExportVertexToPythonBindings
-        public BooleanDoubleWhereVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex,
-                                        @LoadVertexParam(TRUE_VALUE) DoubleVertex trueValue,
-                                        @LoadVertexParam(FALSE_VALUE) DoubleVertex falseValue) {
-            this.inputVertex = inputVertex;
-            this.trueValue = trueValue;
-            this.falseValue = falseValue;
-        }
-
-        @Override
-        public DoubleTensor calculate() {
-            return inputVertex.getValue().doubleWhere(trueValue.getValue(), falseValue.getValue());
-        }
-    }
-
     @Override
     default DoubleVertex doubleWhere(DoubleVertex trueValue, DoubleVertex falseValue) {
         return new BooleanDoubleWhereVertex(this, trueValue, falseValue);
-    }
-
-    class BooleanIntegerWhereVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
-        private static final String INPUT_NAME = "inputName";
-        private static final String TRUE_VALUE = "trueValue";
-        private static final String FALSE_VALUE = "falseValue";
-
-        @Getter(onMethod = @__({@SaveVertexParam(INPUT_NAME)}))
-        private final BooleanVertex inputVertex;
-
-        @Getter(onMethod = @__({@SaveVertexParam(TRUE_VALUE)}))
-        private final IntegerVertex trueValue;
-
-        @Getter(onMethod = @__({@SaveVertexParam(FALSE_VALUE)}))
-        private final IntegerVertex falseValue;
-
-        @ExportVertexToPythonBindings
-        public BooleanIntegerWhereVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex,
-                                         @LoadVertexParam(TRUE_VALUE) IntegerVertex trueValue,
-                                         @LoadVertexParam(FALSE_VALUE) IntegerVertex falseValue) {
-            this.inputVertex = inputVertex;
-            this.trueValue = trueValue;
-            this.falseValue = falseValue;
-        }
-
-        @Override
-        public IntegerTensor calculate() {
-            return inputVertex.getValue().integerWhere(trueValue.getValue(), falseValue.getValue());
-        }
     }
 
     @Override
@@ -278,51 +180,9 @@ public interface BooleanVertex extends
         return new BooleanIntegerWhereVertex(this, trueValue, falseValue);
     }
 
-    class BooleanBooleanWhereVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
-        private static final String INPUT_NAME = "inputName";
-        private static final String TRUE_VALUE = "trueValue";
-        private static final String FALSE_VALUE = "falseValue";
-
-        @Getter(onMethod = @__({@SaveVertexParam(INPUT_NAME)}))
-        private final BooleanVertex inputVertex;
-
-        @Getter(onMethod = @__({@SaveVertexParam(TRUE_VALUE)}))
-        private final BooleanVertex trueValue;
-
-        @Getter(onMethod = @__({@SaveVertexParam(FALSE_VALUE)}))
-        private final BooleanVertex falseValue;
-
-        @ExportVertexToPythonBindings
-        public BooleanBooleanWhereVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex,
-                                         @LoadVertexParam(TRUE_VALUE) BooleanVertex trueValue,
-                                         @LoadVertexParam(FALSE_VALUE) BooleanVertex falseValue) {
-            this.inputVertex = inputVertex;
-            this.trueValue = trueValue;
-            this.falseValue = falseValue;
-        }
-
-        @Override
-        public BooleanTensor calculate() {
-            return inputVertex.getValue().booleanWhere(trueValue.getValue(), falseValue.getValue());
-        }
-    }
-
     @Override
     default BooleanVertex booleanWhere(BooleanVertex trueValue, BooleanVertex falseValue) {
         return new BooleanBooleanWhereVertex(this, trueValue, falseValue);
-    }
-
-    class AllTrueVertex extends BooleanUnaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public AllTrueVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
-            super(inputVertex);
-        }
-
-        @Override
-        protected BooleanTensor op(BooleanTensor l) {
-            return l.allTrue();
-        }
     }
 
     @Override
@@ -330,35 +190,9 @@ public interface BooleanVertex extends
         return new AllTrueVertex(this);
     }
 
-    class AllFalseVertex extends BooleanUnaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public AllFalseVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
-            super(inputVertex);
-        }
-
-        @Override
-        protected BooleanTensor op(BooleanTensor l) {
-            return l.allFalse();
-        }
-    }
-
     @Override
     default BooleanVertex allFalse() {
         return new AllFalseVertex(this);
-    }
-
-    class AnyTrueVertex extends BooleanUnaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public AnyTrueVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
-            super(inputVertex);
-        }
-
-        @Override
-        protected BooleanTensor op(BooleanTensor l) {
-            return l.anyTrue();
-        }
     }
 
     @Override
@@ -366,61 +200,14 @@ public interface BooleanVertex extends
         return new AnyTrueVertex(this);
     }
 
-    class AnyFalseVertex extends BooleanUnaryOpVertex {
-
-        @ExportVertexToPythonBindings
-        public AnyFalseVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
-            super(inputVertex);
-        }
-
-        @Override
-        protected BooleanTensor op(BooleanTensor l) {
-            return l.anyFalse();
-        }
-    }
-
     @Override
     default BooleanVertex anyFalse() {
         return new AnyFalseVertex(this);
     }
 
-    class BooleanToDoubleMaskVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor> {
-        private static final String INPUT_NAME = "inputName";
-
-        @Getter(onMethod = @__({@SaveVertexParam(INPUT_NAME)}))
-        private final BooleanVertex inputVertex;
-
-        @ExportVertexToPythonBindings
-        public BooleanToDoubleMaskVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
-            this.inputVertex = inputVertex;
-        }
-
-        @Override
-        public DoubleTensor calculate() {
-            return inputVertex.getValue().toDoubleMask();
-        }
-    }
-
     @Override
     default DoubleVertex toDoubleMask() {
         return new BooleanToDoubleMaskVertex(this);
-    }
-
-    class BooleanToIntegerMaskVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
-        private static final String INPUT_NAME = "inputName";
-
-        @Getter(onMethod = @__({@SaveVertexParam(INPUT_NAME)}))
-        private final BooleanVertex inputVertex;
-
-        @ExportVertexToPythonBindings
-        public BooleanToIntegerMaskVertex(@LoadVertexParam(INPUT_NAME) BooleanVertex inputVertex) {
-            this.inputVertex = inputVertex;
-        }
-
-        @Override
-        public IntegerTensor calculate() {
-            return inputVertex.getValue().toIntegerMask();
-        }
     }
 
     @Override
