@@ -1,10 +1,9 @@
 import collections
-from typing import List, Tuple, Iterator, Union, SupportsRound, Optional, Callable
-from typing import cast as typing_cast
-
 import numpy as np
 from py4j.java_collections import JavaList, JavaArray
 from py4j.java_gateway import JavaObject, JavaMember, is_instance_of
+from typing import List, Tuple, Iterator, Union, SupportsRound, Optional, Callable
+from typing import cast as typing_cast
 
 import keanu as kn
 from keanu.base import JavaObjectWrapper
@@ -243,12 +242,6 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return tuple(java_vertex.getId().getValue())
 
 
-class Number(Vertex):
-
-    def cast(self, v: tensor_arg_types) -> tensor_arg_types:
-        return cast_tensor_arg_to_double(v)
-
-
 class Double(Vertex):
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
@@ -299,13 +292,15 @@ class Integer(Vertex):
 
     def __sub__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
-            other, lambda casted_to_double: casted_to_double.__sub__(other), lambda other_holder: kn.vertex.generated.
-            NumberDifference(self, other_holder))
+            other, lambda casted_to_double: casted_to_double.__sub__(other), lambda other_holder: Integer(
+                k.jvm_view().NumberDifferenceVertex, None, kn.vertex.generated.cast_to_integer_vertex(self),
+                kn.vertex.generated.cast_to_integer_vertex(other_holder)))
 
     def __rsub__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
-            other, lambda casted_to_double: casted_to_double.__rsub__(other), lambda other_holder: kn.vertex.generated.
-            NumberDifference(other_holder, self))
+            other, lambda casted_to_double: casted_to_double.__rsub__(other), lambda other_holder: Integer(
+                k.jvm_view().NumberDifferenceVertex, None, kn.vertex.generated.cast_to_integer_vertex(other_holder),
+                kn.vertex.generated.cast_to_integer_vertex(self)))
 
     def __mul__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
