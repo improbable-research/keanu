@@ -11,8 +11,6 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
@@ -63,7 +61,7 @@ public class DoubleIfVertexTest {
         UniformVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
-        MultiplicationVertex c = a.times(b);
+        DoubleVertex c = a.times(b);
         DoubleVertex d = b.div(a);
 
         PartialsOf dC = Differentiator.reverseModeAutoDiff(c, a, b);
@@ -224,7 +222,7 @@ public class DoubleIfVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.arange(10, 18).reshape(2, 2, 2));
 
-        MultiplicationVertex c = a.times(b);
+        DoubleVertex c = a.times(b);
 
         DoubleVertex d = new UniformVertex(0, 10);
         d.setValue(DoubleTensor.arange(20, 28).reshape(2, 2, 2));
@@ -232,7 +230,7 @@ public class DoubleIfVertexTest {
         DoubleVertex e = new UniformVertex(0, 10);
         e.setValue(DoubleTensor.arange(30, 38).reshape(2, 2, 2));
 
-        AdditionVertex f = d.plus(e);
+        DoubleVertex f = d.plus(e);
 
         DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a);
         DoubleTensor dFdd = Differentiator.reverseModeAutoDiff(f, d).withRespectTo(d);

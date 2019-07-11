@@ -20,7 +20,6 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
     extends TensorVertex<T, TENSOR, VERTEX>, BaseNumberTensor<BooleanVertex, IntegerVertex, DoubleVertex, T, VERTEX>, NumberOperators<VERTEX> {
 
-
     @Override
     default VERTEX minus(VERTEX that) {
         return asTyped(new NumberDifferenceVertex<>(this, that));
@@ -40,14 +39,6 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
     default IntegerVertex toInteger() {
         return new CastNumberToIntegerVertex<>(this);
     }
-
-    IntegerVertex argMax(int axis);
-
-    IntegerVertex argMax();
-
-    IntegerVertex argMin(int axis);
-
-    IntegerVertex argMin();
 
     @Override
     default BooleanVertex equalsWithinEpsilon(VERTEX other, T epsilon) {

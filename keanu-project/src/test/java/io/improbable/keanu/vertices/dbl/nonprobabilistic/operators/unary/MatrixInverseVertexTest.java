@@ -59,7 +59,7 @@ public class MatrixInverseVertexTest {
     public void canCalculateDiffCorrectly() {
         UniformVertex matrix = new UniformVertex(1.0, 100.0);
         matrix.setValue(DoubleTensor.arange(1, 5).reshape(2, 2));
-        MatrixInverseVertex inverse = matrix.matrixInverse();
+        DoubleVertex inverse = matrix.matrixInverse();
 
         inverse.lazyEval();
 
@@ -115,7 +115,7 @@ public class MatrixInverseVertexTest {
     @Test
     public void inverseDifferenceMatchesGradient() {
         UniformVertex inputVertex = new UniformVertex(new long[]{3, 3}, 1.0, 25.0);
-        MatrixInverseVertex invertVertex = inputVertex.matrixInverse();
+        DoubleVertex invertVertex = inputVertex.matrixInverse();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(
             ImmutableList.of(inputVertex), invertVertex, 0.001, 1e-5);

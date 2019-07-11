@@ -3,7 +3,6 @@ package io.improbable.keanu.network;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +20,7 @@ public class TransitiveClosureTest {
     DoubleVertex Bsigma;
     GaussianVertex A;
     GaussianVertex B;
-    AdditionVertex aPlusB;
+    DoubleVertex aPlusB;
     ConstantDoubleVertex cSigma;
     GaussianVertex C;
 

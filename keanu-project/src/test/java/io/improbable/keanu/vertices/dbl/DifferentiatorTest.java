@@ -8,8 +8,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Test;
@@ -26,7 +24,7 @@ public class DifferentiatorTest {
 
         GaussianVertex A = new GaussianVertex(0, 1);
         GaussianVertex B = new GaussianVertex(0, 1);
-        MultiplicationVertex C = A.times(B);
+        DoubleVertex C = A.times(B);
 
         DoubleTensor dCdA = Differentiator.forwardModeAutoDiff(A, C).of(C);
         DoubleTensor dCdB = Differentiator.forwardModeAutoDiff(B, C).of(C);
@@ -85,7 +83,7 @@ public class DifferentiatorTest {
         DoubleVertex E = C.times(D).pow(A).acos();
         DoubleVertex G = E.log().tan().asin().atan();
         DoubleVertex F = D.plus(B).exp();
-        SumVertex H = G.plus(F).sum();
+        DoubleVertex H = G.plus(F).sum();
 
         PartialsOf dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
 
@@ -116,7 +114,7 @@ public class DifferentiatorTest {
         DoubleVertex E = J.times(D).pow(A).acos();
         DoubleVertex G = E.log().tan().atan();
         DoubleVertex F = D.plus(B).exp();
-        MultiplicationVertex H = G.plus(F).sum().times(A).sum().times(C);
+        DoubleVertex H = G.plus(F).sum().times(A).sum().times(C);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B, C), H, 0.001, 1e-3);
     }

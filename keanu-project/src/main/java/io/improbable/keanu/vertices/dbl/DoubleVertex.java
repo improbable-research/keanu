@@ -49,7 +49,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
 import io.improbable.keanu.vertices.number.FloatingPointTensorVertex;
 
 import java.util.List;
@@ -115,7 +114,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
      *                  dimension
      * @return a vertex that represents the concatenation of the toConcat
      */
-    static ConcatenationVertex concat(int dimension, DoubleVertex... toConcat) {
+    static DoubleVertex concat(int dimension, DoubleVertex... toConcat) {
         return new ConcatenationVertex(dimension, toConcat);
     }
 
@@ -149,12 +148,12 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     //////////////////////////
 
     @Override
-    default SumVertex sum() {
+    default DoubleVertex sum() {
         return new SumVertex(this);
     }
 
     @Override
-    default SumVertex sum(int... sumOverDimensions) {
+    default DoubleVertex sum(int... sumOverDimensions) {
         return new SumVertex(this, sumOverDimensions);
     }
 
@@ -178,11 +177,11 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return null;
     }
 
-    static MinVertex min(DoubleVertex a, DoubleVertex b) {
+    static DoubleVertex min(DoubleVertex a, DoubleVertex b) {
         return new MinVertex(a, b);
     }
 
-    static MaxVertex max(DoubleVertex a, DoubleVertex b) {
+    static DoubleVertex max(DoubleVertex a, DoubleVertex b) {
         return new MaxVertex(a, b);
     }
 
@@ -212,12 +211,12 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default DifferenceVertex minus(double that) {
+    default DoubleVertex minus(double that) {
         return minus(new ConstantDoubleVertex(that));
     }
 
     @Override
-    default DifferenceVertex minus(DoubleVertex that) {
+    default DoubleVertex minus(DoubleVertex that) {
         return new DifferenceVertex(this, that);
     }
 
@@ -227,7 +226,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default MultiplicationVertex unaryMinus() {
+    default DoubleVertex unaryMinus() {
         return multiply(-1.0);
     }
 
@@ -242,7 +241,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default DifferenceVertex reverseMinus(double that) {
+    default DoubleVertex reverseMinus(double that) {
         return new ConstantDoubleVertex(that).minus(this);
     }
 
@@ -252,88 +251,88 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default AdditionVertex plus(Double that) {
+    default DoubleVertex plus(Double that) {
         return plus(new ConstantDoubleVertex(that));
     }
 
     @Override
-    default AdditionVertex plus(DoubleVertex that) {
+    default DoubleVertex plus(DoubleVertex that) {
         return new AdditionVertex(this, that);
     }
 
-    default MultiplicationVertex multiply(double that) {
+    default DoubleVertex multiply(double that) {
         return multiply(new ConstantDoubleVertex(that));
     }
 
-    default MultiplicationVertex multiply(DoubleVertex that) {
+    default DoubleVertex multiply(DoubleVertex that) {
         return new MultiplicationVertex(this, that);
     }
 
     @Override
-    default MultiplicationVertex times(DoubleVertex that) {
+    default DoubleVertex times(DoubleVertex that) {
         return multiply(that);
     }
 
     @Override
-    default MultiplicationVertex times(Double value) {
+    default DoubleVertex times(Double value) {
         return multiply(value);
     }
 
     @Override
-    default MultiplicationVertex times(double that) {
+    default DoubleVertex times(double that) {
         return multiply(that);
     }
 
     @Override
-    default DivisionVertex div(Double value) {
+    default DoubleVertex div(Double value) {
         return divideBy(value);
     }
 
-    default DivisionVertex divideBy(double that) {
+    default DoubleVertex divideBy(double that) {
         return divideBy(new ConstantDoubleVertex(that));
     }
 
-    default DivisionVertex divideBy(DoubleVertex that) {
+    default DoubleVertex divideBy(DoubleVertex that) {
         return new DivisionVertex(this, that);
     }
 
     @Override
-    default DivisionVertex div(DoubleVertex that) {
+    default DoubleVertex div(DoubleVertex that) {
         return divideBy(that);
     }
 
     @Override
-    default DivisionVertex div(double that) {
+    default DoubleVertex div(double that) {
         return divideBy(that);
     }
 
     @Override
-    default DivisionVertex reverseDiv(Double value) {
+    default DoubleVertex reverseDiv(Double value) {
         return null;
     }
 
     @Override
-    default DivisionVertex reverseDiv(DoubleVertex value) {
+    default DoubleVertex reverseDiv(DoubleVertex value) {
         return null;
     }
 
     @Override
-    default DivisionVertex reverseDiv(double that) {
+    default DoubleVertex reverseDiv(double that) {
         return new ConstantDoubleVertex(that).div(this);
     }
 
     @Override
-    default PowerVertex pow(double that) {
+    default DoubleVertex pow(double that) {
         return pow(new ConstantDoubleVertex(that));
     }
 
     @Override
-    default PowerVertex pow(DoubleVertex exponent) {
+    default DoubleVertex pow(DoubleVertex exponent) {
         return new PowerVertex(this, exponent);
     }
 
     @Override
-    default PowerVertex pow(Double exponent) {
+    default DoubleVertex pow(Double exponent) {
         return null;
     }
 
@@ -368,88 +367,88 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default AbsVertex abs() {
+    default DoubleVertex abs() {
         return new AbsVertex(this);
     }
 
     @Override
-    default GreaterThanVertex greaterThan(DoubleVertex rhs) {
+    default BooleanVertex greaterThan(DoubleVertex rhs) {
         return new GreaterThanVertex<>(this, rhs);
     }
 
     @Override
-    default GreaterThanOrEqualVertex greaterThanOrEqual(DoubleVertex rhs) {
+    default BooleanVertex greaterThanOrEqual(DoubleVertex rhs) {
         return new GreaterThanOrEqualVertex<>(this, rhs);
     }
 
     @Override
-    default GreaterThanVertex greaterThan(Double value) {
+    default BooleanVertex greaterThan(Double value) {
         return new GreaterThanVertex<>(this, new ConstantDoubleVertex(value));
     }
 
     @Override
-    default GreaterThanOrEqualVertex greaterThanOrEqual(Double value) {
+    default BooleanVertex greaterThanOrEqual(Double value) {
         return new GreaterThanOrEqualVertex<>(this, new ConstantDoubleVertex(value));
     }
 
     @Override
-    default LessThanVertex lessThan(Double value) {
+    default BooleanVertex lessThan(Double value) {
         return new LessThanVertex<>(this, new ConstantDoubleVertex(value));
     }
 
     @Override
-    default LessThanOrEqualVertex lessThanOrEqual(Double value) {
+    default BooleanVertex lessThanOrEqual(Double value) {
         return new LessThanOrEqualVertex<>(this, new ConstantDoubleVertex(value));
     }
 
     @Override
-    default LessThanVertex lessThan(DoubleVertex rhs) {
+    default BooleanVertex lessThan(DoubleVertex rhs) {
         return new LessThanVertex<>(this, rhs);
     }
 
     @Override
-    default LessThanOrEqualVertex lessThanOrEqual(DoubleVertex rhs) {
+    default BooleanVertex lessThanOrEqual(DoubleVertex rhs) {
         return new LessThanOrEqualVertex<>(this, rhs);
     }
 
     @Override
-    default DoubleGreaterThanMaskVertex greaterThanMask(DoubleVertex rhs) {
+    default DoubleVertex greaterThanMask(DoubleVertex rhs) {
         return new DoubleGreaterThanMaskVertex(this, rhs);
     }
 
-    default DoubleGreaterThanMaskVertex greaterThanMask(Double rhs) {
+    default DoubleVertex greaterThanMask(Double rhs) {
         return greaterThanMask(new ConstantDoubleVertex(rhs));
     }
 
     @Override
-    default DoubleGreaterThanOrEqualToMaskVertex greaterThanOrEqualToMask(DoubleVertex rhs) {
+    default DoubleVertex greaterThanOrEqualToMask(DoubleVertex rhs) {
         return new DoubleGreaterThanOrEqualToMaskVertex(this, rhs);
     }
 
-    default DoubleGreaterThanOrEqualToMaskVertex greaterThanOrEqualToMask(Double rhs) {
+    default DoubleVertex greaterThanOrEqualToMask(Double rhs) {
         return greaterThanOrEqualToMask(new ConstantDoubleVertex(rhs));
     }
 
     @Override
-    default DoubleLessThanMaskVertex lessThanMask(DoubleVertex rhs) {
+    default DoubleVertex lessThanMask(DoubleVertex rhs) {
         return new DoubleLessThanMaskVertex(this, rhs);
     }
 
-    default DoubleLessThanMaskVertex lessThanMask(Double rhs) {
+    default DoubleVertex lessThanMask(Double rhs) {
         return lessThanMask(new ConstantDoubleVertex(rhs));
     }
 
     @Override
-    default DoubleLessThanOrEqualToMaskVertex lessThanOrEqualToMask(DoubleVertex rhs) {
+    default DoubleVertex lessThanOrEqualToMask(DoubleVertex rhs) {
         return new DoubleLessThanOrEqualToMaskVertex(this, rhs);
     }
 
-    default DoubleLessThanOrEqualToMaskVertex lessThanOrEqualToMask(Double rhs) {
+    default DoubleVertex lessThanOrEqualToMask(Double rhs) {
         return lessThanOrEqualToMask(new ConstantDoubleVertex(rhs));
     }
 
     @Override
-    default DoubleSetWithMaskVertex setWithMask(DoubleVertex mask, Double value) {
+    default DoubleVertex setWithMask(DoubleVertex mask, Double value) {
         return setWithMask(mask, new ConstantDoubleVertex(value));
     }
 
@@ -464,11 +463,11 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default NumericalEqualsVertex equalsWithinEpsilon(DoubleVertex other, Double epsilon) {
+    default BooleanVertex equalsWithinEpsilon(DoubleVertex other, Double epsilon) {
         return new NumericalEqualsVertex<>(this, other, epsilon);
     }
 
-    default DoubleSetWithMaskVertex setWithMask(DoubleVertex mask, DoubleVertex value) {
+    default DoubleVertex setWithMask(DoubleVertex mask, DoubleVertex value) {
         return new DoubleSetWithMaskVertex(this, mask, value);
     }
 
@@ -477,22 +476,22 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     //////////////////////////
 
     @Override
-    default FloorVertex floor() {
+    default DoubleVertex floor() {
         return new FloorVertex(this);
     }
 
     @Override
-    default CeilVertex ceil() {
+    default DoubleVertex ceil() {
         return new CeilVertex(this);
     }
 
     @Override
-    default RoundVertex round() {
+    default DoubleVertex round() {
         return new RoundVertex(this);
     }
 
     @Override
-    default ExpVertex exp() {
+    default DoubleVertex exp() {
         return new ExpVertex(this);
     }
 
@@ -592,17 +591,17 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default PowerVertex sqrt() {
+    default DoubleVertex sqrt() {
         return new PowerVertex(this, new ConstantDoubleVertex(0.5));
     }
 
     @Override
-    default LogVertex log() {
+    default DoubleVertex log() {
         return new LogVertex(this);
     }
 
     @Override
-    default LogGammaVertex logGamma() {
+    default DoubleVertex logGamma() {
         return new LogGammaVertex(this);
     }
 
@@ -612,7 +611,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default SigmoidVertex sigmoid() {
+    default DoubleVertex sigmoid() {
         return new SigmoidVertex(this);
     }
 
@@ -622,27 +621,27 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default SinVertex sin() {
+    default DoubleVertex sin() {
         return new SinVertex(this);
     }
 
     @Override
-    default CosVertex cos() {
+    default DoubleVertex cos() {
         return new CosVertex(this);
     }
 
     @Override
-    default TanVertex tan() {
+    default DoubleVertex tan() {
         return new TanVertex(this);
     }
 
     @Override
-    default ArcSinVertex asin() {
+    default DoubleVertex asin() {
         return new ArcSinVertex(this);
     }
 
     @Override
-    default ArcCosVertex acos() {
+    default DoubleVertex acos() {
         return new ArcCosVertex(this);
     }
 
@@ -677,17 +676,17 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default ArcTanVertex atan() {
+    default DoubleVertex atan() {
         return new ArcTanVertex(this);
     }
 
     @Override
-    default ArcTan2Vertex atan2(Double y) {
+    default DoubleVertex atan2(Double y) {
         return atan2(new ConstantDoubleVertex(y));
     }
 
     @Override
-    default ArcTan2Vertex atan2(DoubleVertex that) {
+    default DoubleVertex atan2(DoubleVertex that) {
         return new ArcTan2Vertex(this, that);
     }
 
@@ -736,7 +735,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default MatrixInverseVertex matrixInverse() {
+    default DoubleVertex matrixInverse() {
         return new MatrixInverseVertex(this);
     }
 
@@ -745,12 +744,12 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return null;
     }
 
-    default MatrixDeterminantVertex matrixDeterminant() {
+    default DoubleVertex matrixDeterminant() {
         return determinant();
     }
 
     @Override
-    default MatrixDeterminantVertex determinant() {
+    default DoubleVertex determinant() {
         return new MatrixDeterminantVertex(this);
     }
 
@@ -766,18 +765,4 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return new DoubleUnaryOpLambda<>(this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
-    @Override
-    default BooleanVertex toBoolean() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex toDouble() {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex toInteger() {
-        return new CastNumberToIntegerVertex<>(this);
-    }
 }

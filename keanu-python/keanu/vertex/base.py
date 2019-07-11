@@ -243,6 +243,12 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return tuple(java_vertex.getId().getValue())
 
 
+class Number(Vertex):
+
+    def cast(self, v: tensor_arg_types) -> tensor_arg_types:
+        return cast_tensor_arg_to_double(v)
+
+
 class Double(Vertex):
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:

@@ -84,7 +84,7 @@ public class DivisionVertexTest {
     public void changesMatchGradient() {
         UniformVertex A = new UniformVertex(new long[]{2, 2, 2}, 1.0, 10.0);
         UniformVertex B = new UniformVertex(new long[]{2, 2, 2}, 100.0, 150.0);
-        MultiplicationVertex C = A.div(B).times(A);
+        DoubleVertex C = A.div(B).times(A);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), C, 0.001, 1e-5);
     }

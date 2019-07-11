@@ -10,8 +10,7 @@ import io.improbable.keanu.vertices.tensor.BinaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
 
 @DisplayInformationForOutput(displayName = "-")
-public
-class NumberDifferenceVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+public class NumberDifferenceVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
     extends BinaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX> {
 
     @ExportVertexToPythonBindings

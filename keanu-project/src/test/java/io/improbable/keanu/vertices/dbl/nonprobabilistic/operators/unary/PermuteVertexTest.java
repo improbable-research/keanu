@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -113,7 +112,7 @@ public class PermuteVertexTest {
 
         DoubleVertex permute = C.permute(0, 2, 1);
 
-        SumVertex sum = permute.sum(0);
+        DoubleVertex sum = permute.sum(0);
 
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, sum).of(sum);
         DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(sum, ImmutableSet.of(A)).withRespectTo(A);
@@ -131,7 +130,7 @@ public class PermuteVertexTest {
         UniformVertex B = new UniformVertex(0, 10);
         B.setValue(DoubleTensor.arange(0, 6).reshape(1, 2, 3));
 
-        MultiplicationVertex C = A.times(B);
+        DoubleVertex C = A.times(B);
 
         DoubleVertex permute = C.permute(2, 0, 1);
         DoubleVertex revertThePermute = permute.permute(1, 2, 0);

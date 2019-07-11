@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
@@ -140,7 +139,7 @@ public class LogProbGradientCalculatorTest {
         DoubleVertex E = C.times(D).pow(A).acos();
         DoubleVertex G = E.log().tan().asin().atan();
         DoubleVertex F = D.plus(B).exp();
-        SumVertex H = G.plus(F).sum();
+        DoubleVertex H = G.plus(F).sum();
         GaussianVertex J = new GaussianVertex(H, 1);
         J.observe(0.5);
 

@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -88,7 +87,7 @@ public class ReshapeVertexTest {
         UniformVertex E = new UniformVertex(0, 10);
         E.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 4, 1));
 
-        MultiplicationVertex F = D.times(E);
+        DoubleVertex F = D.times(E);
 
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, F).of(F);
         PartialsOf backwardA = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A));

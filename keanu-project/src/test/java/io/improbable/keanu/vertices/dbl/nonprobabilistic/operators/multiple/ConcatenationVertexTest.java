@@ -8,10 +8,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsWithRespectTo;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -164,8 +161,8 @@ public class ConcatenationVertexTest {
         UniformVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        MultiplicationVertex c = a.times(b);
-        AdditionVertex d = a.plus(b);
+        DoubleVertex c = a.times(b);
+        DoubleVertex d = a.plus(b);
 
         ConcatenationVertex concat = new ConcatenationVertex(0, c, d);
 
@@ -210,7 +207,7 @@ public class ConcatenationVertexTest {
         DoubleVertex d = b.plus(ConstantVertex.of(DoubleTensor.linspace(1, 2, 8).reshape(2, 2, 2)));
 
         DoubleVertex concat = new ConcatenationVertex(2, c, d);
-        SumVertex sum = concat.sum(1);
+        DoubleVertex sum = concat.sum(1);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(Arrays.asList(a, b), sum, 10.0, 1e-10);
     }

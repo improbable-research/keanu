@@ -20,7 +20,7 @@ public class ConstantIntegerVertex extends VertexImpl<IntegerTensor, IntegerVert
         setValue(constant);
     }
 
-    public ConstantIntegerVertex(int[] vector) {
+    public ConstantIntegerVertex(int... vector) {
         this(IntegerTensor.create(vector));
     }
 
