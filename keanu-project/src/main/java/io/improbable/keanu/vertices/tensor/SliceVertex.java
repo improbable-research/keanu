@@ -36,7 +36,7 @@ public class SliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Ten
     public SliceVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
                        @LoadVertexParam(DIMENSION_NAME) int dimension,
                        @LoadVertexParam(INDEX_NAME) long index) {
-        super(removeDimension(dimension, inputVertex.getShape()), inputVertex);
+        super(removeDimension(dimension, inputVertex.getShape()), inputVertex, inputVertex.ofType());
         this.dimension = dimension;
         this.index = index;
     }

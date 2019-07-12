@@ -418,4 +418,8 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return new IntegerModVertex(this, that);
     }
 
+    @Override
+    default Class<?> ofType() {
+        return IntegerTensor.class;
+    }
 }

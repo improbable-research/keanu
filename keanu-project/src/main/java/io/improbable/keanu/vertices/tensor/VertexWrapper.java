@@ -203,6 +203,11 @@ public class VertexWrapper<TENSOR, VERTEX extends Vertex<TENSOR, VERTEX>> implem
     }
 
     @Override
+    public Class<?> ofType() {
+        return vertex.ofType();
+    }
+
+    @Override
     public void save(NetworkSaver netSaver) {
         vertex.save(netSaver);
     }

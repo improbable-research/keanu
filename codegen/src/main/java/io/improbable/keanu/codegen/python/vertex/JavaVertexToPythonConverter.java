@@ -130,7 +130,7 @@ class JavaVertexToPythonConverter {
         } else if (VertexLabel.class.isAssignableFrom(parameterType)) {
             return "str";
         } else {
-            throw new NotImplementedException(String.format("Mapping from Java type %s is not defined.", parameterType.getName()));
+            throw new NotImplementedException(String.format("Mapping from Java type %s is not defined for class %s.", parameterType.getName(), parameterClass));
         }
     }
 

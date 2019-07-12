@@ -20,7 +20,7 @@ public class BroadcastVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends
     @ExportVertexToPythonBindings
     public BroadcastVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
                            @LoadVertexParam(TO_SHAPE) long... toShape) {
-        super(toShape, inputVertex);
+        super(toShape, inputVertex, inputVertex.ofType());
         this.toShape = toShape;
     }
 

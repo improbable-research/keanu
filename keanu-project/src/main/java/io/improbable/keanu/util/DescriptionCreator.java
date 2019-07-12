@@ -16,13 +16,13 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
+import io.improbable.keanu.vertices.tensor.VertexWrapper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -43,7 +43,6 @@ public class DescriptionCreator {
         delimiters = new HashMap<>();
         delimiters.put(AdditionVertex.class, " + ");
         delimiters.put(IntegerAdditionVertex.class, " + ");
-        delimiters.put(DifferenceVertex.class, " - ");
         delimiters.put(NumberDifferenceVertex.class, " - ");
         delimiters.put(MultiplicationVertex.class, " * ");
         delimiters.put(IntegerMultiplicationVertex.class, " * ");
@@ -107,9 +106,11 @@ public class DescriptionCreator {
             return irregularDescription.get();
         }
 
-        if (delimiters.containsKey(vertex.getClass())) {
-            CharSequence delimiter = delimiters.get(vertex.getClass());
-            return getDelimiterVertexDescription(vertex, delimiter, includeBrackets);
+        Vertex unwrapped = vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).getWrappedVertex() : vertex;
+
+        if (delimiters.containsKey(unwrapped.getClass())) {
+            CharSequence delimiter = delimiters.get(unwrapped.getClass());
+            return getDelimiterVertexDescription(unwrapped, delimiter, includeBrackets);
         }
 
         Optional<String> saveLoadDescription = tryCreateDescriptionFromSaveLoadAnnotations(vertex, includeBrackets);

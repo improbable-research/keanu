@@ -85,6 +85,8 @@ public interface Vertex<T, VERTEX extends Vertex<T, VERTEX>> extends Observable<
 
     Set<Vertex> getConnectedGraph();
 
+    Class<?> ofType();
+
     void save(NetworkSaver netSaver);
 
     void saveValue(NetworkSaver netSaver);

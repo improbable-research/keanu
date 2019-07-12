@@ -13,15 +13,18 @@ public class GetBooleanIndexVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX e
 
     private final String INPUT_NAME = "inputVertex";
     private final String BOOLEAN_INDEX_NAME = "booleanIndex";
+    protected static final String TYPE_NAME = "type";
 
     private final TensorVertex<T, TENSOR, VERTEX> inputVertex;
     private final BooleanVertex booleanIndex;
+    private final Class<?> type;
 
     public GetBooleanIndexVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
                                  @LoadVertexParam(BOOLEAN_INDEX_NAME) BooleanVertex booleanIndex) {
         super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         this.booleanIndex = booleanIndex;
+        this.type = inputVertex.ofType();
         setParents(inputVertex, booleanIndex);
     }
 
@@ -48,5 +51,11 @@ public class GetBooleanIndexVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX e
     @SaveVertexParam(BOOLEAN_INDEX_NAME)
     public BooleanVertex getBooleanIndex() {
         return this.booleanIndex;
+    }
+
+    @Override
+    @SaveVertexParam(TYPE_NAME)
+    public Class<?> ofType() {
+        return type;
     }
 }

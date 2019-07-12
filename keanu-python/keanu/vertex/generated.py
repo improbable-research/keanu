@@ -76,7 +76,6 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanMaskVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanOrEqualToMaskVertex")
@@ -320,16 +319,6 @@ def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types
     :param y: y coordinate
     """
     return Double(context.jvm_view().ArcTan2Vertex, label, cast_to_double_vertex(x), cast_to_double_vertex(y))
-
-
-def Difference(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Subtracts one vertex from another
-    
-    :param left: the vertex that will be subtracted from
-    :param right: the vertex to subtract
-    """
-    return Double(context.jvm_view().DifferenceVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
 def Division(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

@@ -21,7 +21,7 @@ public class ReshapeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
     @ExportVertexToPythonBindings
     public ReshapeVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
                          @LoadVertexParam(SHAPE_NAME) long... proposedShape) {
-        super(proposedShape, inputVertex);
+        super(proposedShape, inputVertex, inputVertex.ofType());
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ReshapeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
     }
 
     @Override
-    public boolean isDifferentiable(){
+    public boolean isDifferentiable() {
         return inputVertex.isDifferentiable();
     }
 

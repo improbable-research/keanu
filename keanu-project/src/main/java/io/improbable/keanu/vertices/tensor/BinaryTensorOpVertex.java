@@ -13,8 +13,11 @@ public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, 
 
     protected final TensorVertex<T, TENSOR, VERTEX> left;
     protected final TensorVertex<T, TENSOR, VERTEX> right;
+    private final Class<?> type;
+
     protected static final String LEFT_NAME = "left";
     protected static final String RIGHT_NAME = "right";
+    protected static final String TYPE_NAME = "type";
 
     /**
      * A vertex that performs a user defined operation on two input vertices
@@ -22,8 +25,8 @@ public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, 
      * @param left  first input vertex
      * @param right second input vertex
      */
-    public BinaryTensorOpVertex(TensorVertex<T, TENSOR, VERTEX> left, TensorVertex<T, TENSOR, VERTEX> right) {
-        this(getBroadcastResultShape(left.getShape(), right.getShape()), left, right);
+    public BinaryTensorOpVertex(TensorVertex<T, TENSOR, VERTEX> left, TensorVertex<T, TENSOR, VERTEX> right, Class<?> type) {
+        this(getBroadcastResultShape(left.getShape(), right.getShape()), left, right, type);
     }
 
     /**
@@ -33,10 +36,11 @@ public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, 
      * @param left  first input vertex
      * @param right second input vertex
      */
-    public BinaryTensorOpVertex(long[] shape, TensorVertex<T, TENSOR, VERTEX> left, TensorVertex<T, TENSOR, VERTEX> right) {
+    public BinaryTensorOpVertex(long[] shape, TensorVertex<T, TENSOR, VERTEX> left, TensorVertex<T, TENSOR, VERTEX> right, Class<?> type) {
         super(shape);
         this.left = left;
         this.right = right;
+        this.type = type;
         setParents(left, right);
     }
 
@@ -57,5 +61,11 @@ public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, 
     @SaveVertexParam(RIGHT_NAME)
     public TensorVertex<T, TENSOR, VERTEX> getRight() {
         return right;
+    }
+
+    @Override
+    @SaveVertexParam(TYPE_NAME)
+    public Class<?> ofType(){
+        return type;
     }
 }

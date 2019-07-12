@@ -24,7 +24,7 @@ public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
     @ExportVertexToPythonBindings
     public TakeVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
                       @LoadVertexParam(INDEX) long... index) {
-        super(new long[0], inputVertex);
+        super(new long[0], inputVertex, inputVertex.ofType());
         this.index = index;
     }
 

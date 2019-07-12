@@ -4,18 +4,14 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.ComputableGraphBuilder;
 import io.improbable.keanu.backend.StringVariableReference;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.GenericTensorVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.VertexWrapper;
 import org.joor.Reflect;
 
 import java.util.ArrayList;
@@ -127,12 +123,14 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
             return;
         }
 
-        KeanuVertexToTensorOpMapper.OpMapper opMapperFor = KeanuVertexToTensorOpMapper.getOpMapperFor(visiting.getClass());
+        Vertex unwrappedVisiting = visiting instanceof VertexWrapper ? ((VertexWrapper) visiting).getWrappedVertex() : visiting;
+        Class<?> clazz = unwrappedVisiting.getClass();
+        KeanuVertexToTensorOpMapper.OpMapper opMapperFor = KeanuVertexToTensorOpMapper.getOpMapperFor(clazz);
 
         String variableType = getAssigmentType(visiting);
         String name = toSourceVariableName(visiting.getReference());
 
-        append(computeSourceBuilder, "final ", variableType, " ", name, " = (", variableType, ") ", opMapperFor.apply(visiting, lookup), ";\n");
+        append(computeSourceBuilder, "final ", variableType, " ", name, " = (", variableType, ") ", opMapperFor.apply(unwrappedVisiting, lookup), ";\n");
 
         lookup.put(visiting.getReference(), new KeanuCompiledVariable(name, true));
     }
@@ -141,18 +139,8 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         return v instanceof ConstantDoubleVertex || v instanceof ConstantIntegerVertex || v instanceof ConstantBooleanVertex;
     }
 
-    private String getAssigmentType(Object v) {
-        if (v instanceof DoubleVertex) {
-            return DoubleTensor.class.getCanonicalName();
-        } else if (v instanceof IntegerVertex) {
-            return IntegerTensor.class.getCanonicalName();
-        } else if (v instanceof BooleanVertex) {
-            return BooleanTensor.class.getCanonicalName();
-        } else if (v instanceof GenericTensorVertex) {
-            return Tensor.class.getCanonicalName();
-        } else {
-            return Object.class.getCanonicalName();
-        }
+    private String getAssigmentType(Vertex v) {
+        return v.ofType().getCanonicalName();
     }
 
     private String toSourceVariableName(VariableReference variableReference) {

@@ -27,7 +27,7 @@ public class PermuteVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
     @ExportVertexToPythonBindings
     public PermuteVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
                          @LoadVertexParam(REARRANGE) int... rearrange) {
-        super(getPermutedIndices(inputVertex.getShape(), rearrange), inputVertex);
+        super(getPermutedIndices(inputVertex.getShape(), rearrange), inputVertex, inputVertex.ofType());
         this.rearrange = rearrange;
         this.invertedRearrange = invertedPermute(rearrange);
     }

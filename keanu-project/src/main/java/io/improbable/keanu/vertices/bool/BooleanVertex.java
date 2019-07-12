@@ -219,4 +219,9 @@ public interface BooleanVertex extends
         return new NotBinaryVertex(vertex);
     }
 
+    @Override
+    default Class<?> ofType() {
+        return BooleanTensor.class;
+    }
+
 }

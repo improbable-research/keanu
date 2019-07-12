@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
-public class BooleanIfVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex,  NonProbabilistic<BooleanTensor> {
+public class BooleanIfVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
 
     private final BooleanVertex predicate;
     private final BooleanVertex thn;

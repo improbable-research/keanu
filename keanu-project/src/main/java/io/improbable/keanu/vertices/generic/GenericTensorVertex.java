@@ -20,4 +20,9 @@ public interface GenericTensorVertex<T> extends TensorVertex<T, GenericTensor<T>
         return notEqualTo(new ConstantGenericTensorVertex<>(that));
     }
 
+    @Override
+    default Class<?> ofType() {
+        return GenericTensor.class;
+    }
+
 }
