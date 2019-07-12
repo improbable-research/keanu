@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -50,11 +49,6 @@ public class ConstantDoubleVertex extends VertexImpl<DoubleTensor, DoubleVertex>
 
     public DoubleTensor calculate() {
         return getValue();
-    }
-
-    @Override
-    public void save(NetworkSaver netSaver) {
-        netSaver.save(this);
     }
 
     @SaveVertexParam(CONSTANT_NAME)

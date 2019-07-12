@@ -2,8 +2,6 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.network.NetworkLoader;
-import io.improbable.keanu.network.NetworkSaver;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -86,10 +84,4 @@ public interface Vertex<T, VERTEX extends Vertex<T, VERTEX>> extends Observable<
     Set<Vertex> getConnectedGraph();
 
     Class<?> ofType();
-
-    void save(NetworkSaver netSaver);
-
-    void saveValue(NetworkSaver netSaver);
-
-    void loadValue(NetworkLoader loader);
 }

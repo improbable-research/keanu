@@ -13,7 +13,6 @@ public abstract class UnaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, V
     private final Class<?> type;
 
     protected static final String INPUT_NAME = "inputVertex";
-    protected static final String TYPE_NAME = "type";
 
     /**
      * A vertex that performs a user defined operation on a singe input vertex

@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 
 @Slf4j
 public class DotSaverTest {
@@ -47,11 +47,9 @@ public class DotSaverTest {
     @BeforeClass
     public static void setUpComplexNet() {
         VertexId.resetIdGenerator();
-        complexResultVertex = ((new GammaVertex(0, 1))
-            .lessThan(-1.0))
-            .or((new GaussianVertex(0, 1))
-                .plus(5.0)
-                .elementwiseEquals(10.0));
+        complexResultVertex = new GammaVertex(0, 1).lessThan(-1.0)
+            .or(new GaussianVertex(0, 1).plus(5.0).elementwiseEquals(10.0));
+
         BayesianNetwork complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
         complexNetDotSaver = new DotSaver(complexNet);
     }
@@ -118,7 +116,7 @@ public class DotSaverTest {
         DoubleVertex observedGammaVertex = new GammaVertex(2, 3);
         observedGammaVertex.observe(2.5);
         DoubleVertex gammaMultipliedVertex = observedGammaVertex.times(new ConstantDoubleVertex(4));
-        Vertex resultVertex = gammaMultipliedVertex.plus(unobservedGaussianVertex);
+        DoubleVertex resultVertex = gammaMultipliedVertex.plus(unobservedGaussianVertex);
         gammaMultipliedVertex.setLabel("Gamma Multiplied");
         DotSaver dotSaver = new DotSaver(new BayesianNetwork(resultVertex.getConnectedGraph()));
         dotSaver.save(outputWriter, true);
@@ -158,17 +156,19 @@ public class DotSaverTest {
     }
 
     // Need to compare the outputs line by line, as the labels and edges are not written out in a fixed order.
-    private void checkDotFilesMatch(String output1, String output2) {
+    private void checkDotFilesMatch(String actual, String expected) {
 
-        List<String> output1Lines = Arrays.stream(output1.split("\n"))
+        List<String> actualLines = Arrays.stream(actual.split("\n"))
             .map(s -> s.replace("\r", ""))
+            .sorted()
             .collect(Collectors.toList());
 
-        String[] output2Lines = Arrays.stream(output2.split("\n"))
+        List<String> expectedLines = Arrays.stream(expected.split("\n"))
             .map(s -> s.replace("\r", ""))
-            .toArray(String[]::new);
+            .sorted()
+            .collect(Collectors.toList());
 
-        assertThat(output1Lines, containsInAnyOrder(output2Lines));
+        assertThat(actualLines, equalTo(expectedLines));
     }
 
     private static String readFileToString(String fileOnClassPath) throws IOException {

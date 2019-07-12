@@ -255,7 +255,7 @@ public class BayesianNetwork {
     public void save(NetworkSaver networkSaver) {
         if (isAllSavable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
-                vertex.save(networkSaver);
+                networkSaver.save(unwrapIfNeeded(vertex));
             }
         } else {
             throw new IllegalArgumentException("Trying to save a BayesianNetwork that isn't Saveable");
@@ -263,21 +263,17 @@ public class BayesianNetwork {
     }
 
     private boolean isAllSavable() {
-        return vertices.stream().noneMatch(this::isSavable);
-    }
-
-    private boolean isSavable(Vertex vertex) {
-        if (vertex instanceof VertexWrapper) {
-            return ((VertexWrapper) vertex).getWrappedVertex() instanceof NonSaveableVertex;
-        } else {
-            return vertex instanceof NonSaveableVertex;
-        }
+        return vertices.stream().noneMatch(v -> unwrapIfNeeded(v) instanceof NonSaveableVertex);
     }
 
     public void saveValues(NetworkSaver networkSaver) {
         for (Vertex vertex : TopologicalSort.sort(vertices)) {
-            vertex.saveValue(networkSaver);
+            networkSaver.saveValue(unwrapIfNeeded(vertex));
         }
+    }
+
+    private Vertex unwrapIfNeeded(Vertex vertex) {
+        return vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).getWrappedVertex() : vertex;
     }
 
     /**

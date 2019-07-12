@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -37,11 +36,6 @@ public class ConstantBooleanVertex extends VertexImpl<BooleanTensor, BooleanVert
     @Override
     public BooleanTensor calculate() {
         return getValue();
-    }
-
-    @Override
-    public void save(NetworkSaver netSaver) {
-        netSaver.save(this);
     }
 
     @SaveVertexParam(CONSTANT_NAME)

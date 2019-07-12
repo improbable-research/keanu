@@ -1,15 +1,19 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.number.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
+import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -17,10 +21,10 @@ import java.util.Map;
 import static io.improbable.keanu.tensor.TensorShape.getReductionResultShape;
 import static java.util.Collections.singletonMap;
 
-public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
+public class SumVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+    extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
     private static final String DIMENSIONS_NAME = "overDimensions";
-
     private final int[] overDimensions;
 
     /**
@@ -29,9 +33,9 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
      * @param inputVertex    the vertex to have its values summed
      * @param overDimensions dimensions to sum over
      */
-    public SumVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<DoubleTensor, ?> inputVertex,
+    public SumVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
                      @LoadVertexParam(DIMENSIONS_NAME) int[] overDimensions) {
-        super(getReductionResultShape(inputVertex.getShape(), overDimensions), inputVertex);
+        super(getReductionResultShape(inputVertex.getShape(), overDimensions), inputVertex, inputVertex.ofType());
         this.overDimensions = overDimensions;
     }
 
@@ -41,13 +45,13 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
      * @param inputVertex the vertex to have its values summed
      */
     @ExportVertexToPythonBindings
-    public SumVertex(DoubleVertex inputVertex) {
-        super(Tensor.SCALAR_SHAPE, inputVertex);
+    public SumVertex(TensorVertex<T, TENSOR, VERTEX> inputVertex) {
+        super(Tensor.SCALAR_SHAPE, inputVertex, inputVertex.ofType());
         this.overDimensions = null;
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor value) {
+    protected TENSOR op(TENSOR value) {
         if (overDimensions == null) {
             return value.sum();
         } else {

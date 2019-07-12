@@ -1,8 +1,6 @@
 package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.network.NetworkLoader;
-import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
@@ -205,21 +203,6 @@ public class VertexWrapper<TENSOR, VERTEX extends Vertex<TENSOR, VERTEX>> implem
     @Override
     public Class<?> ofType() {
         return vertex.ofType();
-    }
-
-    @Override
-    public void save(NetworkSaver netSaver) {
-        vertex.save(netSaver);
-    }
-
-    @Override
-    public void saveValue(NetworkSaver netSaver) {
-        vertex.saveValue(netSaver);
-    }
-
-    @Override
-    public void loadValue(NetworkLoader loader) {
-        vertex.loadValue(loader);
     }
 
     @Override

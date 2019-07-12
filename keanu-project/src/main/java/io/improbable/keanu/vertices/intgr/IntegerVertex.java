@@ -20,14 +20,12 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerSetWithMaskVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerTensorMultiplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerApplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumProdVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMaxUnaryVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMinUnaryVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerProductVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 import io.improbable.keanu.vertices.number.FixedPointTensorVertex;
 
@@ -264,21 +262,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     @Override
     default IntegerVertex safeLogTimes(IntegerVertex y) {
         return null;
-    }
-
-    @Override
-    default IntegerVertex abs() {
-        return new IntegerAbsVertex(this);
-    }
-
-    @Override
-    default IntegerVertex sum() {
-        return new IntegerSumVertex(this);
-    }
-
-    @Override
-    default IntegerVertex sum(int... sumOverDimensions) {
-        return new IntegerSumVertex(this, sumOverDimensions);
     }
 
     @Override

@@ -4,10 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.NetworkLoader;
-import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
@@ -320,31 +317,4 @@ public abstract class VertexImpl<T, VERTEX extends Vertex<T, VERTEX>> implements
         return stringBuilder.toString();
     }
 
-    public void save(NetworkSaver netSaver) {
-        netSaver.save(this);
-    }
-
-    public void saveValue(NetworkSaver netSaver) {
-        if (this instanceof DoubleVertex) {
-            netSaver.saveValue((DoubleVertex) this);
-        } else if (this instanceof IntegerVertex) {
-            netSaver.saveValue((IntegerVertex) this);
-        } else if (this instanceof BooleanVertex) {
-            netSaver.saveValue((BooleanVertex) this);
-        } else {
-            netSaver.saveValue(this);
-        }
-    }
-
-    public void loadValue(NetworkLoader loader) {
-        if (this instanceof DoubleVertex) {
-            loader.loadValue((DoubleVertex) this);
-        } else if (this instanceof IntegerVertex) {
-            loader.loadValue((IntegerVertex) this);
-        } else if (this instanceof BooleanVertex) {
-            loader.loadValue((BooleanVertex) this);
-        } else {
-            loader.loadValue(this);
-        }
-    }
 }

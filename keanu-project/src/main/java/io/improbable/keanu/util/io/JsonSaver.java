@@ -3,14 +3,7 @@ package io.improbable.keanu.util.io;
 import com.google.protobuf.util.JsonFormat;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkSaver;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.mir.KeanuSavedBayesNet;
 
 import java.io.IOException;
@@ -60,42 +53,8 @@ public class JsonSaver implements NetworkSaver {
     }
 
     @Override
-    public void save(ConstantVertex vertex) {
-        protobufSaver.save(vertex);
-    }
-
-    @Override
-    public void save(ConstantDoubleVertex vertex) {
-        protobufSaver.save(vertex);
-    }
-
-    @Override
-    public void save(ConstantIntegerVertex vertex) {
-        protobufSaver.save(vertex);
-    }
-
-    @Override
-    public void save(ConstantBooleanVertex vertex) {
-        protobufSaver.save(vertex);
-    }
-
-    @Override
     public void saveValue(Vertex vertex) {
         protobufSaver.save(vertex);
     }
 
-    @Override
-    public void saveValue(DoubleVertex vertex) {
-        protobufSaver.save(vertex);
-    }
-
-    @Override
-    public void saveValue(IntegerVertex vertex) {
-        protobufSaver.save(vertex);
-    }
-
-    @Override
-    public void saveValue(BooleanVertex vertex) {
-        protobufSaver.save(vertex);
-    }
 }

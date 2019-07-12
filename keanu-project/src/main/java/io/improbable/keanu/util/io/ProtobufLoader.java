@@ -16,9 +16,6 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.mir.KeanuSavedBayesNet;
 import io.improbable.mir.SavedBayesNet;
 
@@ -36,11 +33,6 @@ public class ProtobufLoader implements NetworkLoader {
 
     public ProtobufLoader() {
         savedValues = new HashMap<>();
-    }
-
-    @Override
-    public void loadValue(Vertex vertex) {
-        throw new IllegalArgumentException("Cannot Load value for Untyped Vertex");
     }
 
     @Override
@@ -68,14 +60,6 @@ public class ProtobufLoader implements NetworkLoader {
         return bayesNet;
     }
 
-    @Override
-    public void loadValue(DoubleVertex vertex) {
-        SavedBayesNet.StoredValue valueInformation = savedValues.get(vertex);
-        SavedBayesNet.VertexValue value = valueInformation.getValue();
-        DoubleTensor tensor = extractDoubleValue(value);
-        setOrObserveValue(vertex, tensor, valueInformation.getIsObserved());
-    }
-
     private DoubleTensor extractDoubleValue(SavedBayesNet.VertexValue value) {
         if (value.getValueTypeCase() != SavedBayesNet.VertexValue.ValueTypeCase.DOUBLE_VAL) {
             throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
@@ -91,7 +75,7 @@ public class ProtobufLoader implements NetworkLoader {
             Vertex targetVertex = getTargetVertex(value, instantiatedVertices, bayesNet);
 
             savedValues.put(targetVertex, value);
-            targetVertex.loadValue(this);
+            loadValue(targetVertex);
         }
     }
 
@@ -99,7 +83,7 @@ public class ProtobufLoader implements NetworkLoader {
                                    Map<SavedBayesNet.VertexID, Vertex> instantiatedVertices,
                                    BayesianNetwork bayesNet) {
         Vertex idTarget = getTargetByID(storedValue, instantiatedVertices);
-        Vertex labelTarget = getTargetByLabel(storedValue, instantiatedVertices, bayesNet);
+        Vertex labelTarget = getTargetByLabel(storedValue, bayesNet);
 
         return checkTargetsAreValid(idTarget, labelTarget, storedValue);
     }
@@ -114,7 +98,6 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private Vertex getTargetByLabel(SavedBayesNet.StoredValue storedValue,
-                                    Map<SavedBayesNet.VertexID, Vertex> instantiatedVertices,
                                     BayesianNetwork bayesNet) {
         if (!storedValue.getVertexLabel().isEmpty()) {
             return bayesNet.getVertexByLabel(new VertexLabel(storedValue.getVertexLabel()));
@@ -146,11 +129,18 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     @Override
-    public void loadValue(BooleanVertex vertex) {
+    public void loadValue(Vertex vertex) {
         SavedBayesNet.StoredValue valueInformation = savedValues.get(vertex);
         SavedBayesNet.VertexValue value = valueInformation.getValue();
-        BooleanTensor tensor = extractBoolValue(value);
-        setOrObserveValue(vertex, tensor, valueInformation.getIsObserved());
+
+        Class<?> type = vertex.ofType();
+        if (type.isAssignableFrom(BooleanTensor.class)) {
+            setOrObserveValue(vertex, extractBoolValue(value), valueInformation.getIsObserved());
+        } else if (type.isAssignableFrom(DoubleTensor.class)) {
+            setOrObserveValue(vertex, extractDoubleValue(value), valueInformation.getIsObserved());
+        } else if (type.isAssignableFrom(Integer.class)) {
+            setOrObserveValue(vertex, extractIntValue(value), valueInformation.getIsObserved());
+        }
     }
 
     private BooleanTensor extractBoolValue(SavedBayesNet.VertexValue value) {
@@ -159,14 +149,6 @@ public class ProtobufLoader implements NetworkLoader {
         } else {
             return extractBoolTensor(value.getBoolVal());
         }
-    }
-
-    @Override
-    public void loadValue(IntegerVertex vertex) {
-        SavedBayesNet.StoredValue valueInformation = savedValues.get(vertex);
-        SavedBayesNet.VertexValue value = valueInformation.getValue();
-        IntegerTensor tensor = extractIntValue(value);
-        setOrObserveValue(vertex, tensor, valueInformation.getIsObserved());
     }
 
     private IntegerTensor extractIntValue(SavedBayesNet.VertexValue value) {
@@ -186,7 +168,7 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private <T> Vertex<T, ?> createVertexFromProtoBuf(SavedBayesNet.Vertex vertex,
-                                                   Map<SavedBayesNet.VertexID, Vertex> existingVertices) {
+                                                      Map<SavedBayesNet.VertexID, Vertex> existingVertices) {
         Class vertexClass;
         try {
             vertexClass = Class.forName(vertex.getVertexType());

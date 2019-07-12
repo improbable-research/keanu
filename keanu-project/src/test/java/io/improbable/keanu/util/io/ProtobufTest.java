@@ -468,7 +468,7 @@ public class ProtobufTest {
         DoubleVertex testVertex = new TestNonSaveableVertex();
         BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
         ProtobufSaver protobufSaver = new ProtobufSaver(net);
-        testVertex.save(protobufSaver);
+        protobufSaver.save(testVertex);
     }
 
     @Category(Slow.class)

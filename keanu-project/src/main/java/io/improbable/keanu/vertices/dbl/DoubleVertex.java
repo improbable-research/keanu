@@ -1,8 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
-import io.improbable.keanu.network.NetworkLoader;
-import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
@@ -28,7 +26,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Multip
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
@@ -44,7 +41,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixI
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.number.FloatingPointTensorVertex;
@@ -85,16 +81,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
 
     default double getValue(long... index) {
         return getValue().getValue(index);
-    }
-
-    @Override
-    default void loadValue(NetworkLoader loader) {
-        loader.loadValue(this);
-    }
-
-    @Override
-    default void saveValue(NetworkSaver netSaver) {
-        netSaver.saveValue(this);
     }
 
     //////////////////////////
@@ -144,16 +130,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     //////////////////////////
     ////  Number Tensor Operations
     //////////////////////////
-
-    @Override
-    default DoubleVertex sum() {
-        return new SumVertex(this);
-    }
-
-    @Override
-    default DoubleVertex sum(int... sumOverDimensions) {
-        return new SumVertex(this, sumOverDimensions);
-    }
 
     @Override
     default DoubleVertex cumSum(int requestedDimension) {
@@ -352,11 +328,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     @Override
     default IntegerVertex argMin() {
         return null;
-    }
-
-    @Override
-    default DoubleVertex abs() {
-        return new AbsVertex(this);
     }
 
     @Override
