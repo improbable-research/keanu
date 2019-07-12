@@ -13,6 +13,7 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.VertexWrapper;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -252,7 +253,7 @@ public class BayesianNetwork {
     }
 
     public void save(NetworkSaver networkSaver) {
-        if (isSaveable()) {
+        if (isAllSavable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
                 vertex.save(networkSaver);
             }
@@ -261,8 +262,16 @@ public class BayesianNetwork {
         }
     }
 
-    private boolean isSaveable() {
-        return vertices.stream().filter(v -> v instanceof NonSaveableVertex).count() == 0;
+    private boolean isAllSavable() {
+        return vertices.stream().noneMatch(this::isSavable);
+    }
+
+    private boolean isSavable(Vertex vertex) {
+        if (vertex instanceof VertexWrapper) {
+            return ((VertexWrapper) vertex).getWrappedVertex() instanceof NonSaveableVertex;
+        } else {
+            return vertex instanceof NonSaveableVertex;
+        }
     }
 
     public void saveValues(NetworkSaver networkSaver) {

@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 
 public class FloorVertex extends DoubleUnaryOpVertex {
@@ -15,7 +15,7 @@ public class FloorVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex to be floor'd
      */
     @ExportVertexToPythonBindings
-    public FloorVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex) {
+    public FloorVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<DoubleTensor, ?> inputVertex) {
         super(inputVertex);
     }
 

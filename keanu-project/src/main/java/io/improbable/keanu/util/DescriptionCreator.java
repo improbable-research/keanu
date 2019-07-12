@@ -1,9 +1,9 @@
 package io.improbable.keanu.util;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
@@ -15,12 +15,11 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
+import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
 import io.improbable.keanu.vertices.tensor.VertexWrapper;
 
@@ -41,9 +40,8 @@ public class DescriptionCreator {
 
     public DescriptionCreator() {
         delimiters = new HashMap<>();
-        delimiters.put(AdditionVertex.class, " + ");
-        delimiters.put(IntegerAdditionVertex.class, " + ");
         delimiters.put(NumberDifferenceVertex.class, " - ");
+        delimiters.put(NumberAdditionVertex.class, " + ");
         delimiters.put(MultiplicationVertex.class, " * ");
         delimiters.put(IntegerMultiplicationVertex.class, " * ");
         delimiters.put(DivisionVertex.class, " / ");
@@ -183,7 +181,7 @@ public class DescriptionCreator {
     }
 
     private Optional<String> createIfStringDescription(Vertex<?, ?> vertex, boolean includeBrackets) {
-        BooleanVertex predicate;
+        Vertex<BooleanTensor, ?> predicate;
         Vertex<?, ?> thn;
         Vertex<?, ?> els;
 

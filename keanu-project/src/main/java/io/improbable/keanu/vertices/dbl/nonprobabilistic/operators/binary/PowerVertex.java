@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
@@ -24,16 +23,16 @@ public class PowerVertex extends DoubleBinaryOpVertex implements Differentiable 
      * @param exponent the exponent vertex
      */
     @ExportVertexToPythonBindings
-    public PowerVertex(@LoadVertexParam(BASE_NAME) DoubleVertex base,
-                       @LoadVertexParam(EXPONENT_NAME) DoubleVertex exponent) {
+    public PowerVertex(@LoadVertexParam(BASE_NAME) Vertex<DoubleTensor, ?> base,
+                       @LoadVertexParam(EXPONENT_NAME) Vertex<DoubleTensor, ?> exponent) {
         super(base, exponent);
     }
 
-    public DoubleVertex getBase() {
+    public Vertex<DoubleTensor, ?> getBase() {
         return super.getLeft();
     }
 
-    public DoubleVertex getExponent() {
+    public Vertex<DoubleTensor, ?> getExponent() {
         return super.getRight();
     }
 

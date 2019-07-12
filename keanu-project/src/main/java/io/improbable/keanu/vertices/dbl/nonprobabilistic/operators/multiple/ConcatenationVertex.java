@@ -28,7 +28,7 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
     private final static String OPERANDS_NAME = "operands";
 
     private final int dimension;
-    private final DoubleVertex[] operands;
+    private final Vertex<DoubleTensor, ?>[] operands;
 
     /**
      * A vertex that can concatenate any amount of vertices along a given dimension.
@@ -37,21 +37,13 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
      *                  dimension indexing is not supported.
      * @param operands  the operands vertices to concatenate
      */
-    public ConcatenationVertex(int dimension, DoubleVertex... operands) {
+    @ExportVertexToPythonBindings
+    public ConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
+                               @LoadVertexParam(OPERANDS_NAME) Vertex<DoubleTensor, ?>... operands) {
         super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, operands)));
         this.dimension = dimension;
         this.operands = operands;
         setParents(operands);
-    }
-
-    @ExportVertexToPythonBindings
-    public ConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
-                               @LoadVertexParam(OPERANDS_NAME) Vertex[] operands) {
-        this(dimension, convertFromVertexToDoubleVertex(operands));
-    }
-
-    private static DoubleVertex[] convertFromVertexToDoubleVertex(Vertex[] operands) {
-        return Arrays.stream(operands).toArray(DoubleVertex[]::new);
     }
 
     @Override
@@ -59,7 +51,7 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
         List<PartialDerivative> partialsOfOperands = new ArrayList<>();
         List<DoubleTensor> operandValues = new ArrayList<>();
 
-        for (DoubleVertex operand : operands) {
+        for (Vertex<DoubleTensor, ?> operand : operands) {
             PartialDerivative operandPartial = derivativeOfParentsWithRespectToInput.getOrDefault(operand, PartialDerivative.EMPTY);
             partialsOfOperands.add(operandPartial);
             operandValues.add(operand.getValue());
@@ -161,7 +153,7 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
         return DoubleTensor.concat(dimension, inputs);
     }
 
-    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor, DoubleVertex>, T> func, DoubleVertex[] operands) {
+    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor, ?>, T> func, Vertex<DoubleTensor, ?>[] operands) {
         T[] extract = (T[]) Array.newInstance(clazz, operands.length);
         for (int i = 0; i < operands.length; i++) {
             extract[i] = func.apply(operands[i]);
@@ -170,7 +162,7 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
     }
 
     @SaveVertexParam(OPERANDS_NAME)
-    public DoubleVertex[] getOperands() {
+    public Vertex<DoubleTensor, ?>[] getOperands() {
         return operands;
     }
 

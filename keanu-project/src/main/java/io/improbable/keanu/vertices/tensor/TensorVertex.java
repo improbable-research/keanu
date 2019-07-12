@@ -33,7 +33,7 @@ public interface TensorVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extend
     }
 
     default VERTEX diag() {
-        return null;
+        return asTyped(new DiagVertex<>(this));
     }
 
     default VERTEX take(long... index) {

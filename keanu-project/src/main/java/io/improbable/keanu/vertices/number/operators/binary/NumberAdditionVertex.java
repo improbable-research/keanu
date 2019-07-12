@@ -1,20 +1,24 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
+package io.improbable.keanu.vertices.number.operators.binary;
 
 import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.tensor.BinaryTensorOpVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @DisplayInformationForOutput(displayName = "+")
-public class AdditionVertex extends DoubleBinaryOpVertex implements Differentiable {
+public class NumberAdditionVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+    extends BinaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
     /**
      * Adds one vertex to another
@@ -23,13 +27,13 @@ public class AdditionVertex extends DoubleBinaryOpVertex implements Differentiab
      * @param right a vertex to add
      */
     @ExportVertexToPythonBindings
-    public AdditionVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
-                          @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
-        super(left, right);
+    public NumberAdditionVertex(@LoadVertexParam(LEFT_NAME) TensorVertex<T, TENSOR, VERTEX> left,
+                                @LoadVertexParam(RIGHT_NAME) TensorVertex<T, TENSOR, VERTEX> right) {
+        super(left, right, left.ofType());
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+    protected TENSOR op(TENSOR l, TENSOR r) {
         return l.plus(r);
     }
 

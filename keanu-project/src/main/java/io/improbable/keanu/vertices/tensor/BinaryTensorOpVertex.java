@@ -64,7 +64,6 @@ public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, 
     }
 
     @Override
-    @SaveVertexParam(TYPE_NAME)
     public Class<?> ofType(){
         return type;
     }

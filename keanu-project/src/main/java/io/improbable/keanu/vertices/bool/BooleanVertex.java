@@ -22,7 +22,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllFal
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllTrueVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyFalseVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyTrueVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanDiagVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -93,11 +92,6 @@ public interface BooleanVertex extends
     @Override
     default List<BooleanVertex> split(int dimension, long... splitAtIndices) {
         return null;
-    }
-
-    @Override
-    default BooleanVertex diag() {
-        return new BooleanDiagVertex(this);
     }
 
     @Override

@@ -14,6 +14,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
+import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
 
@@ -23,6 +24,11 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
     @Override
     default VERTEX minus(VERTEX that) {
         return asTyped(new NumberDifferenceVertex<>(this, that));
+    }
+
+    @Override
+    default VERTEX plus(VERTEX that) {
+        return asTyped(new NumberAdditionVertex<>(this, that));
     }
 
     @Override

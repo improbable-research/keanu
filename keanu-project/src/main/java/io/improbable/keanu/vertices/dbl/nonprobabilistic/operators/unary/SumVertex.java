@@ -29,7 +29,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
      * @param inputVertex    the vertex to have its values summed
      * @param overDimensions dimensions to sum over
      */
-    public SumVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
+    public SumVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<DoubleTensor, ?> inputVertex,
                      @LoadVertexParam(DIMENSIONS_NAME) int[] overDimensions) {
         super(getReductionResultShape(inputVertex.getShape(), overDimensions), inputVertex);
         this.overDimensions = overDimensions;

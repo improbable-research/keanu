@@ -5,7 +5,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
@@ -180,7 +179,7 @@ public class DifferentiableCheckerTest {
     @Test
     public void constantVerticesAreCached() {
         GaussianVertex baseVertex = new GaussianVertex(1., 1.);
-        AdditionVertex addVertex = new AdditionVertex(baseVertex, new ConstantDoubleVertex(1.));
+        DoubleVertex addVertex = baseVertex.plus(new ConstantDoubleVertex(1.));
         DoubleVertex mockedVertex = Mockito.spy(addVertex);
         FloorVertex nonDiffable = new FloorVertex(mockedVertex);
 

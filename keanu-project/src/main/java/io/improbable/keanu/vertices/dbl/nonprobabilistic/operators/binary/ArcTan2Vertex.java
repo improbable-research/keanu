@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
@@ -24,8 +23,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex implements Differentiabl
      * @param y y coordinate
      */
     @ExportVertexToPythonBindings
-    public ArcTan2Vertex(@LoadVertexParam(X_NAME) DoubleVertex x,
-                         @LoadVertexParam(Y_NAME) DoubleVertex y) {
+    public ArcTan2Vertex(@LoadVertexParam(X_NAME) Vertex<DoubleTensor, ?> x,
+                         @LoadVertexParam(Y_NAME) Vertex<DoubleTensor, ?> y) {
         super(x, y);
     }
 

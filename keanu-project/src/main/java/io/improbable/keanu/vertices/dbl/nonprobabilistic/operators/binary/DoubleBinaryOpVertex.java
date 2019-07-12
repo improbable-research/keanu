@@ -3,16 +3,19 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
-public abstract class DoubleBinaryOpVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexBinaryOp<DoubleVertex, DoubleVertex> {
+public abstract class DoubleBinaryOpVertex
+    extends VertexImpl<DoubleTensor, DoubleVertex>
+    implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexBinaryOp<Vertex<DoubleTensor, ?>, Vertex<DoubleTensor, ?>> {
 
-    protected final DoubleVertex left;
-    protected final DoubleVertex right;
+    protected final Vertex<DoubleTensor, ?> left;
+    protected final Vertex<DoubleTensor, ?> right;
     protected static final String LEFT_NAME = "left";
     protected static final String RIGHT_NAME = "right";
 
@@ -22,7 +25,7 @@ public abstract class DoubleBinaryOpVertex extends VertexImpl<DoubleTensor, Doub
      * @param left  a vertex
      * @param right a vertex
      */
-    public DoubleBinaryOpVertex(DoubleVertex left, DoubleVertex right) {
+    public DoubleBinaryOpVertex(Vertex<DoubleTensor, ?> left, Vertex<DoubleTensor, ?> right) {
         this(getBroadcastResultShape(left.getShape(), right.getShape()), left, right);
     }
 
@@ -33,7 +36,7 @@ public abstract class DoubleBinaryOpVertex extends VertexImpl<DoubleTensor, Doub
      * @param left  a vertex
      * @param right a vertex
      */
-    public DoubleBinaryOpVertex(long[] shape, DoubleVertex left, DoubleVertex right) {
+    public DoubleBinaryOpVertex(long[] shape, Vertex<DoubleTensor, ?> left, Vertex<DoubleTensor, ?> right) {
         super(shape);
         this.left = left;
         this.right = right;
@@ -47,13 +50,13 @@ public abstract class DoubleBinaryOpVertex extends VertexImpl<DoubleTensor, Doub
 
     @Override
     @SaveVertexParam(LEFT_NAME)
-    public DoubleVertex getLeft() {
+    public Vertex<DoubleTensor, ?> getLeft() {
         return left;
     }
 
     @Override
     @SaveVertexParam(RIGHT_NAME)
-    public DoubleVertex getRight() {
+    public Vertex<DoubleTensor, ?> getRight() {
         return right;
     }
 

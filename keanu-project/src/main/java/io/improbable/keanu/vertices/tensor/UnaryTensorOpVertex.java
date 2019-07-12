@@ -49,7 +49,6 @@ public abstract class UnaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, V
         return inputVertex;
     }
 
-    @SaveVertexParam(TYPE_NAME)
     public Class<?> ofType(){
         return type;
     }

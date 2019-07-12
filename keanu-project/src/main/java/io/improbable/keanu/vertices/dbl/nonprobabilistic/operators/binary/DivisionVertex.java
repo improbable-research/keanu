@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
@@ -22,8 +21,8 @@ public class DivisionVertex extends DoubleBinaryOpVertex implements Differentiab
      * @param right the vertex to divide
      */
     @ExportVertexToPythonBindings
-    public DivisionVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
-                          @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
+    public DivisionVertex(@LoadVertexParam(LEFT_NAME) Vertex<DoubleTensor, ?> left,
+                          @LoadVertexParam(RIGHT_NAME) Vertex<DoubleTensor, ?> right) {
         super(left, right);
     }
 

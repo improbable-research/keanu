@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -22,8 +21,8 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements 
      * @param right vertex B
      */
     @ExportVertexToPythonBindings
-    public MatrixMultiplicationVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
-                                      @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
+    public MatrixMultiplicationVertex(@LoadVertexParam(LEFT_NAME) Vertex<DoubleTensor, ?> left,
+                                      @LoadVertexParam(RIGHT_NAME) Vertex<DoubleTensor, ?> right) {
         super(getMatrixMultiplicationResultingShape(left.getShape(), right.getShape()),
             left, right);
     }

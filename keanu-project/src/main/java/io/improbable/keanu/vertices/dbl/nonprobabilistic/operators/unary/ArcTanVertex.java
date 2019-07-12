@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -19,7 +18,7 @@ public class ArcTanVertex extends DoubleUnaryOpVertex implements Differentiable 
      * @param inputVertex the vertex
      */
     @ExportVertexToPythonBindings
-    public ArcTanVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex) {
+    public ArcTanVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<DoubleTensor, ?> inputVertex) {
         super(inputVertex);
     }
 

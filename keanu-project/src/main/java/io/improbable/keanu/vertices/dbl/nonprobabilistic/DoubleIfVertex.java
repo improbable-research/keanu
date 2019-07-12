@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
@@ -20,17 +19,17 @@ import java.util.Map;
 
 public class DoubleIfVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor> {
 
-    private final BooleanVertex predicate;
-    private final DoubleVertex thn;
-    private final DoubleVertex els;
+    private final Vertex<BooleanTensor, ?> predicate;
+    private final Vertex<DoubleTensor, ?> thn;
+    private final Vertex<DoubleTensor, ?> els;
     protected static final String PREDICATE_NAME = "predicate";
     protected static final String THEN_NAME = "then";
     protected static final String ELSE_NAME = "else";
 
     @ExportVertexToPythonBindings
-    public DoubleIfVertex(@LoadVertexParam(PREDICATE_NAME) BooleanVertex predicate,
-                          @LoadVertexParam(THEN_NAME) DoubleVertex thn,
-                          @LoadVertexParam(ELSE_NAME) DoubleVertex els) {
+    public DoubleIfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<BooleanTensor, ?> predicate,
+                          @LoadVertexParam(THEN_NAME) Vertex<DoubleTensor, ?> thn,
+                          @LoadVertexParam(ELSE_NAME) Vertex<DoubleTensor, ?> els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;
@@ -39,17 +38,17 @@ public class DoubleIfVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
     }
 
     @SaveVertexParam(PREDICATE_NAME)
-    public BooleanVertex getPredicate() {
+    public Vertex<BooleanTensor, ?> getPredicate() {
         return predicate;
     }
 
     @SaveVertexParam(THEN_NAME)
-    public DoubleVertex getThn() {
+    public Vertex<DoubleTensor, ?> getThn() {
         return thn;
     }
 
     @SaveVertexParam(ELSE_NAME)
-    public DoubleVertex getEls() {
+    public Vertex<DoubleTensor, ?> getEls() {
         return els;
     }
 

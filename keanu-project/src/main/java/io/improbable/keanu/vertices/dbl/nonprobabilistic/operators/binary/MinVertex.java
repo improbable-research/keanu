@@ -1,8 +1,10 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 
 public class MinVertex extends DoubleIfVertex {
@@ -17,8 +19,8 @@ public class MinVertex extends DoubleIfVertex {
      * @param right one of the vertices to find the minimum of
      */
     @ExportVertexToPythonBindings
-    public MinVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
-                     @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
-        super(left.lessThanOrEqual(right), left, right);
+    public MinVertex(@LoadVertexParam(LEFT_NAME) Vertex<DoubleTensor, ?> left,
+                     @LoadVertexParam(RIGHT_NAME) Vertex<DoubleTensor, ?> right) {
+        super(new LessThanOrEqualVertex<>(left, right), left, right);
     }
 }

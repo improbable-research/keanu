@@ -3,13 +3,14 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-public abstract class DoubleUnaryOpVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexUnaryOp<DoubleVertex> {
+public abstract class DoubleUnaryOpVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexUnaryOp<Vertex<DoubleTensor, ?>> {
 
-    protected final DoubleVertex inputVertex;
+    protected final Vertex<DoubleTensor, ?> inputVertex;
     protected static final String INPUT_VERTEX_NAME = "inputVertex";
 
     /**
@@ -17,7 +18,7 @@ public abstract class DoubleUnaryOpVertex extends VertexImpl<DoubleTensor, Doubl
      *
      * @param inputVertex the input vertex
      */
-    public DoubleUnaryOpVertex(DoubleVertex inputVertex) {
+    public DoubleUnaryOpVertex(Vertex<DoubleTensor, ?> inputVertex) {
         this(inputVertex.getShape(), inputVertex);
     }
 
@@ -27,7 +28,7 @@ public abstract class DoubleUnaryOpVertex extends VertexImpl<DoubleTensor, Doubl
      * @param shape       the shape of the tensor
      * @param inputVertex the input vertex
      */
-    public DoubleUnaryOpVertex(long[] shape, DoubleVertex inputVertex) {
+    public DoubleUnaryOpVertex(long[] shape, Vertex<DoubleTensor, ?> inputVertex) {
         super(shape);
         this.inputVertex = inputVertex;
         setParents(inputVertex);
@@ -35,7 +36,7 @@ public abstract class DoubleUnaryOpVertex extends VertexImpl<DoubleTensor, Doubl
 
     @SaveVertexParam(INPUT_VERTEX_NAME)
     @Override
-    public DoubleVertex getInputVertex() {
+    public Vertex<DoubleTensor, ?> getInputVertex() {
         return inputVertex;
     }
 

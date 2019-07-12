@@ -7,8 +7,8 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerIfVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor> {
@@ -16,14 +16,14 @@ public class IntegerIfVertex extends VertexImpl<IntegerTensor, IntegerVertex> im
     protected static final String PREDICATE_NAME = "predicate";
     protected static final String THEN_NAME = "then";
     protected static final String ELSE_NAME = "else";
-    private final BooleanVertex predicate;
-    private final IntegerVertex thn;
-    private final IntegerVertex els;
+    private final Vertex<BooleanTensor, ?> predicate;
+    private final Vertex<IntegerTensor, ?> thn;
+    private final Vertex<IntegerTensor, ?> els;
 
     @ExportVertexToPythonBindings
-    public IntegerIfVertex(@LoadVertexParam(PREDICATE_NAME) BooleanVertex predicate,
-                           @LoadVertexParam(THEN_NAME) IntegerVertex thn,
-                           @LoadVertexParam(ELSE_NAME) IntegerVertex els) {
+    public IntegerIfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<BooleanTensor, ?> predicate,
+                           @LoadVertexParam(THEN_NAME) Vertex<IntegerTensor, ?> thn,
+                           @LoadVertexParam(ELSE_NAME) Vertex<IntegerTensor, ?> els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;
@@ -32,17 +32,17 @@ public class IntegerIfVertex extends VertexImpl<IntegerTensor, IntegerVertex> im
     }
 
     @SaveVertexParam(PREDICATE_NAME)
-    public BooleanVertex getPredicate() {
+    public Vertex<BooleanTensor, ?> getPredicate() {
         return predicate;
     }
 
     @SaveVertexParam(THEN_NAME)
-    public IntegerVertex getThn() {
+    public Vertex<IntegerTensor, ?> getThn() {
         return thn;
     }
 
     @SaveVertexParam(ELSE_NAME)
-    public IntegerVertex getEls() {
+    public Vertex<IntegerTensor, ?> getEls() {
         return els;
     }
 

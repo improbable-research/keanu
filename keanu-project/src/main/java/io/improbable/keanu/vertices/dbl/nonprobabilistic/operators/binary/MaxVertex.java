@@ -1,8 +1,10 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 
 public class MaxVertex extends DoubleIfVertex {
@@ -17,8 +19,8 @@ public class MaxVertex extends DoubleIfVertex {
      * @param right one of the vertices to find the maximum of
      */
     @ExportVertexToPythonBindings
-    public MaxVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
-                     @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
-        super(left.greaterThanOrEqual(right), left, right);
+    public MaxVertex(@LoadVertexParam(LEFT_NAME) Vertex<DoubleTensor, ?> left,
+                     @LoadVertexParam(RIGHT_NAME) Vertex<DoubleTensor, ?> right) {
+        super(new GreaterThanOrEqualVertex<>(left, right), left, right);
     }
 }

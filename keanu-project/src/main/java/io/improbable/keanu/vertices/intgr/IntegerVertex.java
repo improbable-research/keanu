@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanMaskVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanOrEqualMaskVertex;
@@ -25,7 +24,6 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerApplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumProdVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumSumVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerDiagVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMaxUnaryVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMinUnaryVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerProductVertex;
@@ -88,11 +86,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default IntegerVertex diag() {
-        return new IntegerDiagVertex(this);
-    }
-
-    @Override
     default IntegerVertex slice(Slicer slicer) {
         return null;
     }
@@ -143,18 +136,13 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default IntegerVertex plus(IntegerVertex that) {
-        return new IntegerAdditionVertex(this, that);
-    }
-
-    @Override
     default IntegerVertex plus(int value) {
-        return new IntegerAdditionVertex(this, new ConstantIntegerVertex(value));
+        return plus(new ConstantIntegerVertex(value));
     }
 
     @Override
     default IntegerVertex plus(Integer value) {
-        return new IntegerAdditionVertex(this, new ConstantIntegerVertex(value));
+        return plus(new ConstantIntegerVertex(value));
     }
 
     default IntegerVertex multiply(IntegerVertex that) {
