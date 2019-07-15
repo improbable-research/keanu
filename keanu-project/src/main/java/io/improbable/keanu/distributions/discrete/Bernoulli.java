@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BooleanPlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.tensor.If;
 
 public class Bernoulli implements Distribution<BooleanTensor> {
 

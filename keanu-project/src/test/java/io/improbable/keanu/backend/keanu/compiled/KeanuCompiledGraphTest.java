@@ -11,18 +11,16 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.GenericTensorVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.MultiplexerVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
+import io.improbable.keanu.vertices.tensor.If;
 import io.improbable.keanu.vertices.utility.AssertVertex;
 import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.junit.Test;
@@ -198,7 +196,7 @@ public class KeanuCompiledGraphTest {
         GaussianVertex A = new GaussianVertex(shape, 0, 1);
         GaussianVertex B = new GaussianVertex(shape, 0, 1);
 
-        DoubleIfVertex D = If.isTrue(predicate)
+        DoubleVertex D = If.isTrue(predicate)
             .then(A)
             .orElse(B);
 
@@ -433,7 +431,9 @@ public class KeanuCompiledGraphTest {
         CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
         CategoricalVertex<TestEnum> B = new CategoricalVertex<>(selectableValues);
 
-        IfVertex<TestEnum> D = new IfVertex<>(predicate, A, B);
+        GenericTensorVertex<TestEnum> D = If.isTrue(predicate)
+            .then(A)
+            .orElse(B);
 
         assertCompiledIsSameAsVertexEvaluation(A, B, predicate, D);
     }

@@ -10,10 +10,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
@@ -131,31 +127,11 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     static DoubleVertex min(DoubleVertex a, DoubleVertex b) {
-        return new MinVertex(a, b);
+        return a.min(b);
     }
 
     static DoubleVertex max(DoubleVertex a, DoubleVertex b) {
-        return new MaxVertex(a, b);
-    }
-
-    @Override
-    default DoubleVertex max() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex max(DoubleVertex that) {
-        return max(this, that);
-    }
-
-    @Override
-    default DoubleVertex min() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex min(DoubleVertex that) {
-        return min(this, that);
+        return a.max(b);
     }
 
     @Override
@@ -255,16 +231,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     @Override
     default DoubleVertex pow(double that) {
         return pow(new ConstantDoubleVertex(that));
-    }
-
-    @Override
-    default DoubleVertex pow(DoubleVertex exponent) {
-        return new PowerVertex(this, exponent);
-    }
-
-    @Override
-    default DoubleVertex pow(Double exponent) {
-        return null;
     }
 
     @Override
@@ -449,7 +415,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
 
     @Override
     default DoubleVertex sqrt() {
-        return new PowerVertex(this, new ConstantDoubleVertex(0.5));
+        return pow(new ConstantDoubleVertex(0.5));
     }
 
     @Override
@@ -545,45 +511,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     @Override
     default DoubleVertex atan2(DoubleVertex that) {
         return new ArcTan2Vertex(this, that);
-    }
-
-    /**
-     * Matrix product of two vertices
-     *
-     * @param that a double vertex representing a matrix or a vector to matrix multiply
-     * @return a vertex that represents the matrix multiplication of two vertices.
-     * - If both left and right operands are rank 1, they are promoted to a matrix by prepending a 1 to its dimensions.
-     * After matrix multiplication, it is reshaped to be a scalar. This is essentially a dot product.
-     * This returns a ReshapeVertex.
-     * - If only one of the operands is rank 1 (and the other operand is rank 2), it is promoted to a matrix by prepending a 1 to its dimensions.
-     * After matrix multiplication, the appended 1 is removed. This is essentially a matrix-vector product.
-     * This returns a ReshapeVertex.
-     * - Otherwise, they are multiplied like conventional matrices.
-     * This returns a MatrixMultiplicationVertex.
-     */
-    @Override
-    default DoubleVertex matrixMultiply(DoubleVertex that) {
-        int leftRank = this.getRank();
-        int rightRank = that.getRank();
-
-        if (leftRank < 1 || rightRank < 1) {
-            throw new IllegalArgumentException("Matrix multiply for rank 0 is not supported. Use times instead.");
-        }
-
-        DoubleVertex leftMatrix = leftRank == 1 ? this.reshape(1, this.getShape()[0]) : this;
-        DoubleVertex rightMatrix = rightRank == 1 ? that.reshape(that.getShape()[0], 1) : that;
-
-        MatrixMultiplicationVertex result = new MatrixMultiplicationVertex(leftMatrix, rightMatrix);
-
-        if (leftRank == 1 && rightRank == 1) {
-            return result.reshape(new long[0]);
-        } else if (leftRank == 1 && rightRank == 2) {
-            return result.reshape(result.getShape()[1]);
-        } else if (leftRank == 2 && rightRank == 1) {
-            return result.reshape(result.getShape()[0]);
-        } else {
-            return result;
-        }
     }
 
     @Override

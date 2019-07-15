@@ -13,18 +13,25 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
+import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.number.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.GreaterThanMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.GreaterThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.LessThanMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMaskVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MaxVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.number.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
+import io.improbable.keanu.vertices.number.operators.unary.MaxUnaryVertex;
+import io.improbable.keanu.vertices.number.operators.unary.MinUnaryVertex;
 import io.improbable.keanu.vertices.number.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
 
@@ -164,4 +171,75 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
     default VERTEX setWithMask(VERTEX mask, VERTEX value) {
         return wrap(new SetWithMaskVertex<>(this, mask, value));
     }
+
+    @Override
+    default VERTEX max(VERTEX that) {
+        return wrap(new MaxVertex<>(this, that));
+    }
+
+    @Override
+    default VERTEX min(VERTEX that) {
+        return wrap(new MinVertex<>(this, that));
+    }
+
+    @Override
+    default VERTEX max() {
+        return wrap(new MaxUnaryVertex<>(this));
+    }
+
+    @Override
+    default VERTEX min() {
+        return wrap(new MinUnaryVertex<>(this));
+    }
+
+
+    @Override
+    default VERTEX pow(VERTEX exponent) {
+        return wrap(new PowerVertex<>(this, exponent));
+    }
+
+    @Override
+    default VERTEX pow(T exponent) {
+        return pow((VERTEX) ConstantVertex.scalar(exponent));
+    }
+
+    /**
+     * Matrix product of two vertices
+     *
+     * @param that a double vertex representing a matrix or a vector to matrix multiply
+     * @return a vertex that represents the matrix multiplication of two vertices.
+     * - If both left and right operands are rank 1, they are promoted to a matrix by prepending a 1 to its dimensions.
+     * After matrix multiplication, it is reshaped to be a scalar. This is essentially a dot product.
+     * This returns a ReshapeVertex.
+     * - If only one of the operands is rank 1 (and the other operand is rank 2), it is promoted to a matrix by prepending a 1 to its dimensions.
+     * After matrix multiplication, the appended 1 is removed. This is essentially a matrix-vector product.
+     * This returns a ReshapeVertex.
+     * - Otherwise, they are multiplied like conventional matrices.
+     * This returns a MatrixMultiplicationVertex.
+     */
+    @Override
+    default VERTEX matrixMultiply(VERTEX that) {
+        int leftRank = this.getRank();
+        int rightRank = that.getRank();
+
+        if (leftRank < 1 || rightRank < 1) {
+            throw new IllegalArgumentException("Matrix multiply for rank 0 is not supported. Use times instead.");
+        }
+
+        TensorVertex<T, TENSOR, VERTEX> leftMatrix = leftRank == 1 ? this.reshape(1, this.getShape()[0]) : this;
+        TensorVertex<T, TENSOR, VERTEX> rightMatrix = rightRank == 1 ? that.reshape(that.getShape()[0], 1) : that;
+
+        VERTEX result = wrap(new MatrixMultiplicationVertex<>(leftMatrix, rightMatrix));
+
+        if (leftRank == 1 && rightRank == 1) {
+            return result.reshape(new long[0]);
+        } else if (leftRank == 1 && rightRank == 2) {
+            return result.reshape(result.getShape()[1]);
+        } else if (leftRank == 2 && rightRank == 1) {
+            return result.reshape(result.getShape()[0]);
+        } else {
+            return result;
+        }
+    }
+
 }

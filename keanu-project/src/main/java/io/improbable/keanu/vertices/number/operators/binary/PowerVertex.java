@@ -1,17 +1,23 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
+package io.improbable.keanu.vertices.number.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.tensor.BinaryTensorOpVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PowerVertex extends DoubleBinaryOpVertex implements Differentiable {
+public class PowerVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+    extends BinaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
     private static final String BASE_NAME = LEFT_NAME;
     private static final String EXPONENT_NAME = RIGHT_NAME;
@@ -23,21 +29,21 @@ public class PowerVertex extends DoubleBinaryOpVertex implements Differentiable 
      * @param exponent the exponent vertex
      */
     @ExportVertexToPythonBindings
-    public PowerVertex(@LoadVertexParam(BASE_NAME) Vertex<DoubleTensor, ?> base,
-                       @LoadVertexParam(EXPONENT_NAME) Vertex<DoubleTensor, ?> exponent) {
-        super(base, exponent);
+    public PowerVertex(@LoadVertexParam(BASE_NAME) TensorVertex<T, TENSOR, VERTEX> base,
+                       @LoadVertexParam(EXPONENT_NAME) TensorVertex<T, TENSOR, VERTEX> exponent) {
+        super(base, exponent, base.ofType());
     }
 
-    public Vertex<DoubleTensor, ?> getBase() {
+    public TensorVertex<T, TENSOR, VERTEX> getBase() {
         return super.getLeft();
     }
 
-    public Vertex<DoubleTensor, ?> getExponent() {
+    public TensorVertex<T, TENSOR, VERTEX> getExponent() {
         return super.getRight();
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor base, DoubleTensor exponent) {
+    protected TENSOR op(TENSOR base, TENSOR exponent) {
         return base.pow(exponent);
     }
 
@@ -53,9 +59,12 @@ public class PowerVertex extends DoubleBinaryOpVertex implements Differentiable 
         PartialDerivative partialsFromBase;
         PartialDerivative partialsFromExponent;
 
+        final DoubleTensor baseValue = left.getValue().toDouble();
+        final DoubleTensor exponentValue = right.getValue().toDouble();
+
         if (fromBase.isPresent()) {
             partialsFromBase = fromBase.multiplyAlongOfDimensions(
-                right.getValue().times(left.getValue().pow(right.getValue().minus(1)))
+                exponentValue.times(baseValue.toDouble().pow(exponentValue.toDouble().minus(1)))
             );
         } else {
             partialsFromBase = PartialDerivative.EMPTY;
@@ -63,7 +72,7 @@ public class PowerVertex extends DoubleBinaryOpVertex implements Differentiable 
 
         if (fromExponent.isPresent()) {
             partialsFromExponent = fromExponent.multiplyAlongOfDimensions(
-                left.getValue().log().timesInPlace(this.getValue())
+                baseValue.log().timesInPlace(this.getValue().toDouble())
             );
         } else {
             partialsFromExponent = PartialDerivative.EMPTY;
@@ -75,9 +84,9 @@ public class PowerVertex extends DoubleBinaryOpVertex implements Differentiable 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        DoubleTensor baseValue = getBase().getValue();
-        DoubleTensor exponentValue = getExponent().getValue();
-        DoubleTensor basePowExponent = getValue();
+        DoubleTensor baseValue = getBase().getValue().toDouble();
+        DoubleTensor exponentValue = getExponent().getValue().toDouble();
+        DoubleTensor basePowExponent = getValue().toDouble();
         DoubleTensor dSelfWrtBase = exponentValue.times(baseValue.pow(exponentValue.minus(1)));
         DoubleTensor dSelfWrtExponent = basePowExponent.times(baseValue.log());
 

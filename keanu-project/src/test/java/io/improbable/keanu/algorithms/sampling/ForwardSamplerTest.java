@@ -7,6 +7,7 @@ import io.improbable.keanu.algorithms.ProbabilisticModel;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -14,7 +15,6 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 import lombok.extern.slf4j.Slf4j;
@@ -128,7 +128,7 @@ public class ForwardSamplerTest {
     @Test
     public void nonProbabilisticVerticesAreRecomputedDuringForwardSample() {
         GaussianVertex A = mock(GaussianVertex.class);
-        PowerVertex B = mock(PowerVertex.class);
+        NonProbabilisticVertex B = mock(NonProbabilisticVertex.class);
 
         when(A.getChildren()).thenReturn(Collections.singleton(B));
         when(A.getId()).thenReturn(new VertexId());

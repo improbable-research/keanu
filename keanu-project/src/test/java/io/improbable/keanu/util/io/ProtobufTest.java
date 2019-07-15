@@ -21,7 +21,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.tensor.If;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.mir.KeanuSavedBayesNet;
 import io.improbable.mir.SavedBayesNet;
@@ -134,14 +134,14 @@ public class ProtobufTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ProtobufSaver saver = new ProtobufSaver(complexNet);
         saver.save(outputStream, true);
-        DoubleVertex outputVertex = (DoubleVertex) complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        DoubleVertex inputVertex = (DoubleVertex) complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        Vertex outputVertex = complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        Vertex inputVertex = complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         ByteArrayInputStream input = new ByteArrayInputStream(outputStream.toByteArray());
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork loadedNet = loader.loadNetwork(input);
-        DoubleVertex outputVertex2 = (DoubleVertex) loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        DoubleVertex inputVertex2 = (DoubleVertex) loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        Vertex outputVertex2 = loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        Vertex inputVertex2 =  loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(
             inputVertex,

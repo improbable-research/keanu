@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.tensor.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;

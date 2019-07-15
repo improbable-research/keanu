@@ -6,8 +6,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MatrixMultiplicationVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -86,7 +86,7 @@ public class MatrixInverseVertexTest {
     public void inverseMultipliedEqualsIdentity() {
         UniformVertex inputVertex = new UniformVertex(new long[]{4, 4}, -20.0, 20.0);
         DoubleVertex inverseVertex = inputVertex.matrixInverse();
-        MatrixMultiplicationVertex multiplied = (MatrixMultiplicationVertex) inverseVertex.matrixMultiply(inputVertex);
+        DoubleVertex multiplied =  inverseVertex.matrixMultiply(inputVertex);
 
         for (int i = 0; i < NUM_ITERATIONS; i++) {
             inputVertex.setValue(inputVertex.sample());

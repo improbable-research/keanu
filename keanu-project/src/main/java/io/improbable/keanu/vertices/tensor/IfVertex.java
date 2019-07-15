@@ -1,39 +1,42 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic;
+package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class DoubleIfVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor> {
+public class IfVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
+    extends VertexImpl<TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, TensorVertex<T, TENSOR, VERTEX>, Differentiable {
 
     private final Vertex<BooleanTensor, ?> predicate;
-    private final Vertex<DoubleTensor, ?> thn;
-    private final Vertex<DoubleTensor, ?> els;
+    private final Vertex<TENSOR, ?> thn;
+    private final Vertex<TENSOR, ?> els;
+    private final Class<?> type;
+
     protected static final String PREDICATE_NAME = "predicate";
     protected static final String THEN_NAME = "then";
     protected static final String ELSE_NAME = "else";
 
     @ExportVertexToPythonBindings
-    public DoubleIfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<BooleanTensor, ?> predicate,
-                          @LoadVertexParam(THEN_NAME) Vertex<DoubleTensor, ?> thn,
-                          @LoadVertexParam(ELSE_NAME) Vertex<DoubleTensor, ?> els) {
+    public IfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<BooleanTensor, ?> predicate,
+                    @LoadVertexParam(THEN_NAME) Vertex<TENSOR, ?> thn,
+                    @LoadVertexParam(ELSE_NAME) Vertex<TENSOR, ?> els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
+        this.type = thn.ofType();
         setParents(predicate, thn, els);
     }
 
@@ -43,13 +46,18 @@ public class DoubleIfVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
     }
 
     @SaveVertexParam(THEN_NAME)
-    public Vertex<DoubleTensor, ?> getThn() {
+    public Vertex<TENSOR, ?> getThn() {
         return thn;
     }
 
     @SaveVertexParam(ELSE_NAME)
-    public Vertex<DoubleTensor, ?> getEls() {
+    public Vertex<TENSOR, ?> getEls() {
         return els;
+    }
+
+    @Override
+    public TENSOR calculate() {
+        return predicate.getValue().where(thn.getValue(), els.getValue());
     }
 
     @Override
@@ -70,15 +78,6 @@ public class DoubleIfVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
     }
 
     @Override
-    public DoubleTensor calculate() {
-        return op(predicate.getValue(), thn.getValue(), els.getValue());
-    }
-
-    private DoubleTensor op(BooleanTensor predicate, DoubleTensor thn, DoubleTensor els) {
-        return predicate.doubleWhere(thn, els);
-    }
-
-    @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
@@ -87,5 +86,15 @@ public class DoubleIfVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
         partials.put(els, derivativeOfOutputWithRespectToSelf
             .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask()));
         return partials;
+    }
+
+    @Override
+    public VERTEX wrap(NonProbabilisticVertex<TENSOR, VERTEX> vertex) {
+        return null;
+    }
+
+    @Override
+    public Class<?> ofType() {
+        return type;
     }
 }

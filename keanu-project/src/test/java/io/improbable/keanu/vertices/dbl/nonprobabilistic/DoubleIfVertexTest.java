@@ -13,7 +13,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.tensor.If;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class DoubleIfVertexTest {
         DoubleTensor dCda = dC.withRespectTo(a);
         DoubleTensor dCdb = dC.withRespectTo(b);
 
-        DoubleIfVertex ifVertex = If.isTrue(bool)
+        DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
@@ -68,7 +68,7 @@ public class DoubleIfVertexTest {
         DoubleTensor dCda = dC.withRespectTo(a);
         DoubleTensor dCdb = dC.withRespectTo(b);
 
-        DoubleIfVertex ifVertex = If.isTrue(bool)
+        DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
@@ -103,7 +103,7 @@ public class DoubleIfVertexTest {
         DoubleTensor dDda = dD.withRespectTo(a);
         DoubleTensor dDdb = dD.withRespectTo(b);
 
-        DoubleIfVertex ifVertex = If.isTrue(bool)
+        DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
@@ -134,7 +134,7 @@ public class DoubleIfVertexTest {
         DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a);
         DoubleTensor dDda = Differentiator.reverseModeAutoDiff(d, a).withRespectTo(a);
 
-        DoubleIfVertex ifVertex = If.isTrue(bool)
+        DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
@@ -178,7 +178,7 @@ public class DoubleIfVertexTest {
         DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a);
         DoubleTensor dFdd = Differentiator.reverseModeAutoDiff(f, d).withRespectTo(d);
 
-        DoubleIfVertex ifVertex = If.isTrue(bool)
+        DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(f);
 
@@ -235,7 +235,7 @@ public class DoubleIfVertexTest {
         DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a);
         DoubleTensor dFdd = Differentiator.reverseModeAutoDiff(f, d).withRespectTo(d);
 
-        DoubleIfVertex ifVertex = If.isTrue(bool)
+        DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(f);
 

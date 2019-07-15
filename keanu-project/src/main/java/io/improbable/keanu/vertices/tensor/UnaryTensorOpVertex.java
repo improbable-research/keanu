@@ -1,13 +1,13 @@
 package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 
 public abstract class UnaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
-    extends VertexImpl<TENSOR, VERTEX> implements NonProbabilistic<TENSOR>, VertexUnaryOp<TensorVertex<T, TENSOR, VERTEX>> {
+    extends VertexImpl<TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, VertexUnaryOp<TensorVertex<T, TENSOR, VERTEX>>, TensorVertex<T, TENSOR, VERTEX> {
 
     protected final TensorVertex<T, TENSOR, VERTEX> inputVertex;
     private final Class<?> type;
@@ -48,7 +48,12 @@ public abstract class UnaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, V
         return inputVertex;
     }
 
-    public Class<?> ofType(){
+    public Class<?> ofType() {
         return type;
+    }
+
+    @Override
+    public VERTEX wrap(NonProbabilisticVertex<TENSOR, VERTEX> vertex) {
+        return null;
     }
 }

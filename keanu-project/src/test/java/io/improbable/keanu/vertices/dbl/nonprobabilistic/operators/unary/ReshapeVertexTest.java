@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,7 +34,7 @@ public class ReshapeVertexTest {
         DoubleVertex alpha = new UniformVertex(0, 10);
         alpha.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        MatrixMultiplicationVertex N = (MatrixMultiplicationVertex) m.matrixMultiply(alpha);
+        DoubleVertex N = m.matrixMultiply(alpha);
 
         DoubleVertex reshapedN = N.reshape(4, 1);
 
@@ -56,7 +55,7 @@ public class ReshapeVertexTest {
         UniformVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        MatrixMultiplicationVertex N = (MatrixMultiplicationVertex) m.matrixMultiply(a);
+        DoubleVertex N =  m.matrixMultiply(a);
 
         DoubleTensor dNdm = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m);
         DoubleTensor dNda = Differentiator.reverseModeAutoDiff(N, a).withRespectTo(a);

@@ -1,18 +1,23 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
+package io.improbable.keanu.vertices.number.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.tensor.BinaryTensorOpVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.getMatrixMultiplicationResultingShape;
 
-public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements Differentiable {
+public class MatrixMultiplicationVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+    extends BinaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
     /**
      * Matrix multiplies one vertex by another. C = AB
@@ -21,14 +26,14 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements 
      * @param right vertex B
      */
     @ExportVertexToPythonBindings
-    public MatrixMultiplicationVertex(@LoadVertexParam(LEFT_NAME) Vertex<DoubleTensor, ?> left,
-                                      @LoadVertexParam(RIGHT_NAME) Vertex<DoubleTensor, ?> right) {
+    public MatrixMultiplicationVertex(@LoadVertexParam(LEFT_NAME) TensorVertex<T, TENSOR, VERTEX> left,
+                                      @LoadVertexParam(RIGHT_NAME) TensorVertex<T, TENSOR, VERTEX> right) {
         super(getMatrixMultiplicationResultingShape(left.getShape(), right.getShape()),
-            left, right);
+            left, right, left.ofType());
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+    protected TENSOR op(TENSOR l, TENSOR r) {
         return l.matrixMultiply(r);
     }
 
@@ -38,14 +43,14 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements 
         PartialDerivative dOutputsWrtLeft = PartialDerivative
             .matrixMultiplyAlongWrtDimensions(
                 derivativeOfOutputWithRespectToSelf,
-                right.getValue(),
+                right.getValue().toDouble(),
                 true
             );
 
         PartialDerivative dOutputsWrtRight = PartialDerivative
             .matrixMultiplyAlongWrtDimensions(
                 derivativeOfOutputWithRespectToSelf,
-                left.getValue(),
+                left.getValue().toDouble(),
                 false
             );
 
@@ -64,13 +69,13 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements 
         // dc = A * db + da * B;
         PartialDerivative partialsFromLeft = PartialDerivative.matrixMultiplyAlongOfDimensions(
             dLeftWrtInput,
-            right.getValue(),
+            right.getValue().toDouble(),
             true
         );
 
         PartialDerivative partialsFromRight = PartialDerivative.matrixMultiplyAlongOfDimensions(
             dRightWrtInput,
-            left.getValue(),
+            left.getValue().toDouble(),
             false
         );
 

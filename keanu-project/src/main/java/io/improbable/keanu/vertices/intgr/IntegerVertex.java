@@ -15,8 +15,6 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.In
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerApplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumProdVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumSumVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMaxUnaryVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMinUnaryVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerProductVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 import io.improbable.keanu.vertices.number.FixedPointTensorVertex;
@@ -260,26 +258,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
 
     static IntegerVertex max(IntegerVertex a, IntegerVertex b) {
         return new IntegerMaxVertex(a, b);
-    }
-
-    @Override
-    default IntegerVertex max() {
-        return new IntegerMaxUnaryVertex(this);
-    }
-
-    @Override
-    default IntegerVertex max(IntegerVertex that) {
-        return max(this, that);
-    }
-
-    @Override
-    default IntegerVertex min() {
-        return new IntegerMinUnaryVertex(this);
-    }
-
-    @Override
-    default IntegerVertex min(IntegerVertex that) {
-        return min(this, that);
     }
 
     @Override

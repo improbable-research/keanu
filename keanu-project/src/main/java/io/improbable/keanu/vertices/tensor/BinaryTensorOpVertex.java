@@ -12,7 +12,7 @@ import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
 public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
     extends VertexImpl<TENSOR, VERTEX>
-    implements NonProbabilistic<TENSOR>, VertexBinaryOp<TensorVertex<T, TENSOR, VERTEX>, TensorVertex<T, TENSOR, VERTEX>>, TensorVertex<T, TENSOR, VERTEX> {
+    implements NonProbabilisticVertex<TENSOR, VERTEX>, VertexBinaryOp<TensorVertex<T, TENSOR, VERTEX>, TensorVertex<T, TENSOR, VERTEX>>, TensorVertex<T, TENSOR, VERTEX> {
 
     protected final TensorVertex<T, TENSOR, VERTEX> left;
     protected final TensorVertex<T, TENSOR, VERTEX> right;

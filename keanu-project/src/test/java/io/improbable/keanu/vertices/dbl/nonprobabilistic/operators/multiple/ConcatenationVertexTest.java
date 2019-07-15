@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsWithRespectTo;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -330,8 +329,8 @@ public class ConcatenationVertexTest {
         UniformVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        MatrixMultiplicationVertex c = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(a);
-        MatrixMultiplicationVertex d = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(b);
+        DoubleVertex c = sharedMatrix.matrixMultiply(a);
+        DoubleVertex d = sharedMatrix.matrixMultiply(b);
 
         DoubleTensor dCdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, c).of(c);
         DoubleTensor dDdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, d).of(d);
@@ -382,8 +381,8 @@ public class ConcatenationVertexTest {
         UniformVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        MatrixMultiplicationVertex c = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(a);
-        MatrixMultiplicationVertex d = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(b);
+        DoubleVertex c = sharedMatrix.matrixMultiply(a);
+        DoubleVertex d = sharedMatrix.matrixMultiply(b);
 
         DoubleTensor dCdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, c).of(c);
         DoubleTensor dDdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, d).of(d);
@@ -437,9 +436,9 @@ public class ConcatenationVertexTest {
         UniformVertex f = new UniformVertex(0, 10);
         f.setValue(DoubleTensor.create(new double[]{90, 91, 92, 93}, 2, 2));
 
-        MatrixMultiplicationVertex c = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(a);
-        MatrixMultiplicationVertex d = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(b);
-        MatrixMultiplicationVertex e = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(f);
+        DoubleVertex c = sharedMatrix.matrixMultiply(a);
+        DoubleVertex d = sharedMatrix.matrixMultiply(b);
+        DoubleVertex e = sharedMatrix.matrixMultiply(f);
 
         DoubleTensor dCdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, c).of(c);
         DoubleTensor dDdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, d).of(d);

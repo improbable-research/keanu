@@ -2,14 +2,10 @@ package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.generic.GenericTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
@@ -29,13 +25,11 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.Boo
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MaxVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
@@ -52,32 +46,32 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.MultiplexerVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
+import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.number.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.GreaterThanMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.GreaterThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.LessThanMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex;
+import io.improbable.keanu.vertices.number.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.number.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.tensor.BroadcastVertex;
 import io.improbable.keanu.vertices.tensor.DiagVertex;
 import io.improbable.keanu.vertices.tensor.GetBooleanIndexVertex;
+import io.improbable.keanu.vertices.tensor.IfVertex;
 import io.improbable.keanu.vertices.tensor.PermuteVertex;
 import io.improbable.keanu.vertices.tensor.ReshapeVertex;
 import io.improbable.keanu.vertices.tensor.SliceVertex;
@@ -122,6 +116,8 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(DiagVertex.class, fluentUnaryOp("diag"));
         opMappers.put(GetBooleanIndexVertex.class, fluentBinaryOp("get"));
 
+        opMappers.put(IfVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
+
         //Number ops
         opMappers.put(DifferenceVertex.class, fluentBinaryOp("minus", "minusInPlace"));
         opMappers.put(AdditionVertex.class, fluentBinaryOp("plus", "plusInPlace"));
@@ -134,10 +130,10 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(LessThanOrEqualToMaskVertex.class, fluentBinaryOp("lessThanOrEqualToMask"));
         opMappers.put(LessThanMaskVertex.class, fluentBinaryOp("lessThanMask"));
         opMappers.put(SetWithMaskVertex.class, KeanuVertexToTensorOpMapper::setWithMaskOp);
-
-        //Double ops
         opMappers.put(MatrixMultiplicationVertex.class, fluentBinaryOp("matrixMultiply"));
         opMappers.put(PowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
+
+        //Double ops
         opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
         opMappers.put(CosVertex.class, fluentUnaryOp("cos", "cosInPlace"));
         opMappers.put(ArcCosVertex.class, fluentUnaryOp("acos", "acosInPlace"));
@@ -158,7 +154,6 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(MaxVertex.class, fluentBinaryOp("max"));
         opMappers.put(MinVertex.class, fluentBinaryOp("min"));
         opMappers.put(CastNumberToDoubleVertex.class, fluentUnaryOp("toDouble"));
-        opMappers.put(DoubleIfVertex.class, KeanuVertexToTensorOpMapper::doubleIfOp);
         opMappers.put(DoubleProxyVertex.class, KeanuVertexToTensorOpMapper::doubleProxyOp);
 
         //Integer ops
@@ -167,7 +162,6 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(IntegerMaxVertex.class, fluentBinaryOp("max"));
         opMappers.put(IntegerMinVertex.class, fluentBinaryOp("min"));
         opMappers.put(CastNumberToIntegerVertex.class, fluentUnaryOp("toInteger"));
-        opMappers.put(IntegerIfVertex.class, KeanuVertexToTensorOpMapper::integerIfOp);
         opMappers.put(IntegerProxyVertex.class, KeanuVertexToTensorOpMapper::integerProxyOp);
 
         //Booleans ops
@@ -186,7 +180,6 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(CastToBooleanVertex.class, fluentUnaryOp("toBoolean"));
         opMappers.put(BooleanToIntegerMaskVertex.class, fluentUnaryOp("toIntegerMask"));
         opMappers.put(BooleanToDoubleMaskVertex.class, fluentUnaryOp("toDoubleMask"));
-        opMappers.put(BooleanIfVertex.class, KeanuVertexToTensorOpMapper::booleanIfOp);
         opMappers.put(BooleanProxyVertex.class, KeanuVertexToTensorOpMapper::booleanProxyOp);
 
         //Constants
@@ -195,7 +188,6 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(ConstantBooleanVertex.class, KeanuVertexToTensorOpMapper::constant);
 
         //Generic ops
-        opMappers.put(IfVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
         opMappers.put(MultiplexerVertex.class, KeanuVertexToTensorOpMapper::multiplexerOp);
 
         //Debug ops
@@ -410,57 +402,18 @@ public class KeanuVertexToTensorOpMapper {
         }
     }
 
-    private static String doubleIfOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        DoubleIfVertex ifVertex = (DoubleIfVertex) vertex;
-
-        Vertex<BooleanTensor, ?> predicate = ifVertex.getPredicate();
-        Vertex<DoubleTensor, ?> thn = ifVertex.getThn();
-        Vertex<DoubleTensor, ?> els = ifVertex.getEls();
-
-        return ifOp(predicate, thn, els, "doubleWhere", lookup);
-    }
-
-    private static String integerIfOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        IntegerIfVertex ifVertex = (IntegerIfVertex) vertex;
-
-        Vertex<BooleanTensor, ?> predicate = ifVertex.getPredicate();
-        Vertex<IntegerTensor, ?> thn = ifVertex.getThn();
-        Vertex<IntegerTensor, ?> els = ifVertex.getEls();
-
-        return ifOp(predicate, thn, els, "integerWhere", lookup);
-    }
-
-    private static String booleanIfOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        BooleanIfVertex ifVertex = (BooleanIfVertex) vertex;
-
-        Vertex<BooleanTensor, ?> predicate = ifVertex.getPredicate();
-        Vertex<BooleanTensor, ?> thn = ifVertex.getThn();
-        Vertex<BooleanTensor, ?> els = ifVertex.getEls();
-
-        return ifOp(predicate, thn, els, "booleanWhere", lookup);
-    }
-
     private static String genericIfOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IfVertex ifVertex = (IfVertex) vertex;
 
         Vertex<BooleanTensor, ?> predicate = ifVertex.getPredicate();
-        Vertex<GenericTensor, ?> thn = ifVertex.getThn();
-        Vertex<GenericTensor, ?> els = ifVertex.getEls();
-
-        return ifOp(predicate, thn, els, "where", lookup);
-    }
-
-    private static String ifOp(Vertex predicate,
-                               Vertex thn,
-                               Vertex els,
-                               String methodName,
-                               Map<VariableReference, KeanuCompiledVariable> lookup) {
+        Vertex<?, ?> thn = ifVertex.getThn();
+        Vertex<?, ?> els = ifVertex.getEls();
 
         String predicateName = lookup.get(predicate.getId()).getName();
         String thnName = lookup.get(thn.getId()).getName();
         String elsName = lookup.get(els.getId()).getName();
 
-        return predicateName + "." + methodName + "(" + thnName + "," + elsName + ")";
+        return predicateName + ".where(" + thnName + "," + elsName + ")";
     }
 
     private static String doubleProxyOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {

@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.tensor.If;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;

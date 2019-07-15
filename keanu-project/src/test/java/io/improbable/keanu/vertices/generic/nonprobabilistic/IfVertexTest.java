@@ -4,6 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertexTest;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.If;
 import org.junit.Before;
 import org.junit.Test;
 

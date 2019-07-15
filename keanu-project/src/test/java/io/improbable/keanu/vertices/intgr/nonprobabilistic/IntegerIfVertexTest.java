@@ -6,7 +6,7 @@ import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.tensor.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Rule;
 import org.junit.Test;
