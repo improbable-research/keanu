@@ -32,10 +32,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanMaskVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanOrEqualToMaskVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanMaskVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
@@ -70,6 +66,10 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.number.operators.binary.GreaterThanMaskVertex;
+import io.improbable.keanu.vertices.number.operators.binary.GreaterThanOrEqualToMaskVertex;
+import io.improbable.keanu.vertices.number.operators.binary.LessThanMaskVertex;
+import io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
@@ -129,15 +129,15 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(DivisionVertex.class, fluentBinaryOp("div", "divInPlace"));
         opMappers.put(SumVertex.class, KeanuVertexToTensorOpMapper::sumOp);
         opMappers.put(AbsVertex.class, fluentUnaryOp("abs"));
+        opMappers.put(GreaterThanOrEqualToMaskVertex.class, fluentBinaryOp("greaterThanOrEqualToMask"));
+        opMappers.put(GreaterThanMaskVertex.class, fluentBinaryOp("greaterThanMask"));
+        opMappers.put(LessThanOrEqualToMaskVertex.class, fluentBinaryOp("lessThanOrEqualToMask"));
+        opMappers.put(LessThanMaskVertex.class, fluentBinaryOp("lessThanMask"));
 
         //Double ops
         opMappers.put(MatrixMultiplicationVertex.class, fluentBinaryOp("matrixMultiply"));
         opMappers.put(PowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
         opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
-        opMappers.put(DoubleGreaterThanOrEqualToMaskVertex.class, fluentBinaryOp("greaterThanOrEqualToMask"));
-        opMappers.put(DoubleGreaterThanMaskVertex.class, fluentBinaryOp("greaterThanMask"));
-        opMappers.put(DoubleLessThanOrEqualToMaskVertex.class, fluentBinaryOp("lessThanOrEqualToMask"));
-        opMappers.put(DoubleLessThanMaskVertex.class, fluentBinaryOp("lessThanMask"));
         opMappers.put(DoubleSetWithMaskVertex.class, KeanuVertexToTensorOpMapper::setWithMaskDoubleOp);
         opMappers.put(CosVertex.class, fluentUnaryOp("cos", "cosInPlace"));
         opMappers.put(ArcCosVertex.class, fluentUnaryOp("acos", "acosInPlace"));

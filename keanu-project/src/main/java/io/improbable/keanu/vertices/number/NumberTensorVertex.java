@@ -15,6 +15,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVerte
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
 import io.improbable.keanu.vertices.number.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.number.operators.binary.GreaterThanMaskVertex;
+import io.improbable.keanu.vertices.number.operators.binary.GreaterThanOrEqualToMaskVertex;
+import io.improbable.keanu.vertices.number.operators.binary.LessThanMaskVertex;
+import io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
@@ -109,4 +113,25 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
     default BooleanVertex lessThanOrEqual(VERTEX rhs) {
         return new LessThanOrEqualVertex<>(this, rhs);
     }
+
+    @Override
+    default VERTEX greaterThanMask(VERTEX rhs) {
+        return wrap(new GreaterThanMaskVertex<>(this, rhs));
+    }
+
+    @Override
+    default VERTEX greaterThanOrEqualToMask(VERTEX rhs) {
+        return wrap(new GreaterThanOrEqualToMaskVertex<>(this, rhs));
+    }
+
+    @Override
+    default VERTEX lessThanMask(VERTEX rhs) {
+        return wrap(new LessThanMaskVertex<>(this, rhs));
+    }
+
+    @Override
+    default VERTEX lessThanOrEqualToMask(VERTEX rhs) {
+        return wrap(new LessThanOrEqualToMaskVertex<>(this, rhs));
+    }
+
 }

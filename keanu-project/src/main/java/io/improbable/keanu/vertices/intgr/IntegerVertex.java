@@ -6,10 +6,6 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanMaskVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanOrEqualMaskVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerLessThanMaskVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerLessThanOrEqualMaskVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMatrixMultiplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
@@ -341,25 +337,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return greaterThanOrEqual((new ConstantIntegerVertex(value)));
     }
 
-    @Override
-    default IntegerVertex greaterThanMask(IntegerVertex greaterThanThis) {
-        return new IntegerGreaterThanMaskVertex(this, greaterThanThis);
-    }
-
-    @Override
-    default IntegerVertex greaterThanOrEqualToMask(IntegerVertex greaterThanOrEqualThis) {
-        return new IntegerGreaterThanOrEqualMaskVertex(this, greaterThanOrEqualThis);
-    }
-
-    @Override
-    default IntegerVertex lessThanMask(IntegerVertex lessThanThis) {
-        return new IntegerLessThanMaskVertex(this, lessThanThis);
-    }
-
-    @Override
-    default IntegerVertex lessThanOrEqualToMask(IntegerVertex lessThanOrEqualThis) {
-        return new IntegerLessThanOrEqualMaskVertex(this, lessThanOrEqualThis);
-    }
 
     //////////////////////////
     ////  Fixed Point Tensor Operations

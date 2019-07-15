@@ -14,10 +14,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanMaskVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanOrEqualToMaskVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanMaskVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
@@ -317,16 +313,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default BooleanVertex greaterThan(DoubleVertex rhs) {
-        return new GreaterThanVertex<>(this, rhs);
-    }
-
-    @Override
-    default BooleanVertex greaterThanOrEqual(DoubleVertex rhs) {
-        return new GreaterThanOrEqualVertex<>(this, rhs);
-    }
-
-    @Override
     default BooleanVertex greaterThan(Double value) {
         return new GreaterThanVertex<>(this, new ConstantDoubleVertex(value));
     }
@@ -346,46 +332,16 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return new LessThanOrEqualVertex<>(this, new ConstantDoubleVertex(value));
     }
 
-    @Override
-    default BooleanVertex lessThan(DoubleVertex rhs) {
-        return new LessThanVertex<>(this, rhs);
-    }
-
-    @Override
-    default BooleanVertex lessThanOrEqual(DoubleVertex rhs) {
-        return new LessThanOrEqualVertex<>(this, rhs);
-    }
-
-    @Override
-    default DoubleVertex greaterThanMask(DoubleVertex rhs) {
-        return new DoubleGreaterThanMaskVertex(this, rhs);
-    }
-
     default DoubleVertex greaterThanMask(Double rhs) {
         return greaterThanMask(new ConstantDoubleVertex(rhs));
-    }
-
-    @Override
-    default DoubleVertex greaterThanOrEqualToMask(DoubleVertex rhs) {
-        return new DoubleGreaterThanOrEqualToMaskVertex(this, rhs);
     }
 
     default DoubleVertex greaterThanOrEqualToMask(Double rhs) {
         return greaterThanOrEqualToMask(new ConstantDoubleVertex(rhs));
     }
 
-    @Override
-    default DoubleVertex lessThanMask(DoubleVertex rhs) {
-        return new DoubleLessThanMaskVertex(this, rhs);
-    }
-
     default DoubleVertex lessThanMask(Double rhs) {
         return lessThanMask(new ConstantDoubleVertex(rhs));
-    }
-
-    @Override
-    default DoubleVertex lessThanOrEqualToMask(DoubleVertex rhs) {
-        return new DoubleLessThanOrEqualToMaskVertex(this, rhs);
     }
 
     default DoubleVertex lessThanOrEqualToMask(Double rhs) {
