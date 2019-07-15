@@ -26,7 +26,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.number.FloatingPointTensorVertex;
 
 import java.util.List;
@@ -339,26 +338,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
 
     @Override
     default BooleanVertex isPositiveInfinity() {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex nanArgMax(int axis) {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex nanArgMax() {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex nanArgMin(int axis) {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex nanArgMin() {
         return null;
     }
 
