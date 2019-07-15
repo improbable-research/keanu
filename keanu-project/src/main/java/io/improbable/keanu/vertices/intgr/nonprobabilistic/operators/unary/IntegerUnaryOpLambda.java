@@ -1,40 +1,28 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.VertexImpl;
-import io.improbable.keanu.vertices.VertexUnaryOp;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 
 import java.util.function.Function;
 
-public class IntegerUnaryOpLambda extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex, VertexUnaryOp<IntegerVertex> {
+public class IntegerUnaryOpLambda<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
+    extends IntegerUnaryOpVertex<T, TENSOR, VERTEX> implements NonSaveableVertex {
 
-    protected static final String INPUT_NAME = "inputVertex";
+    protected final Function<TENSOR, IntegerTensor> op;
 
-    protected final IntegerVertex inputVertex;
-    protected final Function<IntegerTensor, IntegerTensor> op;
-
-    public IntegerUnaryOpLambda(long[] shape, IntegerVertex inputVertex, Function<IntegerTensor, IntegerTensor> op) {
-        super(shape);
-        this.inputVertex = inputVertex;
+    public IntegerUnaryOpLambda(long[] shape, VERTEX inputVertex, Function<TENSOR, IntegerTensor> op) {
+        super(shape, inputVertex);
         this.op = op;
-        setParents(inputVertex);
     }
 
-    public IntegerUnaryOpLambda(IntegerVertex inputVertex, Function<IntegerTensor, IntegerTensor> op) {
+    public IntegerUnaryOpLambda(VERTEX inputVertex, Function<TENSOR, IntegerTensor> op) {
         this(inputVertex.getShape(), inputVertex, op);
     }
 
     @Override
-    public IntegerTensor calculate() {
-        return op.apply(inputVertex.getValue());
-    }
-
-    @SaveVertexParam(INPUT_NAME)
-    public IntegerVertex getInputVertex() {
-        return inputVertex;
+    protected IntegerTensor op(TENSOR value) {
+        return op.apply(value);
     }
 }

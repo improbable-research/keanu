@@ -15,6 +15,8 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.ArgMaxVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.ArgMinVertex;
 import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.number.operators.binary.DivisionVertex;
@@ -277,5 +279,26 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
     default VERTEX cumProd(int requestedDimension) {
         return wrap(new CumProdVertex<>(this, requestedDimension));
     }
+
+    @Override
+    default IntegerVertex argMax(int axis) {
+        return new ArgMaxVertex<>(this, axis);
+    }
+
+    @Override
+    default IntegerVertex argMax() {
+        return new ArgMaxVertex<>(this);
+    }
+
+    @Override
+    default IntegerVertex argMin(int axis) {
+        return new ArgMinVertex<>(this, axis);
+    }
+
+    @Override
+    default IntegerVertex argMin() {
+        return new ArgMinVertex<>(this);
+    }
+
 
 }

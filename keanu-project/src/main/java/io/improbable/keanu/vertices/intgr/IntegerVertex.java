@@ -184,26 +184,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default IntegerVertex argMax(int axis) {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex argMax() {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex argMin(int axis) {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex argMin() {
-        return null;
-    }
-
-    @Override
     default IntegerVertex safeLogTimes(IntegerVertex y) {
         return null;
     }
@@ -222,11 +202,11 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     default IntegerVertex lambda(long[] shape, Function<IntegerTensor, IntegerTensor> op) {
-        return new IntegerUnaryOpLambda(shape, this, op);
+        return new IntegerUnaryOpLambda<>(shape, this, op);
     }
 
     default IntegerVertex lambda(Function<IntegerTensor, IntegerTensor> op) {
-        return new IntegerUnaryOpLambda(this, op);
+        return new IntegerUnaryOpLambda<>(this, op);
     }
 
     //////////////////////////

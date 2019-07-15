@@ -1,53 +1,39 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.VertexImpl;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 
 import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
 
-public class IntegerBinaryOpLambda extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public class IntegerBinaryOpLambda<
+    A, TENSORA extends Tensor<A, TENSORA>, VERTEXA extends TensorVertex<A, TENSORA, VERTEXA>,
+    B, TENSORB extends Tensor<B, TENSORB>, VERTEXB extends TensorVertex<B, TENSORB, VERTEXB>
+    > extends IntegerBinaryOpVertex<A, TENSORA, VERTEXA, B, TENSORB, VERTEXB> implements NonSaveableVertex {
 
-    protected static final String LEFT_NAME = "left";
-    protected static final String RIGHT_NAME = "right";
-
-    protected final IntegerVertex left;
-    protected final IntegerVertex right;
-    protected final BiFunction<IntegerTensor, IntegerTensor, IntegerTensor> op;
+    protected final BiFunction<TENSORA, TENSORB, IntegerTensor> op;
 
     public IntegerBinaryOpLambda(long[] shape,
-                                 IntegerVertex left,
-                                 IntegerVertex right,
-                                 BiFunction<IntegerTensor, IntegerTensor, IntegerTensor> op) {
-        super(shape);
-        this.left = left;
-        this.right = right;
+                                 TensorVertex<A, TENSORA, VERTEXA> left,
+                                 TensorVertex<B, TENSORB, VERTEXB> right,
+                                 BiFunction<TENSORA, TENSORB, IntegerTensor> op) {
+        super(shape, left, right);
         this.op = op;
-        setParents(left, right);
     }
 
-    public IntegerBinaryOpLambda(IntegerVertex left, IntegerVertex right, BiFunction<IntegerTensor, IntegerTensor, IntegerTensor> op) {
+    public IntegerBinaryOpLambda(TensorVertex<A, TENSORA, VERTEXA> left,
+                                 TensorVertex<B, TENSORB, VERTEXB> right,
+                                 BiFunction<TENSORA, TENSORB, IntegerTensor> op) {
         this(getBroadcastResultShape(left.getShape(), right.getShape()), left, right, op);
     }
 
     @Override
-    public IntegerTensor calculate() {
-        return op.apply(left.getValue(), right.getValue());
-    }
-
-    @SaveVertexParam(LEFT_NAME)
-    public IntegerVertex getLeft() {
-        return left;
-    }
-
-    @SaveVertexParam(RIGHT_NAME)
-    public IntegerVertex getRight() {
-        return right;
+    protected IntegerTensor op(TENSORA l, TENSORB r) {
+        return op.apply(l, r);
     }
 }

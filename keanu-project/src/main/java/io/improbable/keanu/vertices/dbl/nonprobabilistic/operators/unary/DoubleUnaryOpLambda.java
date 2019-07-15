@@ -12,7 +12,9 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.Map;
 import java.util.function.Function;
 
-public class DoubleUnaryOpLambda<IN> extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class DoubleUnaryOpLambda<IN>
+    extends VertexImpl<DoubleTensor, DoubleVertex>
+    implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
     private final Vertex<IN, ?> inputVertex;
     private final Function<IN, DoubleTensor> op;

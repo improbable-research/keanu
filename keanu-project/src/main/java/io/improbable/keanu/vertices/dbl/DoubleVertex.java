@@ -222,26 +222,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return null;
     }
 
-    @Override
-    default IntegerVertex argMax(int axis) {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex argMax() {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex argMin(int axis) {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex argMin() {
-        return null;
-    }
-
     default DoubleVertex greaterThanMask(Double rhs) {
         return greaterThanMask(new ConstantDoubleVertex(rhs));
     }

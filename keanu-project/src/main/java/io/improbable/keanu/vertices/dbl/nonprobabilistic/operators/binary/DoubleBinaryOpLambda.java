@@ -15,7 +15,9 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
-public class DoubleBinaryOpLambda<A, B> extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class DoubleBinaryOpLambda<A, B>
+    extends VertexImpl<DoubleTensor, DoubleVertex>
+    implements DoubleVertex, Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
     protected final Vertex<A, ?> left;
     protected final Vertex<B, ?> right;

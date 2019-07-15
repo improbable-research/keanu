@@ -1,15 +1,19 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 
-public abstract class IntegerUnaryOpVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, NonProbabilistic<IntegerTensor>, VertexUnaryOp<IntegerVertex> {
+public abstract class IntegerUnaryOpVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
+    extends VertexImpl<IntegerTensor, IntegerVertex>
+    implements IntegerVertex, NonProbabilistic<IntegerTensor>, VertexUnaryOp<TensorVertex<T, TENSOR, VERTEX>> {
 
-    protected final IntegerVertex inputVertex;
+    protected final TensorVertex<T, TENSOR, VERTEX> inputVertex;
     protected static final String INPUT_NAME = "inputVertex";
 
     /**
@@ -17,7 +21,7 @@ public abstract class IntegerUnaryOpVertex extends VertexImpl<IntegerTensor, Int
      *
      * @param inputVertex the input vertex
      */
-    public IntegerUnaryOpVertex(IntegerVertex inputVertex) {
+    public IntegerUnaryOpVertex(TensorVertex<T, TENSOR, VERTEX> inputVertex) {
         this(inputVertex.getShape(), inputVertex);
     }
 
@@ -27,7 +31,7 @@ public abstract class IntegerUnaryOpVertex extends VertexImpl<IntegerTensor, Int
      * @param shape       the shape of the tensor
      * @param inputVertex the input vertex
      */
-    public IntegerUnaryOpVertex(long[] shape, IntegerVertex inputVertex) {
+    public IntegerUnaryOpVertex(long[] shape, TensorVertex<T, TENSOR, VERTEX> inputVertex) {
         super(shape);
         this.inputVertex = inputVertex;
         setParents(inputVertex);
@@ -38,10 +42,10 @@ public abstract class IntegerUnaryOpVertex extends VertexImpl<IntegerTensor, Int
         return op(inputVertex.getValue());
     }
 
-    protected abstract IntegerTensor op(IntegerTensor value);
+    protected abstract IntegerTensor op(TENSOR value);
 
     @SaveVertexParam(INPUT_NAME)
-    public IntegerVertex getInputVertex() {
+    public TensorVertex<T, TENSOR, VERTEX> getInputVertex() {
         return inputVertex;
     }
 }
