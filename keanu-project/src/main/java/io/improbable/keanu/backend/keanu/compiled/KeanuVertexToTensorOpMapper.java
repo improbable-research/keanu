@@ -37,7 +37,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVer
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
@@ -73,6 +72,7 @@ import io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMas
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
+import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.number.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.tensor.BroadcastVertex;
@@ -133,12 +133,12 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(GreaterThanMaskVertex.class, fluentBinaryOp("greaterThanMask"));
         opMappers.put(LessThanOrEqualToMaskVertex.class, fluentBinaryOp("lessThanOrEqualToMask"));
         opMappers.put(LessThanMaskVertex.class, fluentBinaryOp("lessThanMask"));
+        opMappers.put(SetWithMaskVertex.class, KeanuVertexToTensorOpMapper::setWithMaskOp);
 
         //Double ops
         opMappers.put(MatrixMultiplicationVertex.class, fluentBinaryOp("matrixMultiply"));
         opMappers.put(PowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
         opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
-        opMappers.put(DoubleSetWithMaskVertex.class, KeanuVertexToTensorOpMapper::setWithMaskDoubleOp);
         opMappers.put(CosVertex.class, fluentUnaryOp("cos", "cosInPlace"));
         opMappers.put(ArcCosVertex.class, fluentUnaryOp("acos", "acosInPlace"));
         opMappers.put(ExpVertex.class, fluentUnaryOp("exp", "expInPlace"));
@@ -293,8 +293,8 @@ public class KeanuVertexToTensorOpMapper {
         throw new IllegalArgumentException("Constant should not be operation mapped");
     }
 
-    private static String setWithMaskDoubleOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        DoubleSetWithMaskVertex setWithMaskVertex = (DoubleSetWithMaskVertex) vertex;
+    private static String setWithMaskOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        SetWithMaskVertex setWithMaskVertex = (SetWithMaskVertex) vertex;
         Vertex mask = setWithMaskVertex.getMask();
         Vertex operand = setWithMaskVertex.getOperand();
         Vertex setValue = setWithMaskVertex.getSetValue();

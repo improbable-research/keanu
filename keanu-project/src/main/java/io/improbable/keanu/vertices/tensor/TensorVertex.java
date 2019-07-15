@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.tensor;
 import io.improbable.keanu.BaseTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -56,8 +57,16 @@ public interface TensorVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extend
         return new EqualsVertex<>(this, that);
     }
 
-    default BooleanVertex notEqualTo(VERTEX rhs) {
-        return new NotEqualsVertex<>(this, rhs);
+    default BooleanVertex notEqualTo(VERTEX that) {
+        return new NotEqualsVertex<>(this, that);
+    }
+
+    default BooleanVertex elementwiseEquals(T that) {
+        return elementwiseEquals((VERTEX) ConstantVertex.scalar(that));
+    }
+
+    default BooleanVertex notEqualTo(T that) {
+        return notEqualTo(((VERTEX) ConstantVertex.scalar(that)));
     }
 
 }

@@ -6,10 +6,6 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
@@ -19,7 +15,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVer
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
@@ -77,14 +72,19 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return getValue().getValue(index);
     }
 
-    //////////////////////////
-    ////  Tensor Operations
-    //////////////////////////
-
     @Override
     default DoubleVertex wrap(NonProbabilisticVertex<DoubleTensor, DoubleVertex> vertex) {
         return new DoubleVertexWrapper(vertex);
     }
+
+    @Override
+    default Class<?> ofType() {
+        return DoubleTensor.class;
+    }
+
+    //////////////////////////
+    ////  Tensor Operations
+    //////////////////////////
 
     /**
      * @param dimension dimension to concat along. Negative dimension indexing is not supported.
@@ -102,23 +102,8 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default DoubleVertex diag() {
-        return null;
-    }
-
-    @Override
     default DoubleVertex slice(Slicer slicer) {
         return null;
-    }
-
-    @Override
-    default BooleanVertex elementwiseEquals(Double value) {
-        return elementwiseEquals(new ConstantDoubleVertex(value));
-    }
-
-    @Override
-    default BooleanVertex notEqualTo(Double value) {
-        return notEqualTo(new ConstantDoubleVertex(value));
     }
 
     //////////////////////////
@@ -312,26 +297,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return null;
     }
 
-    @Override
-    default BooleanVertex greaterThan(Double value) {
-        return new GreaterThanVertex<>(this, new ConstantDoubleVertex(value));
-    }
-
-    @Override
-    default BooleanVertex greaterThanOrEqual(Double value) {
-        return new GreaterThanOrEqualVertex<>(this, new ConstantDoubleVertex(value));
-    }
-
-    @Override
-    default BooleanVertex lessThan(Double value) {
-        return new LessThanVertex<>(this, new ConstantDoubleVertex(value));
-    }
-
-    @Override
-    default BooleanVertex lessThanOrEqual(Double value) {
-        return new LessThanOrEqualVertex<>(this, new ConstantDoubleVertex(value));
-    }
-
     default DoubleVertex greaterThanMask(Double rhs) {
         return greaterThanMask(new ConstantDoubleVertex(rhs));
     }
@@ -349,11 +314,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default DoubleVertex setWithMask(DoubleVertex mask, Double value) {
-        return setWithMask(mask, new ConstantDoubleVertex(value));
-    }
-
-    @Override
     default DoubleVertex apply(Function<Double, Double> function) {
         return null;
     }
@@ -366,10 +326,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     @Override
     default BooleanVertex equalsWithinEpsilon(DoubleVertex other, Double epsilon) {
         return new NumericalEqualsVertex<>(this, other, epsilon);
-    }
-
-    default DoubleVertex setWithMask(DoubleVertex mask, DoubleVertex value) {
-        return new DoubleSetWithMaskVertex(this, mask, value);
     }
 
     //////////////////////////
@@ -664,11 +620,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
                                                      Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
                                                      Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
-    }
-
-    @Override
-    default Class<?> ofType() {
-        return DoubleTensor.class;
     }
 
 }

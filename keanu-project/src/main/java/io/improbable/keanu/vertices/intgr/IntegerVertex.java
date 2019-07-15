@@ -4,14 +4,12 @@ import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMatrixMultiplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerModVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerSetWithMaskVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerTensorMultiplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerApplyVertex;
@@ -60,13 +58,19 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return getValue().getValue(index);
     }
 
-    //////////////////////////
-    ////  Tensor Operations
-    //////////////////////////
-
+    @Override
     default IntegerVertex wrap(NonProbabilisticVertex<IntegerTensor, IntegerVertex> vertex) {
         return new IntegerVertexWrapper(vertex);
     }
+
+    @Override
+    default Class<?> ofType() {
+        return IntegerTensor.class;
+    }
+
+    //////////////////////////
+    ////  Tensor Operations
+    //////////////////////////
 
     static IntegerVertex concat(int dimension, IntegerVertex... toConcat) {
         return new IntegerConcatenationVertex(dimension, toConcat);
@@ -82,20 +86,9 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return null;
     }
 
-    @Override
-    default BooleanVertex elementwiseEquals(Integer value) {
-        return elementwiseEquals(new ConstantIntegerVertex(value));
-    }
-
-    @Override
-    default BooleanVertex notEqualTo(Integer value) {
-        return notEqualTo(new ConstantIntegerVertex(value));
-    }
-
     //////////////////////////
     ////  Number Tensor Operations
     //////////////////////////
-
 
     @Override
     default IntegerVertex minus(int value) {
@@ -232,11 +225,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default IntegerVertex setWithMask(IntegerVertex mask, Integer value) {
-        return new IntegerSetWithMaskVertex(this, mask, value);
-    }
-
-    @Override
     default IntegerVertex apply(Function<Integer, Integer> function) {
         return new IntegerApplyVertex(this, function);
     }
@@ -317,27 +305,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return new IntegerUnaryOpLambda(this, op);
     }
 
-    @Override
-    default BooleanVertex lessThan(Integer value) {
-        return lessThan(new ConstantIntegerVertex(value));
-    }
-
-    @Override
-    default BooleanVertex lessThanOrEqual(Integer value) {
-        return lessThanOrEqual((new ConstantIntegerVertex(value)));
-    }
-
-    @Override
-    default BooleanVertex greaterThan(Integer value) {
-        return greaterThan((new ConstantIntegerVertex(value)));
-    }
-
-    @Override
-    default BooleanVertex greaterThanOrEqual(Integer value) {
-        return greaterThanOrEqual((new ConstantIntegerVertex(value)));
-    }
-
-
     //////////////////////////
     ////  Fixed Point Tensor Operations
     //////////////////////////
@@ -352,8 +319,4 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return new IntegerModVertex(this, that);
     }
 
-    @Override
-    default Class<?> ofType() {
-        return IntegerTensor.class;
-    }
 }

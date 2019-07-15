@@ -11,6 +11,18 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 
 public interface ConstantVertex {
 
+    static <TYPED extends ConstantVertex> TYPED scalar(Object obj) {
+        if (obj.getClass().isAssignableFrom(Double.class)) {
+            return (TYPED) of((Double) obj);
+        } else if (obj.getClass().isAssignableFrom(Integer.class)) {
+            return (TYPED) of((Integer) obj);
+        } else if (obj.getClass().isAssignableFrom(Boolean.class)) {
+            return (TYPED) of((Boolean) obj);
+        } else {
+            return (TYPED) of(obj);
+        }
+    }
+
     static ConstantBooleanVertex of(Boolean value) {
         return new ConstantBooleanVertex(value);
     }

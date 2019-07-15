@@ -75,13 +75,4 @@ public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, 
         return null;
     }
 
-    @Override
-    public BooleanVertex elementwiseEquals(T value) {
-        return null;
-    }
-
-    @Override
-    public BooleanVertex notEqualTo(T value) {
-        return null;
-    }
 }

@@ -68,14 +68,19 @@ public interface BooleanVertex extends
         return getValue().getValue(index);
     }
 
-    /////////////
-    //// Tensor Ops
-    /////////////
+    @Override
+    default Class<?> ofType() {
+        return BooleanTensor.class;
+    }
 
-
+    @Override
     default BooleanVertex wrap(NonProbabilisticVertex<BooleanTensor, BooleanVertex> vertex) {
         return new BooleanVertexWrapper(vertex);
     }
+
+    /////////////
+    //// Tensor Ops
+    /////////////
 
     static BooleanVertex concat(int dimension, BooleanVertex... toConcat) {
         return new BooleanConcatenationVertex(dimension, toConcat);
@@ -92,16 +97,6 @@ public interface BooleanVertex extends
     @Override
     default List<BooleanVertex> split(int dimension, long... splitAtIndices) {
         return null;
-    }
-
-    @Override
-    default BooleanVertex notEqualTo(Boolean value) {
-        return notEqualTo(new ConstantBooleanVertex(value));
-    }
-
-    @Override
-    default BooleanVertex elementwiseEquals(Boolean value) {
-        return elementwiseEquals(new ConstantBooleanVertex(value));
     }
 
     @Override
@@ -129,15 +124,9 @@ public interface BooleanVertex extends
     }
 
     @Override
-    default BooleanVertex xor(BooleanVertex that) {
-        return new XorBinaryVertex(this, that);
-    }
-
-    @Override
     default BooleanVertex or(BooleanVertex that) {
         return new OrBinaryVertex(this, that);
     }
-
 
     default BooleanVertex and(BooleanVertex... those) {
         if (those.length == 0) return this;
@@ -160,8 +149,17 @@ public interface BooleanVertex extends
     }
 
     @Override
+    default BooleanVertex xor(BooleanVertex that) {
+        return new XorBinaryVertex(this, that);
+    }
+
+    @Override
     default BooleanVertex not() {
         return BooleanVertex.not(this);
+    }
+
+    static BooleanVertex not(BooleanVertex vertex) {
+        return new NotBinaryVertex(vertex);
     }
 
     @Override
@@ -209,13 +207,5 @@ public interface BooleanVertex extends
         return new BooleanToIntegerMaskVertex(this);
     }
 
-    static BooleanVertex not(BooleanVertex vertex) {
-        return new NotBinaryVertex(vertex);
-    }
-
-    @Override
-    default Class<?> ofType() {
-        return BooleanTensor.class;
-    }
 
 }

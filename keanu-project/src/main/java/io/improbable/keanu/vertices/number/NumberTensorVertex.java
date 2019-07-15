@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.number;
 import io.improbable.keanu.BaseNumberTensor;
 import io.improbable.keanu.kotlin.NumberOperators;
 import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.CastNumberToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
@@ -22,6 +23,7 @@ import io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMas
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
+import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.number.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
@@ -115,6 +117,26 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
     }
 
     @Override
+    default BooleanVertex lessThan(T value) {
+        return lessThan((VERTEX) ConstantVertex.scalar(value));
+    }
+
+    @Override
+    default BooleanVertex lessThanOrEqual(T value) {
+        return lessThanOrEqual((VERTEX) ConstantVertex.scalar(value));
+    }
+
+    @Override
+    default BooleanVertex greaterThan(T value) {
+        return greaterThan((VERTEX) ConstantVertex.scalar(value));
+    }
+
+    @Override
+    default BooleanVertex greaterThanOrEqual(T value) {
+        return greaterThanOrEqual((VERTEX) ConstantVertex.scalar(value));
+    }
+
+    @Override
     default VERTEX greaterThanMask(VERTEX rhs) {
         return wrap(new GreaterThanMaskVertex<>(this, rhs));
     }
@@ -134,4 +156,12 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
         return wrap(new LessThanOrEqualToMaskVertex<>(this, rhs));
     }
 
+    @Override
+    default VERTEX setWithMask(VERTEX mask, T value) {
+        return wrap(new SetWithMaskVertex<>(this, mask, ConstantVertex.scalar(value)));
+    }
+
+    default VERTEX setWithMask(VERTEX mask, VERTEX value) {
+        return wrap(new SetWithMaskVertex<>(this, mask, value));
+    }
 }
