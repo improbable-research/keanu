@@ -93,7 +93,7 @@ public class DotSaver implements NetworkSaver {
     }
 
     private Vertex unwrapIfNeeded(Vertex vertex) {
-        return vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).getWrappedVertex() : vertex;
+        return vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).unwrap() : vertex;
     }
 
     private static void outputMetadata(Map<String, String> metadata, Writer outputWriter) throws IOException {

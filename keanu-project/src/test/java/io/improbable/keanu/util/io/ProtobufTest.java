@@ -270,7 +270,7 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfWrongArgumentTypeSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Incorrect Parameter Type specified.  " +
+        expectedException.expectMessage("For ConstantDoubleVertex got incorrect parameter type specified.  " +
             "Got: class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, " +
             "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
 

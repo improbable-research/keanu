@@ -123,7 +123,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
             return;
         }
 
-        Vertex unwrappedVisiting = visiting instanceof VertexWrapper ? ((VertexWrapper) visiting).getWrappedVertex() : visiting;
+        Vertex unwrappedVisiting = visiting instanceof VertexWrapper ? ((VertexWrapper) visiting).unwrap() : visiting;
         Class<?> clazz = unwrappedVisiting.getClass();
         KeanuVertexToTensorOpMapper.OpMapper opMapperFor = KeanuVertexToTensorOpMapper.getOpMapperFor(clazz);
 

@@ -10,8 +10,8 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -84,7 +84,7 @@ public class DotSaverTest {
         int[] intValues = new int[]{1, 2, 3};
         ConstantIntegerVertex constantIntVertex = new ConstantIntegerVertex(intValues);
         ConstantIntegerVertex constantIntVertex2 = new ConstantIntegerVertex(2);
-        IntegerMultiplicationVertex multiplicationVertex = new IntegerMultiplicationVertex(constantIntVertex, constantIntVertex2);
+        IntegerVertex multiplicationVertex = constantIntVertex.times(constantIntVertex2);
         BayesianNetwork constantIntNet = new BayesianNetwork(multiplicationVertex.getConnectedGraph());
 
         DotSaver dotSaver = new DotSaver(constantIntNet);

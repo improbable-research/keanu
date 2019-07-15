@@ -14,6 +14,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
@@ -25,27 +26,31 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
 
     @Override
     default VERTEX minus(VERTEX that) {
-        return asTyped(new NumberDifferenceVertex<>(this, that));
+        return wrap(new NumberDifferenceVertex<>(this, that));
     }
 
     @Override
     default VERTEX plus(VERTEX that) {
-        return asTyped(new NumberAdditionVertex<>(this, that));
+        return wrap(new NumberAdditionVertex<>(this, that));
+    }
+
+    default VERTEX multiply(VERTEX that) {
+        return wrap(new MultiplicationVertex<>(this, that));
     }
 
     @Override
     default VERTEX abs() {
-        return asTyped(new AbsVertex<>(this));
+        return wrap(new AbsVertex<>(this));
     }
 
     @Override
     default VERTEX sum() {
-        return asTyped(new SumVertex<>(this));
+        return wrap(new SumVertex<>(this));
     }
 
     @Override
     default VERTEX sum(int... sumOverDimensions) {
-        return asTyped(new SumVertex<>(this, sumOverDimensions));
+        return wrap(new SumVertex<>(this, sumOverDimensions));
     }
 
 

@@ -73,7 +73,7 @@ public interface BooleanVertex extends
     /////////////
 
 
-    default BooleanVertex asTyped(NonProbabilisticVertex<BooleanTensor, BooleanVertex> vertex) {
+    default BooleanVertex wrap(NonProbabilisticVertex<BooleanTensor, BooleanVertex> vertex) {
         return new BooleanVertexWrapper(vertex);
     }
 

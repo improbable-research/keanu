@@ -2,14 +2,17 @@ package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexImpl;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
 public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
-    extends VertexImpl<TENSOR, VERTEX> implements NonProbabilistic<TENSOR>, VertexBinaryOp<TensorVertex<T, TENSOR, VERTEX>, TensorVertex<T, TENSOR, VERTEX>> {
+    extends VertexImpl<TENSOR, VERTEX>
+    implements NonProbabilistic<TENSOR>, VertexBinaryOp<TensorVertex<T, TENSOR, VERTEX>, TensorVertex<T, TENSOR, VERTEX>>, TensorVertex<T, TENSOR, VERTEX> {
 
     protected final TensorVertex<T, TENSOR, VERTEX> left;
     protected final TensorVertex<T, TENSOR, VERTEX> right;
@@ -17,7 +20,6 @@ public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, 
 
     protected static final String LEFT_NAME = "left";
     protected static final String RIGHT_NAME = "right";
-    protected static final String TYPE_NAME = "type";
 
     /**
      * A vertex that performs a user defined operation on two input vertices
@@ -64,7 +66,22 @@ public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, 
     }
 
     @Override
-    public Class<?> ofType(){
+    public Class<?> ofType() {
         return type;
+    }
+
+    @Override
+    public VERTEX wrap(NonProbabilisticVertex<TENSOR, VERTEX> vertex) {
+        return null;
+    }
+
+    @Override
+    public BooleanVertex elementwiseEquals(T value) {
+        return null;
+    }
+
+    @Override
+    public BooleanVertex notEqualTo(T value) {
+        return null;
     }
 }

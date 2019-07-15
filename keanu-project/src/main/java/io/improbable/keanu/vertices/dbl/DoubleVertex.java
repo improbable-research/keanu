@@ -22,7 +22,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Double
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex;
@@ -88,7 +87,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     //////////////////////////
 
     @Override
-    default DoubleVertex asTyped(NonProbabilisticVertex<DoubleTensor, DoubleVertex> vertex) {
+    default DoubleVertex wrap(NonProbabilisticVertex<DoubleTensor, DoubleVertex> vertex) {
         return new DoubleVertexWrapper(vertex);
     }
 
@@ -226,10 +225,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
 
     default DoubleVertex multiply(double that) {
         return multiply(new ConstantDoubleVertex(that));
-    }
-
-    default DoubleVertex multiply(DoubleVertex that) {
-        return new MultiplicationVertex(this, that);
     }
 
     @Override

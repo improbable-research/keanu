@@ -273,7 +273,7 @@ public class BayesianNetwork {
     }
 
     private Vertex unwrapIfNeeded(Vertex vertex) {
-        return vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).getWrappedVertex() : vertex;
+        return vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).unwrap() : vertex;
     }
 
     /**

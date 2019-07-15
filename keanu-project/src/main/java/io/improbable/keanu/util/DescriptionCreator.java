@@ -16,9 +16,8 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
 import io.improbable.keanu.vertices.tensor.VertexWrapper;
@@ -43,7 +42,6 @@ public class DescriptionCreator {
         delimiters.put(NumberDifferenceVertex.class, " - ");
         delimiters.put(NumberAdditionVertex.class, " + ");
         delimiters.put(MultiplicationVertex.class, " * ");
-        delimiters.put(IntegerMultiplicationVertex.class, " * ");
         delimiters.put(DivisionVertex.class, " / ");
         delimiters.put(AndBinaryVertex.class, " && ");
         delimiters.put(EqualsVertex.class, " == ");
@@ -104,7 +102,7 @@ public class DescriptionCreator {
             return irregularDescription.get();
         }
 
-        Vertex unwrapped = vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).getWrappedVertex() : vertex;
+        Vertex unwrapped = vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).unwrap() : vertex;
 
         if (delimiters.containsKey(unwrapped.getClass())) {
             CharSequence delimiter = delimiters.get(unwrapped.getClass());

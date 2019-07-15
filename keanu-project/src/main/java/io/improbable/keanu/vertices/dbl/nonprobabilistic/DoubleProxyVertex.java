@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class DoubleProxyVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
+public class DoubleProxyVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProxyVertex<Vertex<DoubleTensor, ?>>, NonProbabilistic<DoubleTensor> {
 
     private static final String LABEL_PARAM_NAME = "label";
     private static final String PARENT_NAME = "parent";
@@ -42,12 +42,14 @@ public class DoubleProxyVertex extends VertexImpl<DoubleTensor, DoubleVertex> im
         setLabel(label);
     }
 
-    public DoubleProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_PARAM_NAME) String labelString, @LoadVertexParam(value = PARENT_NAME, isNullable = true) DoubleVertex parent) {
+    public DoubleProxyVertex(@LoadShape long[] shape,
+                             @LoadVertexParam(LABEL_PARAM_NAME) String labelString,
+                             @LoadVertexParam(value = PARENT_NAME, isNullable = true) Vertex<DoubleTensor, ?> parent) {
         super(shape);
         VertexLabel vertexLabel = VertexLabel.parseLabel(labelString);
         setLabel(vertexLabel);
         if (parent != null) {
-            setParent(parent);
+            setParents(parent);
         }
     }
 
@@ -69,14 +71,14 @@ public class DoubleProxyVertex extends VertexImpl<DoubleTensor, DoubleVertex> im
     }
 
     @Override
-    public void setParent(DoubleVertex newParent) {
+    public void setParent(Vertex<DoubleTensor, ?> newParent) {
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(getShape(), newParent.getShape());
         setParents(newParent);
     }
 
     @SaveVertexParam(value = PARENT_NAME, isNullable = true)
-    public DoubleVertex getParent() {
-        return (DoubleVertex) Iterables.getOnlyElement(getParents(), null);
+    public Vertex<DoubleTensor, ?> getParent() {
+        return Iterables.getOnlyElement(getParents(), null);
     }
 
     @Override

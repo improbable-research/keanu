@@ -198,8 +198,8 @@ public class ProtobufLoader implements NetworkLoader {
             Object parameter = getParameter(constructorParameters[i], paramMap, vertex);
             arguments[i] = parameter;
 
-            Class argumentClass;
-            Class parameterClass = Primitives.wrap(constructorParameters[i].getType());
+            Class<?> argumentClass;
+            Class<?> parameterClass = Primitives.wrap(constructorParameters[i].getType());
             if (parameter != null) {
                 argumentClass = arguments[i].getClass();
             } else {
@@ -207,7 +207,7 @@ public class ProtobufLoader implements NetworkLoader {
             }
 
             if (!parameterClass.isAssignableFrom(argumentClass)) {
-                throw new IllegalArgumentException("Incorrect Parameter Type specified.  Got: "
+                throw new IllegalArgumentException("For " + vertexClass.getSimpleName() + " got incorrect parameter type specified.  Got: "
                     + argumentClass + ", Expected: " + parameterClass);
             }
         }

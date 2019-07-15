@@ -15,7 +15,6 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerModVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerSetWithMaskVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerTensorMultiplyVertex;
@@ -70,7 +69,7 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     ////  Tensor Operations
     //////////////////////////
 
-    default IntegerVertex asTyped(NonProbabilisticVertex<IntegerTensor, IntegerVertex> vertex) {
+    default IntegerVertex wrap(NonProbabilisticVertex<IntegerTensor, IntegerVertex> vertex) {
         return new IntegerVertexWrapper(vertex);
     }
 
@@ -143,12 +142,8 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return plus(new ConstantIntegerVertex(value));
     }
 
-    default IntegerVertex multiply(IntegerVertex that) {
-        return new IntegerMultiplicationVertex(this, that);
-    }
-
     default IntegerVertex multiply(int factor) {
-        return new IntegerMultiplicationVertex(this, new ConstantIntegerVertex(factor));
+        return multiply(new ConstantIntegerVertex(factor));
     }
 
     @Override

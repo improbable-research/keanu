@@ -7,7 +7,6 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
@@ -150,35 +149,25 @@ public interface BaseTensor<
         return getLength() == 1;
     }
 
+    /**
+     * @return true if the tensor is rank 0
+     */
     default boolean isScalar() {
         return getRank() == 0;
     }
 
     /**
-     * Returns true if the tensor is a vector. A vector being a 1xn or a nx1 tensor.
-     * <p>
-     * (1, 2, 3) is a 1x3 vector.
-     * <p>
-     * (1)
-     * (2)
-     * (3) is a 3x1 vector.
-     *
-     * @return true if the tensor is a vector
+     * @return true if the tensor is rank 1
      */
     default boolean isVector() {
         return getRank() == 1;
     }
 
+    /**
+     * @return true if the tensor is rank 2
+     */
     default boolean isMatrix() {
         return getRank() == 2;
-    }
-
-    default boolean hasSameShapeAs(T that) {
-        return hasSameShapeAs(that.getShape());
-    }
-
-    default boolean hasSameShapeAs(long[] shape) {
-        return Arrays.equals(this.getShape(), shape);
     }
 
     BOOLEAN elementwiseEquals(T that);

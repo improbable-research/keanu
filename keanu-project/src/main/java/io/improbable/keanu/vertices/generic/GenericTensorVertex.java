@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 
 public interface GenericTensorVertex<T> extends TensorVertex<T, GenericTensor<T>, GenericTensorVertex<T>> {
 
-    default GenericTensorVertex<T> asTyped(NonProbabilisticVertex<GenericTensor<T>, GenericTensorVertex<T>> vertex) {
+    default GenericTensorVertex<T> wrap(NonProbabilisticVertex<GenericTensor<T>, GenericTensorVertex<T>> vertex) {
         return new GenericVertexWrapper<>(vertex);
     }
 

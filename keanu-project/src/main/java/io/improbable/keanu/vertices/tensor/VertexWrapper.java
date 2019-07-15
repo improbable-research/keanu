@@ -225,7 +225,7 @@ public class VertexWrapper<TENSOR, VERTEX extends Vertex<TENSOR, VERTEX>> implem
         return vertex.toString();
     }
 
-    public NonProbabilisticVertex<TENSOR, VERTEX> getWrappedVertex() {
+    public NonProbabilisticVertex<TENSOR, VERTEX> unwrap() {
         return vertex;
     }
 }

@@ -16,12 +16,12 @@ public class DoubleVertexWrapper extends VertexWrapper<DoubleTensor, DoubleVerte
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        return ((Differentiable) getWrappedVertex()).reverseModeAutoDifferentiation(derivativeOfOutputWithRespectToSelf);
+        return ((Differentiable) unwrap()).reverseModeAutoDifferentiation(derivativeOfOutputWithRespectToSelf);
     }
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return ((Differentiable) getWrappedVertex()).forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
+        return ((Differentiable) unwrap()).forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
     }
 
 }
