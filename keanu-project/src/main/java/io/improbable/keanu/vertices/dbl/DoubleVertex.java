@@ -514,11 +514,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default DoubleVertex tensorMultiply(DoubleVertex value, int[] dimLeft, int[] dimsRight) {
-        return null;
-    }
-
-    @Override
     default DoubleVertex matrixInverse() {
         return new MatrixInverseVertex(this);
     }

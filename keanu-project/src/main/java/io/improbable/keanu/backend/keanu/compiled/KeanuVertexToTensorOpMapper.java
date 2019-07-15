@@ -27,9 +27,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVerte
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
-import io.improbable.keanu.vertices.number.operators.binary.MatrixMultiplicationVertex;
-import io.improbable.keanu.vertices.number.operators.binary.MaxVertex;
-import io.improbable.keanu.vertices.number.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
@@ -60,8 +57,12 @@ import io.improbable.keanu.vertices.number.operators.binary.GreaterThanMaskVerte
 import io.improbable.keanu.vertices.number.operators.binary.GreaterThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.LessThanMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMaskVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MaxVertex;
+import io.improbable.keanu.vertices.number.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.number.operators.binary.TensorMultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.number.operators.unary.MaxUnaryVertex;
@@ -124,6 +125,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(DivisionVertex.class, fluentBinaryOp("div", "divInPlace"));
         opMappers.put(SumVertex.class, KeanuVertexToTensorOpMapper::sumOp);
         opMappers.put(MatrixMultiplicationVertex.class, fluentBinaryOp("matrixMultiply"));
+        opMappers.put(TensorMultiplicationVertex.class, KeanuVertexToTensorOpMapper::tensorMultiply);
         opMappers.put(PowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
         opMappers.put(AbsVertex.class, fluentUnaryOp("abs"));
 
@@ -282,6 +284,15 @@ public class KeanuVertexToTensorOpMapper {
 
     private static String constant(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         throw new IllegalArgumentException("Constant should not be operation mapped");
+    }
+
+    private static String tensorMultiply(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        TensorMultiplicationVertex tmul = (TensorMultiplicationVertex) vertex;
+        String leftName = lookup.get(tmul.getLeft().getId()).getName();
+        String rightName = lookup.get(tmul.getRight().getId()).getName();
+        int[] dimsLeft = tmul.getDimsLeft();
+        int[] dimsRight = tmul.getDimsRight();
+        return leftName + ".tensorMultiply(" + rightName + "," + toJavaArrayCreation(dimsLeft) + "," + toJavaArrayCreation(dimsRight) + ");";
     }
 
     private static String setWithMaskOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {

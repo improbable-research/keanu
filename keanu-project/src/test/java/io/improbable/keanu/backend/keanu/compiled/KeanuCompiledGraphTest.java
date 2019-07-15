@@ -83,6 +83,11 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void compilesTensorMultiply() {
+        assertBinaryDoubleMatches(new long[]{2, 3, 4}, new long[]{3, 2, 4}, (a, b) -> a.tensorMultiply(b, new int[]{1}, new int[]{0}));
+    }
+
+    @Test
     public void compilesSeveralChainedOpsWithConstant() {
         assertBinaryDoubleMatches((a, b) -> a.plus(b).times(b).div(2).minus(a));
     }

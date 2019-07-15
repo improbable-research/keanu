@@ -13,7 +13,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
 import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
@@ -28,6 +27,7 @@ import io.improbable.keanu.vertices.number.operators.binary.MaxVertex;
 import io.improbable.keanu.vertices.number.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.number.operators.binary.TensorMultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.number.operators.unary.MaxUnaryVertex;
@@ -240,6 +240,11 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
         } else {
             return result;
         }
+    }
+
+    @Override
+    default VERTEX tensorMultiply(VERTEX value, int[] dimLeft, int[] dimsRight) {
+        return wrap(new TensorMultiplicationVertex<>(this, value, dimLeft, dimsRight));
     }
 
 }

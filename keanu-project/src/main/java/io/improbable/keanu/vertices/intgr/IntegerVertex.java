@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerModVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerTensorMultiplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerApplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumProdVertex;
@@ -249,11 +248,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     @Override
     default IntegerVertex clamp(IntegerVertex min, IntegerVertex max) {
         return null;
-    }
-
-    @Override
-    default IntegerVertex tensorMultiply(IntegerVertex value, int[] dimLeft, int[] dimsRight) {
-        return new IntegerTensorMultiplyVertex(this, value, dimLeft, dimsRight);
     }
 
     default IntegerVertex lambda(long[] shape, Function<IntegerTensor, IntegerTensor> op) {

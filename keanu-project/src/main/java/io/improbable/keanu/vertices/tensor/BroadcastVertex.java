@@ -39,11 +39,6 @@ public class BroadcastVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends
         return null;
     }
 
-    @Override
-    public boolean isDifferentiable() {
-        return false;
-    }
-
     @SaveVertexParam(TO_SHAPE)
     public long[] getToShape() {
         return this.toShape;
