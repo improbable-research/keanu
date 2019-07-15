@@ -14,7 +14,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanMaskVertex;
@@ -190,7 +189,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
 
     @Override
     default DoubleVertex minus(Double value) {
-        return null;
+        return minus(new ConstantDoubleVertex(value));
     }
 
     @Override
@@ -199,13 +198,8 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default DoubleVertex reverseMinus(DoubleVertex value) {
-        return null;
-    }
-
-    @Override
     default DoubleVertex reverseMinus(Double value) {
-        return null;
+        return reverseDiv(new ConstantDoubleVertex(value));
     }
 
     @Override
@@ -223,61 +217,58 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return plus(new ConstantDoubleVertex(that));
     }
 
-    default DoubleVertex multiply(double that) {
-        return multiply(new ConstantDoubleVertex(that));
+    default DoubleVertex multiply(DoubleVertex that) {
+        return times(that);
     }
 
-    @Override
-    default DoubleVertex times(DoubleVertex that) {
-        return multiply(that);
+    default DoubleVertex multiply(Double that) {
+        return times(new ConstantDoubleVertex(that));
+    }
+
+    default DoubleVertex multiply(double that) {
+        return times(new ConstantDoubleVertex(that));
     }
 
     @Override
     default DoubleVertex times(Double value) {
-        return multiply(value);
+        return times(new ConstantDoubleVertex(value));
     }
 
     @Override
     default DoubleVertex times(double that) {
-        return multiply(that);
+        return times(new ConstantDoubleVertex(that));
+    }
+
+    default DoubleVertex divideBy(DoubleVertex that) {
+        return div(that);
+    }
+
+    default DoubleVertex divideBy(Double that) {
+        return div(new ConstantDoubleVertex(that));
+    }
+
+    default DoubleVertex divideBy(double that) {
+        return div(new ConstantDoubleVertex(that));
     }
 
     @Override
     default DoubleVertex div(Double value) {
-        return divideBy(value);
-    }
-
-    default DoubleVertex divideBy(double that) {
-        return divideBy(new ConstantDoubleVertex(that));
-    }
-
-    default DoubleVertex divideBy(DoubleVertex that) {
-        return new DivisionVertex(this, that);
-    }
-
-    @Override
-    default DoubleVertex div(DoubleVertex that) {
-        return divideBy(that);
+        return div(new ConstantDoubleVertex(value));
     }
 
     @Override
     default DoubleVertex div(double that) {
-        return divideBy(that);
+        return div(new ConstantDoubleVertex(that));
     }
 
     @Override
     default DoubleVertex reverseDiv(Double value) {
-        return null;
+        return reverseDiv(new ConstantDoubleVertex(value));
     }
 
     @Override
-    default DoubleVertex reverseDiv(DoubleVertex value) {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex reverseDiv(double that) {
-        return new ConstantDoubleVertex(that).div(this);
+    default DoubleVertex reverseDiv(double value) {
+        return reverseDiv(new ConstantDoubleVertex(value));
     }
 
     @Override

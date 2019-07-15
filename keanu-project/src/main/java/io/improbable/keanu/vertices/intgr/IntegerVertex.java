@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanMaskVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanOrEqualMaskVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerLessThanMaskVertex;
@@ -113,18 +112,13 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default IntegerVertex reverseMinus(IntegerVertex value) {
-        return value.minus(this);
-    }
-
-    @Override
     default IntegerVertex reverseMinus(Integer value) {
-        return new ConstantIntegerVertex(value).minus(this);
+        return reverseMinus(new ConstantIntegerVertex(value));
     }
 
     @Override
     default IntegerVertex reverseMinus(int that) {
-        return new ConstantIntegerVertex(that).minus(this);
+        return reverseMinus(new ConstantIntegerVertex(that));
     }
 
     @Override
@@ -142,61 +136,58 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return plus(new ConstantIntegerVertex(value));
     }
 
-    default IntegerVertex multiply(int factor) {
-        return multiply(new ConstantIntegerVertex(factor));
+    default IntegerVertex multiply(IntegerVertex factor) {
+        return times(factor);
     }
 
-    @Override
-    default IntegerVertex times(IntegerVertex that) {
-        return multiply(that);
+    default IntegerVertex multiply(int factor) {
+        return times(new ConstantIntegerVertex(factor));
+    }
+
+    default IntegerVertex multiply(Integer factor) {
+        return times(new ConstantIntegerVertex(factor));
     }
 
     @Override
     default IntegerVertex times(Integer value) {
-        return multiply(value);
+        return times(new ConstantIntegerVertex(value));
     }
 
     @Override
     default IntegerVertex times(int that) {
-        return multiply(that);
+        return times(new ConstantIntegerVertex(that));
+    }
+
+    default IntegerVertex divideBy(Integer divisor) {
+        return div(new ConstantIntegerVertex(divisor));
     }
 
     default IntegerVertex divideBy(int divisor) {
-        return new IntegerDivisionVertex(this, new ConstantIntegerVertex(divisor));
+        return div(new ConstantIntegerVertex(divisor));
     }
 
     default IntegerVertex divideBy(IntegerVertex that) {
-        return new IntegerDivisionVertex(this, that);
-    }
-
-    @Override
-    default IntegerVertex div(IntegerVertex that) {
-        return divideBy(that);
+        return div(that);
     }
 
     @Override
     default IntegerVertex div(Integer value) {
-        return divideBy(value);
+        return div(new ConstantIntegerVertex(value));
     }
 
     @Override
     default IntegerVertex div(int that) {
-        return divideBy(that);
+        return div(new ConstantIntegerVertex(that));
     }
 
     @Override
     default IntegerVertex reverseDiv(Integer value) {
-        return new ConstantIntegerVertex(value).div(this);
+        return reverseDiv(new ConstantIntegerVertex(value));
     }
 
     @Override
-    default IntegerVertex reverseDiv(IntegerVertex value) {
-        return value.div(this);
-    }
-
-    @Override
-    default IntegerVertex reverseDiv(int that) {
-        return (new ConstantIntegerVertex(that)).div(this);
+    default IntegerVertex reverseDiv(int value) {
+        return reverseDiv(new ConstantIntegerVertex(value));
     }
 
     @Override

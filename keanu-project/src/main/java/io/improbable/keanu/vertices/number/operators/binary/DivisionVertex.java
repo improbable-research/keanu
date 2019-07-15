@@ -1,19 +1,25 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
+package io.improbable.keanu.vertices.number.operators.binary;
 
 import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.tensor.BinaryTensorOpVertex;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @DisplayInformationForOutput(displayName = "/")
-public class DivisionVertex extends DoubleBinaryOpVertex implements Differentiable {
+public class DivisionVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+    extends BinaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
     /**
      * Divides one vertex by another
      *
@@ -21,13 +27,13 @@ public class DivisionVertex extends DoubleBinaryOpVertex implements Differentiab
      * @param right the vertex to divide
      */
     @ExportVertexToPythonBindings
-    public DivisionVertex(@LoadVertexParam(LEFT_NAME) Vertex<DoubleTensor, ?> left,
-                          @LoadVertexParam(RIGHT_NAME) Vertex<DoubleTensor, ?> right) {
-        super(left, right);
+    public DivisionVertex(@LoadVertexParam(LEFT_NAME) TensorVertex<T, TENSOR, VERTEX> left,
+                          @LoadVertexParam(RIGHT_NAME) TensorVertex<T, TENSOR, VERTEX> right) {
+        super(left, right, left.ofType());
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+    protected TENSOR op(TENSOR l, TENSOR r) {
         return l.div(r);
     }
 
@@ -40,17 +46,17 @@ public class DivisionVertex extends DoubleBinaryOpVertex implements Differentiab
         PartialDerivative fromRight = AutoDiffBroadcast.correctForBroadcastPartialForward(dRightWrtInput, right.getShape(), this.getShape());
 
         // dc = (B * da - A * db) / B^2;
-        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue(), this.getRank());
-        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue(), this.getRank());
+        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue().toDouble(), this.getRank());
+        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue().toDouble(), this.getRank());
 
-        return partialsFromLeft.subtract(partialsFromRight).divideByAlongOfDimensions(right.getValue().pow(2), this.getRank());
+        return partialsFromLeft.subtract(partialsFromRight).divideByAlongOfDimensions(right.getValue().toDouble().pow(2.), this.getRank());
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        DoubleTensor leftValue = left.getValue();
-        DoubleTensor rightValue = right.getValue();
+        DoubleTensor leftValue = left.getValue().toDouble();
+        DoubleTensor rightValue = right.getValue().toDouble();
         DoubleTensor dOutWrtLeft = rightValue.reciprocal();
         DoubleTensor dOutWrtRight = leftValue.div(rightValue.pow(2.0)).unaryMinusInPlace();
 
