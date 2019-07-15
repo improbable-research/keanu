@@ -52,9 +52,6 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex;
@@ -67,6 +64,8 @@ import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex
 import io.improbable.keanu.vertices.number.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
+import io.improbable.keanu.vertices.number.operators.unary.MaxUnaryVertex;
+import io.improbable.keanu.vertices.number.operators.unary.MinUnaryVertex;
 import io.improbable.keanu.vertices.number.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.tensor.BroadcastVertex;
 import io.improbable.keanu.vertices.tensor.DiagVertex;
@@ -124,14 +123,19 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(MultiplicationVertex.class, fluentBinaryOp("times", "timesInPlace"));
         opMappers.put(DivisionVertex.class, fluentBinaryOp("div", "divInPlace"));
         opMappers.put(SumVertex.class, KeanuVertexToTensorOpMapper::sumOp);
+        opMappers.put(MatrixMultiplicationVertex.class, fluentBinaryOp("matrixMultiply"));
+        opMappers.put(PowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
         opMappers.put(AbsVertex.class, fluentUnaryOp("abs"));
+
         opMappers.put(GreaterThanOrEqualToMaskVertex.class, fluentBinaryOp("greaterThanOrEqualToMask"));
         opMappers.put(GreaterThanMaskVertex.class, fluentBinaryOp("greaterThanMask"));
         opMappers.put(LessThanOrEqualToMaskVertex.class, fluentBinaryOp("lessThanOrEqualToMask"));
         opMappers.put(LessThanMaskVertex.class, fluentBinaryOp("lessThanMask"));
         opMappers.put(SetWithMaskVertex.class, KeanuVertexToTensorOpMapper::setWithMaskOp);
-        opMappers.put(MatrixMultiplicationVertex.class, fluentBinaryOp("matrixMultiply"));
-        opMappers.put(PowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
+        opMappers.put(MaxVertex.class, fluentBinaryOp("max"));
+        opMappers.put(MinVertex.class, fluentBinaryOp("min"));
+        opMappers.put(MaxUnaryVertex.class, fluentUnaryOp("max"));
+        opMappers.put(MinUnaryVertex.class, fluentUnaryOp("min"));
 
         //Double ops
         opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
@@ -151,16 +155,11 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(MatrixDeterminantVertex.class, fluentUnaryOp("determinant"));
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));
         opMappers.put(ConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatDoubleOp);
-        opMappers.put(MaxVertex.class, fluentBinaryOp("max"));
-        opMappers.put(MinVertex.class, fluentBinaryOp("min"));
         opMappers.put(CastNumberToDoubleVertex.class, fluentUnaryOp("toDouble"));
         opMappers.put(DoubleProxyVertex.class, KeanuVertexToTensorOpMapper::doubleProxyOp);
 
         //Integer ops
-        opMappers.put(IntegerPowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
         opMappers.put(IntegerConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatIntegerOp);
-        opMappers.put(IntegerMaxVertex.class, fluentBinaryOp("max"));
-        opMappers.put(IntegerMinVertex.class, fluentBinaryOp("min"));
         opMappers.put(CastNumberToIntegerVertex.class, fluentUnaryOp("toInteger"));
         opMappers.put(IntegerProxyVertex.class, KeanuVertexToTensorOpMapper::integerProxyOp);
 

@@ -5,11 +5,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMatrixMultiplyVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerModVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerTensorMultiplyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerApplyVertex;
@@ -178,16 +174,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default IntegerVertex pow(IntegerVertex exponent) {
-        return new IntegerPowerVertex(this, exponent);
-    }
-
-    @Override
-    default IntegerVertex pow(Integer exponent) {
-        return pow(new ConstantIntegerVertex(exponent));
-    }
-
-    @Override
     default IntegerVertex pow(int exponent) {
         return pow(new ConstantIntegerVertex(exponent));
     }
@@ -253,21 +239,16 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     static IntegerVertex min(IntegerVertex a, IntegerVertex b) {
-        return new IntegerMinVertex(a, b);
+        return a.min(b);
     }
 
     static IntegerVertex max(IntegerVertex a, IntegerVertex b) {
-        return new IntegerMaxVertex(a, b);
+        return a.max(b);
     }
 
     @Override
     default IntegerVertex clamp(IntegerVertex min, IntegerVertex max) {
         return null;
-    }
-
-    @Override
-    default IntegerVertex matrixMultiply(IntegerVertex that) {
-        return new IntegerMatrixMultiplyVertex(this, that);
     }
 
     @Override
