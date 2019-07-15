@@ -107,7 +107,7 @@ public class MatrixDeterminantVertexTest {
         final BayesianNetwork net = new BayesianNetwork(output.getConnectedGraph());
 
         Keanu.Optimizer.of(net).maxLikelihood();
-        assertEquals(input.getValue().determinant().scalar(), 2.2, 0.1);
+        assertEquals(input.getValue().matrixDeterminant().scalar(), 2.2, 0.1);
     }
 
 }

@@ -196,7 +196,7 @@ public class DoubleTensorTest {
     public void canInverseMatrix() {
         DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
 
-        DoubleTensor expected = DoubleTensor.create(4, -2, -3, 1).reshape(2, 2).times(1.0 / A.determinant().scalar());
+        DoubleTensor expected = DoubleTensor.create(4, -2, -3, 1).reshape(2, 2).times(1.0 / A.matrixDeterminant().scalar());
 
         DoubleTensor actual = A.matrixInverse();
 
@@ -254,14 +254,14 @@ public class DoubleTensorTest {
     public void canFindDeterminantOf2By2Matrix() {
         DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
         double expected = 1 * 4 - 2 * 3;
-        assertEquals(expected, A.determinant().scalar(), 1e-10);
+        assertEquals(expected, A.matrixDeterminant().scalar(), 1e-10);
     }
 
     @Test
     public void canFindDeterminantOfSingular3By3Matrix() {
         DoubleTensor A = DoubleTensor.arange(1, 10).reshape(3, 3);
         double expected = 0;
-        assertEquals(expected, A.determinant().scalar(), 1e-10);
+        assertEquals(expected, A.matrixDeterminant().scalar(), 1e-10);
     }
 
     @Test
@@ -278,7 +278,7 @@ public class DoubleTensorTest {
             new double[]{10, -3, 5}
         })).getDeterminant();
 
-        assertEquals(expected, A.determinant().scalar(), 1e-10);
+        assertEquals(expected, A.matrixDeterminant().scalar(), 1e-10);
     }
 
     @Test

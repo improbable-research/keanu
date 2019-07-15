@@ -246,7 +246,7 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
     }
 
     @Override
-    public TENSOR determinant() {
+    public TENSOR matrixDeterminant() {
         INDArray dup = tensor.dup();
         double[][] asMatrix = dup.toDoubleMatrix();
         RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);

@@ -99,7 +99,7 @@ public interface BaseFloatingPointTensor<
 
     T choleskyDecomposition();
 
-    T determinant();
+    T matrixDeterminant();
 
     T matrixInverse();
 

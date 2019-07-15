@@ -267,7 +267,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor determinant() {
+    public DoubleTensor matrixDeterminant() {
 
         final int m = Ints.checkedCast(shape[0]);
         final int n = Ints.checkedCast(shape[1]);

@@ -472,13 +472,8 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return new MatrixInverseVertex(this);
     }
 
-
-    default DoubleVertex matrixDeterminant() {
-        return determinant();
-    }
-
     @Override
-    default DoubleVertex determinant() {
+    default DoubleVertex matrixDeterminant() {
         return new MatrixDeterminantVertex(this);
     }
 

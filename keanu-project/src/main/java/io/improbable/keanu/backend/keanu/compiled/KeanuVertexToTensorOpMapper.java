@@ -154,7 +154,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(FloorVertex.class, fluentUnaryOp("floor", "floorInPlace"));
         opMappers.put(RoundVertex.class, fluentUnaryOp("round", "roundInPlace"));
         opMappers.put(SigmoidVertex.class, fluentUnaryOp("sigmoid", "sigmoidInPlace"));
-        opMappers.put(MatrixDeterminantVertex.class, fluentUnaryOp("determinant"));
+        opMappers.put(MatrixDeterminantVertex.class, fluentUnaryOp("matrixDeterminant"));
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));
         opMappers.put(ConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatDoubleOp);
         opMappers.put(CastNumberToDoubleVertex.class, fluentUnaryOp("toDouble"));

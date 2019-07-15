@@ -14,7 +14,7 @@ public enum UnaryOperation {
     DETERMINANT {
         @Override
         public DoubleTensor apply(DoubleTensor tensor) {
-            return tensor.determinant();
+            return tensor.matrixDeterminant();
         }
     },
 
