@@ -28,12 +28,13 @@ public class HalfGaussianVertex extends GaussianVertex {
      * @param tensorShape the desired shape of the tensor in this vertex
      * @param sigma       the sigma of the HalfGaussian with either the same tensorShape as specified for this vertex or a scalar
      */
-    public HalfGaussianVertex(@LoadShape long[] tensorShape, @LoadVertexParam(SIGMA_NAME) DoubleVertex sigma) {
+    public HalfGaussianVertex(@LoadShape long[] tensorShape,
+                              @LoadVertexParam(SIGMA_NAME) Vertex<DoubleTensor, ?> sigma) {
         super(tensorShape, MU_ZERO, sigma);
     }
 
     @ExportVertexToPythonBindings
-    public HalfGaussianVertex(DoubleVertex sigma) {
+    public HalfGaussianVertex(Vertex<DoubleTensor, ?> sigma) {
         super(MU_ZERO, sigma);
     }
 

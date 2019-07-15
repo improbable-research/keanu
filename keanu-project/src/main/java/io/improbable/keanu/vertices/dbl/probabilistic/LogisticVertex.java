@@ -27,6 +27,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class LogisticVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
@@ -45,26 +46,26 @@ public class LogisticVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
      * @param s           the s (scale) of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
     public LogisticVertex(@LoadShape long[] tensorShape,
-                          @LoadVertexParam(MU_NAME) DoubleVertex mu,
-                          @LoadVertexParam(S_NAME) DoubleVertex s) {
+                          @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu,
+                          @LoadVertexParam(S_NAME) Vertex<DoubleTensor, ?> s) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), s.getShape());
 
-        this.mu = mu;
-        this.s = s;
+        this.mu = wrapIfNeeded(mu);
+        this.s = wrapIfNeeded(s);
         setParents(mu, s);
     }
 
     @ExportVertexToPythonBindings
-    public LogisticVertex(DoubleVertex mu, DoubleVertex s) {
+    public LogisticVertex(Vertex<DoubleTensor, ?> mu, Vertex<DoubleTensor, ?> s) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), s.getShape()), mu, s);
     }
 
-    public LogisticVertex(DoubleVertex mu, double s) {
+    public LogisticVertex(Vertex<DoubleTensor, ?> mu, double s) {
         this(mu, new ConstantDoubleVertex(s));
     }
 
-    public LogisticVertex(double mu, DoubleVertex s) {
+    public LogisticVertex(double mu, Vertex<DoubleTensor, ?> s) {
         this(new ConstantDoubleVertex(mu), s);
     }
 

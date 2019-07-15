@@ -15,7 +15,9 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertexWrapper;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertexWrapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,7 +51,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
  * therefore k = 3
  * and the result shape is (2, 2, 3), which is (2, 2) broadcasted with (2) and k appended.
  */
-public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex,   ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
+public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
@@ -62,15 +64,15 @@ public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> 
     private static final String N_NAME = "n";
 
     public MultinomialVertex(@LoadShape long[] tensorShape,
-                             @LoadVertexParam(N_NAME) IntegerVertex n,
-                             @LoadVertexParam(P_NAME) DoubleVertex p) {
+                             @LoadVertexParam(N_NAME) Vertex<IntegerTensor, ?> n,
+                             @LoadVertexParam(P_NAME) Vertex<DoubleTensor, ?> p) {
         super(tensorShape);
 
         long[] expectedShape = calculateExpectedShape(n.getShape(), p.getShape());
         Preconditions.checkArgument(Arrays.equals(expectedShape, tensorShape));
 
-        this.p = p;
-        this.n = n;
+        this.p = DoubleVertexWrapper.wrapIfNeeded(p);
+        this.n = IntegerVertexWrapper.wrapIfNeeded(n);
         this.validationEnabled = true;
 
         setParents(p, n);
@@ -96,11 +98,11 @@ public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> 
     }
 
     @ExportVertexToPythonBindings
-    public MultinomialVertex(IntegerVertex n, DoubleVertex p) {
+    public MultinomialVertex(Vertex<IntegerTensor, ?> n, Vertex<DoubleTensor, ?> p) {
         this(calculateExpectedShape(n.getShape(), p.getShape()), n, p);
     }
 
-    public MultinomialVertex(int n, DoubleVertex p) {
+    public MultinomialVertex(int n, Vertex<DoubleTensor, ?> p) {
         this(p.getShape(), ConstantVertex.of(IntegerTensor.scalar(n)), p);
     }
 
@@ -108,7 +110,7 @@ public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> 
         this(p.getShape(), ConstantVertex.of(IntegerTensor.scalar(n)), ConstantVertex.of(p));
     }
 
-    public MultinomialVertex(IntegerTensor n, DoubleVertex p) {
+    public MultinomialVertex(IntegerTensor n, Vertex<DoubleTensor, ?> p) {
         this(ConstantVertex.of(n), p);
     }
 

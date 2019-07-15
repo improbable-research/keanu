@@ -27,6 +27,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
@@ -45,21 +46,21 @@ public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex> implem
      * @param beta        the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     public LaplaceVertex(@LoadShape long[] tensorShape,
-                         @LoadVertexParam(MU_NAME) DoubleVertex mu,
-                         @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
+                         @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu,
+                         @LoadVertexParam(BETA_NAME) Vertex<DoubleTensor, ?> beta) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), beta.getShape());
 
-        this.mu = mu;
-        this.beta = beta;
+        this.mu = wrapIfNeeded(mu);
+        this.beta = wrapIfNeeded(beta);
         setParents(mu, beta);
     }
 
-    public LaplaceVertex(long[] shape, DoubleVertex mu, double beta) {
+    public LaplaceVertex(long[] shape, Vertex<DoubleTensor, ?> mu, double beta) {
         this(shape, mu, new ConstantDoubleVertex(beta));
     }
 
-    public LaplaceVertex(long[] shape, double mu, DoubleVertex beta) {
+    public LaplaceVertex(long[] shape, double mu, Vertex<DoubleTensor, ?> beta) {
         this(shape, new ConstantDoubleVertex(mu), beta);
     }
 
@@ -75,16 +76,16 @@ public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex> implem
      * @param beta the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public LaplaceVertex(DoubleVertex mu,
-                         DoubleVertex beta) {
+    public LaplaceVertex(Vertex<DoubleTensor, ?> mu,
+                         Vertex<DoubleTensor, ?> beta) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), beta.getShape()), mu, beta);
     }
 
-    public LaplaceVertex(DoubleVertex mu, double beta) {
+    public LaplaceVertex(Vertex<DoubleTensor, ?> mu, double beta) {
         this(mu, new ConstantDoubleVertex(beta));
     }
 
-    public LaplaceVertex(double mu, DoubleVertex beta) {
+    public LaplaceVertex(double mu, Vertex<DoubleTensor, ?> beta) {
         this(new ConstantDoubleVertex(mu), beta);
     }
 

@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Poisson;
-import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -17,7 +16,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -27,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
@@ -41,11 +40,12 @@ public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex> impl
      * @param shape the desired shape of the vertex
      * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
      */
-    public PoissonVertex(@LoadShape long[] shape, @LoadVertexParam(MU_NAME) DoubleVertex mu) {
+    public PoissonVertex(@LoadShape long[] shape,
+                         @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu) {
         super(shape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, mu.getShape());
 
-        this.mu = mu;
+        this.mu = wrapIfNeeded(mu);
         setParents(mu);
     }
 
@@ -60,12 +60,8 @@ public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex> impl
      * @param mu mu with same shape as desired Poisson tensor or scalar
      */
     @ExportVertexToPythonBindings
-    public PoissonVertex(DoubleVertex mu) {
+    public PoissonVertex(Vertex<DoubleTensor, ?> mu) {
         this(mu.getShape(), mu);
-    }
-
-    public PoissonVertex(Vertex<? extends NumberTensor, ?> mu) {
-        this(mu.getShape(), new CastNumberToDoubleVertex<>(mu));
     }
 
     public PoissonVertex(double mu) {

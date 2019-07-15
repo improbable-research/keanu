@@ -27,8 +27,9 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.THETA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class GammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class GammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex theta;
     private final DoubleVertex k;
@@ -45,13 +46,13 @@ public class GammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implemen
      * @param k           the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     public GammaVertex(@LoadShape long[] tensorShape,
-                       @LoadVertexParam(THETA_NAME) DoubleVertex theta,
-                       @LoadVertexParam(K_NAME) DoubleVertex k) {
+                       @LoadVertexParam(THETA_NAME) Vertex<DoubleTensor, ?> theta,
+                       @LoadVertexParam(K_NAME) Vertex<DoubleTensor, ?> k) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, theta.getShape(), k.getShape());
 
-        this.theta = theta;
-        this.k = k;
+        this.theta = wrapIfNeeded(theta);
+        this.k = wrapIfNeeded(k);
         setParents(theta, k);
     }
 
@@ -62,16 +63,16 @@ public class GammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implemen
      * @param k     the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     @ExportVertexToPythonBindings
-    public GammaVertex(DoubleVertex theta,
-                       DoubleVertex k) {
+    public GammaVertex(Vertex<DoubleTensor, ?> theta,
+                       Vertex<DoubleTensor, ?> k) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(theta.getShape(), k.getShape()), theta, k);
     }
 
-    public GammaVertex(DoubleVertex theta, double k) {
+    public GammaVertex(Vertex<DoubleTensor, ?> theta, double k) {
         this(theta, new ConstantDoubleVertex(k));
     }
 
-    public GammaVertex(double theta, DoubleVertex k) {
+    public GammaVertex(double theta, Vertex<DoubleTensor, ?> k) {
         this(new ConstantDoubleVertex(theta), k);
     }
 

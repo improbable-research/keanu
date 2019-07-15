@@ -24,8 +24,9 @@ import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.C;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class DirichletVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class DirichletVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex concentration;
 
@@ -38,9 +39,9 @@ public class DirichletVertex extends VertexImpl<DoubleTensor, DoubleVertex> impl
      * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(@LoadShape long[] tensorShape,
-                           @LoadVertexParam(CONCENTRATION_NAME) DoubleVertex concentration) {
+                           @LoadVertexParam(CONCENTRATION_NAME) Vertex<DoubleTensor, ?> concentration) {
         super(tensorShape);
-        this.concentration = concentration;
+        this.concentration = wrapIfNeeded(concentration);
         if (concentration.getValue().getLength() < 2) {
             throw new IllegalArgumentException("Dirichlet must be comprised of more than one concentration parameter");
         }
@@ -53,7 +54,7 @@ public class DirichletVertex extends VertexImpl<DoubleTensor, DoubleVertex> impl
      * @param concentration the concentration values of the dirichlet
      */
     @ExportVertexToPythonBindings
-    public DirichletVertex(DoubleVertex concentration) {
+    public DirichletVertex(Vertex<DoubleTensor, ?> concentration) {
         this(concentration.getShape(), concentration);
     }
 

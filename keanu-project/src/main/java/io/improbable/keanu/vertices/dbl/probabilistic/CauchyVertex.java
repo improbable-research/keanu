@@ -27,6 +27,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class CauchyVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
@@ -45,26 +46,26 @@ public class CauchyVertex extends VertexImpl<DoubleTensor, DoubleVertex> impleme
      * @param scale       the scale of the Cauchy with either the same tensorShape as specified for this vertex or a scalar
      */
     public CauchyVertex(@LoadShape long[] tensorShape,
-                        @LoadVertexParam(LOCATION_NAME) DoubleVertex location,
-                        @LoadVertexParam(SCALE_NAME) DoubleVertex scale) {
+                        @LoadVertexParam(LOCATION_NAME) Vertex<DoubleTensor, ?> location,
+                        @LoadVertexParam(SCALE_NAME) Vertex<DoubleTensor, ?> scale) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, location.getShape(), scale.getShape());
 
-        this.location = location;
-        this.scale = scale;
+        this.location = wrapIfNeeded(location);
+        this.scale = wrapIfNeeded(scale);
         setParents(location, scale);
     }
 
     @ExportVertexToPythonBindings
-    public CauchyVertex(DoubleVertex location, DoubleVertex scale) {
+    public CauchyVertex(Vertex<DoubleTensor, ?> location, Vertex<DoubleTensor, ?> scale) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(location.getShape(), scale.getShape()), location, scale);
     }
 
-    public CauchyVertex(DoubleVertex location, double scale) {
+    public CauchyVertex(Vertex<DoubleTensor, ?> location, double scale) {
         this(location, new ConstantDoubleVertex(scale));
     }
 
-    public CauchyVertex(double location, DoubleVertex scale) {
+    public CauchyVertex(double location, Vertex<DoubleTensor, ?> scale) {
         this(new ConstantDoubleVertex(location), scale);
     }
 
@@ -72,11 +73,11 @@ public class CauchyVertex extends VertexImpl<DoubleTensor, DoubleVertex> impleme
         this(new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
-    public CauchyVertex(long[] tensorShape, DoubleVertex location, double scale) {
+    public CauchyVertex(long[] tensorShape, Vertex<DoubleTensor, ?> location, double scale) {
         this(tensorShape, location, new ConstantDoubleVertex(scale));
     }
 
-    public CauchyVertex(long[] tensorShape, double location, DoubleVertex scale) {
+    public CauchyVertex(long[] tensorShape, double location, Vertex<DoubleTensor, ?> scale) {
         this(tensorShape, new ConstantDoubleVertex(location), scale);
     }
 

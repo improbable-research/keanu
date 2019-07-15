@@ -25,9 +25,10 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 import static java.util.Collections.singletonMap;
 
-public class SmoothUniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class SmoothUniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private static final double DEFAULT_EDGE_SHARPNESS = 0.01;
 
@@ -38,8 +39,8 @@ public class SmoothUniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
     private static final String X_MAX_NAME = "xMax";
 
     public SmoothUniformVertex(@LoadShape long[] tensorShape,
-                               @LoadVertexParam(X_MIN_NAME) DoubleVertex xMin,
-                               @LoadVertexParam(X_MAX_NAME) DoubleVertex xMax) {
+                               @LoadVertexParam(X_MIN_NAME) Vertex<DoubleTensor, ?> xMin,
+                               @LoadVertexParam(X_MAX_NAME) Vertex<DoubleTensor, ?> xMax) {
         this(tensorShape, xMin, xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
@@ -53,12 +54,12 @@ public class SmoothUniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
      * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
-    public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
+    public SmoothUniformVertex(long[] tensorShape, Vertex<DoubleTensor, ?> xMin, Vertex<DoubleTensor, ?> xMax, double edgeSharpness) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape());
 
-        this.xMin = xMin;
-        this.xMax = xMax;
+        this.xMin = wrapIfNeeded(xMin);
+        this.xMax = wrapIfNeeded(xMax);
         this.edgeSharpness = edgeSharpness;
         setParents(xMin, xMax);
     }
@@ -71,15 +72,15 @@ public class SmoothUniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
      * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
-    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
+    public SmoothUniformVertex(Vertex<DoubleTensor, ?> xMin, Vertex<DoubleTensor, ?> xMax, double edgeSharpness) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
     }
 
-    public SmoothUniformVertex(DoubleVertex xMin, double xMax, double edgeSharpness) {
+    public SmoothUniformVertex(Vertex<DoubleTensor, ?> xMin, double xMax, double edgeSharpness) {
         this(xMin, new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(double xMin, DoubleVertex xMax, double edgeSharpness) {
+    public SmoothUniformVertex(double xMin, Vertex<DoubleTensor, ?> xMax, double edgeSharpness) {
         this(new ConstantDoubleVertex(xMin), xMax, edgeSharpness);
     }
 
@@ -88,15 +89,15 @@ public class SmoothUniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
     }
 
     @ExportVertexToPythonBindings
-    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
+    public SmoothUniformVertex(Vertex<DoubleTensor, ?> xMin, Vertex<DoubleTensor, ?> xMax) {
         this(xMin, xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(DoubleVertex xMin, double xMax) {
+    public SmoothUniformVertex(Vertex<DoubleTensor, ?> xMin, double xMax) {
         this(xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(double xMin, DoubleVertex xMax) {
+    public SmoothUniformVertex(double xMin, Vertex<DoubleTensor, ?> xMax) {
         this(new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
@@ -104,11 +105,11 @@ public class SmoothUniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, double xMax, double edgeSharpness) {
+    public SmoothUniformVertex(long[] tensorShape, Vertex<DoubleTensor, ?> xMin, double xMax, double edgeSharpness) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(long[] tensorShape, double xMin, DoubleVertex xMax, double edgeSharpness) {
+    public SmoothUniformVertex(long[] tensorShape, double xMin, Vertex<DoubleTensor, ?> xMax, double edgeSharpness) {
         this(tensorShape, new ConstantDoubleVertex(xMin), xMax, edgeSharpness);
     }
 
@@ -116,11 +117,11 @@ public class SmoothUniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
         this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, double xMax) {
+    public SmoothUniformVertex(long[] tensorShape, Vertex<DoubleTensor, ?> xMin, double xMax) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(long[] tensorShape, double xMin, DoubleVertex xMax) {
+    public SmoothUniformVertex(long[] tensorShape, double xMin, Vertex<DoubleTensor, ?> xMax) {
         this(tensorShape, new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS);
     }
 

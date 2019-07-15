@@ -5,6 +5,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -24,12 +25,12 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.intgr.IntegerVertexWrapper.wrapIfNeeded;
 
-public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private IntegerVertex k;
     private static final String K_NAME = "k";
-    private static final double LOG_TWO = Math.log(2);
 
     /**
      * One k that must match a proposed tensor shape of ChiSquared
@@ -39,11 +40,12 @@ public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex> imp
      * @param tensorShape the desired shape of the vertex
      * @param k           the number of degrees of freedom
      */
-    public ChiSquaredVertex(@LoadShape long[] tensorShape, @LoadVertexParam(K_NAME) IntegerVertex k) {
+    public ChiSquaredVertex(@LoadShape long[] tensorShape,
+                            @LoadVertexParam(K_NAME) Vertex<IntegerTensor, ?> k) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, k.getShape());
 
-        this.k = k;
+        this.k = wrapIfNeeded(k);
         setParents(k);
     }
 

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.intgr.IntegerVertexWrapper.wrapIfNeeded;
 
 public class UniformIntVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
@@ -37,13 +38,13 @@ public class UniformIntVertex extends VertexImpl<IntegerTensor, IntegerVertex> i
      * @param max   The exclusive upper bound.
      */
     public UniformIntVertex(@LoadShape long[] shape,
-                            @LoadVertexParam(MIN_NAME) IntegerVertex min,
-                            @LoadVertexParam(MAX_NAME) IntegerVertex max) {
+                            @LoadVertexParam(MIN_NAME) Vertex<IntegerTensor, ?> min,
+                            @LoadVertexParam(MAX_NAME) Vertex<IntegerTensor, ?> max) {
         super(shape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, min.getShape(), max.getShape());
 
-        this.min = min;
-        this.max = max;
+        this.min = wrapIfNeeded(min);
+        this.max = wrapIfNeeded(max);
         setParents(min, max);
     }
 
@@ -55,24 +56,24 @@ public class UniformIntVertex extends VertexImpl<IntegerTensor, IntegerVertex> i
         this(shape, new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
     }
 
-    public UniformIntVertex(long[] shape, IntegerVertex min, int max) {
+    public UniformIntVertex(long[] shape, Vertex<IntegerTensor, ?> min, int max) {
         this(shape, min, new ConstantIntegerVertex(max));
     }
 
-    public UniformIntVertex(long[] shape, int min, IntegerVertex max) {
+    public UniformIntVertex(long[] shape, int min, Vertex<IntegerTensor, ?> max) {
         this(shape, new ConstantIntegerVertex(min), max);
     }
 
     @ExportVertexToPythonBindings
-    public UniformIntVertex(IntegerVertex min, IntegerVertex max) {
+    public UniformIntVertex(Vertex<IntegerTensor, ?> min, Vertex<IntegerTensor, ?> max) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(min.getShape(), max.getShape()), min, max);
     }
 
-    public UniformIntVertex(IntegerVertex min, int max) {
+    public UniformIntVertex(Vertex<IntegerTensor, ?> min, int max) {
         this(min.getShape(), min, new ConstantIntegerVertex(max));
     }
 
-    public UniformIntVertex(int min, IntegerVertex max) {
+    public UniformIntVertex(int min, Vertex<IntegerTensor, ?> max) {
         this(max.getShape(), new ConstantIntegerVertex(min), max);
     }
 

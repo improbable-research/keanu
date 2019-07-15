@@ -23,9 +23,10 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 import static java.util.Collections.singletonMap;
 
-public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
@@ -42,13 +43,13 @@ public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> implem
      * @param xMax        the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
     public UniformVertex(@LoadShape long[] tensorShape,
-                         @LoadVertexParam(X_MIN_NAME) DoubleVertex xMin,
-                         @LoadVertexParam(X_MAX_NAME) DoubleVertex xMax) {
+                         @LoadVertexParam(X_MIN_NAME) Vertex<DoubleTensor, ?> xMin,
+                         @LoadVertexParam(X_MAX_NAME) Vertex<DoubleTensor, ?> xMax) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape());
 
-        this.xMin = xMin;
-        this.xMax = xMax;
+        this.xMin = wrapIfNeeded(xMin);
+        this.xMax = wrapIfNeeded(xMax);
         setParents(xMin, xMax);
     }
 
@@ -60,15 +61,15 @@ public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> implem
      * @param xMax the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
+    public UniformVertex(Vertex<DoubleTensor, ?> xMin, Vertex<DoubleTensor, ?> xMax) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }
 
-    public UniformVertex(DoubleVertex xMin, double xMax) {
+    public UniformVertex(Vertex<DoubleTensor, ?> xMin, double xMax) {
         this(xMin, new ConstantDoubleVertex(xMax));
     }
 
-    public UniformVertex(double xMin, DoubleVertex xMax) {
+    public UniformVertex(double xMin, Vertex<DoubleTensor, ?> xMax) {
         this(new ConstantDoubleVertex(xMin), xMax);
     }
 
@@ -76,11 +77,11 @@ public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> implem
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax));
     }
 
-    public UniformVertex(long[] tensorShape, DoubleVertex xMin, double xMax) {
+    public UniformVertex(long[] tensorShape, Vertex<DoubleTensor, ?> xMin, double xMax) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax));
     }
 
-    public UniformVertex(long[] tensorShape, double xMin, DoubleVertex xMax) {
+    public UniformVertex(long[] tensorShape, double xMin, Vertex<DoubleTensor, ?> xMax) {
         this(tensorShape, new ConstantDoubleVertex(xMin), xMax);
     }
 

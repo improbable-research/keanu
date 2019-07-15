@@ -22,7 +22,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
+
+public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;
@@ -38,13 +40,13 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     public MultivariateGaussianVertex(@LoadShape long[] shape,
-                                      @LoadVertexParam(MU_NAME) DoubleVertex mu,
-                                      @LoadVertexParam(COVARIANCE_NAME) DoubleVertex covariance) {
+                                      @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu,
+                                      @LoadVertexParam(COVARIANCE_NAME) Vertex<DoubleTensor, ?> covariance) {
         super(shape);
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
-        this.mu = mu;
-        this.covariance = covariance;
+        this.mu = wrapIfNeeded(mu);
+        this.covariance = wrapIfNeeded(covariance);
         setParents(mu, covariance);
     }
 
@@ -55,7 +57,7 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     @ExportVertexToPythonBindings
-    public MultivariateGaussianVertex(DoubleVertex mu, DoubleVertex covariance) {
+    public MultivariateGaussianVertex(Vertex<DoubleTensor, ?> mu, Vertex<DoubleTensor, ?> covariance) {
         this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
 
@@ -67,7 +69,7 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
      * @param mu         the mu of the Multivariate Gaussian
      * @param covariance the scale of the identity matrix
      */
-    public MultivariateGaussianVertex(DoubleVertex mu, double covariance) {
+    public MultivariateGaussianVertex(Vertex<DoubleTensor, ?> mu, double covariance) {
         this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0]).times(covariance)));
     }
 

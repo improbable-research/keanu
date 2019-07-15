@@ -33,8 +33,8 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
-    private static final String MU_NAME = "mu";
-    private static final String SIGMA_NAME = "sigma";
+    protected static final String MU_NAME = "mu";
+    protected static final String SIGMA_NAME = "sigma";
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -65,7 +65,7 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
         this(mu, new ConstantDoubleVertex(sigma));
     }
 
-    public GaussianVertex(double mu, DoubleVertex sigma) {
+    public GaussianVertex(double mu, Vertex<DoubleTensor, ?> sigma) {
         this(new ConstantDoubleVertex(mu), sigma);
     }
 

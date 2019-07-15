@@ -28,6 +28,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class BetaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
@@ -46,13 +47,13 @@ public class BetaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implement
      * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     public BetaVertex(@LoadShape long[] tensorShape,
-                      @LoadVertexParam(ALPHA_NAME) DoubleVertex alpha,
-                      @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
+                      @LoadVertexParam(ALPHA_NAME) Vertex<DoubleTensor, ?> alpha,
+                      @LoadVertexParam(BETA_NAME) Vertex<DoubleTensor, ?> beta) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, alpha.getShape(), beta.getShape());
 
-        this.alpha = alpha;
-        this.beta = beta;
+        this.alpha = wrapIfNeeded(alpha);
+        this.beta = wrapIfNeeded(beta);
         setParents(alpha, beta);
     }
 

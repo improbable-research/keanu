@@ -40,7 +40,7 @@ public class GradientOptimizerTest {
     @Test(expected = UnsupportedOperationException.class)
     public void errorOnDiscreteLatents() {
         PoissonVertex v1 = new PoissonVertex(15);
-        PoissonVertex v2 = new PoissonVertex(v1);
+        PoissonVertex v2 = new PoissonVertex(v1.toDouble());
 
         GradientOptimizer optimizer = Keanu.Optimizer.Gradient.ofConnectedGraph(v1);
     }

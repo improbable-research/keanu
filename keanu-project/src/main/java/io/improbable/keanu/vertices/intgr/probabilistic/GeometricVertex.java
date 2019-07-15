@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class GeometricVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
@@ -42,10 +43,10 @@ public class GeometricVertex extends VertexImpl<IntegerTensor, IntegerVertex> im
      * @param p           the probability that an individual test is a success
      */
     public GeometricVertex(@LoadShape long[] tensorShape,
-                           @LoadVertexParam(P_NAME) DoubleVertex p) {
+                           @LoadVertexParam(P_NAME) Vertex<DoubleTensor, ?> p) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, p.getShape());
-        this.p = p;
+        this.p = wrapIfNeeded(p);
 
         setParents(p);
     }
@@ -55,7 +56,7 @@ public class GeometricVertex extends VertexImpl<IntegerTensor, IntegerVertex> im
     }
 
     @ExportVertexToPythonBindings
-    public GeometricVertex(DoubleVertex p) {
+    public GeometricVertex(Vertex<DoubleTensor, ?> p) {
         this(p.getShape(), p);
     }
 

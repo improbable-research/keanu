@@ -27,8 +27,9 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class InverseGammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class InverseGammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
@@ -45,13 +46,13 @@ public class InverseGammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> i
      * @param beta        the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
     public InverseGammaVertex(@LoadShape long[] tensorShape,
-                              @LoadVertexParam(ALPHA_NAME) DoubleVertex alpha,
-                              @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
+                              @LoadVertexParam(ALPHA_NAME) Vertex<DoubleTensor, ?> alpha,
+                              @LoadVertexParam(BETA_NAME) Vertex<DoubleTensor, ?> beta) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, alpha.getShape(), beta.getShape());
 
-        this.alpha = alpha;
-        this.beta = beta;
+        this.alpha = wrapIfNeeded(alpha);
+        this.beta = wrapIfNeeded(beta);
         setParents(alpha, beta);
     }
 
@@ -63,15 +64,15 @@ public class InverseGammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> i
      * @param beta  the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
     @ExportVertexToPythonBindings
-    public InverseGammaVertex(DoubleVertex alpha, DoubleVertex beta) {
+    public InverseGammaVertex(Vertex<DoubleTensor, ?> alpha, Vertex<DoubleTensor, ?> beta) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
-    public InverseGammaVertex(DoubleVertex alpha, double beta) {
+    public InverseGammaVertex(Vertex<DoubleTensor, ?> alpha, double beta) {
         this(alpha, new ConstantDoubleVertex(beta));
     }
 
-    public InverseGammaVertex(double alpha, DoubleVertex beta) {
+    public InverseGammaVertex(double alpha, Vertex<DoubleTensor, ?> beta) {
         this(new ConstantDoubleVertex(alpha), beta);
     }
 
@@ -79,11 +80,11 @@ public class InverseGammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> i
         this(new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
-    public InverseGammaVertex(long[] tensorShape, DoubleVertex alpha, double beta) {
+    public InverseGammaVertex(long[] tensorShape, Vertex<DoubleTensor, ?> alpha, double beta) {
         this(tensorShape, alpha, new ConstantDoubleVertex(beta));
     }
 
-    public InverseGammaVertex(long[] tensorShape, double alpha, DoubleVertex beta) {
+    public InverseGammaVertex(long[] tensorShape, double alpha, Vertex<DoubleTensor, ?> beta) {
         this(tensorShape, new ConstantDoubleVertex(alpha), beta);
     }
 

@@ -6,6 +6,7 @@ import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -27,8 +28,9 @@ import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.intgr.IntegerVertexWrapper.wrapIfNeeded;
 
-public class StudentTVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class StudentTVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final IntegerVertex v;
     private static final String V_NAME = "v";
@@ -41,10 +43,11 @@ public class StudentTVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
      * @param tensorShape expected tensor shape
      * @param v           Degrees of Freedom
      */
-    public StudentTVertex(@LoadShape long[] tensorShape, @LoadVertexParam(V_NAME) IntegerVertex v) {
+    public StudentTVertex(@LoadShape long[] tensorShape,
+                          @LoadVertexParam(V_NAME) Vertex<IntegerTensor, ?> v) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, v.getShape());
-        this.v = v;
+        this.v = wrapIfNeeded(v);
         setParents(v);
     }
 

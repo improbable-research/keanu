@@ -16,8 +16,10 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertexWrapper;
 import io.improbable.keanu.vertices.intgr.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertexWrapper;
 
 import java.util.Collections;
 import java.util.Map;
@@ -26,7 +28,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex,   ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
+public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
@@ -34,21 +36,21 @@ public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> imp
     private final static String N_NAME = "n";
 
     public BinomialVertex(@LoadShape long[] tensorShape,
-                          @LoadVertexParam(P_NAME) DoubleVertex p,
-                          @LoadVertexParam(N_NAME) IntegerVertex n) {
+                          @LoadVertexParam(P_NAME) Vertex<DoubleTensor, ?> p,
+                          @LoadVertexParam(N_NAME) Vertex<IntegerTensor, ?> n) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, p.getShape(), n.getShape());
-        this.p = p;
-        this.n = n;
+        this.p = DoubleVertexWrapper.wrapIfNeeded(p);
+        this.n = IntegerVertexWrapper.wrapIfNeeded(n);
 
         setParents(p, n);
     }
 
-    public BinomialVertex(long[] tensorShape, double p, IntegerVertex n) {
+    public BinomialVertex(long[] tensorShape, double p, Vertex<IntegerTensor, ?> n) {
         this(tensorShape, ConstantVertex.of(p), n);
     }
 
-    public BinomialVertex(long[] tensorShape, DoubleVertex p, int n) {
+    public BinomialVertex(long[] tensorShape, Vertex<DoubleTensor, ?> p, int n) {
         this(tensorShape, p, ConstantVertex.of(n));
     }
 
@@ -57,15 +59,15 @@ public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> imp
     }
 
     @ExportVertexToPythonBindings
-    public BinomialVertex(DoubleVertex p, IntegerVertex n) {
+    public BinomialVertex(Vertex<DoubleTensor, ?> p, Vertex<IntegerTensor, ?> n) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(p.getShape(), n.getShape()), p, n);
     }
 
-    public BinomialVertex(double p, IntegerVertex n) {
+    public BinomialVertex(double p, Vertex<IntegerTensor, ?> n) {
         this(ConstantVertex.of(p), n);
     }
 
-    public BinomialVertex(DoubleVertex p, int n) {
+    public BinomialVertex(Vertex<DoubleTensor, ?> p, int n) {
         this(p, ConstantVertex.of(n));
     }
 

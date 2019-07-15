@@ -22,8 +22,9 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class TriangularVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class TriangularVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
@@ -43,35 +44,35 @@ public class TriangularVertex extends VertexImpl<DoubleTensor, DoubleVertex> imp
      * @param c           the center of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     public TriangularVertex(@LoadShape long[] tensorShape,
-                            @LoadVertexParam(X_MIN_NAME) DoubleVertex xMin,
-                            @LoadVertexParam(X_MAX_NAME) DoubleVertex xMax,
-                            @LoadVertexParam(C_NAME) DoubleVertex c) {
+                            @LoadVertexParam(X_MIN_NAME) Vertex<DoubleTensor, ?> xMin,
+                            @LoadVertexParam(X_MAX_NAME) Vertex<DoubleTensor, ?> xMax,
+                            @LoadVertexParam(C_NAME) Vertex<DoubleTensor, ?> c) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape(), c.getShape());
 
-        this.xMin = xMin;
-        this.xMax = xMax;
-        this.c = c;
+        this.xMin = wrapIfNeeded(xMin);
+        this.xMax = wrapIfNeeded(xMax);
+        this.c = wrapIfNeeded(c);
         setParents(xMin, xMax, c);
     }
 
-    public TriangularVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double c) {
+    public TriangularVertex(long[] tensorShape, Vertex<DoubleTensor, ?> xMin, Vertex<DoubleTensor, ?> xMax, double c) {
         this(tensorShape, xMin, xMax, new ConstantDoubleVertex(c));
     }
 
-    public TriangularVertex(long[] tensorShape, DoubleVertex xMin, double xMax, DoubleVertex c) {
+    public TriangularVertex(long[] tensorShape, Vertex<DoubleTensor, ?> xMin, double xMax, Vertex<DoubleTensor, ?> c) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax), c);
     }
 
-    public TriangularVertex(long[] tensorShape, DoubleVertex xMin, double xMax, double c) {
+    public TriangularVertex(long[] tensorShape, Vertex<DoubleTensor, ?> xMin, double xMax, double c) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax), new ConstantDoubleVertex(c));
     }
 
-    public TriangularVertex(long[] tensorShape, double xMin, DoubleVertex xMax, DoubleVertex c) {
+    public TriangularVertex(long[] tensorShape, double xMin, Vertex<DoubleTensor, ?> xMax, Vertex<DoubleTensor, ?> c) {
         this(tensorShape, new ConstantDoubleVertex(xMin), xMax, c);
     }
 
-    public TriangularVertex(long[] tensorShape, double xMin, double xMax, DoubleVertex c) {
+    public TriangularVertex(long[] tensorShape, double xMin, double xMax, Vertex<DoubleTensor, ?> c) {
         this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), c);
     }
 
@@ -87,27 +88,27 @@ public class TriangularVertex extends VertexImpl<DoubleTensor, DoubleVertex> imp
      * @param c    the c of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public TriangularVertex(DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
+    public TriangularVertex(Vertex<DoubleTensor, ?> xMin, Vertex<DoubleTensor, ?> xMax, Vertex<DoubleTensor, ?> c) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(xMin.getShape(), xMax.getShape(), c.getShape()), xMin, xMax, c);
     }
 
-    public TriangularVertex(DoubleVertex xMin, DoubleVertex xMax, double c) {
+    public TriangularVertex(Vertex<DoubleTensor, ?> xMin, Vertex<DoubleTensor, ?> xMax, double c) {
         this(xMin, xMax, new ConstantDoubleVertex(c));
     }
 
-    public TriangularVertex(DoubleVertex xMin, double xMax, DoubleVertex c) {
+    public TriangularVertex(Vertex<DoubleTensor, ?> xMin, double xMax, Vertex<DoubleTensor, ?> c) {
         this(xMin, new ConstantDoubleVertex(xMax), c);
     }
 
-    public TriangularVertex(DoubleVertex xMin, double xMax, double c) {
+    public TriangularVertex(Vertex<DoubleTensor, ?> xMin, double xMax, double c) {
         this(xMin, new ConstantDoubleVertex(xMax), new ConstantDoubleVertex(c));
     }
 
-    public TriangularVertex(double xMin, DoubleVertex xMax, DoubleVertex c) {
+    public TriangularVertex(double xMin, Vertex<DoubleTensor, ?> xMax, Vertex<DoubleTensor, ?> c) {
         this(new ConstantDoubleVertex(xMin), xMax, c);
     }
 
-    public TriangularVertex(double xMin, double xMax, DoubleVertex c) {
+    public TriangularVertex(double xMin, double xMax, Vertex<DoubleTensor, ?> c) {
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), c);
     }
 

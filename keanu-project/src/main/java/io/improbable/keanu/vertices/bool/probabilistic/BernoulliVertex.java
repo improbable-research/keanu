@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class BernoulliVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor>, LogProbGraphSupplier {
 
@@ -39,10 +40,11 @@ public class BernoulliVertex extends VertexImpl<BooleanTensor, BooleanVertex> im
      * @param shape    the desired shape of the vertex
      * @param probTrue the probability the bernoulli returns true
      */
-    public BernoulliVertex(@LoadShape long[] shape, @LoadVertexParam(PROBTRUE_NAME) DoubleVertex probTrue) {
+    public BernoulliVertex(@LoadShape long[] shape,
+                           @LoadVertexParam(PROBTRUE_NAME) Vertex<DoubleTensor, ?> probTrue) {
         super(shape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, probTrue.getShape());
-        this.probTrue = probTrue;
+        this.probTrue = wrapIfNeeded(probTrue);
         setParents(probTrue);
     }
 
@@ -53,7 +55,7 @@ public class BernoulliVertex extends VertexImpl<BooleanTensor, BooleanVertex> im
      * @param probTrue probTrue with same shape as desired Bernoulli tensor or scalar
      */
     @ExportVertexToPythonBindings
-    public BernoulliVertex(DoubleVertex probTrue) {
+    public BernoulliVertex(Vertex<DoubleTensor, ?> probTrue) {
         this(probTrue.getShape(), probTrue);
     }
 

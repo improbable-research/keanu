@@ -27,7 +27,8 @@ public class HalfCauchyVertex extends CauchyVertex {
      * @param tensorShape the desired shape of the tensor in this vertex
      * @param scale       the scale of the HalfCauchy with either the same tensorShape as specified for this vertex or a scalar
      */
-    public HalfCauchyVertex(@LoadShape long[] tensorShape, @LoadVertexParam(SCALE_NAME) DoubleVertex scale) {
+    public HalfCauchyVertex(@LoadShape long[] tensorShape,
+                            @LoadVertexParam(SCALE_NAME) Vertex<DoubleTensor, ?> scale) {
         super(tensorShape, LOC_ZERO, scale);
     }
 
@@ -36,7 +37,7 @@ public class HalfCauchyVertex extends CauchyVertex {
     }
 
     @ExportVertexToPythonBindings
-    public HalfCauchyVertex(DoubleVertex scale) {
+    public HalfCauchyVertex(Vertex<DoubleTensor, ?> scale) {
         super(LOC_ZERO, scale);
     }
 
