@@ -200,6 +200,10 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
         return wrap(new MinUnaryVertex<>(this));
     }
 
+    @Override
+    default VERTEX clamp(VERTEX low, VERTEX high) {
+        return max(low).min(high);
+    }
 
     @Override
     default VERTEX pow(VERTEX exponent) {

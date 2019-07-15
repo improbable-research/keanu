@@ -113,11 +113,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default DoubleVertex clamp(DoubleVertex min, DoubleVertex max) {
-        return null;
-    }
-
-    @Override
     default DoubleVertex minus(double that) {
         return minus(new ConstantDoubleVertex(that));
     }

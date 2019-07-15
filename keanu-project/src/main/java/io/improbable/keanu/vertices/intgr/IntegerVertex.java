@@ -186,11 +186,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return a.max(b);
     }
 
-    @Override
-    default IntegerVertex clamp(IntegerVertex min, IntegerVertex max) {
-        return null;
-    }
-
     default IntegerVertex lambda(long[] shape, Function<IntegerTensor, IntegerTensor> op) {
         return new IntegerUnaryOpLambda<>(shape, this, op);
     }
