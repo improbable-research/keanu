@@ -27,13 +27,14 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.vertices.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
-    protected static final String MU_NAME = "mu";
-    protected static final String SIGMA_NAME = "sigma";
+    private static final String MU_NAME = "mu";
+    private static final String SIGMA_NAME = "sigma";
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -45,22 +46,22 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
     public GaussianVertex(@LoadShape long[] tensorShape,
-                          @LoadVertexParam(MU_NAME) DoubleVertex mu,
-                          @LoadVertexParam(SIGMA_NAME) DoubleVertex sigma) {
+                          @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu,
+                          @LoadVertexParam(SIGMA_NAME) Vertex<DoubleTensor, ?> sigma) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), sigma.getShape());
 
-        this.mu = mu;
-        this.sigma = sigma;
+        this.mu = wrapIfNeeded(mu);
+        this.sigma = wrapIfNeeded(sigma);
         setParents(mu, sigma);
     }
 
     @ExportVertexToPythonBindings
-    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
+    public GaussianVertex(Vertex<DoubleTensor, ?> mu, Vertex<DoubleTensor, ?> sigma) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
-    public GaussianVertex(DoubleVertex mu, double sigma) {
+    public GaussianVertex(Vertex<DoubleTensor, ?> mu, double sigma) {
         this(mu, new ConstantDoubleVertex(sigma));
     }
 
@@ -72,11 +73,11 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
         this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
 
-    public GaussianVertex(long[] tensorShape, DoubleVertex mu, double sigma) {
+    public GaussianVertex(long[] tensorShape, Vertex<DoubleTensor, ?> mu, double sigma) {
         this(tensorShape, mu, new ConstantDoubleVertex(sigma));
     }
 
-    public GaussianVertex(long[] tensorShape, double mu, DoubleVertex sigma) {
+    public GaussianVertex(long[] tensorShape, double mu, Vertex<DoubleTensor, ?> sigma) {
         this(tensorShape, new ConstantDoubleVertex(mu), sigma);
     }
 

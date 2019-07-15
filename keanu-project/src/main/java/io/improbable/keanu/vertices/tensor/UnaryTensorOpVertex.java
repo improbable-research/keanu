@@ -18,6 +18,7 @@ public abstract class UnaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, V
      * A vertex that performs a user defined operation on a singe input vertex
      *
      * @param inputVertex the input vertex
+     * @param type        type of tensor outputted
      */
     public UnaryTensorOpVertex(TensorVertex<T, TENSOR, VERTEX> inputVertex, Class<?> type) {
         this(inputVertex.getShape(), inputVertex, type);
@@ -28,6 +29,7 @@ public abstract class UnaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, V
      *
      * @param shape       the shape of the tensor
      * @param inputVertex the input vertex
+     * @param type        type of tensor outputted
      */
     public UnaryTensorOpVertex(long[] shape, TensorVertex<T, TENSOR, VERTEX> inputVertex, Class<?> type) {
         super(shape);

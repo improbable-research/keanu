@@ -43,7 +43,6 @@ def cast_to_vertex(input: vertex_constructor_param_types) -> Vertex:
 
 
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.CastNumberToBooleanVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex")
@@ -67,28 +66,13 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilis
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllTrueVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyFalseVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyTrueVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanDiagVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanOrEqualToMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanOrEqualToMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex")
@@ -103,7 +87,6 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.BetaVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
@@ -128,38 +111,38 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerGreaterThanOrEqualMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerLessThanMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerLessThanOrEqualMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMatrixMultiplyVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerModVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerSetWithMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerTensorMultiplyVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumProdVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumSumVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerDiagVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMaxUnaryVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerMinUnaryVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerProductVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.GeometricVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.MultinomialVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.AdditionVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.DivisionVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.GreaterThanMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.GreaterThanOrEqualToMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.LessThanMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.MatrixMultiplicationVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.MaxVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.MinVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.PowerVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.binary.TensorMultiplicationVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.unary.AbsVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.unary.CumProdVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.unary.CumSumVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.unary.MaxUnaryVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.unary.MinUnaryVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.unary.ProductVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.number.operators.unary.SumVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.BroadcastVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.DiagVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.IfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.PermuteVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.ReshapeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.SliceVertex")
@@ -169,10 +152,6 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.utility.AssertVert
 
 def CastNumberToBoolean(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     return Boolean(context.jvm_view().CastNumberToBooleanVertex, label, cast_to_vertex(input_vertex))
-
-
-def BooleanIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Boolean(context.jvm_view().BooleanIfVertex, label, cast_to_boolean_vertex(predicate), cast_to_boolean_vertex(thn), cast_to_boolean_vertex(els))
 
 
 def BooleanProxy(shape: Collection[int], label: str) -> Vertex:
@@ -267,10 +246,6 @@ def AnyTrue(input_vertex: vertex_constructor_param_types, label: Optional[str]=N
     return Boolean(context.jvm_view().AnyTrueVertex, label, cast_to_boolean_vertex(input_vertex))
 
 
-def BooleanDiag(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Boolean(context.jvm_view().BooleanDiagVertex, label, cast_to_boolean_vertex(input_vertex))
-
-
 def NotBinary(a: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     return Boolean(context.jvm_view().NotBinaryVertex, label, cast_to_boolean_vertex(a))
 
@@ -293,22 +268,8 @@ def ConstantDouble(constant: tensor_arg_types, label: Optional[str]=None) -> Ver
     return Double(context.jvm_view().ConstantDoubleVertex, label, cast_to_double_tensor(constant))
 
 
-def DoubleIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().DoubleIfVertex, label, cast_to_boolean_vertex(predicate), cast_to_double_vertex(thn), cast_to_double_vertex(els))
-
-
 def DoubleProxy(shape: Collection[int], label: str) -> Vertex:
     return Double(context.jvm_view().DoubleProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label))
-
-
-def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Adds one vertex to another
-    
-    :param left: a vertex to add
-    :param right: a vertex to add
-    """
-    return Double(context.jvm_view().AdditionVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
 def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -318,100 +279,18 @@ def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types
     :param x: x coordinate
     :param y: y coordinate
     """
-    return Double(context.jvm_view().ArcTan2Vertex, label, cast_to_double_vertex(x), cast_to_double_vertex(y))
-
-
-def Division(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Divides one vertex by another
-    
-    :param left: the vertex to be divided
-    :param right: the vertex to divide
-    """
-    return Double(context.jvm_view().DivisionVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
-
-
-def DoubleGreaterThanMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().DoubleGreaterThanMaskVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
-
-
-def DoubleGreaterThanOrEqualToMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().DoubleGreaterThanOrEqualToMaskVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
-
-
-def DoubleLessThanMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().DoubleLessThanMaskVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
-
-
-def DoubleLessThanOrEqualToMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().DoubleLessThanOrEqualToMaskVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
-
-
-def MatrixMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Matrix multiplies one vertex by another. C = AB
-    
-    :param left: vertex A
-    :param right: vertex B
-    """
-    return Double(context.jvm_view().MatrixMultiplicationVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
-
-
-def Max(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Finds the maximum between two vertices
-    
-    :param left: one of the vertices to find the maximum of
-    :param right: one of the vertices to find the maximum of
-    """
-    return Double(context.jvm_view().MaxVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
-
-
-def Min(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Finds the minimum between two vertices
-    
-    :param left: one of the vertices to find the minimum of
-    :param right: one of the vertices to find the minimum of
-    """
-    return Double(context.jvm_view().MinVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
-
-
-def Multiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Multiplies one vertex by another
-    
-    :param left: vertex to be multiplied
-    :param right: vertex to be multiplied
-    """
-    return Double(context.jvm_view().MultiplicationVertex, label, cast_to_double_vertex(left), cast_to_double_vertex(right))
-
-
-def Power(base: vertex_constructor_param_types, exponent: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Raises a vertex to the power of another
-    
-    :param base: the base vertex
-    :param exponent: the exponent vertex
-    """
-    return Double(context.jvm_view().PowerVertex, label, cast_to_double_vertex(base), cast_to_double_vertex(exponent))
+    return Double(context.jvm_view().ArcTan2Vertex, label, cast_to_vertex(x), cast_to_vertex(y))
 
 
 def Concatenation(dimension: int, operands: Collection[Vertex], label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().ConcatenationVertex, label, cast_to_integer(dimension), cast_to_vertex_array(operands))
-
-
-def DoubleSetWithMask(operand: vertex_constructor_param_types, mask: vertex_constructor_param_types, set_value: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().DoubleSetWithMaskVertex, label, cast_to_double_vertex(operand), cast_to_double_vertex(mask), cast_to_double_vertex(set_value))
-
-
-def Abs(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
-    Takes the absolute of a vertex
+    A vertex that can concatenate any amount of vertices along a given dimension.
     
-    :param input_vertex: the vertex
+    :param dimension: the dimension to concatenate on. This is the only dimension in which sizes may be different. Negative
+                  dimension indexing is not supported.
+    :param operands: the operands vertices to concatenate
     """
-    return Double(context.jvm_view().AbsVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().ConcatenationVertex, label, cast_to_integer(dimension), cast_to_vertex_array(operands))
 
 
 def ArcCos(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -420,7 +299,7 @@ def ArcCos(input_vertex: vertex_constructor_param_types, label: Optional[str]=No
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().ArcCosVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().ArcCosVertex, label, cast_to_vertex(input_vertex))
 
 
 def ArcSin(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -429,7 +308,7 @@ def ArcSin(input_vertex: vertex_constructor_param_types, label: Optional[str]=No
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().ArcSinVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().ArcSinVertex, label, cast_to_vertex(input_vertex))
 
 
 def ArcTan(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -438,7 +317,7 @@ def ArcTan(input_vertex: vertex_constructor_param_types, label: Optional[str]=No
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().ArcTanVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().ArcTanVertex, label, cast_to_vertex(input_vertex))
 
 
 def Ceil(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -448,7 +327,7 @@ def Ceil(input_vertex: vertex_constructor_param_types, label: Optional[str]=None
     
     :param input_vertex: the vertex to be ceil'd
     """
-    return Double(context.jvm_view().CeilVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().CeilVertex, label, cast_to_vertex(input_vertex))
 
 
 def Cos(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -457,7 +336,7 @@ def Cos(input_vertex: vertex_constructor_param_types, label: Optional[str]=None)
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().CosVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().CosVertex, label, cast_to_vertex(input_vertex))
 
 
 def Exp(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -466,7 +345,7 @@ def Exp(input_vertex: vertex_constructor_param_types, label: Optional[str]=None)
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().ExpVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().ExpVertex, label, cast_to_vertex(input_vertex))
 
 
 def Floor(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -476,7 +355,7 @@ def Floor(input_vertex: vertex_constructor_param_types, label: Optional[str]=Non
     
     :param input_vertex: the vertex to be floor'd
     """
-    return Double(context.jvm_view().FloorVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().FloorVertex, label, cast_to_vertex(input_vertex))
 
 
 def LogGamma(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -485,7 +364,7 @@ def LogGamma(input_vertex: vertex_constructor_param_types, label: Optional[str]=
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().LogGammaVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().LogGammaVertex, label, cast_to_vertex(input_vertex))
 
 
 def Log(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -494,15 +373,15 @@ def Log(input_vertex: vertex_constructor_param_types, label: Optional[str]=None)
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().LogVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().LogVertex, label, cast_to_vertex(input_vertex))
 
 
 def MatrixDeterminant(vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().MatrixDeterminantVertex, label, cast_to_double_vertex(vertex))
+    return Double(context.jvm_view().MatrixDeterminantVertex, label, cast_to_vertex(vertex))
 
 
 def MatrixInverse(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().MatrixInverseVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().MatrixInverseVertex, label, cast_to_vertex(input_vertex))
 
 
 def Round(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -512,7 +391,7 @@ def Round(input_vertex: vertex_constructor_param_types, label: Optional[str]=Non
     
     :param input_vertex: the vertex to be rounded
     """
-    return Double(context.jvm_view().RoundVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().RoundVertex, label, cast_to_vertex(input_vertex))
 
 
 def Sigmoid(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -522,7 +401,7 @@ def Sigmoid(input_vertex: vertex_constructor_param_types, label: Optional[str]=N
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().SigmoidVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().SigmoidVertex, label, cast_to_vertex(input_vertex))
 
 
 def Sin(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -531,16 +410,7 @@ def Sin(input_vertex: vertex_constructor_param_types, label: Optional[str]=None)
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().SinVertex, label, cast_to_double_vertex(input_vertex))
-
-
-def Sum(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Performs a sum across all dimensions
-    
-    :param input_vertex: the vertex to have its values summed
-    """
-    return Double(context.jvm_view().SumVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().SinVertex, label, cast_to_vertex(input_vertex))
 
 
 def Tan(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -549,7 +419,7 @@ def Tan(input_vertex: vertex_constructor_param_types, label: Optional[str]=None)
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().TanVertex, label, cast_to_double_vertex(input_vertex))
+    return Double(context.jvm_view().TanVertex, label, cast_to_vertex(input_vertex))
 
 
 def Beta(alpha: vertex_constructor_param_types, beta: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -707,151 +577,16 @@ def ConstantInteger(constant: tensor_arg_types, label: Optional[str]=None) -> Ve
     return Integer(context.jvm_view().ConstantIntegerVertex, label, cast_to_integer_tensor(constant))
 
 
-def IntegerIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerIfVertex, label, cast_to_boolean_vertex(predicate), cast_to_integer_vertex(thn), cast_to_integer_vertex(els))
-
-
 def IntegerProxy(shape: Collection[int], label: str) -> Vertex:
     return Integer(context.jvm_view().IntegerProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label))
-
-
-def IntegerAddition(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Adds one vertex to another
-    
-    :param left: a vertex to add
-    :param right: a vertex to add
-    """
-    return Integer(context.jvm_view().IntegerAdditionVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
-def IntegerDivision(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Divides one vertex by another
-    
-    :param left: a vertex to be divided
-    :param right: a vertex to divide by
-    """
-    return Integer(context.jvm_view().IntegerDivisionVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
-def IntegerGreaterThanMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerGreaterThanMaskVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
-def IntegerGreaterThanOrEqualMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerGreaterThanOrEqualMaskVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
-def IntegerLessThanMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerLessThanMaskVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
-def IntegerLessThanOrEqualMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerLessThanOrEqualMaskVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
-def IntegerMatrixMultiply(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerMatrixMultiplyVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
-def IntegerMax(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Finds the maximum between two vertices
-    
-    :param left: one of the vertices to find the maximum of
-    :param right: one of the vertices to find the maximum of
-    """
-    return Integer(context.jvm_view().IntegerMaxVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
-def IntegerMin(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Finds the minimum between two vertices
-    
-    :param left: one of the vertices to find the minimum of
-    :param right: one of the vertices to find the minimum of
-    """
-    return Integer(context.jvm_view().IntegerMinVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
 def IntegerMod(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     return Integer(context.jvm_view().IntegerModVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Multiplies one vertex by another
-    
-    :param left: a vertex to be multiplied
-    :param right: a vertex to be multiplied
-    """
-    return Integer(context.jvm_view().IntegerMultiplicationVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
-def IntegerPower(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Raises one vertex to the power of another
-    
-    :param left: the base vertex
-    :param right: the exponent vertex
-    """
-    return Integer(context.jvm_view().IntegerPowerVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
-
-
-def IntegerSetWithMask(left: vertex_constructor_param_types, mask: vertex_constructor_param_types, replace_with_value: int, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerSetWithMaskVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(mask), cast_to_integer(replace_with_value))
-
-
-def IntegerTensorMultiply(left: vertex_constructor_param_types, right: vertex_constructor_param_types, dims_left: Collection[int], dims_right: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerTensorMultiplyVertex, label, cast_to_integer_vertex(left), cast_to_integer_vertex(right), cast_to_int_array(dims_left), cast_to_int_array(dims_right))
-
-
 def IntegerConcatenation(dimension: int, input: Collection[Vertex], label: Optional[str]=None) -> Vertex:
     return Integer(context.jvm_view().IntegerConcatenationVertex, label, cast_to_integer(dimension), cast_to_vertex_array(input))
-
-
-def IntegerAbs(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Takes the absolute value of a vertex
-    
-    :param input_vertex: the vertex
-    """
-    return Integer(context.jvm_view().IntegerAbsVertex, label, cast_to_integer_vertex(input_vertex))
-
-
-def IntegerCumProd(input_vertex: vertex_constructor_param_types, requested_dimension: int, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerCumProdVertex, label, cast_to_integer_vertex(input_vertex), cast_to_integer(requested_dimension))
-
-
-def IntegerCumSum(input_vertex: vertex_constructor_param_types, requested_dimension: int, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerCumSumVertex, label, cast_to_integer_vertex(input_vertex), cast_to_integer(requested_dimension))
-
-
-def IntegerDiag(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerDiagVertex, label, cast_to_integer_vertex(input_vertex))
-
-
-def IntegerMaxUnary(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerMaxUnaryVertex, label, cast_to_integer_vertex(input_vertex))
-
-
-def IntegerMinUnary(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerMinUnaryVertex, label, cast_to_integer_vertex(input_vertex))
-
-
-def IntegerProduct(input_vertex: vertex_constructor_param_types, over_dimensions: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerProductVertex, label, cast_to_integer_vertex(input_vertex), cast_to_int_array(over_dimensions))
-
-
-def IntegerSum(input_vertex: vertex_constructor_param_types, over_dimensions: Collection[int], label: Optional[str]=None) -> Vertex:
-    """
-    Performs a sum across each value stored in a vertex
-    
-    :param input_vertex: the vertex to have its values summed
-    :param over_dimensions: the dimensions to sum over
-    """
-    return Integer(context.jvm_view().IntegerSumVertex, label, cast_to_integer_vertex(input_vertex), cast_to_int_array(over_dimensions))
 
 
 def Binomial(p: vertex_constructor_param_types, n: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -880,12 +615,162 @@ def UniformInt(min: vertex_constructor_param_types, max: vertex_constructor_para
     return Integer(context.jvm_view().UniformIntVertex, label, cast_to_integer_vertex(min), cast_to_integer_vertex(max))
 
 
-def NumberDifference(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().NumberDifferenceVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Adds one vertex to another
+    
+    :param left: a vertex to add
+    :param right: a vertex to add
+    """
+    return Vertex(context.jvm_view().AdditionVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def Difference(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().DifferenceVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def Division(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Divides one vertex by another
+    
+    :param left: the vertex to be divided
+    :param right: the vertex to divide
+    """
+    return Vertex(context.jvm_view().DivisionVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def GreaterThanMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().GreaterThanMaskVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def GreaterThanOrEqualToMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().GreaterThanOrEqualToMaskVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def LessThanMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().LessThanMaskVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def LessThanOrEqualToMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().LessThanOrEqualToMaskVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def MatrixMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Matrix multiplies one vertex by another. C = AB
+    
+    :param left: vertex A
+    :param right: vertex B
+    """
+    return Vertex(context.jvm_view().MatrixMultiplicationVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def Max(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Finds the minimum between two vertices
+    
+    :param left: one of the vertices to find the minimum of
+    :param right: one of the vertices to find the minimum of
+    """
+    return Vertex(context.jvm_view().MaxVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def Min(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Finds the minimum between two vertices
+    
+    :param left: one of the vertices to find the minimum of
+    :param right: one of the vertices to find the minimum of
+    """
+    return Vertex(context.jvm_view().MinVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def Multiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Multiplies one vertex by another
+    
+    :param left: vertex to be multiplied
+    :param right: vertex to be multiplied
+    """
+    return Vertex(context.jvm_view().MultiplicationVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def Power(base: vertex_constructor_param_types, exponent: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Raises a vertex to the power of another
+    
+    :param base: the base vertex
+    :param exponent: the exponent vertex
+    """
+    return Vertex(context.jvm_view().PowerVertex, label, cast_to_vertex(base), cast_to_vertex(exponent))
+
+
+def TensorMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, dims_left: Collection[int], dims_right: Collection[int], label: Optional[str]=None) -> Vertex:
+    """
+    Tensor multiplies one vertex by another. C = AB.
+    
+    :param left: the left vertex for operand
+    :param right: the right vertex for operand
+    :param dims_left: The dimensions of the left for multiplying. The left shape at these dimensions must align with the
+                  shape of the corresponding right vertex at its specified dimensions.
+    :param dims_right: The dimensions of the right for multiplying. The right shape at these dimensions must align with the
+                  shape of the corresponding left vertex at its specified dimensions.
+    """
+    return Vertex(context.jvm_view().TensorMultiplicationVertex, label, cast_to_vertex(left), cast_to_vertex(right), cast_to_int_array(dims_left), cast_to_int_array(dims_right))
+
+
+def SetWithMask(operand: vertex_constructor_param_types, mask: vertex_constructor_param_types, set_value: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().SetWithMaskVertex, label, cast_to_vertex(operand), cast_to_vertex(mask), cast_to_vertex(set_value))
+
+
+def Abs(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Takes the absolute of a vertex
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().AbsVertex, label, cast_to_vertex(input_vertex))
+
+
+def CumProd(input_vertex: vertex_constructor_param_types, requested_dimension: int, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().CumProdVertex, label, cast_to_vertex(input_vertex), cast_to_integer(requested_dimension))
+
+
+def CumSum(input_vertex: vertex_constructor_param_types, requested_dimension: int, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().CumSumVertex, label, cast_to_vertex(input_vertex), cast_to_integer(requested_dimension))
+
+
+def MaxUnary(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().MaxUnaryVertex, label, cast_to_vertex(input_vertex))
+
+
+def MinUnary(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().MinUnaryVertex, label, cast_to_vertex(input_vertex))
+
+
+def Product(input_vertex: vertex_constructor_param_types, over_dimensions: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().ProductVertex, label, cast_to_vertex(input_vertex), cast_to_int_array(over_dimensions))
+
+
+def Sum(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Performs a sum across all dimensions
+    
+    :param input_vertex: the vertex to have its values summed
+    """
+    return Vertex(context.jvm_view().SumVertex, label, cast_to_vertex(input_vertex))
 
 
 def Broadcast(input_vertex: vertex_constructor_param_types, to_shape: Collection[int], label: Optional[str]=None) -> Vertex:
     return Vertex(context.jvm_view().BroadcastVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(to_shape))
+
+
+def Diag(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().DiagVertex, label, cast_to_vertex(input_vertex))
+
+
+def If(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().IfVertex, label, cast_to_vertex(predicate), cast_to_vertex(thn), cast_to_vertex(els))
 
 
 def Permute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], label: Optional[str]=None) -> Vertex:

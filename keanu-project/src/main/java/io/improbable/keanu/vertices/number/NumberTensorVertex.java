@@ -30,10 +30,16 @@ import io.improbable.keanu.vertices.number.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.number.operators.binary.TensorMultiplicationVertex;
 import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
+import io.improbable.keanu.vertices.number.operators.unary.ApplyVertex;
+import io.improbable.keanu.vertices.number.operators.unary.CumProdVertex;
+import io.improbable.keanu.vertices.number.operators.unary.CumSumVertex;
 import io.improbable.keanu.vertices.number.operators.unary.MaxUnaryVertex;
 import io.improbable.keanu.vertices.number.operators.unary.MinUnaryVertex;
+import io.improbable.keanu.vertices.number.operators.unary.ProductVertex;
 import io.improbable.keanu.vertices.number.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
+
+import java.util.function.Function;
 
 public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
     extends TensorVertex<T, TENSOR, VERTEX>, BaseNumberTensor<BooleanVertex, IntegerVertex, DoubleVertex, T, VERTEX>, NumberOperators<VERTEX> {
@@ -245,6 +251,31 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
     @Override
     default VERTEX tensorMultiply(VERTEX value, int[] dimLeft, int[] dimsRight) {
         return wrap(new TensorMultiplicationVertex<>(this, value, dimLeft, dimsRight));
+    }
+
+    @Override
+    default VERTEX apply(Function<T, T> function) {
+        return wrap(new ApplyVertex<>(this, function));
+    }
+
+    @Override
+    default VERTEX cumSum(int requestedDimension) {
+        return wrap(new CumSumVertex<>(this, requestedDimension));
+    }
+
+    @Override
+    default VERTEX product() {
+        return wrap(new ProductVertex<>(this));
+    }
+
+    @Override
+    default VERTEX product(int... overDimensions) {
+        return wrap(new ProductVertex<>(this, overDimensions));
+    }
+
+    @Override
+    default VERTEX cumProd(int requestedDimension) {
+        return wrap(new CumProdVertex<>(this, requestedDimension));
     }
 
 }

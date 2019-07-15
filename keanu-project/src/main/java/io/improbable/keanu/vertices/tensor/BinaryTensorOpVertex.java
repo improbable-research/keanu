@@ -1,12 +1,10 @@
 package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexImpl;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 
@@ -26,6 +24,7 @@ public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, 
      *
      * @param left  first input vertex
      * @param right second input vertex
+     * @param type  type of tensor outputted
      */
     public BinaryTensorOpVertex(TensorVertex<T, TENSOR, VERTEX> left, TensorVertex<T, TENSOR, VERTEX> right, Class<?> type) {
         this(getBroadcastResultShape(left.getShape(), right.getShape()), left, right, type);
@@ -37,6 +36,7 @@ public abstract class BinaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, 
      * @param shape the shape of the tensor
      * @param left  first input vertex
      * @param right second input vertex
+     * @param type  type of tensor outputted
      */
     public BinaryTensorOpVertex(long[] shape, TensorVertex<T, TENSOR, VERTEX> left, TensorVertex<T, TENSOR, VERTEX> right, Class<?> type) {
         super(shape);

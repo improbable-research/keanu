@@ -7,10 +7,6 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerModVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerApplyVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumProdVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerCumSumVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerProductVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 import io.improbable.keanu.vertices.number.FixedPointTensorVertex;
 
@@ -208,33 +204,8 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default IntegerVertex apply(Function<Integer, Integer> function) {
-        return new IntegerApplyVertex(this, function);
-    }
-
-    @Override
     default IntegerVertex safeLogTimes(IntegerVertex y) {
         return null;
-    }
-
-    @Override
-    default IntegerVertex cumSum(int requestedDimension) {
-        return new IntegerCumSumVertex(this, requestedDimension);
-    }
-
-    @Override
-    default IntegerVertex product() {
-        return new IntegerProductVertex(this);
-    }
-
-    @Override
-    default IntegerVertex product(int... overDimensions) {
-        return new IntegerProductVertex(this, overDimensions);
-    }
-
-    @Override
-    default IntegerVertex cumProd(int requestedDimension) {
-        return new IntegerCumProdVertex(this, requestedDimension);
     }
 
     static IntegerVertex min(IntegerVertex a, IntegerVertex b) {

@@ -10,7 +10,19 @@ import java.util.Map;
 
 public class DoubleVertexWrapper extends VertexWrapper<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable {
 
-    public DoubleVertexWrapper(NonProbabilisticVertex<DoubleTensor, DoubleVertex> vertex) {
+    public static DoubleVertex wrapIfNeeded(Vertex<DoubleTensor, ?> vertex) {
+        if (vertex instanceof DoubleVertex) {
+            return (DoubleVertex) vertex;
+        }
+
+        if (vertex instanceof NonProbabilisticVertex) {
+            return new DoubleVertexWrapper((NonProbabilisticVertex<DoubleTensor, ?>) vertex);
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+    public DoubleVertexWrapper(NonProbabilisticVertex<DoubleTensor, ?> vertex) {
         super(vertex);
     }
 

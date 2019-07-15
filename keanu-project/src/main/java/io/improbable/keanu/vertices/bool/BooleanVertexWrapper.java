@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.tensor.VertexWrapper;
 
 public class BooleanVertexWrapper extends VertexWrapper<BooleanTensor, BooleanVertex> implements BooleanVertex {
 
-    public BooleanVertexWrapper(NonProbabilisticVertex<BooleanTensor, BooleanVertex> vertex) {
+    public BooleanVertexWrapper(NonProbabilisticVertex<BooleanTensor, ?> vertex) {
         super(vertex);
     }
 }

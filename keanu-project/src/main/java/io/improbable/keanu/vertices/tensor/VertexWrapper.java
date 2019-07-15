@@ -17,7 +17,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class VertexWrapper<TENSOR, VERTEX extends Vertex<TENSOR, VERTEX>> implements Vertex<TENSOR, VERTEX>, NonProbabilistic<TENSOR>, NonSaveableVertex {
 
-    private final NonProbabilisticVertex<TENSOR, VERTEX> vertex;
+    private final NonProbabilisticVertex<TENSOR, ?> vertex;
 
     public VERTEX setLabel(VertexLabel label) {
         vertex.setLabel(label);
@@ -225,7 +225,7 @@ public class VertexWrapper<TENSOR, VERTEX extends Vertex<TENSOR, VERTEX>> implem
         return vertex.toString();
     }
 
-    public NonProbabilisticVertex<TENSOR, VERTEX> unwrap() {
+    public NonProbabilisticVertex<TENSOR, ?> unwrap() {
         return vertex;
     }
 }

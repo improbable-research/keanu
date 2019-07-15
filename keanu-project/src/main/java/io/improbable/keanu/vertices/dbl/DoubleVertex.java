@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
@@ -105,26 +104,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     //////////////////////////
     ////  Number Tensor Operations
     //////////////////////////
-
-    @Override
-    default DoubleVertex cumSum(int requestedDimension) {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex product() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex product(int... overDimensions) {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex cumProd(int requestedDimension) {
-        return null;
-    }
 
     static DoubleVertex min(DoubleVertex a, DoubleVertex b) {
         return a.min(b);
@@ -280,18 +259,8 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default DoubleVertex apply(Function<Double, Double> function) {
-        return null;
-    }
-
-    @Override
     default DoubleVertex safeLogTimes(DoubleVertex y) {
         return null;
-    }
-
-    @Override
-    default BooleanVertex equalsWithinEpsilon(DoubleVertex other, Double epsilon) {
-        return new NumericalEqualsVertex<>(this, other, epsilon);
     }
 
     //////////////////////////
