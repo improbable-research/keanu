@@ -70,8 +70,8 @@ import io.improbable.keanu.vertices.number.operators.binary.GreaterThanOrEqualTo
 import io.improbable.keanu.vertices.number.operators.binary.LessThanMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
-import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
+import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.number.operators.unary.SumVertex;
@@ -123,8 +123,8 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(GetBooleanIndexVertex.class, fluentBinaryOp("get"));
 
         //Number ops
-        opMappers.put(NumberDifferenceVertex.class, fluentBinaryOp("minus", "minusInPlace"));
-        opMappers.put(NumberAdditionVertex.class, fluentBinaryOp("plus", "plusInPlace"));
+        opMappers.put(DifferenceVertex.class, fluentBinaryOp("minus", "minusInPlace"));
+        opMappers.put(AdditionVertex.class, fluentBinaryOp("plus", "plusInPlace"));
         opMappers.put(MultiplicationVertex.class, fluentBinaryOp("times", "timesInPlace"));
         opMappers.put(DivisionVertex.class, fluentBinaryOp("div", "divInPlace"));
         opMappers.put(SumVertex.class, KeanuVertexToTensorOpMapper::sumOp);

@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @DisplayInformationForOutput(displayName = "+")
-public class NumberAdditionVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+public class AdditionVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
     extends BinaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
     /**
@@ -27,8 +27,8 @@ public class NumberAdditionVertex<T extends Number, TENSOR extends NumberTensor<
      * @param right a vertex to add
      */
     @ExportVertexToPythonBindings
-    public NumberAdditionVertex(@LoadVertexParam(LEFT_NAME) TensorVertex<T, TENSOR, VERTEX> left,
-                                @LoadVertexParam(RIGHT_NAME) TensorVertex<T, TENSOR, VERTEX> right) {
+    public AdditionVertex(@LoadVertexParam(LEFT_NAME) TensorVertex<T, TENSOR, VERTEX> left,
+                          @LoadVertexParam(RIGHT_NAME) TensorVertex<T, TENSOR, VERTEX> right) {
         super(left, right, left.ofType());
     }
 

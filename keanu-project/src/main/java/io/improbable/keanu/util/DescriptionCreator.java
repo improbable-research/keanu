@@ -16,10 +16,10 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
+import io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.number.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
-import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
+import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.tensor.VertexWrapper;
 
 import java.lang.reflect.InvocationTargetException;
@@ -39,8 +39,8 @@ public class DescriptionCreator {
 
     public DescriptionCreator() {
         delimiters = new HashMap<>();
-        delimiters.put(NumberDifferenceVertex.class, " - ");
-        delimiters.put(NumberAdditionVertex.class, " + ");
+        delimiters.put(DifferenceVertex.class, " - ");
+        delimiters.put(AdditionVertex.class, " + ");
         delimiters.put(MultiplicationVertex.class, " * ");
         delimiters.put(DivisionVertex.class, " / ");
         delimiters.put(AndBinaryVertex.class, " && ");

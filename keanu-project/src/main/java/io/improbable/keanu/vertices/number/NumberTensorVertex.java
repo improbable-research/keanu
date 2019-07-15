@@ -15,14 +15,14 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex;
+import io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.number.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.number.operators.binary.GreaterThanMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.GreaterThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.LessThanMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.number.operators.binary.NumberAdditionVertex;
-import io.improbable.keanu.vertices.number.operators.binary.NumberDifferenceVertex;
+import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
 import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.number.operators.unary.SumVertex;
@@ -33,17 +33,17 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
 
     @Override
     default VERTEX minus(VERTEX that) {
-        return wrap(new NumberDifferenceVertex<>(this, that));
+        return wrap(new DifferenceVertex<>(this, that));
     }
 
     @Override
     default VERTEX reverseMinus(VERTEX that) {
-        return wrap(new NumberDifferenceVertex<>(that, this));
+        return wrap(new DifferenceVertex<>(that, this));
     }
 
     @Override
     default VERTEX plus(VERTEX that) {
-        return wrap(new NumberAdditionVertex<>(this, that));
+        return wrap(new AdditionVertex<>(this, that));
     }
 
     @Override
