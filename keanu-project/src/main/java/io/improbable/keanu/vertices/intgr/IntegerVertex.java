@@ -174,16 +174,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     }
 
     @Override
-    default IntegerVertex average() {
-        return null;
-    }
-
-    @Override
-    default IntegerVertex standardDeviation() {
-        return null;
-    }
-
-    @Override
     default IntegerVertex safeLogTimes(IntegerVertex y) {
         return null;
     }

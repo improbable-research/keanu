@@ -377,16 +377,6 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
-    public TENSOR average() {
-        return create(Nd4j.scalar(tensor.meanNumber().doubleValue()).castTo(tensor.dataType()));
-    }
-
-    @Override
-    public TENSOR standardDeviation() {
-        return create(Nd4j.scalar(tensor.stdNumber().doubleValue()).castTo(tensor.dataType()));
-    }
-
-    @Override
     public BooleanTensor greaterThan(T value) {
         return fromMask(tensor.gt(value));
     }

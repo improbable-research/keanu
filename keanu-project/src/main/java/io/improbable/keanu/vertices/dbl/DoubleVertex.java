@@ -222,6 +222,11 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return null;
     }
 
+    @Override
+    default DoubleVertex standardize() {
+        return null;
+    }
+
     default DoubleVertex greaterThanMask(Double rhs) {
         return greaterThanMask(new ConstantDoubleVertex(rhs));
     }
@@ -359,7 +364,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
 
     @Override
     default DoubleVertex reciprocal() {
-        return null;
+        return reverseDiv(1.0);
     }
 
     @Override
@@ -467,10 +472,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return new MatrixInverseVertex(this);
     }
 
-    @Override
-    default DoubleVertex standardize() {
-        return null;
-    }
 
     default DoubleVertex matrixDeterminant() {
         return determinant();

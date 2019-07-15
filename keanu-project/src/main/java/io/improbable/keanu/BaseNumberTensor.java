@@ -85,10 +85,6 @@ public interface BaseNumberTensor<
 
     T pow(N exponent);
 
-    T average();
-
-    T standardDeviation();
-
     /**
      * Find the indices into the tensor of the largest values in a specified axis (dimension), e.g.
      * <pre>

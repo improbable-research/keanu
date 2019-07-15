@@ -303,16 +303,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor average() {
-        return duplicate();
-    }
-
-    @Override
-    public IntegerTensor standardDeviation() {
-        return IntegerTensor.scalar(0);
-    }
-
-    @Override
     public IntegerTensor minusInPlace(IntegerTensor that) {
         if (that.isLengthOne()) {
             minusInPlace(that.scalar());

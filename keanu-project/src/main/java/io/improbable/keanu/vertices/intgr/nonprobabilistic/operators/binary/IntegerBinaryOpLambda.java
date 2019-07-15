@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
 
 import java.util.function.BiFunction;

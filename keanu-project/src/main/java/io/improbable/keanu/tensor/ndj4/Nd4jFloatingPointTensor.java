@@ -202,6 +202,16 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
     }
 
     @Override
+    public TENSOR average() {
+        return create(Nd4j.scalar(tensor.meanNumber().doubleValue()).castTo(tensor.dataType()));
+    }
+
+    @Override
+    public TENSOR standardDeviation() {
+        return create(Nd4j.scalar(tensor.stdNumber().doubleValue()).castTo(tensor.dataType()));
+    }
+
+    @Override
     public TENSOR setAllInPlace(T value) {
         this.tensor.assign(value);
         return getThis();

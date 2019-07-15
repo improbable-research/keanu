@@ -104,4 +104,8 @@ public interface BaseFloatingPointTensor<
     T matrixInverse();
 
     T standardize();
+
+    T average();
+
+    T standardDeviation();
 }
