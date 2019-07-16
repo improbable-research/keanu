@@ -17,7 +17,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVer
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGammaVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex;
@@ -26,7 +25,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
-import io.improbable.keanu.vertices.number.FloatingPointTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.FloatingPointTensorVertex;
 
 import java.util.List;
 import java.util.Map;
@@ -206,21 +205,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return pow(new ConstantDoubleVertex(that));
     }
 
-    @Override
-    default DoubleVertex average() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex standardDeviation() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex standardize() {
-        return null;
-    }
-
     default DoubleVertex greaterThanMask(Double rhs) {
         return greaterThanMask(new ConstantDoubleVertex(rhs));
     }
@@ -247,8 +231,18 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     //////////////////////////
 
     @Override
-    default DoubleVertex floor() {
-        return new FloorVertex(this);
+    default DoubleVertex average() {
+        return null;
+    }
+
+    @Override
+    default DoubleVertex standardDeviation() {
+        return null;
+    }
+
+    @Override
+    default DoubleVertex standardize() {
+        return null;
     }
 
     @Override

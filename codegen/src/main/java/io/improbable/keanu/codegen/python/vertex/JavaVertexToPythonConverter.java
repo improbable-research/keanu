@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import org.apache.commons.lang3.NotImplementedException;
 import org.reflections.Reflections;
 

@@ -34,7 +34,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanV
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGammaVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex;
@@ -50,24 +49,6 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVe
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
-import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex;
-import io.improbable.keanu.vertices.number.operators.binary.DivisionVertex;
-import io.improbable.keanu.vertices.number.operators.binary.GreaterThanMaskVertex;
-import io.improbable.keanu.vertices.number.operators.binary.GreaterThanOrEqualToMaskVertex;
-import io.improbable.keanu.vertices.number.operators.binary.LessThanMaskVertex;
-import io.improbable.keanu.vertices.number.operators.binary.LessThanOrEqualToMaskVertex;
-import io.improbable.keanu.vertices.number.operators.binary.MatrixMultiplicationVertex;
-import io.improbable.keanu.vertices.number.operators.binary.MaxVertex;
-import io.improbable.keanu.vertices.number.operators.binary.MinVertex;
-import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.number.operators.binary.PowerVertex;
-import io.improbable.keanu.vertices.number.operators.binary.TensorMultiplicationVertex;
-import io.improbable.keanu.vertices.number.operators.ternary.SetWithMaskVertex;
-import io.improbable.keanu.vertices.number.operators.unary.AbsVertex;
-import io.improbable.keanu.vertices.number.operators.unary.MaxUnaryVertex;
-import io.improbable.keanu.vertices.number.operators.unary.MinUnaryVertex;
-import io.improbable.keanu.vertices.number.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.tensor.BroadcastVertex;
 import io.improbable.keanu.vertices.tensor.DiagVertex;
 import io.improbable.keanu.vertices.tensor.GetBooleanIndexVertex;
@@ -76,6 +57,25 @@ import io.improbable.keanu.vertices.tensor.PermuteVertex;
 import io.improbable.keanu.vertices.tensor.ReshapeVertex;
 import io.improbable.keanu.vertices.tensor.SliceVertex;
 import io.improbable.keanu.vertices.tensor.TakeVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.DifferenceVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.GreaterThanMaskVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.GreaterThanOrEqualToMaskVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.LessThanMaskVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.LessThanOrEqualToMaskVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.MaxVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.MinVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.TensorMultiplicationVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.ternary.SetWithMaskVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.unary.AbsVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.unary.MaxUnaryVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.unary.MinUnaryVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.utility.AssertVertex;
 
 import java.util.Arrays;
@@ -139,6 +139,9 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(MaxUnaryVertex.class, fluentUnaryOp("max"));
         opMappers.put(MinUnaryVertex.class, fluentUnaryOp("min"));
 
+        //Floating point ops
+        opMappers.put(FloorVertex.class, fluentUnaryOp("floor", "floorInPlace"));
+
         //Double ops
         opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
         opMappers.put(CosVertex.class, fluentUnaryOp("cos", "cosInPlace"));
@@ -151,7 +154,6 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(TanVertex.class, fluentUnaryOp("tan", "tanInPlace"));
         opMappers.put(ArcTanVertex.class, fluentUnaryOp("atan", "atanInPlace"));
         opMappers.put(CeilVertex.class, fluentUnaryOp("ceil", "ceilInPlace"));
-        opMappers.put(FloorVertex.class, fluentUnaryOp("floor", "floorInPlace"));
         opMappers.put(RoundVertex.class, fluentUnaryOp("round", "roundInPlace"));
         opMappers.put(SigmoidVertex.class, fluentUnaryOp("sigmoid", "sigmoidInPlace"));
         opMappers.put(MatrixDeterminantVertex.class, fluentUnaryOp("matrixDeterminant"));

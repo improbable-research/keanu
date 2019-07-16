@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerModVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
-import io.improbable.keanu.vertices.number.FixedPointTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.FixedPointTensorVertex;
 
 import java.util.List;
 import java.util.function.Function;

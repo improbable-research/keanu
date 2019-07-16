@@ -14,12 +14,12 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
-import io.improbable.keanu.vertices.number.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.number.operators.binary.DifferenceVertex;
-import io.improbable.keanu.vertices.number.operators.binary.DivisionVertex;
-import io.improbable.keanu.vertices.number.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.tensor.IfVertex;
 import io.improbable.keanu.vertices.tensor.VertexWrapper;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.DifferenceVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.MultiplicationVertex;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -5,7 +5,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.tensor.If;
@@ -51,7 +50,7 @@ public class DifferentiableCheckerTest {
     @Test
     public void gaussiansWithAFloorInMiddleIsntDiffable() {
         GaussianVertex latentBeforeNonDiffable = new GaussianVertex(5., 3.);
-        FloorVertex nonDiffable = new FloorVertex(latentBeforeNonDiffable);
+        DoubleVertex nonDiffable = latentBeforeNonDiffable.floor();
         GaussianVertex latentAfterNonDiffable = new GaussianVertex(nonDiffable, 1.);
         assertMAPNotDifferentiable(nonDiffable.getConnectedGraph());
     }
@@ -87,7 +86,7 @@ public class DifferentiableCheckerTest {
     @Test
     public void latentAsParentOfNonDiffIsntDiffable() {
         GaussianVertex latent = new GaussianVertex(5., 1.);
-        DoubleVertex nonDiffableVertex = new FloorVertex(latent);
+        DoubleVertex nonDiffableVertex = latent.floor();
         GaussianVertex gaussian = new GaussianVertex(nonDiffableVertex, 1.);
         assertMAPNotDifferentiable(gaussian.getConnectedGraph());
     }
@@ -96,7 +95,7 @@ public class DifferentiableCheckerTest {
     public void observedLatentAsParentOfNonDiffIsDiffable() {
         GaussianVertex observedLatent = new GaussianVertex(5., 1.);
         observedLatent.observe(4);
-        FloorVertex nonDiffableVertex = new FloorVertex(observedLatent);
+        DoubleVertex nonDiffableVertex = observedLatent.floor();
         GaussianVertex gaussian = new GaussianVertex(nonDiffableVertex, 1.);
         assertMAPIsDifferentiable(gaussian.getConnectedGraph());
     }
@@ -104,7 +103,7 @@ public class DifferentiableCheckerTest {
     @Test
     public void constantAsParentOfNonDiffIsDiffable() {
         DoubleVertex constantVertex = new ConstantDoubleVertex(20.);
-        FloorVertex nonDiffableVertex = new FloorVertex(constantVertex);
+        DoubleVertex nonDiffableVertex = constantVertex.floor();
         GaussianVertex gaussian = new GaussianVertex(nonDiffableVertex, 1.);
         assertMAPIsDifferentiable(gaussian.getConnectedGraph());
     }
@@ -112,7 +111,7 @@ public class DifferentiableCheckerTest {
     @Test
     public void nonDiffableNotOnPathToLatentIsDiffable() {
         GaussianVertex gaussianA = new GaussianVertex(5., 1.);
-        FloorVertex nonDiffableVertex = new FloorVertex(gaussianA);
+        DoubleVertex nonDiffableVertex = gaussianA.floor();
         GaussianVertex gaussianB = new GaussianVertex(gaussianA, 1.);
         assertMAPIsDifferentiable(gaussianB.getConnectedGraph());
     }
@@ -133,11 +132,11 @@ public class DifferentiableCheckerTest {
         gaussianB.observe(4.);
 
         DoubleVertex resultVertex = gaussianA.multiply(gaussianB).plus(gaussianB);
-        DoubleVertex nonDiffableA = new FloorVertex(resultVertex);
-        DoubleVertex nonDiffableB = new FloorVertex(resultVertex);
-        DoubleVertex nonDiffableC = new FloorVertex(resultVertex);
-        DoubleVertex nonDiffableD = new FloorVertex(resultVertex);
-        DoubleVertex nonDiffableE = new FloorVertex(resultVertex);
+        DoubleVertex nonDiffableA = resultVertex.floor();
+        DoubleVertex nonDiffableB = resultVertex.floor();
+        DoubleVertex nonDiffableC = resultVertex.floor();
+        DoubleVertex nonDiffableD = resultVertex.floor();
+        DoubleVertex nonDiffableE = resultVertex.floor();
         DoubleVertex nonDiffSum = nonDiffableA.plus(nonDiffableB).plus(nonDiffableC).plus(nonDiffableD).plus(nonDiffableE);
         GaussianVertex gaussianSum = new GaussianVertex(nonDiffSum, 1.);
         assertMAPIsDifferentiable(gaussianSum.getConnectedGraph());
@@ -146,7 +145,7 @@ public class DifferentiableCheckerTest {
     @Test
     public void observedVertexWithNonDiffableParentIsntDiffable() {
         GaussianVertex gaussianA = new GaussianVertex(5., 1.);
-        FloorVertex nonDiffable = new FloorVertex(gaussianA);
+        DoubleVertex nonDiffable = gaussianA.floor();
         GaussianVertex observed = new GaussianVertex(nonDiffable, 1.);
         observed.observe(4.);
         assertMAPNotDifferentiable(observed.getConnectedGraph());
@@ -155,7 +154,7 @@ public class DifferentiableCheckerTest {
     @Test
     public void observedVertexWithNonDiffableConstantParentIsDiffable() {
         DoubleVertex constDouble = new ConstantDoubleVertex(4.);
-        FloorVertex nonDiffable = new FloorVertex(constDouble);
+        DoubleVertex nonDiffable = constDouble.floor();
         GaussianVertex observed = new GaussianVertex(nonDiffable, 1.);
         observed.observe(4.);
         assertMAPIsDifferentiable(observed.getConnectedGraph());
@@ -165,7 +164,7 @@ public class DifferentiableCheckerTest {
     public void graphWhichShouldBeMLEDiffableAndNotMAPDiffable() {
         DoubleVertex constDouble = new ConstantDoubleVertex(5.);
         GaussianVertex gaussianA = new GaussianVertex(constDouble, constDouble);
-        FloorVertex nonDiffable = new FloorVertex(gaussianA);
+        DoubleVertex nonDiffable = gaussianA.floor();
         GaussianVertex gaussianB = new GaussianVertex(nonDiffable, constDouble);
         GaussianVertex gaussianObserved = new GaussianVertex(gaussianB, constDouble);
 
@@ -181,7 +180,7 @@ public class DifferentiableCheckerTest {
         GaussianVertex baseVertex = new GaussianVertex(1., 1.);
         DoubleVertex addVertex = baseVertex.plus(new ConstantDoubleVertex(1.));
         DoubleVertex mockedVertex = Mockito.spy(addVertex);
-        FloorVertex nonDiffable = new FloorVertex(mockedVertex);
+        DoubleVertex nonDiffable = mockedVertex.floor();
 
         GaussianVertex gaussianA = new GaussianVertex(nonDiffable, new ConstantDoubleVertex(3.));
         GaussianVertex gaussianB = new GaussianVertex(nonDiffable, new ConstantDoubleVertex(3.));
