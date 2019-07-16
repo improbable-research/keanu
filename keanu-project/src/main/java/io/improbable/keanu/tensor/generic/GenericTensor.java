@@ -13,6 +13,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.jvm.JVMTensorBroadcast.broadcastIfNeeded;
 import static java.util.Arrays.copyOf;
@@ -64,6 +65,25 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
         Object[] data = new Object[TensorShape.getLengthAsInt(shape)];
         Arrays.fill(data, value);
         return (T[]) data;
+    }
+
+    @Override
+    public GenericTensor<T> where(BooleanTensor predicate, GenericTensor<T> els) {
+        final long[] resultShape = getBroadcastResultShape(getBroadcastResultShape(shape, predicate.getShape()), els.getShape());
+        final GenericTensor<T> broadcastedTrue = this.hasShape(resultShape) ? this : this.broadcast(resultShape);
+        final GenericTensor<T> broadcastedFalse = els.hasShape(resultShape) ? els : els.broadcast(resultShape);
+        final BooleanTensor broadcastedPredicate = predicate.hasShape(resultShape) ? predicate : predicate.broadcast(resultShape);
+
+        FlattenedView<T> trueValuesFlattened = broadcastedTrue.getFlattenedView();
+        FlattenedView<T> falseValuesFlattened = broadcastedFalse.getFlattenedView();
+        FlattenedView<Boolean> predicateValuesFlattened = broadcastedPredicate.getFlattenedView();
+
+        T[] result = (T[]) (new Object[TensorShape.getLengthAsInt(resultShape)]);
+        for (int i = 0; i < result.length; i++) {
+            result[i] = predicateValuesFlattened.get(i) ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
+        }
+
+        return GenericTensor.create(result, copyOf(resultShape, resultShape.length));
     }
 
     @Override

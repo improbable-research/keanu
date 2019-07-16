@@ -541,7 +541,7 @@ public class KeanuVertexToTensorOpMapper {
         String thnName = lookup.get(thn.getId()).getName();
         String elsName = lookup.get(els.getId()).getName();
 
-        return predicateName + ".where(" + thnName + "," + elsName + ")";
+        return thnName + ".where(" + predicateName + "," + elsName + ")";
     }
 
     private static String doubleProxyOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {

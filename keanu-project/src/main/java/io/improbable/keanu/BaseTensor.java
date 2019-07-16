@@ -141,6 +141,8 @@ public interface BaseTensor<
         return permute(rearrange);
     }
 
+    T where(BOOLEAN predicate, T els);
+
     T permute(int... rearrange);
 
     T broadcast(long... toShape);

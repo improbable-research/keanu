@@ -11,10 +11,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBi
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.XorBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanBooleanWhereVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanDoubleWhereVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanIntegerWhereVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToDoubleMaskVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToIntegerMaskVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
@@ -160,21 +157,6 @@ public interface BooleanVertex extends
 
     static BooleanVertex not(BooleanVertex vertex) {
         return new NotBinaryVertex(vertex);
-    }
-
-    @Override
-    default DoubleVertex doubleWhere(DoubleVertex trueValue, DoubleVertex falseValue) {
-        return new BooleanDoubleWhereVertex(this, trueValue, falseValue);
-    }
-
-    @Override
-    default IntegerVertex integerWhere(IntegerVertex trueValue, IntegerVertex falseValue) {
-        return new BooleanIntegerWhereVertex(this, trueValue, falseValue);
-    }
-
-    @Override
-    default BooleanVertex booleanWhere(BooleanVertex trueValue, BooleanVertex falseValue) {
-        return new BooleanBooleanWhereVertex(this, trueValue, falseValue);
     }
 
     @Override

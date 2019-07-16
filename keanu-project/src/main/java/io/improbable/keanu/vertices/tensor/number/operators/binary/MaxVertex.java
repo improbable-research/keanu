@@ -23,8 +23,8 @@ public class MaxVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>,
      * @param right one of the vertices to find the minimum of
      */
     @ExportVertexToPythonBindings
-    public MaxVertex(@LoadVertexParam(LEFT_NAME) Vertex<TENSOR, ?> left,
-                     @LoadVertexParam(RIGHT_NAME) Vertex<TENSOR, ?> right) {
+    public MaxVertex(@LoadVertexParam(LEFT_NAME) TensorVertex<T, TENSOR, VERTEX> left,
+                     @LoadVertexParam(RIGHT_NAME) TensorVertex<T, TENSOR, VERTEX>right) {
         super(new GreaterThanOrEqualVertex<>(left, right), left, right);
     }
 }

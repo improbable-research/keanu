@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
@@ -29,9 +30,9 @@ public class IfVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tensor
     protected static final String ELSE_NAME = "else";
 
     @ExportVertexToPythonBindings
-    public IfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<BooleanTensor, ?> predicate,
-                    @LoadVertexParam(THEN_NAME) Vertex<TENSOR, ?> thn,
-                    @LoadVertexParam(ELSE_NAME) Vertex<TENSOR, ?> els) {
+    public IfVertex(@LoadVertexParam(PREDICATE_NAME) TensorVertex<Boolean, BooleanTensor, ?> predicate,
+                    @LoadVertexParam(THEN_NAME) TensorVertex<T, TENSOR, ?> thn,
+                    @LoadVertexParam(ELSE_NAME) TensorVertex<T, TENSOR, ?>els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;
@@ -57,7 +58,7 @@ public class IfVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tensor
 
     @Override
     public TENSOR calculate() {
-        return predicate.getValue().where(thn.getValue(), els.getValue());
+        return thn.getValue().where(predicate.getValue(), els.getValue());
     }
 
     @Override

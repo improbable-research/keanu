@@ -48,6 +48,10 @@ public interface Tensor<N, T extends Tensor<N, T>> extends BaseTensor<BooleanTen
         }
     }
 
+    default boolean hasShape(long[] shape) {
+        return Arrays.equals(getShape(), shape);
+    }
+
     /**
      * getValue returns a single primitive value from a specified index. The number of indices supplied must
      * match the rank of the tensor.

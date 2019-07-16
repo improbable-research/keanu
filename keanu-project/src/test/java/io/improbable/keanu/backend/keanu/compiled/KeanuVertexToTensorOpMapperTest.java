@@ -17,7 +17,6 @@ import static io.improbable.keanu.backend.keanu.compiled.KeanuVertexToTensorOpMa
 public class KeanuVertexToTensorOpMapperTest {
 
     @Test
-    @Ignore
     public void doesSupportAllOperations() {
 
         Reflections reflections = new Reflections("io.improbable.keanu.vertices");

@@ -17,12 +17,6 @@ public interface BaseBooleanTensor<
     BOOLEAN xor(BOOLEAN that);
 
     BOOLEAN not();
-
-    DOUBLE doubleWhere(DOUBLE trueValue, DOUBLE falseValue);
-
-    INTEGER integerWhere(INTEGER trueValue, INTEGER falseValue);
-
-    BOOLEAN booleanWhere(BOOLEAN trueValue, BOOLEAN falseValue);
     
     BOOLEAN allTrue();
 

@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertexWrapper;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -31,7 +30,7 @@ public class If {
             this.predicate = predicate;
         }
 
-        public <T> IfThenElseBuilder<T> then(Vertex<GenericTensor<T>, ?> thn) {
+        public <T> IfThenElseBuilder<T> then(TensorVertex<T, GenericTensor<T>, ?> thn) {
             return new IfThenElseBuilder<>(predicate, thn);
         }
 
@@ -62,32 +61,32 @@ public class If {
 
     public static class IfThenElseBuilder<T> {
 
-        private final Vertex<BooleanTensor, ?> predicate;
-        private final Vertex<GenericTensor<T>, ?> thn;
+        private final TensorVertex<Boolean, BooleanTensor, ?> predicate;
+        private final TensorVertex<T, GenericTensor<T>, ?> thn;
 
-        public IfThenElseBuilder(Vertex<BooleanTensor, ?> predicate,
-                                 Vertex<GenericTensor<T>, ?> thn) {
+        public IfThenElseBuilder(TensorVertex<Boolean, BooleanTensor, BooleanVertex> predicate,
+                                 TensorVertex<T, GenericTensor<T>, ?> thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
 
-        public GenericTensorVertex<T> orElse(Vertex<GenericTensor<T>, ?> els) {
+        public GenericTensorVertex<T> orElse(TensorVertex<T, GenericTensor<T>, ?> els) {
             return new GenericVertexWrapper<>(new IfVertex<>(predicate, thn, els));
         }
     }
 
     public static class BooleanIfThenElseBuilder {
 
-        private final Vertex<BooleanTensor, ?> predicate;
-        private final Vertex<BooleanTensor, ?> thn;
+        private final TensorVertex<Boolean, BooleanTensor, ?> predicate;
+        private final TensorVertex<Boolean, BooleanTensor, ?> thn;
 
-        public BooleanIfThenElseBuilder(Vertex<BooleanTensor, ?> predicate,
-                                        Vertex<BooleanTensor, ?> thn) {
+        public BooleanIfThenElseBuilder(TensorVertex<Boolean, BooleanTensor, ?> predicate,
+                                        TensorVertex<Boolean, BooleanTensor, ?> thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
 
-        public BooleanVertex orElse(Vertex<BooleanTensor, ?> els) {
+        public BooleanVertex orElse(TensorVertex<Boolean, BooleanTensor, ?> els) {
             return new BooleanVertexWrapper(new IfVertex<>(predicate, thn, els));
         }
 
@@ -98,16 +97,16 @@ public class If {
 
     public static class DoubleIfThenElseBuilder {
 
-        private final Vertex<BooleanTensor, ?> predicate;
-        private final Vertex<DoubleTensor, ?> thn;
+        private final TensorVertex<Boolean, BooleanTensor, ?> predicate;
+        private final TensorVertex<Double, DoubleTensor, ?> thn;
 
-        public DoubleIfThenElseBuilder(Vertex<BooleanTensor, ?> predicate,
-                                       Vertex<DoubleTensor, ?> thn) {
+        public DoubleIfThenElseBuilder(TensorVertex<Boolean, BooleanTensor, ?> predicate,
+                                       TensorVertex<Double, DoubleTensor, ?> thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
 
-        public DoubleVertex orElse(Vertex<DoubleTensor, ?> els) {
+        public DoubleVertex orElse(TensorVertex<Double, DoubleTensor, ?> els) {
             return new DoubleVertexWrapper(new IfVertex<>(predicate, thn, els));
         }
 
@@ -118,16 +117,16 @@ public class If {
 
     public static class IntegerIfThenElseBuilder {
 
-        private final Vertex<BooleanTensor, ?> predicate;
-        private final Vertex<IntegerTensor, ?> thn;
+        private final TensorVertex<Boolean, BooleanTensor, ?> predicate;
+        private final TensorVertex<Integer, IntegerTensor, ?> thn;
 
-        public IntegerIfThenElseBuilder(Vertex<BooleanTensor, ?> predicate,
-                                        Vertex<IntegerTensor, ?> thn) {
+        public IntegerIfThenElseBuilder(TensorVertex<Boolean, BooleanTensor, ?> predicate,
+                                        TensorVertex<Integer, IntegerTensor, ?> thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
 
-        public IntegerVertex orElse(Vertex<IntegerTensor, ?> els) {
+        public IntegerVertex orElse(TensorVertex<Integer, IntegerTensor, ?> els) {
             return new IntegerVertexWrapper(new IfVertex<>(predicate, thn, els));
         }
 

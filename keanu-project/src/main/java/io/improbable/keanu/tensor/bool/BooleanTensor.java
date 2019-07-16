@@ -75,60 +75,64 @@ public interface BooleanTensor extends
         return JVMBooleanTensor.concat(dimension, toConcat);
     }
 
+    @Override
     default BooleanTensor and(BooleanTensor that) {
         return duplicate().andInPlace(that);
     }
 
     BooleanTensor andInPlace(BooleanTensor that);
 
+    @Override
     default BooleanTensor and(boolean that) {
         return duplicate().andInPlace(that);
     }
 
     BooleanTensor andInPlace(boolean that);
 
+    @Override
     default BooleanTensor or(BooleanTensor that) {
         return duplicate().orInPlace(that);
     }
 
     BooleanTensor orInPlace(BooleanTensor that);
 
+    @Override
     default BooleanTensor or(boolean that) {
         return duplicate().orInPlace(that);
     }
 
     BooleanTensor orInPlace(boolean that);
 
+    @Override
     default BooleanTensor xor(BooleanTensor that) {
         return duplicate().xorInPlace(that);
     }
 
     BooleanTensor xorInPlace(BooleanTensor that);
 
+    @Override
     default BooleanTensor not() {
         return duplicate().notInPlace();
     }
 
     BooleanTensor notInPlace();
 
-    DoubleTensor doubleWhere(DoubleTensor trueValue, DoubleTensor falseValue);
-
-    IntegerTensor integerWhere(IntegerTensor trueValue, IntegerTensor falseValue);
-
-    BooleanTensor booleanWhere(BooleanTensor trueValue, BooleanTensor falseValue);
-
-    <T, TENSOR extends Tensor<T, TENSOR>> TENSOR where(TENSOR trueValue, TENSOR falseValue);
-
+    @Override
     BooleanTensor allTrue();
 
+    @Override
     BooleanTensor allFalse();
 
+    @Override
     BooleanTensor anyTrue();
 
+    @Override
     BooleanTensor anyFalse();
 
+    @Override
     DoubleTensor toDoubleMask();
 
+    @Override
     IntegerTensor toIntegerMask();
 
     double[] asFlatDoubleArray();

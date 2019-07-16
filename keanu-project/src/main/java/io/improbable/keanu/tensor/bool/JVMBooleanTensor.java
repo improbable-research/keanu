@@ -1,8 +1,6 @@
 package io.improbable.keanu.tensor.bool;
 
 import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -14,6 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.bool.BroadcastableBooleanOperations.AND;
 import static io.improbable.keanu.tensor.bool.BroadcastableBooleanOperations.OR;
@@ -113,63 +112,22 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    public DoubleTensor doubleWhere(DoubleTensor trueValue, DoubleTensor falseValue) {
-        FlattenedView<Double> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<Double> falseValuesFlattened = falseValue.getFlattenedView();
+    public BooleanTensor where(BooleanTensor predicate, BooleanTensor els) {
+        final long[] resultShape = getBroadcastResultShape(getBroadcastResultShape(shape, predicate.getShape()), els.getShape());
+        final BooleanTensor broadcastedTrue = this.hasShape(resultShape) ? this : this.broadcast(resultShape);
+        final BooleanTensor broadcastedFalse = els.hasShape(resultShape) ? els : els.broadcast(resultShape);
+        final BooleanTensor broadcastedPredicate = predicate.hasShape(resultShape) ? predicate : predicate.broadcast(resultShape);
 
-        double[] result = new double[Ints.checkedCast(buffer.getLength())];
+        FlattenedView<Boolean> trueValuesFlattened = broadcastedTrue.getFlattenedView();
+        FlattenedView<Boolean> falseValuesFlattened = broadcastedFalse.getFlattenedView();
+        FlattenedView<Boolean> predicateValuesFlattened = broadcastedPredicate.getFlattenedView();
+
+        boolean[] result = new boolean[TensorShape.getLengthAsInt(resultShape)];
         for (int i = 0; i < result.length; i++) {
-            result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            result[i] = predicateValuesFlattened.get(i) ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
         }
 
-        return DoubleTensor.create(result, copyOf(shape, shape.length));
-    }
-
-    @Override
-    public IntegerTensor integerWhere(IntegerTensor trueValue, IntegerTensor falseValue) {
-        FlattenedView<Integer> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<Integer> falseValuesFlattened = falseValue.getFlattenedView();
-
-        int[] result = new int[Ints.checkedCast(buffer.getLength())];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
-        }
-
-        return IntegerTensor.create(result, copyOf(shape, shape.length));
-    }
-
-    @Override
-    public BooleanTensor booleanWhere(BooleanTensor trueValue, BooleanTensor falseValue) {
-        FlattenedView<Boolean> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<Boolean> falseValuesFlattened = falseValue.getFlattenedView();
-
-        boolean[] result = new boolean[Ints.checkedCast(buffer.getLength())];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
-        }
-
-        return BooleanTensor.create(result, copyOf(shape, shape.length));
-    }
-
-    @Override
-    public <T, TENSOR extends Tensor< T, TENSOR>> TENSOR where(TENSOR trueValue, TENSOR falseValue) {
-        if (trueValue instanceof DoubleTensor && falseValue instanceof DoubleTensor) {
-            return (TENSOR) doubleWhere((DoubleTensor) trueValue, (DoubleTensor) falseValue);
-        } else if (trueValue instanceof IntegerTensor && falseValue instanceof IntegerTensor) {
-            return (TENSOR) integerWhere((IntegerTensor) trueValue, (IntegerTensor) falseValue);
-        } else if (trueValue instanceof BooleanTensor && falseValue instanceof BooleanTensor) {
-            return (TENSOR) booleanWhere((BooleanTensor) trueValue, (BooleanTensor) falseValue);
-        } else {
-            FlattenedView<T> trueValuesFlattened = trueValue.getFlattenedView();
-            FlattenedView<T> falseValuesFlattened = falseValue.getFlattenedView();
-
-            T[] result = (T[]) (new Object[Ints.checkedCast(buffer.getLength())]);
-            for (int i = 0; i < result.length; i++) {
-                result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
-            }
-
-            return Tensor.create(result, copyOf(shape, shape.length));
-        }
+        return BooleanTensor.create(result, copyOf(resultShape, resultShape.length));
     }
 
     @Override

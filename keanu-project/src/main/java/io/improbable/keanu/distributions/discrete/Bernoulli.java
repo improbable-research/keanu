@@ -32,10 +32,7 @@ public class Bernoulli implements Distribution<BooleanTensor> {
     public DoubleTensor logProb(BooleanTensor x) {
         DoubleTensor probTrueClamped = probTrue.clamp(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));
 
-        DoubleTensor probability = x.doubleWhere(
-            probTrueClamped,
-            probTrueClamped.unaryMinus().plusInPlace(1.0)
-        );
+        DoubleTensor probability = probTrueClamped.where(x, probTrueClamped.unaryMinus().plusInPlace(1.0));
 
         return probability.logInPlace();
     }
@@ -67,10 +64,7 @@ public class Bernoulli implements Distribution<BooleanTensor> {
         DoubleTensor dlogProbdxForFalse = probTrue.minus(1.0).reciprocalInPlace();
         dlogProbdxForFalse = dlogProbdxForFalse.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
 
-        DoubleTensor dLogPdp = x.doubleWhere(
-            dlogProbdxForTrue,
-            dlogProbdxForFalse
-        );
+        DoubleTensor dLogPdp =dlogProbdxForTrue.where(x, dlogProbdxForFalse);
 
         return dLogPdp;
     }

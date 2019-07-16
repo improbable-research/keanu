@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor.intgr;
 
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.ndj4.INDArrayShim;
@@ -13,6 +15,9 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
+import static java.util.Arrays.copyOf;
 
 /**
  * Class for representing n-dimensional arrays of integers. This is
@@ -149,6 +154,25 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
     @Override
     protected IntegerTensor getThis() {
         return this;
+    }
+
+    @Override
+    public IntegerTensor where(BooleanTensor predicate, IntegerTensor els) {
+        final long[] resultShape = getBroadcastResultShape(getBroadcastResultShape(getShape(), predicate.getShape()), els.getShape());
+        final IntegerTensor broadcastedTrue = this.hasShape(resultShape) ? this : this.broadcast(resultShape);
+        final IntegerTensor broadcastedFalse = els.hasShape(resultShape) ? els : els.broadcast(resultShape);
+        final BooleanTensor broadcastedPredicate = predicate.hasShape(resultShape) ? predicate : predicate.broadcast(resultShape);
+
+        FlattenedView<Integer> trueValuesFlattened = broadcastedTrue.getFlattenedView();
+        FlattenedView<Integer> falseValuesFlattened = broadcastedFalse.getFlattenedView();
+        FlattenedView<Boolean> predicateValuesFlattened = broadcastedPredicate.getFlattenedView();
+
+        int[] result = new int[TensorShape.getLengthAsInt(resultShape)];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = predicateValuesFlattened.get(i) ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
+        }
+
+        return IntegerTensor.create(result, copyOf(resultShape, resultShape.length));
     }
 
     @Override

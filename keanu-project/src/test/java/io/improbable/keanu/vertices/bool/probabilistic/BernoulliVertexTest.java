@@ -194,8 +194,8 @@ public class BernoulliVertexTest {
 
         Map<VertexId, DoubleTensor> dLogPmf = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
-        DoubleTensor expectedWrtA = atValue.doubleWhere(
-            AValue.reciprocal(),
+        DoubleTensor expectedWrtA = AValue.reciprocal().where(
+            atValue,
             BValue.div(AValue.times(BValue).minus(1.0))
         );
 
@@ -209,8 +209,8 @@ public class BernoulliVertexTest {
             0.0
         );
 
-        DoubleTensor expectedWrtB = atValue.doubleWhere(
-            BValue.reciprocal(),
+        DoubleTensor expectedWrtB = BValue.reciprocal().where(
+            atValue,
             AValue.div(AValue.times(BValue).minus(1.0))
         );
 
@@ -245,8 +245,8 @@ public class BernoulliVertexTest {
 
         optimizer.maxAPosteriori();
 
-        DoubleTensor expected = observation.doubleWhere(
-            DoubleTensor.scalar(max),
+        DoubleTensor expected = DoubleTensor.scalar(max).where(
+            observation,
             DoubleTensor.scalar(min)
         );
 

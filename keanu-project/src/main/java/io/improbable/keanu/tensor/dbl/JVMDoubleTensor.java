@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
@@ -207,6 +208,26 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         );
 
         return equalsMask.toBoolean();
+    }
+
+    @Override
+    public DoubleTensor where(BooleanTensor predicate, DoubleTensor els) {
+
+        final long[] resultShape = getBroadcastResultShape(getBroadcastResultShape(shape, predicate.getShape()), els.getShape());
+        final DoubleTensor broadcastedTrue = this.hasShape(resultShape) ? this : this.broadcast(resultShape);
+        final DoubleTensor broadcastedFalse = els.hasShape(resultShape) ? els : els.broadcast(resultShape);
+        final BooleanTensor broadcastedPredicate = predicate.hasShape(resultShape) ? predicate : predicate.broadcast(resultShape);
+
+        FlattenedView<Double> trueValuesFlattened = broadcastedTrue.getFlattenedView();
+        FlattenedView<Double> falseValuesFlattened = broadcastedFalse.getFlattenedView();
+        FlattenedView<Boolean> predicateValuesFlattened = broadcastedPredicate.getFlattenedView();
+
+        double[] result = new double[TensorShape.getLengthAsInt(resultShape)];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = predicateValuesFlattened.get(i) ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
+        }
+
+        return DoubleTensor.create(result, copyOf(resultShape, resultShape.length));
     }
 
     @Override

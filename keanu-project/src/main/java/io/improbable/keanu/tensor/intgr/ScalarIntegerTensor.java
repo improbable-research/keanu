@@ -91,6 +91,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor where(BooleanTensor predicate, IntegerTensor els) {
+        return predicate.scalar() ? duplicate() : els.duplicate();
+    }
+
+    @Override
     public IntegerTensor reshape(long... newShape) {
         if (TensorShape.getLength(newShape) != 1) {
             throw new IllegalArgumentException("Cannot reshape scalar to non scalar");

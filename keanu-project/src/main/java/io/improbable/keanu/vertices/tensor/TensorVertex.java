@@ -37,6 +37,10 @@ public interface TensorVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extend
         return wrap(new DiagVertex<>(this));
     }
 
+    default VERTEX where(BooleanVertex predicate, VERTEX els) {
+        return wrap(new IfVertex<>(predicate, this, els));
+    }
+
     default VERTEX take(long... index) {
         return wrap(new TakeVertex<>(this, index));
     }
