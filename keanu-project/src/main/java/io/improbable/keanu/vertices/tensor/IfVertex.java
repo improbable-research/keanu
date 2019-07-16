@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 

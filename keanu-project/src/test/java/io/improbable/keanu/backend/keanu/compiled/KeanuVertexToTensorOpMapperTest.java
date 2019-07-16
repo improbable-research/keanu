@@ -3,7 +3,6 @@ package io.improbable.keanu.backend.keanu.compiled;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.reflections.Reflections;
 
