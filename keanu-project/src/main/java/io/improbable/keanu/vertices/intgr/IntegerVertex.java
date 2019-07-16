@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerModVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 import io.improbable.keanu.vertices.tensor.number.fixed.FixedPointTensorVertex;
@@ -201,11 +200,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
     @Override
     default IntegerVertex mod(Integer that) {
         return mod(new ConstantIntegerVertex(that));
-    }
-
-    @Override
-    default IntegerVertex mod(IntegerVertex that) {
-        return new IntegerModVertex(this, that);
     }
 
 }

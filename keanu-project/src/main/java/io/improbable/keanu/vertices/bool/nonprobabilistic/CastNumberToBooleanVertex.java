@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.bool;
+package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;
@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexUnaryOp;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 public class CastNumberToBooleanVertex<T extends NumberTensor> extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, NonProbabilistic<BooleanTensor>, VertexUnaryOp<Vertex<T, ?>> {
 

@@ -18,7 +18,7 @@ public class DoubleVertexWrapper extends VertexWrapper<DoubleTensor, DoubleVerte
         if (vertex instanceof NonProbabilisticVertex) {
             return new DoubleVertexWrapper((NonProbabilisticVertex<DoubleTensor, ?>) vertex);
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Cannot wrap " + vertex.getClass().getCanonicalName() + " as DoubleVertex");
         }
     }
 

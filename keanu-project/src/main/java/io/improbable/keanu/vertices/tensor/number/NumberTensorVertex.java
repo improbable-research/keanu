@@ -5,7 +5,7 @@ import io.improbable.keanu.kotlin.NumberOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.CastNumberToBooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.CastNumberToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
