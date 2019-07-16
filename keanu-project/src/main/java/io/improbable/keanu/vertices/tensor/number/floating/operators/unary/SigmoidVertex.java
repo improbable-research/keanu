@@ -1,16 +1,22 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.FloatingPointTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
+import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
+import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SigmoidVertex extends DoubleUnaryOpVertex implements Differentiable {
+public class SigmoidVertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+    extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
     /**
      * Applies the sigmoid function to a vertex.
@@ -19,19 +25,19 @@ public class SigmoidVertex extends DoubleUnaryOpVertex implements Differentiable
      * @param inputVertex the vertex
      */
     @ExportVertexToPythonBindings
-    public SigmoidVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<DoubleTensor, ?> inputVertex) {
+    public SigmoidVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex) {
         super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return value.unaryMinus().expInPlace().plusInPlace(1.0).reciprocalInPlace();
+    protected TENSOR op(TENSOR value) {
+        return value.sigmoid();
     }
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        DoubleTensor x = inputVertex.getValue();
+        DoubleTensor x = inputVertex.getValue().toDouble();
         DoubleTensor xExp = x.exp();
         DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2.0));
         return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dxdfx);
@@ -39,7 +45,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex implements Differentiable
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        DoubleTensor sigmoidOfInput = getValue();
+        DoubleTensor sigmoidOfInput = getValue().toDouble();
         //dSigmoid = sigmoid(x)*(1-sigmoid(x))
         DoubleTensor derivativeOfSigmoidWrtInput = sigmoidOfInput.minus(sigmoidOfInput.pow(2));
 

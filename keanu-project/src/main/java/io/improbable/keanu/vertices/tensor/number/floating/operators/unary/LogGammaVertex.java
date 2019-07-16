@@ -1,16 +1,21 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.FloatingPointTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
+import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
+import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class LogGammaVertex extends DoubleUnaryOpVertex implements Differentiable {
+public class LogGammaVertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+    extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
     /**
      * Returns the log of the gamma of the inputVertex
@@ -18,26 +23,26 @@ public class LogGammaVertex extends DoubleUnaryOpVertex implements Differentiabl
      * @param inputVertex the vertex
      */
     @ExportVertexToPythonBindings
-    public LogGammaVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<DoubleTensor, ?> inputVertex) {
+    public LogGammaVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex) {
         super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor value) {
+    protected TENSOR op(TENSOR value) {
         return value.logGamma();
     }
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(inputVertex.getValue().digamma());
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(inputVertex.getValue().toDouble().digamma());
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         PartialDerivative dOutputsWrtInputVertex =
-            derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(inputVertex.getValue().digamma());
+            derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(inputVertex.getValue().toDouble().digamma());
         partials.put(inputVertex, dOutputsWrtInputVertex);
         return partials;
     }

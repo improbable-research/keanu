@@ -14,6 +14,10 @@ public abstract class UnaryTensorOpVertex<T, TENSOR extends Tensor<T, TENSOR>, V
 
     protected static final String INPUT_NAME = "inputVertex";
 
+    public UnaryTensorOpVertex(TensorVertex<T, TENSOR, VERTEX> inputVertex) {
+        this(inputVertex.getShape(), inputVertex, inputVertex.ofType());
+    }
+
     /**
      * A vertex that performs a user defined operation on a singe input vertex
      *

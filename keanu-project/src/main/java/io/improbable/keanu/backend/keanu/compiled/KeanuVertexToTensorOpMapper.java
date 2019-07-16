@@ -28,20 +28,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGammaVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.MultiplexerVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -57,7 +43,21 @@ import io.improbable.keanu.vertices.tensor.PermuteVertex;
 import io.improbable.keanu.vertices.tensor.ReshapeVertex;
 import io.improbable.keanu.vertices.tensor.SliceVertex;
 import io.improbable.keanu.vertices.tensor.TakeVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCosVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CeilVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CosVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ExpVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.LogGammaVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.MatrixDeterminantVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.MatrixInverseVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.RoundVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.SigmoidVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.SinVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.binary.DivisionVertex;
@@ -141,9 +141,6 @@ public class KeanuVertexToTensorOpMapper {
 
         //Floating point ops
         opMappers.put(FloorVertex.class, fluentUnaryOp("floor", "floorInPlace"));
-
-        //Double ops
-        opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
         opMappers.put(CosVertex.class, fluentUnaryOp("cos", "cosInPlace"));
         opMappers.put(ArcCosVertex.class, fluentUnaryOp("acos", "acosInPlace"));
         opMappers.put(ExpVertex.class, fluentUnaryOp("exp", "expInPlace"));
@@ -158,6 +155,9 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(SigmoidVertex.class, fluentUnaryOp("sigmoid", "sigmoidInPlace"));
         opMappers.put(MatrixDeterminantVertex.class, fluentUnaryOp("matrixDeterminant"));
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));
+
+        //Double ops
+        opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
         opMappers.put(ConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatDoubleOp);
         opMappers.put(CastNumberToDoubleVertex.class, fluentUnaryOp("toDouble"));
         opMappers.put(DoubleProxyVertex.class, KeanuVertexToTensorOpMapper::doubleProxyOp);

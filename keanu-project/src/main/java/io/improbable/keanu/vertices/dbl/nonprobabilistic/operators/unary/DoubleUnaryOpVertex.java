@@ -13,7 +13,7 @@ public abstract class DoubleUnaryOpVertex
     implements DoubleVertex, NonProbabilistic<DoubleTensor>, VertexUnaryOp<Vertex<DoubleTensor, ?>> {
 
     protected final Vertex<DoubleTensor, ?> inputVertex;
-    protected static final String INPUT_VERTEX_NAME = "inputVertex";
+    protected static final String INPUT_NAME = "inputVertex";
 
     /**
      * A vertex that performs a user defined operation on a single input vertex
@@ -36,7 +36,7 @@ public abstract class DoubleUnaryOpVertex
         setParents(inputVertex);
     }
 
-    @SaveVertexParam(INPUT_VERTEX_NAME)
+    @SaveVertexParam(INPUT_NAME)
     @Override
     public Vertex<DoubleTensor, ?> getInputVertex() {
         return inputVertex;

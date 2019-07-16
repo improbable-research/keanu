@@ -1,14 +1,19 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.FloatingPointTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
+import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
+import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 
 import java.util.Collections;
 import java.util.Map;
@@ -22,16 +27,17 @@ import java.util.Map;
  * <p>
  * Forward mode differentiation is not implemented due to requiring a tensor trace, which is not yet implemented
  */
-public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Differentiable {
+public class MatrixDeterminantVertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
+    extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
     @ExportVertexToPythonBindings
-    public MatrixDeterminantVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<DoubleTensor, ?> vertex) {
-        super(Tensor.SCALAR_SHAPE, vertex);
+    public MatrixDeterminantVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> vertex) {
+        super(Tensor.SCALAR_SHAPE, vertex, vertex.ofType());
         TensorShapeValidation.checkShapeIsSquareMatrix(vertex.getShape());
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor value) {
+    protected TENSOR op(TENSOR value) {
         return value.matrixDeterminant();
     }
 
@@ -44,7 +50,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
 
         PartialDerivative dOutputTimesDeterminant = derivativeOfOutputWithRespectToSelf
-            .multiplyBy(inputVertex.getValue().matrixDeterminant().scalar());
+            .multiplyBy(inputVertex.getValue().toDouble().matrixDeterminant().scalar());
 
         long[] resultShape = TensorShape.concat(
             derivativeOfOutputWithRespectToSelf.get().getShape(),
@@ -58,7 +64,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
 
         DoubleTensor broadcastedPartial = reshapedPartial.broadcast(resultShape);
 
-        DoubleTensor inverseTranspose = inputVertex.getValue().transpose().matrixInverse();
+        DoubleTensor inverseTranspose = inputVertex.getValue().toDouble().transpose().matrixInverse();
 
         PartialDerivative toInput = new PartialDerivative(broadcastedPartial)
             .multiplyAlongWrtDimensions(inverseTranspose);

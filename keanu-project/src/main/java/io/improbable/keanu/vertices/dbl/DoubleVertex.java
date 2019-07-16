@@ -5,27 +5,18 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGammaVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.FloatingPointTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCosVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CosVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ExpVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.SinVertex;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +25,7 @@ import java.util.function.Function;
 public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPointTensorVertex<Double, DoubleTensor, DoubleVertex> {
 
     //////////////////////////
-    ////  Vertex helpers
+    ////  Vertex helpersx
     //////////////////////////
 
     default void setValue(double value) {
@@ -231,103 +222,33 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     //////////////////////////
 
     @Override
-    default DoubleVertex average() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex standardDeviation() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex standardize() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex ceil() {
-        return new CeilVertex(this);
-    }
-
-    @Override
-    default DoubleVertex round() {
-        return new RoundVertex(this);
+    default DoubleVertex log() {
+        return wrap(new LogVertex<>(this));
     }
 
     @Override
     default DoubleVertex exp() {
-        return new ExpVertex(this);
+        return wrap(new ExpVertex<>(this));
     }
 
     @Override
-    default DoubleVertex logAddExp2(DoubleVertex that) {
-        return null;
+    default DoubleVertex sin() {
+        return wrap(new SinVertex<>(this));
     }
 
     @Override
-    default DoubleVertex logAddExp(DoubleVertex that) {
-        return null;
+    default DoubleVertex cos() {
+        return wrap(new CosVertex<>(this));
     }
 
     @Override
-    default DoubleVertex log1p() {
-        return null;
+    default DoubleVertex asin() {
+        return wrap(new ArcSinVertex<>(this));
     }
 
     @Override
-    default DoubleVertex log2() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex log10() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex exp2() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex expM1() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex replaceNaN(Double value) {
-        return null;
-    }
-
-    @Override
-    default BooleanVertex notNaN() {
-        return null;
-    }
-
-    @Override
-    default BooleanVertex isNaN() {
-        return null;
-    }
-
-    @Override
-    default BooleanVertex isFinite() {
-        return null;
-    }
-
-    @Override
-    default BooleanVertex isInfinite() {
-        return null;
-    }
-
-    @Override
-    default BooleanVertex isNegativeInfinity() {
-        return null;
-    }
-
-    @Override
-    default BooleanVertex isPositiveInfinity() {
-        return null;
+    default DoubleVertex acos() {
+        return wrap(new ArcCosVertex<>(this));
     }
 
     @Override
@@ -341,91 +262,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
-    default DoubleVertex log() {
-        return new LogVertex(this);
-    }
-
-    @Override
-    default DoubleVertex logGamma() {
-        return new LogGammaVertex(this);
-    }
-
-    @Override
-    default DoubleVertex digamma() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex sigmoid() {
-        return new SigmoidVertex(this);
-    }
-
-    @Override
-    default DoubleVertex choleskyDecomposition() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex sin() {
-        return new SinVertex(this);
-    }
-
-    @Override
-    default DoubleVertex cos() {
-        return new CosVertex(this);
-    }
-
-    @Override
-    default DoubleVertex tan() {
-        return new TanVertex(this);
-    }
-
-    @Override
-    default DoubleVertex asin() {
-        return new ArcSinVertex(this);
-    }
-
-    @Override
-    default DoubleVertex acos() {
-        return new ArcCosVertex(this);
-    }
-
-    @Override
-    default DoubleVertex sinh() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex cosh() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex tanh() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex asinh() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex acosh() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex atanh() {
-        return null;
-    }
-
-    @Override
-    default DoubleVertex atan() {
-        return new ArcTanVertex(this);
-    }
-
-    @Override
     default DoubleVertex atan2(Double y) {
         return atan2(new ConstantDoubleVertex(y));
     }
@@ -433,16 +269,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     @Override
     default DoubleVertex atan2(DoubleVertex that) {
         return new ArcTan2Vertex(this, that);
-    }
-
-    @Override
-    default DoubleVertex matrixInverse() {
-        return new MatrixInverseVertex(this);
-    }
-
-    @Override
-    default DoubleVertex matrixDeterminant() {
-        return new MatrixDeterminantVertex(this);
     }
 
     default DoubleUnaryOpLambda<DoubleTensor> lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
