@@ -546,7 +546,7 @@ public class MultinomialVertexTest {
             IntegerTensor sampleForIndexI = samples.slice(1, i);
 
             Double probability = p.getValue(i);
-            double mean = sampleForIndexI.toDouble().average().scalar();
+            double mean = sampleForIndexI.toDouble().mean().scalar();
             double std = sampleForIndexI.toDouble().standardDeviation().scalar();
 
             double epsilonForMean = 0.5;

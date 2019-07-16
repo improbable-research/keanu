@@ -29,9 +29,9 @@ public class IfVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tensor
     protected static final String ELSE_NAME = "else";
 
     @ExportVertexToPythonBindings
-    public IfVertex(@LoadVertexParam(PREDICATE_NAME) TensorVertex<Boolean, BooleanTensor, ?> predicate,
-                    @LoadVertexParam(THEN_NAME) TensorVertex<T, TENSOR, ?> thn,
-                    @LoadVertexParam(ELSE_NAME) TensorVertex<T, TENSOR, ?>els) {
+    public IfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<BooleanTensor, ?> predicate,
+                    @LoadVertexParam(THEN_NAME) Vertex<TENSOR, ?> thn,
+                    @LoadVertexParam(ELSE_NAME) Vertex<TENSOR, ?> els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;

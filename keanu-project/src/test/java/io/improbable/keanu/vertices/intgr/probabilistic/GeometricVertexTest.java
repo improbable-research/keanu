@@ -143,7 +143,7 @@ public class GeometricVertexTest {
 
         double expectedMean = 1 / p;
         double expectedStdDeviation = Math.sqrt((1 - p) / Math.pow(p, 2.0));
-        double actualMean = samples.toDouble().average().scalar();
+        double actualMean = samples.toDouble().mean().scalar();
         double actualStdDeviation = samples.toDouble().standardDeviation().scalar();
 
         assertEquals(expectedMean, actualMean, 1e-3);

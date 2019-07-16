@@ -16,7 +16,7 @@ public class ModelScoring {
      */
     public static double coefficientOfDetermination(DoubleTensor predictedOutput, DoubleTensor trueOutput) {
         double residualSumOfSquares = (trueOutput.minus(predictedOutput).pow(2.)).sumNumber();
-        double totalSumOfSquares = ((trueOutput.minus(trueOutput.average())).pow(2.)).sumNumber();
+        double totalSumOfSquares = ((trueOutput.minus(trueOutput.mean())).pow(2.)).sumNumber();
         return 1 - (residualSumOfSquares / totalSumOfSquares);
     }
 

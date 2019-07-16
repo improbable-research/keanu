@@ -23,7 +23,7 @@ public class BinomialVertexTest {
         BinomialVertex testBinomialVertex = new BinomialVertex(new long[]{1, N}, p, n);
         IntegerTensor samples = testBinomialVertex.sample();
 
-        double mean = samples.toDouble().average().scalar();
+        double mean = samples.toDouble().mean().scalar();
         double std = samples.toDouble().standardDeviation().scalar();
 
         double epsilon = 0.1;

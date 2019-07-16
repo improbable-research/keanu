@@ -577,7 +577,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor average() {
+    public DoubleTensor mean() {
         return new JVMDoubleTensor(buffer.sum() / buffer.getLength());
     }
 
@@ -847,7 +847,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor standardizeInPlace() {
-        return this.minusInPlace(average()).divInPlace(standardDeviation());
+        return this.minusInPlace(mean()).divInPlace(standardDeviation());
     }
 
     @Override

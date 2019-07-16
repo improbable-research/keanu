@@ -105,7 +105,7 @@ public interface BaseFloatingPointTensor<
 
     T standardize();
 
-    T average();
+    T mean();
 
     T standardDeviation();
 }

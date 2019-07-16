@@ -103,7 +103,7 @@ public class DoubleTensorTest {
 
     @Test
     public void canAverage() {
-        assertEquals(2.5, matrixA.average().scalar(), 1e-6);
+        assertEquals(2.5, matrixA.mean().scalar(), 1e-6);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class DoubleTensorTest {
         DoubleTensor A = random.nextGaussian(new long[]{50});
 
         double actual = A.standardDeviation().scalar();
-        double expected = Math.sqrt(A.minus(A.average()).pow(2).sumNumber() / (A.getLength() - 1));
+        double expected = Math.sqrt(A.minus(A.mean()).pow(2).sumNumber() / (A.getLength() - 1));
 
         assertEquals(expected, actual, 1e-3);
     }

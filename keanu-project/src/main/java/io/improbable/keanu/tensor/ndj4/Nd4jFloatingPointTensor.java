@@ -197,12 +197,12 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
 
     @Override
     public TENSOR standardizeInPlace() {
-        tensor.subi(average().scalar()).divi(standardDeviation().scalar());
+        tensor.subi(mean().scalar()).divi(standardDeviation().scalar());
         return getThis();
     }
 
     @Override
-    public TENSOR average() {
+    public TENSOR mean() {
         return create(Nd4j.scalar(tensor.meanNumber().doubleValue()).castTo(tensor.dataType()));
     }
 

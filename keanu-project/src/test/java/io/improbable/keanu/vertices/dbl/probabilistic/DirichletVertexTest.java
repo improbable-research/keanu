@@ -175,9 +175,9 @@ public class DirichletVertexTest {
         DoubleTensor stringTwo = samples.slice(1, 1);
         DoubleTensor stringThree = samples.slice(1, 2);
 
-        double stringOneLength = stringOne.average().scalar();
-        double stringTwoLength = stringTwo.average().scalar();
-        double stringThreeLength = stringThree.average().scalar();
+        double stringOneLength = stringOne.mean().scalar();
+        double stringTwoLength = stringTwo.mean().scalar();
+        double stringThreeLength = stringThree.mean().scalar();
 
         Assert.assertEquals(1.0, stringOneLength + stringTwoLength + stringThreeLength, 1e-3);
         Assert.assertEquals(10. / 18., stringOneLength, 1e-3);

@@ -3,26 +3,51 @@ package io.improbable.keanu.vertices.tensor.number.floating;
 import io.improbable.keanu.BaseFloatingPointTensor;
 import io.improbable.keanu.tensor.FloatingPointTensor;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsFiniteVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsInfiniteVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsNaNVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsNegativeInfinityVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsPositiveInfinityVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotNaNVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.NaNArgMaxVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.NaNArgMinVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ACoshVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ATanhVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinhVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CeilVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecopositionVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CosVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CoshVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.DigammaVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.Exp2Vertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ExpM1Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ExpVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.Log10Vertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.Log1pVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.Log2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.LogGammaVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.MatrixDeterminantVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.MatrixInverseVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.MeanVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ReplaceNaNVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.SinVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.SinhVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.StandardDeviationVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.StandardizeVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanhVertex;
 
 public interface FloatingPointTensorVertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends FloatingPointTensorVertex<T, TENSOR, VERTEX>>
     extends NumberTensorVertex<T, TENSOR, VERTEX>, BaseFloatingPointTensor<BooleanVertex, IntegerVertex, DoubleVertex, T, VERTEX> {
@@ -68,88 +93,88 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
     }
 
     @Override
-    default VERTEX average() {
-        return null;
+    default VERTEX mean() {
+        return wrap(new MeanVertex<>(this));
     }
 
     @Override
     default VERTEX standardDeviation() {
-        return null;
+        return wrap(new StandardDeviationVertex<>(this));
     }
 
     @Override
     default VERTEX standardize() {
-        return null;
+        return wrap(new StandardizeVertex<>(this));
     }
 
     @Override
     default VERTEX logAddExp2(VERTEX that) {
-        return null;
+        return wrap(new LogAddExp2Vertex<>(this, that));
     }
 
     @Override
     default VERTEX logAddExp(VERTEX that) {
-        return null;
+        return wrap(new LogAddExpVertex<>(this, that));
     }
 
     @Override
     default VERTEX log1p() {
-        return null;
+        return wrap(new Log1pVertex<>(this));
     }
 
     @Override
     default VERTEX log2() {
-        return null;
+        return wrap(new Log2Vertex<>(this));
     }
 
     @Override
     default VERTEX log10() {
-        return null;
+        return wrap(new Log10Vertex<>(this));
     }
 
     @Override
     default VERTEX exp2() {
-        return null;
+        return wrap(new Exp2Vertex<>(this));
     }
 
     @Override
     default VERTEX expM1() {
-        return null;
+        return wrap(new ExpM1Vertex<>(this));
     }
 
     @Override
     default VERTEX replaceNaN(T value) {
-        return null;
+        return wrap(new ReplaceNaNVertex<>(this, value));
     }
 
     @Override
     default BooleanVertex notNaN() {
-        return null;
+        return new NotNaNVertex<>(this);
     }
 
     @Override
     default BooleanVertex isNaN() {
-        return null;
+        return new IsNaNVertex<>(this);
     }
 
     @Override
     default BooleanVertex isFinite() {
-        return null;
+        return new IsFiniteVertex<>(this);
     }
 
     @Override
     default BooleanVertex isInfinite() {
-        return null;
+        return new IsInfiniteVertex<>(this);
     }
 
     @Override
     default BooleanVertex isNegativeInfinity() {
-        return null;
+        return new IsNegativeInfinityVertex<>(this);
     }
 
     @Override
     default BooleanVertex isPositiveInfinity() {
-        return null;
+        return new IsPositiveInfinityVertex<>(this);
     }
 
     @Override
@@ -170,7 +195,7 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
 
     @Override
     default VERTEX digamma() {
-        return null;
+        return wrap(new DigammaVertex<>(this));
     }
 
     @Override
@@ -180,37 +205,37 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
 
     @Override
     default VERTEX choleskyDecomposition() {
-        return null;
+        return wrap(new CholeskyDecopositionVertex<>(this));
     }
 
     @Override
     default VERTEX sinh() {
-        return null;
+        return wrap(new SinhVertex<>(this));
     }
 
     @Override
     default VERTEX cosh() {
-        return null;
+        return wrap(new CoshVertex<>(this));
     }
 
     @Override
     default VERTEX tanh() {
-        return null;
+        return wrap(new TanhVertex<>(this));
     }
 
     @Override
     default VERTEX asinh() {
-        return null;
+        return wrap(new ArcSinhVertex<>(this));
     }
 
     @Override
     default VERTEX acosh() {
-        return null;
+        return wrap(new ACoshVertex<>(this));
     }
 
     @Override
     default VERTEX atanh() {
-        return null;
+        return wrap(new ATanhVertex<>(this));
     }
 
     @Override

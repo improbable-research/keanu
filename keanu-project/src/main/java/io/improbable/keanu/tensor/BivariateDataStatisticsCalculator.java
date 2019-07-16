@@ -32,14 +32,14 @@ public class BivariateDataStatisticsCalculator {
      * @return The mean X value from the data set
      */
     public double xMean() {
-        return xData.average().scalar();
+        return xData.mean().scalar();
     }
 
     /**
      * @return The mean Y value from the data set
      */
     public double yMean() {
-        return yData.average().scalar();
+        return yData.mean().scalar();
     }
 
     /**

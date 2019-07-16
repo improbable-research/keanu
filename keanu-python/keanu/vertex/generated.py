@@ -56,17 +56,20 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilis
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanBooleanWhereVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanDoubleWhereVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanIntegerWhereVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToDoubleMaskVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToIntegerMaskVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllFalseVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllTrueVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyFalseVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyTrueVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsFiniteVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsInfiniteVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsNaNVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsNegativeInfinityVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsPositiveInfinityVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotNaNVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
@@ -115,21 +118,40 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.ReshapeVert
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.SliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.TakeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.operators.unary.ModVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ACoshVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ATanhVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCosVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinhVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CeilVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecopositionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CosVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CoshVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.DigammaVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.Exp2Vertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ExpM1Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ExpVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.FloorVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.Log10Vertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.Log1pVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.Log2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.LogGammaVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.LogVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.MatrixDeterminantVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.MatrixInverseVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.MeanVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ReplaceNaNVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.RoundVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.SigmoidVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.SinVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.SinhVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.StandardDeviationVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.StandardizeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanhVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.binary.AdditionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.binary.DifferenceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.binary.DivisionVertex")
@@ -210,20 +232,8 @@ def NumericalEquals(a: vertex_constructor_param_types, b: vertex_constructor_par
     return Boolean(context.jvm_view().NumericalEqualsVertex, label, cast_to_vertex(a), cast_to_vertex(b), cast_to_double(epsilon))
 
 
-def BooleanBooleanWhere(input_vertex: vertex_constructor_param_types, true_value: vertex_constructor_param_types, false_value: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Boolean(context.jvm_view().BooleanBooleanWhereVertex, label, cast_to_boolean_vertex(input_vertex), cast_to_boolean_vertex(true_value), cast_to_boolean_vertex(false_value))
-
-
 def BooleanConcatenation(dimension: int, input: Collection[Vertex], label: Optional[str]=None) -> Vertex:
     return Boolean(context.jvm_view().BooleanConcatenationVertex, label, cast_to_integer(dimension), cast_to_vertex_array(input))
-
-
-def BooleanDoubleWhere(input_vertex: vertex_constructor_param_types, true_value: vertex_constructor_param_types, false_value: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().BooleanDoubleWhereVertex, label, cast_to_boolean_vertex(input_vertex), cast_to_double_vertex(true_value), cast_to_double_vertex(false_value))
-
-
-def BooleanIntegerWhere(input_vertex: vertex_constructor_param_types, true_value: vertex_constructor_param_types, false_value: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().BooleanIntegerWhereVertex, label, cast_to_boolean_vertex(input_vertex), cast_to_integer_vertex(true_value), cast_to_integer_vertex(false_value))
 
 
 def BooleanToDoubleMask(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -250,8 +260,32 @@ def AnyTrue(input_vertex: vertex_constructor_param_types, label: Optional[str]=N
     return Boolean(context.jvm_view().AnyTrueVertex, label, cast_to_boolean_vertex(input_vertex))
 
 
+def IsFinite(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().IsFiniteVertex, label, cast_to_vertex(input_vertex))
+
+
+def IsInfinite(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().IsInfiniteVertex, label, cast_to_vertex(input_vertex))
+
+
+def IsNaN(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().IsNaNVertex, label, cast_to_vertex(input_vertex))
+
+
+def IsNegativeInfinity(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().IsNegativeInfinityVertex, label, cast_to_vertex(input_vertex))
+
+
+def IsPositiveInfinity(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().IsPositiveInfinityVertex, label, cast_to_vertex(input_vertex))
+
+
 def NotBinary(a: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     return Boolean(context.jvm_view().NotBinaryVertex, label, cast_to_boolean_vertex(a))
+
+
+def NotNaN(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Boolean(context.jvm_view().NotNaNVertex, label, cast_to_vertex(input_vertex))
 
 
 def Bernoulli(prob_true: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -541,6 +575,32 @@ def Mod(left: vertex_constructor_param_types, right: vertex_constructor_param_ty
     return Vertex(context.jvm_view().ModVertex, label, cast_to_vertex(left), cast_to_vertex(right))
 
 
+def LogAddExp2(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().LogAddExp2Vertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def LogAddExp(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().LogAddExpVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def ACosh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().ACoshVertex, label, cast_to_vertex(input_vertex))
+
+
+def ATanh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().ATanhVertex, label, cast_to_vertex(input_vertex))
+
+
 def ArcCos(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     Takes the inverse cosine of a vertex, Arccos(vertex)
@@ -557,6 +617,15 @@ def ArcSin(input_vertex: vertex_constructor_param_types, label: Optional[str]=No
     :param input_vertex: the vertex
     """
     return Vertex(context.jvm_view().ArcSinVertex, label, cast_to_vertex(input_vertex))
+
+
+def ArcSinh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().ArcSinhVertex, label, cast_to_vertex(input_vertex))
 
 
 def ArcTan(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -578,6 +647,15 @@ def Ceil(input_vertex: vertex_constructor_param_types, label: Optional[str]=None
     return Vertex(context.jvm_view().CeilVertex, label, cast_to_vertex(input_vertex))
 
 
+def CholeskyDecoposition(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().CholeskyDecopositionVertex, label, cast_to_vertex(input_vertex))
+
+
 def Cos(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     Takes the cosine of a vertex, Cos(vertex)
@@ -585,6 +663,42 @@ def Cos(input_vertex: vertex_constructor_param_types, label: Optional[str]=None)
     :param input_vertex: the vertex
     """
     return Vertex(context.jvm_view().CosVertex, label, cast_to_vertex(input_vertex))
+
+
+def Cosh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().CoshVertex, label, cast_to_vertex(input_vertex))
+
+
+def Digamma(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().DigammaVertex, label, cast_to_vertex(input_vertex))
+
+
+def Exp2(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().Exp2Vertex, label, cast_to_vertex(input_vertex))
+
+
+def ExpM1(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().ExpM1Vertex, label, cast_to_vertex(input_vertex))
 
 
 def Exp(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -604,6 +718,33 @@ def Floor(input_vertex: vertex_constructor_param_types, label: Optional[str]=Non
     :param input_vertex: the vertex to be floor'd
     """
     return Vertex(context.jvm_view().FloorVertex, label, cast_to_vertex(input_vertex))
+
+
+def Log10(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().Log10Vertex, label, cast_to_vertex(input_vertex))
+
+
+def Log1p(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().Log1pVertex, label, cast_to_vertex(input_vertex))
+
+
+def Log2(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().Log2Vertex, label, cast_to_vertex(input_vertex))
 
 
 def LogGamma(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -630,6 +771,19 @@ def MatrixDeterminant(vertex: vertex_constructor_param_types, label: Optional[st
 
 def MatrixInverse(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     return Vertex(context.jvm_view().MatrixInverseVertex, label, cast_to_vertex(input_vertex))
+
+
+def Mean(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().MeanVertex, label, cast_to_vertex(input_vertex))
+
+
+def ReplaceNaN(input_vertex: vertex_constructor_param_types, replace_with_value: float, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().ReplaceNaNVertex, label, cast_to_vertex(input_vertex), cast_to_double(replace_with_value))
 
 
 def Round(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -661,6 +815,28 @@ def Sin(input_vertex: vertex_constructor_param_types, label: Optional[str]=None)
     return Vertex(context.jvm_view().SinVertex, label, cast_to_vertex(input_vertex))
 
 
+def Sinh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().SinhVertex, label, cast_to_vertex(input_vertex))
+
+
+def StandardDeviation(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().StandardDeviationVertex, label, cast_to_vertex(input_vertex))
+
+
+def Standardize(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().StandardizeVertex, label, cast_to_vertex(input_vertex))
+
+
 def Tan(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     Takes the tangent of a vertex. Tan(vertex).
@@ -668,6 +844,15 @@ def Tan(input_vertex: vertex_constructor_param_types, label: Optional[str]=None)
     :param input_vertex: the vertex
     """
     return Vertex(context.jvm_view().TanVertex, label, cast_to_vertex(input_vertex))
+
+
+def Tanh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().TanhVertex, label, cast_to_vertex(input_vertex))
 
 
 def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
