@@ -37,7 +37,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotNaN
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.MultiplexerVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
@@ -59,6 +58,7 @@ import io.improbable.keanu.vertices.tensor.ReshapeVertex;
 import io.improbable.keanu.vertices.tensor.SliceVertex;
 import io.improbable.keanu.vertices.tensor.TakeVertex;
 import io.improbable.keanu.vertices.tensor.number.fixed.operators.unary.ModVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ACoshVertex;
@@ -185,53 +185,55 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(MinUnaryVertex.class, fluentUnaryOp("min"));
 
         //Floating point ops
-        opMappers.put(FloorVertex.class, fluentUnaryOp("floor", "floorInPlace"));
         opMappers.put(CosVertex.class, fluentUnaryOp("cos", "cosInPlace"));
+        opMappers.put(CoshVertex.class, fluentUnaryOp("cosh", "coshInPlace"));
         opMappers.put(ArcCosVertex.class, fluentUnaryOp("acos", "acosInPlace"));
+        opMappers.put(TanhVertex.class, fluentUnaryOp("tanh", "tanhInPlace"));
+        opMappers.put(ATanhVertex.class, fluentUnaryOp("atanh", "atanhInPlace"));
+        opMappers.put(ACoshVertex.class, fluentUnaryOp("acosh", "acoshInPlace"));
+        opMappers.put(SinhVertex.class, fluentUnaryOp("sinh", "sinhInPlace"));
+        opMappers.put(ArcSinhVertex.class, fluentUnaryOp("asinh", "asinhInPlace"));
+        opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
+        opMappers.put(SinVertex.class, fluentUnaryOp("sin", "sinInPlace"));
+        opMappers.put(TanVertex.class, fluentUnaryOp("tan", "tanInPlace"));
+        opMappers.put(ArcSinVertex.class, fluentUnaryOp("asin", "asinInPlace"));
+        opMappers.put(ArcTanVertex.class, fluentUnaryOp("atan", "atanInPlace"));
+
+        opMappers.put(CeilVertex.class, fluentUnaryOp("ceil", "ceilInPlace"));
+        opMappers.put(FloorVertex.class, fluentUnaryOp("floor", "floorInPlace"));
+        opMappers.put(RoundVertex.class, fluentUnaryOp("round", "roundInPlace"));
+
         opMappers.put(ExpVertex.class, fluentUnaryOp("exp", "expInPlace"));
         opMappers.put(LogVertex.class, fluentUnaryOp("log", "logInPlace"));
         opMappers.put(LogGammaVertex.class, fluentUnaryOp("logGamma", "logGammaInPlace"));
-        opMappers.put(SinVertex.class, fluentUnaryOp("sin", "sinInPlace"));
-        opMappers.put(ArcSinVertex.class, fluentUnaryOp("asin", "asinInPlace"));
-        opMappers.put(TanVertex.class, fluentUnaryOp("tan", "tanInPlace"));
-        opMappers.put(ArcTanVertex.class, fluentUnaryOp("atan", "atanInPlace"));
-        opMappers.put(CeilVertex.class, fluentUnaryOp("ceil", "ceilInPlace"));
-        opMappers.put(RoundVertex.class, fluentUnaryOp("round", "roundInPlace"));
+        opMappers.put(Log2Vertex.class, fluentUnaryOp("log2", "log2InPlace"));
+        opMappers.put(Exp2Vertex.class, fluentUnaryOp("exp2", "exp2InPlace"));
+        opMappers.put(Log10Vertex.class, fluentUnaryOp("log10", "log10InPlace"));
+        opMappers.put(LogAddExp2Vertex.class, fluentBinaryOp("logAddExp2"));
+        opMappers.put(LogAddExpVertex.class, fluentBinaryOp("logAddExp2"));
+        opMappers.put(Log1pVertex.class, fluentUnaryOp("log1p", "log1pInPlace"));
+        opMappers.put(ExpM1Vertex.class, fluentUnaryOp("expM1", "expM1InPlace"));
+
+        opMappers.put(DigammaVertex.class, fluentUnaryOp("digamma", "digammaInPlace"));
         opMappers.put(SigmoidVertex.class, fluentUnaryOp("sigmoid", "sigmoidInPlace"));
         opMappers.put(MatrixDeterminantVertex.class, fluentUnaryOp("matrixDeterminant"));
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));
-
-        opMappers.put(Log2Vertex.class, fluentUnaryOp("log2", "log2InPlace"));
-        opMappers.put(CoshVertex.class, fluentUnaryOp("cosh", "coshInPlace"));
-        opMappers.put(NotNaNVertex.class, fluentUnaryOp("notNaN"));
-        opMappers.put(Exp2Vertex.class, fluentUnaryOp("exp2", "exp2InPlace"));
-        opMappers.put(StandardizeVertex.class, fluentUnaryOp("standardize"));
-        opMappers.put(Log10Vertex.class, fluentUnaryOp("log10", "log10InPlace"));
-        opMappers.put(IsNegativeInfinityVertex.class, fluentUnaryOp("isNegativeInfinity"));
-        opMappers.put(TanhVertex.class, fluentUnaryOp("tanh", "tanhInPlace"));
-        opMappers.put(IsNaNVertex.class, fluentUnaryOp("isNaN"));
-        opMappers.put(MeanVertex.class, fluentUnaryOp("mean"));
-        opMappers.put(LogAddExp2Vertex.class, fluentBinaryOp("logAddExp2"));
-        opMappers.put(IsPositiveInfinityVertex.class, fluentUnaryOp("isPositiveInfinity"));
-        opMappers.put(DigammaVertex.class, fluentUnaryOp("digamma", "digammaInPlace"));
-        opMappers.put(IsInfiniteVertex.class, fluentUnaryOp("isInfinite"));
-        opMappers.put(ATanhVertex.class, fluentUnaryOp("atanh", "atanhInPlace"));
-        opMappers.put(ACoshVertex.class, fluentUnaryOp("acosh", "acoshInPlace"));
-        opMappers.put(StandardDeviationVertex.class, fluentUnaryOp("standardDeviation"));
-        opMappers.put(SinhVertex.class, fluentUnaryOp("sinh", "sinhInPlace"));
-        opMappers.put(ReplaceNaNVertex.class, KeanuVertexToTensorOpMapper::replaceNaNOp);
         opMappers.put(CholeskyDecopositionVertex.class, fluentUnaryOp("choleskyDecomposition"));
-        opMappers.put(LogAddExpVertex.class, fluentBinaryOp("logAddExp2"));
+        opMappers.put(StandardizeVertex.class, fluentUnaryOp("standardize"));
+        opMappers.put(MeanVertex.class, fluentUnaryOp("mean"));
+        opMappers.put(StandardDeviationVertex.class, fluentUnaryOp("standardDeviation"));
+        opMappers.put(ReplaceNaNVertex.class, KeanuVertexToTensorOpMapper::replaceNaNOp);
+        opMappers.put(NotNaNVertex.class, fluentUnaryOp("notNaN"));
+        opMappers.put(IsNaNVertex.class, fluentUnaryOp("isNaN"));
+        opMappers.put(IsNegativeInfinityVertex.class, fluentUnaryOp("isNegativeInfinity"));
+        opMappers.put(IsPositiveInfinityVertex.class, fluentUnaryOp("isPositiveInfinity"));
+        opMappers.put(IsInfiniteVertex.class, fluentUnaryOp("isInfinite"));
         opMappers.put(IsFiniteVertex.class, fluentUnaryOp("isFinite"));
-        opMappers.put(Log1pVertex.class, fluentUnaryOp("log1p", "log1pInPlace"));
-        opMappers.put(ArcSinhVertex.class, fluentUnaryOp("asinh", "asinhInPlace"));
-        opMappers.put(ExpM1Vertex.class, fluentUnaryOp("expM1", "expM1InPlace"));
 
         //Fixed point ops
         opMappers.put(ModVertex.class, fluentBinaryOp("mod", "modInPlace"));
 
         //Double ops
-        opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
         opMappers.put(ConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatDoubleOp);
         opMappers.put(CastNumberToDoubleVertex.class, fluentUnaryOp("toDouble"));
         opMappers.put(DoubleProxyVertex.class, KeanuVertexToTensorOpMapper::doubleProxyOp);

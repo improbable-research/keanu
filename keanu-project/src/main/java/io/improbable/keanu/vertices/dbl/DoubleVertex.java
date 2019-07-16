@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.tensor.number.floating.FloatingPointTensorVertex;
@@ -264,11 +263,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     @Override
     default DoubleVertex atan2(Double y) {
         return atan2(new ConstantDoubleVertex(y));
-    }
-
-    @Override
-    default DoubleVertex atan2(DoubleVertex that) {
-        return new ArcTan2Vertex(this, that);
     }
 
     default DoubleUnaryOpLambda<DoubleTensor> lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,

@@ -14,6 +14,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.NaNArgMaxVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.NaNArgMinVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ACoshVertex;
@@ -241,6 +242,11 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
     @Override
     default VERTEX atan() {
         return wrap(new ArcTanVertex<>(this));
+    }
+
+    @Override
+    default VERTEX atan2(VERTEX that) {
+        return wrap(new ArcTan2Vertex<>(this, that));
     }
 
     @Override
