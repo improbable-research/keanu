@@ -10,11 +10,15 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
+import org.apache.commons.math3.util.FastMath;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Exp2Vertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
     extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
+
+    private static final double LN2 = FastMath.log(2);
 
     /**
      * @param inputVertex the vertex
@@ -31,11 +35,14 @@ public class Exp2Vertex<T extends Number, TENSOR extends FloatingPointTensor<T, 
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return null;
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(getValue().times(LN2).toDouble());
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        return null;
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(getValue().times(LN2).toDouble()));
+        return partials;
     }
 }

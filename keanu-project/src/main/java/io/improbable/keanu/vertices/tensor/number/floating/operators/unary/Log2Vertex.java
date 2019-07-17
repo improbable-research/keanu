@@ -18,7 +18,7 @@ import java.util.Map;
 public class Log2Vertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
     extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
 
-    private static final double LN10 = FastMath.log(2);
+    private static final double LN2 = FastMath.log(2);
 
     /**
      * @param inputVertex the vertex
@@ -36,14 +36,14 @@ public class Log2Vertex<T extends Number, TENSOR extends FloatingPointTensor<T, 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return derivativeOfParentWithRespectToInputs.divideByAlongOfDimensions(inputVertex.getValue().times(LN10).toDouble());
+        return derivativeOfParentWithRespectToInputs.divideByAlongOfDimensions(inputVertex.getValue().times(LN2).toDouble());
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         partials.put(inputVertex, derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(inputVertex.getValue().toDouble().times(LN10).reciprocal()));
+            .multiplyAlongWrtDimensions(inputVertex.getValue().toDouble().times(LN2).reciprocal()));
         return partials;
     }
 }

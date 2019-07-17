@@ -11,6 +11,7 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ExpM1Vertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
@@ -31,11 +32,14 @@ public class ExpM1Vertex<T extends Number, TENSOR extends FloatingPointTensor<T,
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return null;
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(getValue().plus(1.0).toDouble());
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        return null;
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(getValue().plus(1.0).toDouble()));
+        return partials;
     }
 }
