@@ -61,14 +61,14 @@ import io.improbable.keanu.vertices.tensor.number.fixed.operators.unary.ModVerte
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex;
-import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ACoshVertex;
-import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ATanhVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCoshVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanhVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinhVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CeilVertex;
-import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecopositionVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecompositionVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CosVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CoshVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.DigammaVertex;
@@ -189,8 +189,8 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(CoshVertex.class, fluentUnaryOp("cosh", "coshInPlace"));
         opMappers.put(ArcCosVertex.class, fluentUnaryOp("acos", "acosInPlace"));
         opMappers.put(TanhVertex.class, fluentUnaryOp("tanh", "tanhInPlace"));
-        opMappers.put(ATanhVertex.class, fluentUnaryOp("atanh", "atanhInPlace"));
-        opMappers.put(ACoshVertex.class, fluentUnaryOp("acosh", "acoshInPlace"));
+        opMappers.put(ArcTanhVertex.class, fluentUnaryOp("atanh", "atanhInPlace"));
+        opMappers.put(ArcCoshVertex.class, fluentUnaryOp("acosh", "acoshInPlace"));
         opMappers.put(SinhVertex.class, fluentUnaryOp("sinh", "sinhInPlace"));
         opMappers.put(ArcSinhVertex.class, fluentUnaryOp("asinh", "asinhInPlace"));
         opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
@@ -218,7 +218,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(SigmoidVertex.class, fluentUnaryOp("sigmoid", "sigmoidInPlace"));
         opMappers.put(MatrixDeterminantVertex.class, fluentUnaryOp("matrixDeterminant"));
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));
-        opMappers.put(CholeskyDecopositionVertex.class, fluentUnaryOp("choleskyDecomposition"));
+        opMappers.put(CholeskyDecompositionVertex.class, fluentUnaryOp("choleskyDecomposition"));
         opMappers.put(StandardizeVertex.class, fluentUnaryOp("standardize"));
         opMappers.put(MeanVertex.class, fluentUnaryOp("mean"));
         opMappers.put(StandardDeviationVertex.class, fluentUnaryOp("standardDeviation"));

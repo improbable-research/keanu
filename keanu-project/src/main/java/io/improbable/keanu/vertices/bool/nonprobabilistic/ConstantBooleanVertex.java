@@ -25,7 +25,7 @@ public class ConstantBooleanVertex extends VertexImpl<BooleanTensor, BooleanVert
         this(BooleanTensor.scalar(constant));
     }
 
-    public ConstantBooleanVertex(boolean[] vector) {
+    public ConstantBooleanVertex(boolean... vector) {
         this(BooleanTensor.create(vector));
     }
 

@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
 
 public class ConcatenationVertexTest {

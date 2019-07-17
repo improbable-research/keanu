@@ -17,14 +17,14 @@ import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex;
-import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ACoshVertex;
-import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ATanhVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCoshVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanhVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinhVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CeilVertex;
-import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecopositionVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecompositionVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CosVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CoshVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.DigammaVertex;
@@ -206,7 +206,7 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
 
     @Override
     default VERTEX choleskyDecomposition() {
-        return wrap(new CholeskyDecopositionVertex<>(this));
+        return wrap(new CholeskyDecompositionVertex<>(this));
     }
 
     @Override
@@ -231,12 +231,12 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
 
     @Override
     default VERTEX acosh() {
-        return wrap(new ACoshVertex<>(this));
+        return wrap(new ArcCoshVertex<>(this));
     }
 
     @Override
     default VERTEX atanh() {
-        return wrap(new ATanhVertex<>(this));
+        return wrap(new ArcTanhVertex<>(this));
     }
 
     @Override
