@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.tensor.number.BinaryOperationTestHelpers.toDiagonalArray;
@@ -23,11 +22,10 @@ public class SinhVertexTest {
     }
 
     @Test
-    @Ignore
     public void calculatesDerivativeOScalarSinh() {
         calculatesDerivativeOfScalar(
             0.5,
-            Math.cos(0.5),
+            Math.cosh(0.5),
             DoubleVertex::sinh
         );
     }
@@ -42,17 +40,15 @@ public class SinhVertexTest {
     }
 
     @Test
-    @Ignore
     public void calculatesDerivativeOfMatrixElementWiseSinh() {
         calculatesDerivativeOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
-            toDiagonalArray(new double[]{Math.cos(0.1), Math.cos(0.2), Math.cos(0.3), Math.cos(0.4)}),
+            toDiagonalArray(new double[]{Math.cosh(0.1), Math.cosh(0.2), Math.cosh(0.3), Math.cosh(0.4)}),
             DoubleVertex::sinh
         );
     }
 
     @Test
-    @Ignore
     public void changesMatchGradient() {
         finiteDifferenceMatchesElementwise(DoubleVertex::sinh);
     }

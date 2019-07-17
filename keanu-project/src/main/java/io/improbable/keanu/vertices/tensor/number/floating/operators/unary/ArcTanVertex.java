@@ -33,25 +33,23 @@ public class ArcTanVertex<T extends Number, TENSOR extends FloatingPointTensor<T
         return value.atan();
     }
 
+    private DoubleTensor dArcTanh(final DoubleTensor inputValue) {
+        //dArcTandx = 1 / (1 + x^2)
+        return inputValue.pow(2.0).plusInPlace(1.0).reciprocalInPlace();
+    }
+
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
         DoubleTensor value = inputVertex.getValue().toDouble();
-
-        DoubleTensor dArcTan = value.pow(2.0).plusInPlace(1.0).reciprocalInPlace();
-        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcTan);
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcTanh(value));
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        DoubleTensor inputValue = inputVertex.getValue().toDouble();
-
-        //dArcTandx = 1 / (1 + x^2)
-        DoubleTensor dSelfWrtInput = inputValue.pow(2.0).plusInPlace(1.0).reciprocalInPlace();
-
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput));
-
+        DoubleTensor inputValue = inputVertex.getValue().toDouble();
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dArcTanh(inputValue)));
         return partials;
     }
 }

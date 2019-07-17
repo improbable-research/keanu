@@ -1,14 +1,17 @@
 package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 
+import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.apache.commons.math3.util.FastMath;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.function.Function;
+
 import static io.improbable.keanu.vertices.tensor.number.BinaryOperationTestHelpers.toDiagonalArray;
+import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.tensor.number.UnaryOperationTestHelpers.calculatesDerivativeOfMatrixElementWiseOperator;
 import static io.improbable.keanu.vertices.tensor.number.UnaryOperationTestHelpers.calculatesDerivativeOfScalar;
-import static io.improbable.keanu.vertices.tensor.number.UnaryOperationTestHelpers.finiteDifferenceMatchesElementwise;
 import static io.improbable.keanu.vertices.tensor.number.UnaryOperationTestHelpers.operatesOn2x2MatrixVertexValues;
 import static io.improbable.keanu.vertices.tensor.number.UnaryOperationTestHelpers.operatesOnScalarVertexValue;
 
@@ -24,11 +27,10 @@ public class ArcCoshVertexTest {
     }
 
     @Test
-    @Ignore
     public void calculatesDerivativeOScalarACosh() {
         calculatesDerivativeOfScalar(
-            0.5,
-            -1.0 / Math.sqrt(1.0 - 0.5 * 0.5),
+            1.5,
+            1.0 / Math.sqrt(1.5 * 1.5 -1),
             DoubleVertex::acosh
         );
     }
@@ -43,24 +45,34 @@ public class ArcCoshVertexTest {
     }
 
     @Test
-    @Ignore
     public void calculatesDerivativeOfMatrixElementWiseACosh() {
         calculatesDerivativeOfMatrixElementWiseOperator(
-            new double[]{0.1, 0.2, 0.3, 0.4},
+            new double[]{1.1, 1.2, 1.3, 1.4},
             toDiagonalArray(new double[]{
-                -1.0 / Math.sqrt(1.0 - 0.1 * 0.1),
-                -1.0 / Math.sqrt(1.0 - 0.2 * 0.2),
-                -1.0 / Math.sqrt(1.0 - 0.3 * 0.3),
-                -1.0 / Math.sqrt(1.0 - 0.4 * 0.4)
+                1.0 / Math.sqrt(1.1 * 1.1 - 1),
+                1.0 / Math.sqrt(1.2 * 1.2 - 1),
+                1.0 / Math.sqrt(1.3 * 1.3 - 1),
+                1.0 / Math.sqrt(1.4 * 1.4 - 1)
             }),
             DoubleVertex::acosh
         );
     }
 
     @Test
-    @Ignore
     public void changesMatchGradient() {
         finiteDifferenceMatchesElementwise(DoubleVertex::acosh);
+    }
+
+    public <T extends DoubleVertex> void finiteDifferenceMatchesElementwise(Function<UniformVertex, T> op) {
+        testWithFiniteDifference(op, new long[0]);
+        testWithFiniteDifference(op, new long[]{3});
+        testWithFiniteDifference(op, new long[]{2, 3});
+        testWithFiniteDifference(op, new long[]{2, 2, 2});
+    }
+
+    public <T extends DoubleVertex> void testWithFiniteDifference(Function<UniformVertex, T> op, long[] shape) {
+        UniformVertex A = new UniformVertex(shape, 1.1, 1.9);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A), op.apply(A), 1e-10, 1e-10);
     }
 
 }

@@ -33,30 +33,23 @@ public class ArcCosVertex<T extends Number, TENSOR extends FloatingPointTensor<T
         return value.acos();
     }
 
+    private DoubleTensor dArcCos(final DoubleTensor inputValue) {
+        //dArcCosdx = -1 / sqrt(1 - x^2)
+        return inputValue.times(inputValue).reverseMinusInPlace(1.0).sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
+    }
+
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-
         DoubleTensor inputValue = inputVertex.getValue().toDouble();
-
-        DoubleTensor dArcCos = inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1.0)
-            .sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
-        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcCos);
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcCos(inputValue));
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        DoubleTensor inputValue = inputVertex.getValue().toDouble();
-
-        //dArcCosdx = -1 / sqrt(1 - x^2)
-        DoubleTensor dSelfWrtInput = inputValue.pow(2).unaryMinusInPlace().plusInPlace(1.0)
-            .sqrtInPlace()
-            .reciprocalInPlace()
-            .unaryMinusInPlace();
-
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput));
-
+        DoubleTensor inputValue = inputVertex.getValue().toDouble();
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dArcCos(inputValue)));
         return partials;
     }
 }

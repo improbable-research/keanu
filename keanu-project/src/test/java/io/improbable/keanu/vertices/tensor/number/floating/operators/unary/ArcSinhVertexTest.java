@@ -24,11 +24,10 @@ public class ArcSinhVertexTest {
     }
 
     @Test
-    @Ignore
     public void calculatesDerivativeOfTwoScalarsAsinh() {
         calculatesDerivativeOfScalar(
             0.5,
-            1.0 / Math.sqrt(1.0 - 0.5 * 0.5),
+            1.0 / Math.sqrt(0.5 * 0.5 + 1),
             DoubleVertex::asinh
         );
     }
@@ -43,22 +42,20 @@ public class ArcSinhVertexTest {
     }
 
     @Test
-    @Ignore
     public void calculatesDerivativeOfTwoMatricesElementWiseAsinh() {
         calculatesDerivativeOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
             toDiagonalArray(new double[]{
-                1.0 / Math.sqrt(1.0 - 0.1 * 0.1),
-                1.0 / Math.sqrt(1.0 - 0.2 * 0.2),
-                1.0 / Math.sqrt(1.0 - 0.3 * 0.3),
-                1.0 / Math.sqrt(1.0 - 0.4 * 0.4)
+                1.0 / Math.sqrt(0.1 * 0.1 + 1),
+                1.0 / Math.sqrt(0.2 * 0.2 + 1),
+                1.0 / Math.sqrt(0.3 * 0.3 + 1),
+                1.0 / Math.sqrt(0.4 * 0.4 + 1)
             }),
             DoubleVertex::asinh
         );
     }
 
     @Test
-    @Ignore
     public void changesMatchGradient() {
         finiteDifferenceMatchesElementwise(DoubleVertex::asinh);
     }

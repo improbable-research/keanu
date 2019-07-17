@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.util.FastMath;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.tensor.number.BinaryOperationTestHelpers.toDiagonalArray;
@@ -24,11 +23,10 @@ public class CoshVertexTest {
     }
 
     @Test
-    @Ignore
     public void calculatesDerivativeOScalarCosh() {
         calculatesDerivativeOfScalar(
             0.5,
-            -Math.sin(0.5),
+            Math.sinh(0.5),
             DoubleVertex::cosh
         );
     }
@@ -43,17 +41,15 @@ public class CoshVertexTest {
     }
 
     @Test
-    @Ignore
     public void calculatesDerivativeOfMatrixElementWiseCosh() {
         calculatesDerivativeOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
-            toDiagonalArray(new double[]{-Math.sin(0.1), -Math.sin(0.2), -Math.sin(0.3), -Math.sin(0.4)}),
+            toDiagonalArray(new double[]{Math.sinh(0.1), Math.sinh(0.2), Math.sinh(0.3), Math.sinh(0.4)}),
             DoubleVertex::cosh
         );
     }
 
     @Test
-    @Ignore
     public void changesMatchGradient() {
         finiteDifferenceMatchesElementwise(DoubleVertex::cosh);
     }

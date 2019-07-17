@@ -33,28 +33,26 @@ public class ArcSinVertex<T extends Number, TENSOR extends FloatingPointTensor<T
         return value.asin();
     }
 
+    private DoubleTensor dArcSin(final DoubleTensor inputValue) {
+        //dArcSindx = 1 / sqrt(1 - x^2)
+        return inputValue.times(inputValue).reverseMinusInPlace(1.0).sqrtInPlace().reciprocalInPlace();
+    }
+
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
         DoubleTensor inputValue = inputVertex.getValue().toDouble();
 
-        DoubleTensor dArcSin = (inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1.0))
-            .sqrtInPlace().reciprocalInPlace();
-        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcSin);
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcSin(inputValue));
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         DoubleTensor inputValue = inputVertex.getValue().toDouble();
 
-        //dArcSindx = 1 / sqrt(1 - x^2)
-        DoubleTensor dSelfWrtInput = inputValue.pow(2.0).unaryMinusInPlace().plusInPlace(1.0)
-            .sqrtInPlace()
-            .reciprocalInPlace();
-
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dArcSin(inputValue)));
 
         return partials;
     }

@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.FloatingPointTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -11,6 +12,7 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ArcTanhVertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
@@ -29,13 +31,23 @@ public class ArcTanhVertex<T extends Number, TENSOR extends FloatingPointTensor<
         return value.atanh();
     }
 
+    private DoubleTensor dArcTanh(final DoubleTensor inputValue) {
+        //dArcTanhdx = 1 / (1 - x^2)
+        return inputValue.times(inputValue).reverseMinusInPlace(1.0).reciprocalInPlace();
+    }
+
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return null;
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        DoubleTensor inputValue = inputVertex.getValue().toDouble();
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcTanh(inputValue));
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        return null;
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+        DoubleTensor inputValue = inputVertex.getValue().toDouble();
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dArcTanh(inputValue)));
+        return partials;
     }
 }

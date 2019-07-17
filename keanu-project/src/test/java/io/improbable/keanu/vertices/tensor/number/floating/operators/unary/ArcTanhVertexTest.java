@@ -24,11 +24,10 @@ public class ArcTanhVertexTest {
     }
 
     @Test
-    @Ignore
     public void calculatesDerivativeOfTwoScalarsAtanh() {
         calculatesDerivativeOfScalar(
             0.5,
-            1.0 / (1.0 + 0.5 * 0.5),
+            1.0 / (1.0 - 0.5 * 0.5),
             DoubleVertex::atanh
         );
     }
@@ -43,22 +42,20 @@ public class ArcTanhVertexTest {
     }
 
     @Test
-    @Ignore
     public void calculatesDerivativeOfTwoMatricesElementWiseAtanh() {
         calculatesDerivativeOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
             toDiagonalArray(new double[]{
-                1.0 / (1.0 + 0.1 * 0.1),
-                1.0 / (1.0 + 0.2 * 0.2),
-                1.0 / (1.0 + 0.3 * 0.3),
-                1.0 / (1.0 + 0.4 * 0.4)
+                1.0 / (1.0 - 0.1 * 0.1),
+                1.0 / (1.0 - 0.2 * 0.2),
+                1.0 / (1.0 - 0.3 * 0.3),
+                1.0 / (1.0 - 0.4 * 0.4)
             }),
             DoubleVertex::atanh
         );
     }
 
     @Test
-    @Ignore
     public void changesMatchGradient() {
         finiteDifferenceMatchesElementwise(DoubleVertex::atanh);
     }
