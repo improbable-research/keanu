@@ -11,11 +11,31 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 import java.util.function.Function;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class UnaryOperationTestHelpers {
+
+    public static void operatesOnInput(Function<DoubleTensor, DoubleTensor> tensorOp,
+                                       Function<DoubleVertex, DoubleVertex> vertexOp) {
+        operatesOnInput(matrixPositiveRange(), tensorOp, vertexOp);
+    }
+
+    public static void operatesOnInput(DoubleTensor input,
+                                       Function<DoubleTensor, DoubleTensor> tensorOp,
+                                       Function<DoubleVertex, DoubleVertex> vertexOp) {
+
+        ConstantDoubleVertex A = ConstantVertex.of(input);
+
+        assertThat(tensorOp.apply(input), valuesWithinEpsilonAndShapesMatch(vertexOp.apply(A).getValue(), 1e-5));
+    }
+
+    private static DoubleTensor matrixPositiveRange() {
+        return DoubleTensor.linspace(0.1, 0.9, 4).reshape(2, 2);
+    }
 
     public static void operatesOnScalarVertexValue(double aValue,
                                                    double expected,

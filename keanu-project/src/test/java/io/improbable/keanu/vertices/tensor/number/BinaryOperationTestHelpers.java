@@ -3,18 +3,43 @@ package io.improbable.keanu.vertices.tensor.number;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 import java.util.function.BiFunction;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class BinaryOperationTestHelpers {
+
+    public static void operatesOnInput(BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> tensorOp,
+                                       BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> vertexOp) {
+        operatesOnInput(matrixPositiveRange(), matrixPositiveRange(), tensorOp, vertexOp);
+    }
+
+    public static void operatesOnInput(DoubleTensor left,
+                                       DoubleTensor right,
+                                       BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> tensorOp,
+                                       BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> vertexOp) {
+
+        ConstantDoubleVertex A = ConstantVertex.of(left);
+        ConstantDoubleVertex B = ConstantVertex.of(right);
+
+        assertThat(tensorOp.apply(left, right), valuesWithinEpsilonAndShapesMatch(vertexOp.apply(A, B).getValue(), 1e-5));
+    }
+
+    private static DoubleTensor matrixPositiveRange() {
+        return DoubleTensor.linspace(0.1, 0.9, 4).reshape(2, 2);
+    }
+
 
     public static void operatesOnTwoScalarVertexValues(double aValue,
                                                        double bValue,
