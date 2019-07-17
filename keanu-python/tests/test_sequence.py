@@ -294,7 +294,7 @@ def test_proxy_vertices_are_correctly_typed() -> None:
         int_vertex = previous_int_vertex + 1
         int_vertex.set_label("int_vertex")
         sequence_item.add(int_vertex)
-        assert int_vertex._class == "IntegerAdditionVertex"
+        assert int_vertex._class == "AdditionVertex"
         assert type(int_vertex) == Integer
 
         bool_vertex = previous_bool_vertex == True

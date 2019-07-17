@@ -74,7 +74,6 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.probabilistic
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.BetaVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
@@ -118,6 +117,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.ReshapeVert
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.SliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.TakeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.operators.unary.ModVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ACoshVertex")
@@ -308,16 +308,6 @@ def ConstantDouble(constant: tensor_arg_types, label: Optional[str]=None) -> Ver
 
 def DoubleProxy(shape: Collection[int], label: str) -> Vertex:
     return Double(context.jvm_view().DoubleProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label))
-
-
-def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin
-    
-    :param x: x coordinate
-    :param y: y coordinate
-    """
-    return Double(context.jvm_view().ArcTan2Vertex, label, cast_to_double_vertex(x), cast_to_double_vertex(y))
 
 
 def Concatenation(dimension: int, operands: Collection[Vertex], label: Optional[str]=None) -> Vertex:
@@ -573,6 +563,16 @@ def Take(input_vertex: vertex_constructor_param_types, index: Collection[int], l
 
 def Mod(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     return Vertex(context.jvm_view().ModVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin
+    
+    :param x: x coordinate
+    :param y: y coordinate
+    """
+    return Vertex(context.jvm_view().ArcTan2Vertex, label, cast_to_vertex(x), cast_to_vertex(y))
 
 
 def LogAddExp2(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
