@@ -52,11 +52,11 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.NaNAr
 import io.improbable.keanu.vertices.tensor.BroadcastVertex;
 import io.improbable.keanu.vertices.tensor.DiagVertex;
 import io.improbable.keanu.vertices.tensor.GetBooleanIndexVertex;
-import io.improbable.keanu.vertices.tensor.IfVertex;
 import io.improbable.keanu.vertices.tensor.PermuteVertex;
 import io.improbable.keanu.vertices.tensor.ReshapeVertex;
 import io.improbable.keanu.vertices.tensor.SliceVertex;
 import io.improbable.keanu.vertices.tensor.TakeVertex;
+import io.improbable.keanu.vertices.tensor.WhereVertex;
 import io.improbable.keanu.vertices.tensor.number.fixed.operators.unary.ModVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex;
@@ -154,7 +154,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(DiagVertex.class, fluentUnaryOp("diag"));
         opMappers.put(GetBooleanIndexVertex.class, fluentBinaryOp("get"));
 
-        opMappers.put(IfVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
+        opMappers.put(WhereVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
 
         //Number ops
         opMappers.put(DifferenceVertex.class, fluentBinaryOp("minus", "minusInPlace"));
@@ -590,11 +590,11 @@ public class KeanuVertexToTensorOpMapper {
     }
 
     private static String genericIfOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        IfVertex ifVertex = (IfVertex) vertex;
+        WhereVertex whereVertex = (WhereVertex) vertex;
 
-        Vertex<BooleanTensor, ?> predicate = ifVertex.getPredicate();
-        Vertex<?, ?> thn = ifVertex.getThn();
-        Vertex<?, ?> els = ifVertex.getEls();
+        Vertex<BooleanTensor, ?> predicate = whereVertex.getPredicate();
+        Vertex<?, ?> thn = whereVertex.getThn();
+        Vertex<?, ?> els = whereVertex.getEls();
 
         String predicateName = lookup.get(predicate.getId()).getName();
         String thnName = lookup.get(thn.getId()).getName();

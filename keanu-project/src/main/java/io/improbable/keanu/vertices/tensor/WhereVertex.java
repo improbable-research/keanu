@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class IfVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
+public class WhereVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
     extends VertexImpl<TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, TensorVertex<T, TENSOR, VERTEX>, Differentiable {
 
     private final Vertex<BooleanTensor, ?> predicate;
@@ -29,9 +29,9 @@ public class IfVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tensor
     protected static final String ELSE_NAME = "else";
 
     @ExportVertexToPythonBindings
-    public IfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<BooleanTensor, ?> predicate,
-                    @LoadVertexParam(THEN_NAME) Vertex<TENSOR, ?> thn,
-                    @LoadVertexParam(ELSE_NAME) Vertex<TENSOR, ?> els) {
+    public WhereVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<BooleanTensor, ?> predicate,
+                       @LoadVertexParam(THEN_NAME) Vertex<TENSOR, ?> thn,
+                       @LoadVertexParam(ELSE_NAME) Vertex<TENSOR, ?> els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;

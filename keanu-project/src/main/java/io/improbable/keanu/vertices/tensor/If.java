@@ -71,7 +71,7 @@ public class If {
         }
 
         public GenericTensorVertex<T> orElse(TensorVertex<T, GenericTensor<T>, ?> els) {
-            return new GenericVertexWrapper<>(new IfVertex<>(predicate, thn, els));
+            return new GenericVertexWrapper<>(new WhereVertex<>(predicate, thn, els));
         }
     }
 
@@ -87,7 +87,7 @@ public class If {
         }
 
         public BooleanVertex orElse(TensorVertex<Boolean, BooleanTensor, ?> els) {
-            return new BooleanVertexWrapper(new IfVertex<>(predicate, thn, els));
+            return new BooleanVertexWrapper(new WhereVertex<>(predicate, thn, els));
         }
 
         public BooleanVertex orElse(boolean els) {
@@ -107,7 +107,7 @@ public class If {
         }
 
         public DoubleVertex orElse(TensorVertex<Double, DoubleTensor, ?> els) {
-            return new DoubleVertexWrapper(new IfVertex<>(predicate, thn, els));
+            return new DoubleVertexWrapper(new WhereVertex<>(predicate, thn, els));
         }
 
         public DoubleVertex orElse(double els) {
@@ -127,7 +127,7 @@ public class If {
         }
 
         public IntegerVertex orElse(TensorVertex<Integer, IntegerTensor, ?> els) {
-            return new IntegerVertexWrapper(new IfVertex<>(predicate, thn, els));
+            return new IntegerVertexWrapper(new WhereVertex<>(predicate, thn, els));
         }
 
         public IntegerVertex orElse(int els) {

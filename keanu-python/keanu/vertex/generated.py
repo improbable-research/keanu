@@ -111,23 +111,23 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.BroadcastVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.DiagVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.IfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.PermuteVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.ReshapeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.SliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.TakeVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.WhereVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.operators.unary.ModVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ACoshVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ATanhVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCosVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCoshVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinhVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanhVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CeilVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecopositionVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecompositionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CosVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CoshVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.DigammaVertex")
@@ -534,10 +534,6 @@ def Diag(input_vertex: vertex_constructor_param_types, label: Optional[str]=None
     return Vertex(context.jvm_view().DiagVertex, label, cast_to_vertex(input_vertex))
 
 
-def If(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().IfVertex, label, cast_to_boolean_vertex(predicate), cast_to_vertex(thn), cast_to_vertex(els))
-
-
 def Permute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], label: Optional[str]=None) -> Vertex:
     return Vertex(context.jvm_view().PermuteVertex, label, cast_to_vertex(input_vertex), cast_to_int_array(rearrange))
 
@@ -559,6 +555,10 @@ def Slice(input_vertex: vertex_constructor_param_types, dimension: int, index: i
 
 def Take(input_vertex: vertex_constructor_param_types, index: Collection[int], label: Optional[str]=None) -> Vertex:
     return Vertex(context.jvm_view().TakeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(index))
+
+
+def Where(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().WhereVertex, label, cast_to_boolean_vertex(predicate), cast_to_vertex(thn), cast_to_vertex(els))
 
 
 def Mod(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -583,24 +583,6 @@ def LogAddExp(left: vertex_constructor_param_types, right: vertex_constructor_pa
     return Vertex(context.jvm_view().LogAddExpVertex, label, cast_to_vertex(left), cast_to_vertex(right))
 
 
-def ACosh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    
-    
-    :param input_vertex: the vertex
-    """
-    return Vertex(context.jvm_view().ACoshVertex, label, cast_to_vertex(input_vertex))
-
-
-def ATanh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    
-    
-    :param input_vertex: the vertex
-    """
-    return Vertex(context.jvm_view().ATanhVertex, label, cast_to_vertex(input_vertex))
-
-
 def ArcCos(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     Takes the inverse cosine of a vertex, Arccos(vertex)
@@ -608,6 +590,15 @@ def ArcCos(input_vertex: vertex_constructor_param_types, label: Optional[str]=No
     :param input_vertex: the vertex
     """
     return Vertex(context.jvm_view().ArcCosVertex, label, cast_to_vertex(input_vertex))
+
+
+def ArcCosh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().ArcCoshVertex, label, cast_to_vertex(input_vertex))
 
 
 def ArcSin(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -637,6 +628,15 @@ def ArcTan(input_vertex: vertex_constructor_param_types, label: Optional[str]=No
     return Vertex(context.jvm_view().ArcTanVertex, label, cast_to_vertex(input_vertex))
 
 
+def ArcTanh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().ArcTanhVertex, label, cast_to_vertex(input_vertex))
+
+
 def Ceil(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     Applies the Ceiling operator to a vertex.
@@ -647,13 +647,13 @@ def Ceil(input_vertex: vertex_constructor_param_types, label: Optional[str]=None
     return Vertex(context.jvm_view().CeilVertex, label, cast_to_vertex(input_vertex))
 
 
-def CholeskyDecoposition(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+def CholeskyDecomposition(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
     
     
     :param input_vertex: the vertex
     """
-    return Vertex(context.jvm_view().CholeskyDecopositionVertex, label, cast_to_vertex(input_vertex))
+    return Vertex(context.jvm_view().CholeskyDecompositionVertex, label, cast_to_vertex(input_vertex))
 
 
 def Cos(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

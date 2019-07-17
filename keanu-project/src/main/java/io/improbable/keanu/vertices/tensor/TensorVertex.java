@@ -38,7 +38,7 @@ public interface TensorVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extend
     }
 
     default VERTEX where(BooleanVertex predicate, VERTEX els) {
-        return wrap(new IfVertex<>(predicate, this, els));
+        return wrap(new WhereVertex<>(predicate, this, els));
     }
 
     default VERTEX take(long... index) {

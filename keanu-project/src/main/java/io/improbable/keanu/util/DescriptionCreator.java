@@ -14,8 +14,8 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
-import io.improbable.keanu.vertices.tensor.IfVertex;
 import io.improbable.keanu.vertices.tensor.VertexWrapper;
+import io.improbable.keanu.vertices.tensor.WhereVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.binary.DivisionVertex;
@@ -165,8 +165,8 @@ public class DescriptionCreator {
     }
 
     private Optional<String> checkForIrregularExpressions(Vertex<?, ?> vertex, boolean includeBrackets) {
-        if (vertex instanceof IfVertex) {
-            return createIfStringDescription((IfVertex<?, ?, ?>) vertex, includeBrackets);
+        if (vertex instanceof WhereVertex) {
+            return createIfStringDescription((WhereVertex<?, ?, ?>) vertex, includeBrackets);
         } else if (vertex instanceof BooleanBinaryOpVertex) {
             String booleanBinaryDescription = createBooleanBinaryOpDescription(
                 (BooleanBinaryOpVertex) vertex,
@@ -178,7 +178,7 @@ public class DescriptionCreator {
         return Optional.empty();
     }
 
-    private Optional<String> createIfStringDescription(IfVertex<?, ?, ?> vertex, boolean includeBrackets) {
+    private Optional<String> createIfStringDescription(WhereVertex<?, ?, ?> vertex, boolean includeBrackets) {
         Vertex<BooleanTensor, ?> predicate = vertex.getPredicate();
         Vertex<?, ?> thn = vertex.getThn();
         Vertex<?, ?> els = vertex.getEls();
