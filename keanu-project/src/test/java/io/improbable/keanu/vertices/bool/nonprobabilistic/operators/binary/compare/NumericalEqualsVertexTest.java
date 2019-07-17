@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.comp
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;

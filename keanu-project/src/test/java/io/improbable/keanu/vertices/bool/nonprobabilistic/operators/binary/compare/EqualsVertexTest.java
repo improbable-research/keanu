@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.comp
 
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
