@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.util.FastMath;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.tensor.number.BinaryOperationTestHelpers.toDiagonalArray;

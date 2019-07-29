@@ -69,7 +69,7 @@ public class AutoDiffBroadcast {
         return partial.isPresent() && !Arrays.equals(actualShape, expectedShape);
     }
 
-    private static int[] dimensionsWithShapeChange(long[] partialShape, int partialWrtRank, long[] wrtShape) {
+    public static int[] dimensionsWithShapeChange(long[] partialShape, int partialWrtRank, long[] wrtShape) {
 
         final int partialRank = partialShape.length;
         final int wrtRank = wrtShape.length;
