@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
-
 /**
  * This class is meant to help with auto diff in operations that support implicit broadcasting. E.g. In
  * addition/subtraction/multiplication/division scalar operands can be operated with non-scalar operands.
@@ -21,40 +19,43 @@ public class AutoDiffBroadcast {
     public static PartialDerivative correctForBroadcastPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
 
         if (shouldCorrectPartialForBroadcast(partial, partialOfShape, targetOfShape)) {
-
-            long[] wrtShape = partial.getWrtShape(partialOfShape);
-            long[] resultShape = TensorShape.concat(targetOfShape, wrtShape);
-            long[] upRankedPartialShape = shapeToDesiredRankByPrependingOnes(partial.get().getShape(), resultShape.length);
-
-            DoubleTensor correctedPartial = partial.get()
-                .reshape(upRankedPartialShape)
-                .broadcast(resultShape);
-
-            return new PartialDerivative(correctedPartial);
+            return broadcastPartialForward(partial, partialOfShape, targetOfShape);
         } else {
             return partial;
         }
     }
 
+    public static PartialDerivative broadcastPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
+        long[] wrtShape = partial.getWrtShape(partialOfShape);
+        long[] resultShape = TensorShape.concat(targetOfShape, wrtShape);
+
+        DoubleTensor correctedPartial = partial.get().broadcast(resultShape);
+
+        return new PartialDerivative(correctedPartial);
+    }
+
     public static PartialDerivative correctForBroadcastPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
 
         if (shouldCorrectPartialForBroadcast(partial, partialWrtShape, targetWrtShape)) {
-
-            long[] partialShape = partial.get().getShape();
-
-            int[] broadcastDimensions = dimensionsWithShapeChange(partialShape, partialWrtShape.length, targetWrtShape);
-
-            DoubleTensor partialSummed = partial.get().sum(broadcastDimensions);
-
-            long[] resultShape = TensorShape.concat(
-                partial.getOfShape(partialWrtShape),
-                targetWrtShape
-            );
-
-            return new PartialDerivative(partialSummed.reshape(resultShape));
+            return broadcastPartialReverse(partial, partialWrtShape, targetWrtShape);
         } else {
             return partial;
         }
+    }
+
+    public static PartialDerivative broadcastPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
+        long[] partialShape = partial.get().getShape();
+
+        int[] broadcastDimensions = dimensionsWithShapeChange(partialShape, partialWrtShape.length, targetWrtShape);
+
+        DoubleTensor partialSummed = partial.get().sum(broadcastDimensions);
+
+        long[] resultShape = TensorShape.concat(
+            partial.getOfShape(partialWrtShape),
+            targetWrtShape
+        );
+
+        return new PartialDerivative(partialSummed.reshape(resultShape));
     }
 
     /**
