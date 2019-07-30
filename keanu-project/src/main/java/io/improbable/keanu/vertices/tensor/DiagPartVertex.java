@@ -27,8 +27,8 @@ public class DiagPartVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
     }
 
     @Override
-    protected TENSOR op(TENSOR l) {
-        return l.diagPart();
+    protected TENSOR op(TENSOR input) {
+        return input.diagPart();
     }
 
     @Override

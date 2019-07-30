@@ -8,13 +8,14 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardModeGradient;
+import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesReverseModeGradient;
 
 public class DiagVertexTest {
 
     @Test
     @Ignore
-    public void changesMatchGradient() {
+    public void changesMatchGradientForward() {
         UniformVertex inputA = new UniformVertex(new long[]{2, 2}, -10.0, 10.0);
         DoubleVertex diag = inputA.diag();
         DoubleVertex outputVertex = diag.times(
@@ -24,6 +25,48 @@ public class DiagVertexTest {
         final double INCREMENT = 10;
         final double DELTA = 1e-10;
 
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
+        finiteDifferenceMatchesForwardModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
+    }
+
+    @Test
+    public void changesMatchGradientReverse() {
+        UniformVertex inputA = new UniformVertex(new long[]{2, 2}, -10.0, 10.0);
+        DoubleVertex diag = inputA.diag();
+        DoubleVertex outputVertex = diag.times(
+            new ConstantDoubleVertex(DoubleTensor.arange(1, 3))
+        );
+
+        final double INCREMENT = 10;
+        final double DELTA = 1e-10;
+
+        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
+    }
+
+    @Test
+    public void changesMatchGradientReverseWithWideMatrix() {
+        UniformVertex inputA = new UniformVertex(new long[]{2, 3}, -10.0, 10.0);
+        DoubleVertex diag = inputA.diag();
+        DoubleVertex outputVertex = diag.times(
+            new ConstantDoubleVertex(DoubleTensor.arange(1, 2))
+        );
+
+        final double INCREMENT = 10;
+        final double DELTA = 1e-10;
+
+        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
+    }
+
+    @Test
+    public void changesMatchGradientReverseWithNarrowMatrix() {
+        UniformVertex inputA = new UniformVertex(new long[]{3, 2}, -10.0, 10.0);
+        DoubleVertex diag = inputA.diag();
+        DoubleVertex outputVertex = diag.times(
+            new ConstantDoubleVertex(DoubleTensor.arange(1, 2))
+        );
+
+        final double INCREMENT = 10;
+        final double DELTA = 1e-10;
+
+        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
     }
 }
