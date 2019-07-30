@@ -94,6 +94,36 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
         }
     }
 
+    /**
+     * Nd4j DiagPart doesnt support non-square matrix diag. In the case where this is non-square
+     * the JVMDoubleTensor implementation is used. For square matrices, the nd4j implementation is used.
+     *
+     * @return matrices with their diagonals equal to the batched vectors from this.
+     */
+    @Override
+    public IntegerTensor diag() {
+        if (getRank() > 1) {
+            return toDouble().diag().toInteger();
+        } else {
+            return super.diag();
+        }
+    }
+
+    /**
+     * Nd4j DiagPart doesnt support non-square matrix diag. In the case where this is non-square
+     * the JVMDoubleTensor implementation is used. For square matrices, the nd4j implementation is used.
+     *
+     * @return The elements from the diagonal of this matrix.
+     */
+    @Override
+    public IntegerTensor diagPart() {
+        if (tensor.size(0) != tensor.size(1)) {
+            return toDouble().diagPart().toInteger();
+        } else {
+            return super.diagPart();
+        }
+    }
+
     @Override
     protected Integer getNumber(Number number) {
         return number.intValue();

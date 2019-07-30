@@ -50,6 +50,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.ArgMi
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.NaNArgMaxVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.NaNArgMinVertex;
 import io.improbable.keanu.vertices.tensor.BroadcastVertex;
+import io.improbable.keanu.vertices.tensor.DiagPartVertex;
 import io.improbable.keanu.vertices.tensor.DiagVertex;
 import io.improbable.keanu.vertices.tensor.GetBooleanIndexVertex;
 import io.improbable.keanu.vertices.tensor.PermuteVertex;
@@ -152,8 +153,8 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(TakeVertex.class, KeanuVertexToTensorOpMapper::takeOp);
         opMappers.put(SliceVertex.class, KeanuVertexToTensorOpMapper::sliceOp);
         opMappers.put(DiagVertex.class, fluentUnaryOp("diag"));
+        opMappers.put(DiagPartVertex.class, fluentUnaryOp("diagPart"));
         opMappers.put(GetBooleanIndexVertex.class, fluentBinaryOp("get"));
-
         opMappers.put(WhereVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
 
         //Number ops

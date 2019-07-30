@@ -5,6 +5,7 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
@@ -151,11 +152,7 @@ public abstract class VertexImpl<T, VERTEX extends Vertex<T, VERTEX>> implements
     }
 
     public long getLength() {
-        if (state.getValue() instanceof Tensor) {
-            return ((Tensor) state.getValue()).getLength();
-        } else {
-            return 1;
-        }
+        return TensorShape.getLength(getShape());
     }
 
     public int getRank() {

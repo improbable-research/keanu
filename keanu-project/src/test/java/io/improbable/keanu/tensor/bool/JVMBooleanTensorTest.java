@@ -439,7 +439,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void canDiagFromMatrix() {
-        BooleanTensor actual = BooleanTensor.create(new boolean[]{true, false, false, false, true, false, false, false, false}, 3, 3).diag();
+        BooleanTensor actual = BooleanTensor.create(new boolean[]{true, false, false, false, true, false, false, false, false}, 3, 3).diagPart();
         BooleanTensor expected = BooleanTensor.create(true, true, false);
 
         Assert.assertEquals(expected, actual);

@@ -5,6 +5,8 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.shape.Diag;
+import org.nd4j.linalg.api.ops.impl.shape.DiagPart;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
@@ -79,7 +81,16 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
 
     @Override
     public TENSOR diag() {
-        return create(Nd4j.diag(tensor));
+        INDArray result = Nd4j.create(tensor.length(), tensor.length());
+        Nd4j.getExecutioner().execAndReturn(new Diag(new INDArray[]{tensor}, new INDArray[]{result}));
+        return create(result);
+    }
+
+    @Override
+    public TENSOR diagPart() {
+        INDArray result = Nd4j.createUninitialized(new long[]{Math.min(tensor.size(0), tensor.size(1))});
+        Nd4j.getExecutioner().execAndReturn(new DiagPart(tensor, result));
+        return create(result);
     }
 
     @Override

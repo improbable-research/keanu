@@ -174,8 +174,50 @@ public class DoubleTensorTest {
     }
 
     @Test
-    public void canDiagFromMatrix() {
-        DoubleTensor actual = DoubleTensor.create(new double[]{1, 0, 0, 0, 2, 0, 0, 0, 3}, 3, 3).diag();
+    public void canBatchDiagFromMatrix() {
+        DoubleTensor expected = DoubleTensor.create(new double[]{1, 0, 0, 2, 3, 0, 0, 4, 5, 0, 0, 6}, 3, 2, 2);
+        DoubleTensor actual = DoubleTensor.create(1, 2, 3, 4, 5, 6).reshape(3, 2).diag();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canBigBatchDiagFromMatrix() {
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            1, 0, 0, 0,
+            0, 2, 0, 0,
+            0, 0, 3, 0,
+            0, 0, 0, 4,
+            5, 0, 0, 0,
+            0, 6, 0, 0,
+            0, 0, 7, 0,
+            0, 0, 0, 8
+        }, 2, 4, 4);
+
+        DoubleTensor actual = DoubleTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4).diag();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canDiagPartFromWideMatrix() {
+        DoubleTensor actual = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3).diagPart();
+        DoubleTensor expected = DoubleTensor.create(1, 5);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canDiagPartFromNarrowMatrix() {
+        DoubleTensor actual = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 3, 2).diagPart();
+        DoubleTensor expected = DoubleTensor.create(1, 4);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canDiagPartFromSquareMatrix() {
+        DoubleTensor actual = DoubleTensor.create(new double[]{1, 0, 0, 0, 2, 0, 0, 0, 3}, 3, 3).diagPart();
         DoubleTensor expected = DoubleTensor.create(1, 2, 3);
 
         assertEquals(expected, actual);

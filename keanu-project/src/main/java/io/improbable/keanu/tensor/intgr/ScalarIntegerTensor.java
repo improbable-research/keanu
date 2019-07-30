@@ -126,6 +126,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor diagPart() {
+        return duplicate();
+    }
+
+    @Override
     public IntegerTensor transpose() {
         return duplicate();
     }

@@ -80,32 +80,46 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     }
 
     @Override
-    public TENSOR diag() {
-        return createFromResultWrapper(diag(shape.length, shape, buffer, getFactory()));
+    public TENSOR diagPart() {
+        return createFromResultWrapper(diagPart(shape.length, shape, buffer, getFactory()));
     }
 
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
-    ResultWrapper<T, B> diag(int rank, long[] shape,
+    ResultWrapper<T, B> diagPart(int rank, long[] shape,
+                                 B buffer, JVMBuffer.ArrayWrapperFactory<T, B> factory) {
+
+        Preconditions.checkArgument(rank == 2, "Diag Part only operates on matrices (rank 2)");
+        B newBuffer;
+
+        long n = Math.min(shape[0], shape[1]);
+        long columns = shape[1];
+        newBuffer = factory.createNew(n);
+
+        for (long i = 0; i < n; i++) {
+            newBuffer.set(buffer.get(i * columns + i), i);
+        }
+
+        return new ResultWrapper<>(newBuffer, new long[]{n}, new long[]{1});
+    }
+
+    @Override
+    public TENSOR diag() {
+        return createFromResultWrapper(diag(shape, buffer, getFactory()));
+    }
+
+    public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
+    ResultWrapper<T, B> diag(long[] shape,
                              B buffer, JVMBuffer.ArrayWrapperFactory<T, B> factory) {
 
-        B newBuffer;
-        long[] newShape;
-        if (rank == 1) {
-            long n = buffer.getLength();
-            newBuffer = factory.createNew(n * n);
-            for (long i = 0; i < n; i++) {
-                newBuffer.set(buffer.get(i), i * n + i);
-            }
-            newShape = new long[]{n, n};
-        } else if (rank == 2 && shape[0] == shape[1]) {
-            long n = shape[0];
-            newBuffer = factory.createNew(n);
-            for (long i = 0; i < n; i++) {
-                newBuffer.set(buffer.get(i * n + i), i);
-            }
-            newShape = new long[]{n};
-        } else {
-            throw new IllegalArgumentException("Diag is only valid for vectors or square matrices");
+        long endDim = shape[shape.length - 1];
+        long[] newShape = ArrayUtils.add(shape, endDim);
+        long n = buffer.getLength();
+
+        B newBuffer = factory.createNew(buffer.getLength() * endDim);
+        for (long i = 0; i < n; i++) {
+
+            final long pos = i + endDim * i - (i / endDim) * endDim;
+            newBuffer.set(buffer.get(i), pos);
         }
 
         return new ResultWrapper<>(newBuffer, newShape, TensorShape.getRowFirstStride(newShape));

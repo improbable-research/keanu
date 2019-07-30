@@ -47,6 +47,10 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
         super(tensor);
     }
 
+    public Nd4jDoubleTensor(DoubleTensor from) {
+        this(TypedINDArrayFactory.create(from.asFlatDoubleArray(), from.getShape()));
+    }
+
     @Override
     protected INDArray getTensor(Tensor tensor) {
         return getAsINDArray(tensor);
@@ -127,6 +131,36 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
             return TypedINDArrayFactory.create(((NumberTensor) that).toDouble().asFlatDoubleArray(), that.getShape());
         } else {
             throw new IllegalArgumentException("Cannot convert " + that.getClass().getSimpleName() + " to double INDArray/");
+        }
+    }
+
+    /**
+     * Nd4j DiagPart doesnt support non-square matrix diag. In the case where this is non-square
+     * the JVMDoubleTensor implementation is used. For square matrices, the nd4j implementation is used.
+     *
+     * @return matrices with their diagonals equal to the batched vectors from this.
+     */
+    @Override
+    public DoubleTensor diag() {
+        if (getRank() > 1) {
+            return new Nd4jDoubleTensor(JVMDoubleTensor.create(asFlatDoubleArray(), getShape()).diag());
+        } else {
+            return super.diag();
+        }
+    }
+
+    /**
+     * Nd4j DiagPart doesnt support non-square matrix diag. In the case where this is non-square
+     * the JVMDoubleTensor implementation is used. For square matrices, the nd4j implementation is used.
+     *
+     * @return The elements from the diagonal of this matrix.
+     */
+    @Override
+    public DoubleTensor diagPart() {
+        if (tensor.size(0) != tensor.size(1)) {
+            return new Nd4jDoubleTensor(JVMDoubleTensor.create(asFlatDoubleArray(), getShape()).diagPart());
+        } else {
+            return super.diagPart();
         }
     }
 

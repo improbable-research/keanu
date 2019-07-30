@@ -37,6 +37,10 @@ public interface TensorVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extend
         return wrap(new DiagVertex<>(this));
     }
 
+    default VERTEX diagPart() {
+        return wrap(new DiagPartVertex<>(this));
+    }
+
     default VERTEX where(BooleanVertex predicate, VERTEX els) {
         return wrap(new WhereVertex<>(predicate, this, els));
     }

@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -15,7 +16,11 @@ public class DiagVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
 
     @ExportVertexToPythonBindings
     public DiagVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex) {
-        super(inputVertex, inputVertex.ofType());
+        super(getDiagShape(inputVertex.getShape()), inputVertex, inputVertex.ofType());
+    }
+
+    private static long[] getDiagShape(long[] inputShape) {
+        return TensorShape.concat(inputShape, new long[]{inputShape[inputShape.length - 1]});
     }
 
     @Override
@@ -25,11 +30,11 @@ public class DiagVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        return null;
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
+        throw new UnsupportedOperationException();
     }
 }

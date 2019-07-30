@@ -91,6 +91,8 @@ public interface BaseTensor<
 
     T diag();
 
+    T diagPart();
+
     default T transpose() {
         Preconditions.checkArgument(
             getRank() == 2,

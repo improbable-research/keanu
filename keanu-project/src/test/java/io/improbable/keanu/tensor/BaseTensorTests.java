@@ -237,11 +237,16 @@ public class BaseTensorTests {
         assertThat(xDiag.getShape(), equalTo(new long[]{2, 2}));
         assertThat(xDiag.getValue(0, 0), equalTo(x.getValue(0)));
         assertThat(xDiag.getValue(1, 1), equalTo(x.getValue(1)));
+    }
 
-        Tensor<?, ?> xUnDiag = xDiag.diag();
-        assertThat(xUnDiag.getShape(), equalTo(new long[]{2}));
-        assertThat(xUnDiag.getValue(0), equalTo(x.getValue(0)));
-        assertThat(xUnDiag.getValue(1), equalTo(x.getValue(1)));
+    @Test
+    public void canDiagPart() {
+        Tensor<?, ?> x = factory.apply(new long[]{2, 2});
+
+        Tensor<?, ?> diagPart = x.diagPart();
+        assertThat(diagPart.getShape(), equalTo(new long[]{2}));
+        assertThat(diagPart.getValue(0), equalTo(x.getValue(0, 0)));
+        assertThat(diagPart.getValue(1), equalTo(x.getValue(1, 1)));
     }
 
     @Test

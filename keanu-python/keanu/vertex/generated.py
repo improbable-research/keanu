@@ -110,6 +110,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.BroadcastVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.DiagPartVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.DiagVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.PermuteVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.ReshapeVertex")
@@ -528,6 +529,10 @@ def UniformInt(min: vertex_constructor_param_types, max: vertex_constructor_para
 
 def Broadcast(input_vertex: vertex_constructor_param_types, to_shape: Collection[int], label: Optional[str]=None) -> Vertex:
     return Vertex(context.jvm_view().BroadcastVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(to_shape))
+
+
+def DiagPart(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().DiagPartVertex, label, cast_to_vertex(input_vertex))
 
 
 def Diag(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
