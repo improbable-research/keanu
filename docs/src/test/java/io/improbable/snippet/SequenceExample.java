@@ -12,7 +12,6 @@ import io.improbable.keanu.util.io.ProtobufSaver;
 import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
-import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -135,17 +134,17 @@ public class SequenceExample {
 
         // You get vertices from specific sequence items
         // For instance here we retrieve a vertex from the last sequence item
-        VertexImpl x1Retrieved = sequence.getLastItem().get(x1Label);
+        Vertex x1Retrieved = sequence.getLastItem().get(x1Label);
 
         // Or you can iterate over all the sequence items using an iterator
         for (SequenceItem item : sequence) {
-            VertexImpl x2Retrieved = item.get(x2Label);
+            Vertex x2Retrieved = item.get(x2Label);
         }
 
         // Or you can get the SequenceItem as a list to retrieve an item at a specific index
         List<SequenceItem> sequenceItems = sequence.asList();
         SequenceItem secondSequenceItem = sequenceItems.get(1);
-        VertexImpl x2InSecondSequenceItem = secondSequenceItem.get(x2Label);
+        Vertex x2InSecondSequenceItem = secondSequenceItem.get(x2Label);
 
         // Finally, you may want to save your sequence to disk and then load it back later.
         // Firstly you can use the standard ProtobufSaver to save `network` to disk.

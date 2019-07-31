@@ -69,7 +69,7 @@ public class BetaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implement
      * @param beta  the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
+    public BetaVertex(Vertex<DoubleTensor, ?> alpha, Vertex<DoubleTensor, ?> beta) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 

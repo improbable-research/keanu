@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import org.apache.commons.lang3.NotImplementedException;
 import org.reflections.Reflections;
 
@@ -82,8 +81,6 @@ class JavaVertexToPythonConverter {
             return "Integer";
         } else if (BooleanVertex.class.isAssignableFrom(javaClass)) {
             return "Boolean";
-        } else if (NumberTensorVertex.class.isAssignableFrom(javaClass)) {
-            return "Number";
         } else {
             return "Vertex";
         }
