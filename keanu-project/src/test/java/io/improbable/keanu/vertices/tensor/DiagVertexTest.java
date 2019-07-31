@@ -39,8 +39,13 @@ public class DiagVertexTest {
     }
 
     @Test
-    public void changesMatchGradientReverseWithNarrowMatrix() {
+    public void changesMatchGradientReverseWithBatchNarrowMatrix() {
         assertChangesMatchesReverseGradient(new long[]{3, 2}, DoubleTensor.arange(1, 2));
+    }
+
+    @Test
+    public void changesMatchGradientReverseWithBatchRank3() {
+        assertChangesMatchesReverseGradient(new long[]{2, 3, 2}, DoubleTensor.arange(1, 2));
     }
 
     @Test(expected = IllegalArgumentException.class)

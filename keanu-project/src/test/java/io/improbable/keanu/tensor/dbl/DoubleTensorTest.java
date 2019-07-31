@@ -217,6 +217,24 @@ public class DoubleTensorTest {
 
     @Test
     public void canDiagPartFromSquareMatrix() {
+        DoubleTensor actual = DoubleTensor.create(new double[]{
+            1, 0, 0, 0,
+            0, 2, 0, 0,
+            0, 0, 3, 0,
+            0, 0, 0, 4,
+            5, 0, 0, 0,
+            0, 6, 0, 0,
+            0, 0, 7, 0,
+            0, 0, 0, 8
+        }, 2, 4, 4).diagPart();
+
+        DoubleTensor expected = DoubleTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canBatchDiagPartFromSquareMatrices() {
         DoubleTensor actual = DoubleTensor.create(new double[]{1, 0, 0, 0, 2, 0, 0, 0, 3}, 3, 3).diagPart();
         DoubleTensor expected = DoubleTensor.create(1, 2, 3);
 

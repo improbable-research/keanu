@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.tensor;
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -24,8 +25,8 @@ public class DiagPartVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
     }
 
     private static long[] getDiagPartShape(long[] inputShape) {
-        Preconditions.checkArgument(inputShape.length == 2, "Diag Part operates on matrices only");
-        return new long[]{Math.min(inputShape[0], inputShape[1])};
+        Preconditions.checkArgument(inputShape.length >= 2, "Diag Part operates on matrices or greater rank");
+        return TensorShape.getDiagPartResultShape(inputShape);
     }
 
     @Override
@@ -37,20 +38,28 @@ public class DiagPartVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
 
         PartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
-
         final long[] inputShape = inputVertex.getShape();
-        final long inputLength = inputVertex.getLength();
-
         final long[] wrtShape = partial.getWrtShape(inputShape);
-        final long resultLength = Math.min(inputShape[0], inputShape[1]);
 
-        final long[] ofFlattenedShape = ArrayUtils.insert(0, wrtShape, inputLength);
+        final long M = inputShape[inputShape.length - 2];
+        final long N = inputShape[inputShape.length - 1];
+        final long inputMatrixLength = M * N;
+        final long resultLength = Math.min(M, N);
+        final long[] flatMatrixShape = ArrayUtils.subarray(inputShape, 0, inputShape.length - 1);
+        flatMatrixShape[flatMatrixShape.length - 1] = inputMatrixLength;
 
-        DoubleTensor result = partial.get().reshape(ofFlattenedShape)
-            .slice(Slicer.builder()
-                .slice(0L, inputLength, resultLength + 1L)
-                .build()
-            );
+        Slicer.SlicerBuilder slicerBuilder = Slicer.builder();
+
+        for (int i = 0; i < inputShape.length - 2; i++) {
+            slicerBuilder.all();
+        }
+
+        Slicer slicer = slicerBuilder
+            .slice(0L, inputMatrixLength, resultLength + 1L)
+            .build();
+
+        DoubleTensor result = partial.get().reshape(TensorShape.concat(flatMatrixShape, wrtShape))
+            .slice(slicer);
 
         return new PartialDerivative(result);
     }

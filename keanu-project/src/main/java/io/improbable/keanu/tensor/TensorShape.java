@@ -444,4 +444,19 @@ public class TensorShape {
         return false;
     }
 
+    public static long[] getDiagResultShape(long[] shape) {
+        final long endDim = shape[shape.length - 1];
+        return ArrayUtils.add(shape, endDim);
+    }
+
+    public static long[] getDiagPartResultShape(long[] shape) {
+        final long M = shape[shape.length - 2];
+        final long N = shape[shape.length - 1];
+        final long diagLength = Math.min(M, N);
+
+        final long[] resultShape = ArrayUtils.subarray(shape, 0, shape.length - 1);
+        resultShape[resultShape.length - 1] = diagLength;
+        return resultShape;
+    }
+
 }

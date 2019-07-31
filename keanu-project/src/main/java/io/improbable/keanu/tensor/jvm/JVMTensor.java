@@ -81,25 +81,26 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
     @Override
     public TENSOR diagPart() {
-        return createFromResultWrapper(diagPart(shape.length, shape, buffer, getFactory()));
+        return createFromResultWrapper(diagPart(shape, buffer, getFactory()));
     }
 
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
-    ResultWrapper<T, B> diagPart(int rank, long[] shape,
+    ResultWrapper<T, B> diagPart(long[] shape,
                                  B buffer, JVMBuffer.ArrayWrapperFactory<T, B> factory) {
 
-        Preconditions.checkArgument(rank == 2, "Diag Part only operates on matrices (rank 2)");
-        B newBuffer;
+        Preconditions.checkArgument(shape.length >= 2, "Diag Part only operates on matrices or greater rank");
 
-        long n = Math.min(shape[0], shape[1]);
-        long columns = shape[1];
-        newBuffer = factory.createNew(n);
+        final long N = shape[shape.length - 1];
+        final long[] resultShape = TensorShape.getDiagPartResultShape(shape);
+        final long bufferLength = TensorShape.getLength(resultShape);
+        final B newBuffer = factory.createNew(bufferLength);
 
-        for (long i = 0; i < n; i++) {
-            newBuffer.set(buffer.get(i * columns + i), i);
+        for (long i = 0; i < bufferLength; i++) {
+            final long pos = i + N * i - (i / N) * N;
+            newBuffer.set(buffer.get(pos), i);
         }
 
-        return new ResultWrapper<>(newBuffer, new long[]{n}, new long[]{1});
+        return new ResultWrapper<>(newBuffer, resultShape, TensorShape.getRowFirstStride(resultShape));
     }
 
     @Override
@@ -113,17 +114,16 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
         Preconditions.checkArgument(shape.length >= 1, "Diag operates on rank >= 1");
 
-        long endDim = shape[shape.length - 1];
-        long[] newShape = ArrayUtils.add(shape, endDim);
-        long n = buffer.getLength();
+        final long endDim = shape[shape.length - 1];
+        final long bufferLength = buffer.getLength();
+        final B newBuffer = factory.createNew(buffer.getLength() * endDim);
 
-        B newBuffer = factory.createNew(buffer.getLength() * endDim);
-        for (long i = 0; i < n; i++) {
-
+        for (long i = 0; i < bufferLength; i++) {
             final long pos = i + endDim * i - (i / endDim) * endDim;
             newBuffer.set(buffer.get(i), pos);
         }
 
+        final long[] newShape = TensorShape.getDiagResultShape(shape);
         return new ResultWrapper<>(newBuffer, newShape, TensorShape.getRowFirstStride(newShape));
     }
 

@@ -26,7 +26,7 @@ public class DiagVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
 
     private static long[] getDiagShape(long[] inputShape) {
         Preconditions.checkArgument(inputShape.length > 0, "Diag only operates on rank >= 1");
-        return TensorShape.concat(inputShape, new long[]{inputShape[inputShape.length - 1]});
+        return TensorShape.getDiagResultShape(inputShape);
     }
 
     @Override
