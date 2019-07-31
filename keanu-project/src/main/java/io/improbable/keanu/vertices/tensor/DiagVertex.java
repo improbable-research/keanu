@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.tensor;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -24,6 +25,7 @@ public class DiagVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
     }
 
     private static long[] getDiagShape(long[] inputShape) {
+        Preconditions.checkArgument(inputShape.length > 0, "Diag only operates on rank >= 1");
         return TensorShape.concat(inputShape, new long[]{inputShape[inputShape.length - 1]});
     }
 

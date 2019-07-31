@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.tensor;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -23,6 +24,7 @@ public class DiagPartVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
     }
 
     private static long[] getDiagPartShape(long[] inputShape) {
+        Preconditions.checkArgument(inputShape.length == 2, "Diag Part operates on matrices only");
         return new long[]{Math.min(inputShape[0], inputShape[1])};
     }
 

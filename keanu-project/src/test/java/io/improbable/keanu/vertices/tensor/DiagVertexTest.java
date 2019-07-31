@@ -30,38 +30,29 @@ public class DiagVertexTest {
 
     @Test
     public void changesMatchGradientReverse() {
-        UniformVertex inputA = new UniformVertex(new long[]{2, 2}, -10.0, 10.0);
-        DoubleVertex diag = inputA.diag();
-        DoubleVertex outputVertex = diag.times(
-            new ConstantDoubleVertex(DoubleTensor.arange(1, 3))
-        );
-
-        final double INCREMENT = 10;
-        final double DELTA = 1e-10;
-
-        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
+        assertChangesMatchesReverseGradient(new long[]{2, 2}, DoubleTensor.arange(1, 3));
     }
 
     @Test
     public void changesMatchGradientReverseWithWideMatrix() {
-        UniformVertex inputA = new UniformVertex(new long[]{2, 3}, -10.0, 10.0);
-        DoubleVertex diag = inputA.diag();
-        DoubleVertex outputVertex = diag.times(
-            new ConstantDoubleVertex(DoubleTensor.arange(1, 2))
-        );
-
-        final double INCREMENT = 10;
-        final double DELTA = 1e-10;
-
-        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
+        assertChangesMatchesReverseGradient(new long[]{2, 3}, DoubleTensor.arange(1, 2));
     }
 
     @Test
     public void changesMatchGradientReverseWithNarrowMatrix() {
-        UniformVertex inputA = new UniformVertex(new long[]{3, 2}, -10.0, 10.0);
+        assertChangesMatchesReverseGradient(new long[]{3, 2}, DoubleTensor.arange(1, 2));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void changesMatchGradientReverseWithScalar() {
+        assertChangesMatchesReverseGradient(new long[0], DoubleTensor.scalar(2));
+    }
+
+    public void assertChangesMatchesReverseGradient(long[] inputShape, DoubleTensor postDiagFactor) {
+        UniformVertex inputA = new UniformVertex(inputShape, -10.0, 10.0);
         DoubleVertex diag = inputA.diag();
         DoubleVertex outputVertex = diag.times(
-            new ConstantDoubleVertex(DoubleTensor.arange(1, 2))
+            new ConstantDoubleVertex(postDiagFactor)
         );
 
         final double INCREMENT = 10;
@@ -69,4 +60,5 @@ public class DiagVertexTest {
 
         finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
     }
+
 }

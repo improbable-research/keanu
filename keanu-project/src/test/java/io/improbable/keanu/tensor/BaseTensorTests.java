@@ -239,6 +239,12 @@ public class BaseTensorTests {
         assertThat(xDiag.getValue(1, 1), equalTo(x.getValue(1)));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsOnDiagOfScalar() {
+        Tensor<?, ?> x = factory.apply(new long[0]);
+        x.diag();
+    }
+
     @Test
     public void canDiagPart() {
         Tensor<?, ?> x = factory.apply(new long[]{2, 2});
@@ -247,6 +253,12 @@ public class BaseTensorTests {
         assertThat(diagPart.getShape(), equalTo(new long[]{2}));
         assertThat(diagPart.getValue(0), equalTo(x.getValue(0, 0)));
         assertThat(diagPart.getValue(1), equalTo(x.getValue(1, 1)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfDiagPartOnRank() {
+        Tensor<?, ?> x = factory.apply(new long[]{2});
+        x.diagPart();
     }
 
     @Test

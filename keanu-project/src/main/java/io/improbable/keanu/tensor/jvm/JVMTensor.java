@@ -111,6 +111,8 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     ResultWrapper<T, B> diag(long[] shape,
                              B buffer, JVMBuffer.ArrayWrapperFactory<T, B> factory) {
 
+        Preconditions.checkArgument(shape.length >= 1, "Diag operates on rank >= 1");
+
         long endDim = shape[shape.length - 1];
         long[] newShape = ArrayUtils.add(shape, endDim);
         long n = buffer.getLength();

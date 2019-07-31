@@ -24,4 +24,16 @@ public class DiagPartVertexTest {
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfInputIsRank3() {
+        UniformVertex inputA = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        inputA.diagPart();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfInputIsRank1() {
+        UniformVertex inputA = new UniformVertex(new long[]{2}, -10.0, 10.0);
+        inputA.diagPart();
+    }
 }

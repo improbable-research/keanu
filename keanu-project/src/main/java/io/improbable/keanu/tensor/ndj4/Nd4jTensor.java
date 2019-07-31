@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.ndj4;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -81,6 +82,7 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
 
     @Override
     public TENSOR diag() {
+        Preconditions.checkArgument(tensor.rank() >= 1, "Diag operates on rank >= 1");
         INDArray result = Nd4j.create(tensor.length(), tensor.length());
         Nd4j.getExecutioner().execAndReturn(new Diag(new INDArray[]{tensor}, new INDArray[]{result}));
         return create(result);
@@ -88,6 +90,7 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
 
     @Override
     public TENSOR diagPart() {
+        Preconditions.checkArgument(tensor.rank() >= 2, "Diag operates on rank >= 2");
         INDArray result = Nd4j.createUninitialized(new long[]{Math.min(tensor.size(0), tensor.size(1))});
         Nd4j.getExecutioner().execAndReturn(new DiagPart(tensor, result));
         return create(result);
