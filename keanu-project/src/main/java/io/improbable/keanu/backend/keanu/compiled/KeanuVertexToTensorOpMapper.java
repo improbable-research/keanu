@@ -221,7 +221,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));
         opMappers.put(CholeskyDecompositionVertex.class, fluentUnaryOp("choleskyDecomposition"));
         opMappers.put(StandardizeVertex.class, fluentUnaryOp("standardize"));
-        opMappers.put(MeanVertex.class, fluentUnaryOp("mean"));
+        opMappers.put(MeanVertex.class, KeanuVertexToTensorOpMapper::meanOp);
         opMappers.put(StandardDeviationVertex.class, fluentUnaryOp("standardDeviation"));
         opMappers.put(ReplaceNaNVertex.class, KeanuVertexToTensorOpMapper::replaceNaNOp);
         opMappers.put(NotNaNVertex.class, fluentUnaryOp("notNaN"));
@@ -569,6 +569,24 @@ public class KeanuVertexToTensorOpMapper {
             return declaration + ".sum(" + args + ")";
         } else {
             return declaration + ".sum()";
+        }
+    }
+
+    private static String meanOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        MeanVertex meanVertex = (MeanVertex) vertex;
+
+        int[] dimensions = meanVertex.getOverDimensions();
+        String declaration = lookup.get(meanVertex.getInputVertex().getReference()).getName();
+
+        if (dimensions != null) {
+            String dims = Arrays.stream(dimensions)
+                .mapToObj(i -> i + "")
+                .collect(Collectors.joining(","));
+
+            String args = "new int[]{" + dims + "}";
+            return declaration + ".mean(" + args + ")";
+        } else {
+            return declaration + ".mean()";
         }
     }
 

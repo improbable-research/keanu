@@ -202,6 +202,14 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
     }
 
     @Override
+    public TENSOR mean(int... overDimensions) {
+        if (overDimensions.length == 0) {
+            return duplicate();
+        }
+        return create(tensor.mean(overDimensions));
+    }
+
+    @Override
     public TENSOR mean() {
         return create(Nd4j.scalar(tensor.meanNumber().doubleValue()).castTo(tensor.dataType()));
     }

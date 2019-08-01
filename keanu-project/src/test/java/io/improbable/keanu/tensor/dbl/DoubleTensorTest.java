@@ -58,8 +58,6 @@ public class DoubleTensorTest {
     private DoubleTensor matrixA;
     private DoubleTensor matrixB;
     private DoubleTensor scalarA;
-    private DoubleTensor vectorA;
-    private DoubleTensor rankThreeTensor;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -68,11 +66,9 @@ public class DoubleTensorTest {
 
         TensorFactories.doubleTensorFactory = factory;
 
-        matrixA = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        matrixB = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        matrixA = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        matrixB = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
         scalarA = DoubleTensor.scalar(2.0);
-        vectorA = DoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
-        rankThreeTensor = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
     }
 
     @Before
@@ -102,8 +98,32 @@ public class DoubleTensorTest {
     }
 
     @Test
-    public void canAverage() {
+    public void canMeanAllDimensions() {
         assertEquals(2.5, matrixA.mean().scalar(), 1e-6);
+    }
+
+    @Test
+    public void canMeanOverSpecifiedDimensionOfRank3() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2);
+        DoubleTensor summation = x.mean(2);
+        DoubleTensor expected = DoubleTensor.create(new double[]{3, 7, 11, 15}, 2, 2).div(2);
+        assertThat(summation, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canMeanOverSpecifiedDimensionOfMatrix() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        DoubleTensor summationRow = x.mean(1);
+        DoubleTensor expected = DoubleTensor.create(3, 7).div(2);
+        assertThat(summationRow, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canMeanOverSpecifiedDimensionOfVector() {
+        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4);
+        DoubleTensor summation = x.mean(0);
+        DoubleTensor expected = DoubleTensor.scalar(10).div(4);
+        assertThat(summation, valuesAndShapesMatch(expected));
     }
 
     @Test
@@ -828,6 +848,8 @@ public class DoubleTensorTest {
 
     @Test
     public void canCalculateProductOfVector() {
+        DoubleTensor vectorA = DoubleTensor.create(1, 2, 3);
+        DoubleTensor rankThreeTensor = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2);
         double productVectorA = vectorA.product().scalar();
         double productRankThreeTensor = rankThreeTensor.product().scalar();
 

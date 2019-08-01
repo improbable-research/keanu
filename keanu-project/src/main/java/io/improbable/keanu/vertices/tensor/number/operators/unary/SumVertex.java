@@ -15,7 +15,6 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShape.getReductionResultShape;
@@ -61,47 +60,33 @@ public class SumVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>,
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        int operandRank = inputVertex.getValue().getRank();
-        int[] dimensionsToSum = overDimensions == null ? TensorShape.dimensionRange(0, operandRank) : overDimensions;
+        final PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        final int operandRank = inputVertex.getValue().getRank();
+        final int[] dimensionsToSum = overDimensions == null ? TensorShape.dimensionRange(0, operandRank) : overDimensions;
         return new PartialDerivative(dInputVertex.get().sum(dimensionsToSum));
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
 
-        long[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
-        long[] ofShape = derivativeOfOutputWithRespectToSelf.getOfShape(this.getShape());
+        final long[] wrtShapeWithoutRankLoss = TensorShape.getReductionResultShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
+        final long[] ofShape = partial.getOfShape(this.getShape());
 
-        long[] newPartialShape = TensorShape.concat(
+        final long[] newPartialShape = TensorShape.concat(
             ofShape,
             wrtShapeWithoutRankLoss
         );
 
-        DoubleTensor partialDueToSummationShapeChange = derivativeOfOutputWithRespectToSelf.get().reshape(newPartialShape);
+        final DoubleTensor partialDueToSummationShapeChange = partial.get().reshape(newPartialShape);
 
-        long[] resultShape = TensorShape.concat(
+        final long[] resultShape = TensorShape.concat(
             ofShape,
             inputVertex.getShape()
         );
 
-        DoubleTensor broadcastedPartial = partialDueToSummationShapeChange.broadcast(resultShape);
+        final DoubleTensor broadcastedPartial = partialDueToSummationShapeChange.broadcast(resultShape);
 
         return singletonMap(inputVertex, new PartialDerivative(broadcastedPartial));
-    }
-
-    private static long[] summedOverShapeWithoutRankLoss(long[] shape, int[] sumOverDimensions) {
-        long[] shapeCopy = Arrays.copyOf(shape, shape.length);
-
-        if (sumOverDimensions == null) {
-            Arrays.fill(shapeCopy, 1L);
-        } else {
-            for (int sumOverDimension : sumOverDimensions) {
-                shapeCopy[sumOverDimension] = 1L;
-            }
-        }
-
-        return shapeCopy;
     }
 
     @SaveVertexParam(DIMENSIONS_NAME)

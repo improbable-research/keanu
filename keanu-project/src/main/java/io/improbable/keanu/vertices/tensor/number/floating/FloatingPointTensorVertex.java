@@ -94,6 +94,11 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
     }
 
     @Override
+    default VERTEX mean(int... overDimensions) {
+        return wrap(new MeanVertex<>(this, overDimensions));
+    }
+
+    @Override
     default VERTEX mean() {
         return wrap(new MeanVertex<>(this));
     }

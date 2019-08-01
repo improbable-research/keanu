@@ -158,6 +158,13 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void compilesMean() {
+        assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::mean);
+        assertUnaryDoubleMatches(new long[]{2, 2}, (a) -> a.mean(0));
+        assertUnaryDoubleMatches(new long[]{2, 2}, (a) -> a.mean(1));
+    }
+
+    @Test
     public void compilesSimpleUnaryOps() {
         assertUnaryDoubleMatches(DoubleVertex::abs);
         assertUnaryDoubleMatches(DoubleVertex::cos);

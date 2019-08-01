@@ -66,6 +66,20 @@ public class TensorShape {
     }
 
     /**
+     * @param shape          for finding length of
+     * @param overDimensions the dimensions to calculate the length over.
+     * @return the number of elements in a tensor. This
+     * is the product of all ints in shape.
+     */
+    public static long getLength(long[] shape, int... overDimensions) {
+        long length = 1;
+        for (int dim : overDimensions) {
+            length *= shape[dim];
+        }
+        return length;
+    }
+
+    /**
      * @param shape shape to find stride for
      * @return the stride which is used to convert from a N dimensional index
      * to a buffer array flat index. This is based on the C convention of
@@ -290,13 +304,27 @@ public class TensorShape {
         return dimension;
     }
 
-    public static long[] getReductionResultShape(long[] inputShape, int[] sumOverDimensions) {
+    public static long[] getReductionResultShape(long[] inputShape, int[] reduceOverDimensions) {
         if (inputShape.length > 0) {
-            return ArrayUtils.removeAll(inputShape, sumOverDimensions);
+            return ArrayUtils.removeAll(inputShape, reduceOverDimensions);
         } else {
-            Preconditions.checkArgument(sumOverDimensions.length == 0);
+            Preconditions.checkArgument(reduceOverDimensions.length == 0);
             return inputShape;
         }
+    }
+
+    public static long[] getReductionResultShapeWithoutRankLoss(long[] shape, int[] reduceOverDimensions) {
+        long[] shapeCopy = Arrays.copyOf(shape, shape.length);
+
+        if (reduceOverDimensions == null) {
+            Arrays.fill(shapeCopy, 1L);
+        } else {
+            for (int sumOverDimension : reduceOverDimensions) {
+                shapeCopy[sumOverDimension] = 1L;
+            }
+        }
+
+        return shapeCopy;
     }
 
     public static long[] getPermutedIndices(long[] indices, int... rearrange) {

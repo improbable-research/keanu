@@ -143,6 +143,7 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     @Override
     public DoubleTensor diag() {
         if (getRank() > 1) {
+            //TODO: use nd4j if they support this at later versions
             return new Nd4jDoubleTensor(JVMDoubleTensor.create(asFlatDoubleArray(), getShape()).diag());
         } else {
             return super.diag();
@@ -158,6 +159,7 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     @Override
     public DoubleTensor diagPart() {
         if (tensor.size(0) != tensor.size(1)) {
+            //TODO: use nd4j if they support this at later versions
             return new Nd4jDoubleTensor(JVMDoubleTensor.create(asFlatDoubleArray(), getShape()).diagPart());
         } else {
             return super.diagPart();

@@ -778,13 +778,14 @@ def MatrixInverse(input_vertex: vertex_constructor_param_types, label: Optional[
     return Vertex(context.jvm_view().MatrixInverseVertex, label, cast_to_vertex(input_vertex))
 
 
-def Mean(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+def Mean(input_vertex: vertex_constructor_param_types, over_dimensions: Collection[int], label: Optional[str]=None) -> Vertex:
     """
+    Performs a sum across specified dimensions. Negative dimension indexing is not supported.
     
-    
-    :param input_vertex: the vertex
+    :param input_vertex: the vertex to have its values summed
+    :param over_dimensions: dimensions to sum over
     """
-    return Vertex(context.jvm_view().MeanVertex, label, cast_to_vertex(input_vertex))
+    return Vertex(context.jvm_view().MeanVertex, label, cast_to_vertex(input_vertex), cast_to_int_array(over_dimensions))
 
 
 def ReplaceNaN(input_vertex: vertex_constructor_param_types, replace_with_value: float, label: Optional[str]=None) -> Vertex:

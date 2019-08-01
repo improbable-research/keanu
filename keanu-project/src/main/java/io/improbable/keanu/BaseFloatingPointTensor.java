@@ -105,7 +105,20 @@ public interface BaseFloatingPointTensor<
 
     T standardize();
 
+    /**
+     * Mean over all dimensions. This will always result in a scalar.
+     *
+     * @return the mean of all elements
+     */
     T mean();
+
+    /**
+     * Mean over specified dimensions.
+     *
+     * @param overDimensions dimensions to mean over.
+     * @return the mean result
+     */
+    T mean(int... overDimensions);
 
     T standardDeviation();
 }
