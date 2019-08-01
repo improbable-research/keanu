@@ -36,6 +36,7 @@ public class DiagVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        Preconditions.checkArgument(inputVertex.getRank() == 1, "Forward mode autodiff for diag does not support batch diag");
         PartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
         return new PartialDerivative(partial.get().diag());
     }
