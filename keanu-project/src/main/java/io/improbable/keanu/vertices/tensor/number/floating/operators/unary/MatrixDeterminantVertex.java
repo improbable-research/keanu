@@ -66,8 +66,7 @@ public class MatrixDeterminantVertex<T extends Number, TENSOR extends FloatingPo
 
         DoubleTensor inverseTranspose = inputVertex.getValue().toDouble().transpose().matrixInverse();
 
-        PartialDerivative toInput = new PartialDerivative(broadcastedPartial)
-            .multiplyAlongWrtDimensions(inverseTranspose);
+        PartialDerivative toInput = new PartialDerivative(broadcastedPartial.times(inverseTranspose));
 
         return Collections.singletonMap(inputVertex, toInput);
     }

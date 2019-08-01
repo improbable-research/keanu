@@ -29,11 +29,11 @@ public class LogAddExp2Vertex<T extends Number, TENSOR extends FloatingPointTens
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

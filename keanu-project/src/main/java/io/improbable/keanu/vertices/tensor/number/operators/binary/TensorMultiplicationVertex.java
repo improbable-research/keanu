@@ -52,12 +52,12 @@ public class TensorMultiplicationVertex<T extends Number, TENSOR extends NumberT
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @SaveVertexParam(DIMS_LEFT)

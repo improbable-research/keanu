@@ -21,7 +21,7 @@ public class StandardDeviationVertex<T extends Number, TENSOR extends FloatingPo
      */
     @ExportVertexToPythonBindings
     public StandardDeviationVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex) {
-        super(inputVertex);
+        super(new long[0], inputVertex, inputVertex.ofType());
     }
 
     @Override
@@ -31,11 +31,11 @@ public class StandardDeviationVertex<T extends Number, TENSOR extends FloatingPo
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }
