@@ -36,7 +36,8 @@ public class DiagVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        throw new UnsupportedOperationException();
+        PartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        return new PartialDerivative(partial.get().diag());
     }
 
     @Override
@@ -51,17 +52,17 @@ public class DiagVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
         final long[] firstDims = ArrayUtils.subarray(pShape, 0, p.getRank() - 1);
         firstDims[firstDims.length - 1] = endDimsLength;
 
-        Slicer.SlicerBuilder builder = Slicer.builder();
+        final Slicer.SlicerBuilder builder = Slicer.builder();
 
         for (int i = 0; i < firstDims.length - 1; i++) {
             builder.all();
         }
 
-        Slicer slicer = builder.slice(0L, endDimsLength, endDim + 1L).build();
+        final Slicer slicer = builder.slice(0L, endDimsLength, endDim + 1L).build();
 
-        DoubleTensor inputResultPartial = partial.get().reshape(firstDims).slice(slicer);
+        final DoubleTensor inputResultPartial = partial.get().reshape(firstDims).slice(slicer);
 
-        HashMap<Vertex, PartialDerivative> result = new HashMap<>();
+        final HashMap<Vertex, PartialDerivative> result = new HashMap<>();
         result.put(inputVertex, new PartialDerivative(inputResultPartial));
         return result;
     }

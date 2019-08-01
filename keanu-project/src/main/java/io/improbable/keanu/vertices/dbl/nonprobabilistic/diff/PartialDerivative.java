@@ -132,7 +132,7 @@ public class PartialDerivative {
         final DoubleTensor partialValue = partial.get();
         final int partialRank = partialValue.getRank();
 
-        DoubleTensor result;
+        final DoubleTensor result;
         if (partialIsLeft) {
             final int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
             rearrange[0] = 0;
@@ -159,7 +159,7 @@ public class PartialDerivative {
         final int partialRank = partialValue.getRank();
         final int wrtRightDimension = partialRank - 1;
 
-        DoubleTensor result;
+        final DoubleTensor result;
         if (partialIsLeft) {
             result = partialValue
                 .tensorMultiply(multiplier, new int[]{wrtRightDimension}, new int[]{1});
@@ -197,7 +197,7 @@ public class PartialDerivative {
         final long[] alongOfShape = new long[partialShape.length];
         Arrays.fill(alongOfShape, 1L);
 
-        int tensorRank = tensor.getRank();
+        final int tensorRank = tensor.getRank();
         System.arraycopy(tensor.getShape(), 0, alongOfShape, partialOfRank - tensorRank, tensorRank);
 
         return tensor.reshape(alongOfShape);

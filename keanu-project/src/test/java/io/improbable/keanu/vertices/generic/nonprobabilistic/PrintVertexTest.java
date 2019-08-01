@@ -86,7 +86,7 @@ public class PrintVertexTest {
 
         sut.calculate();
         final String expected = "Calculated Vertex:\n" +
-            "{\nshape = []\ndata = [1.0]\n}\n";
+            "{\nshape = []\ndata = \n1.0\n}\n";
         verify(printStream).print(expected);
     }
 
@@ -117,7 +117,7 @@ public class PrintVertexTest {
 
         sut.calculate();
         final String expected = "my vertex\n" +
-            "{\nshape = []\ndata = [1.0]\n}\n";
+            "{\nshape = []\ndata = \n1.0\n}\n";
 
         verify(printStream).print(expected);
     }
@@ -158,7 +158,7 @@ public class PrintVertexTest {
         printVertex.getValue();
 
         final String expectedOutput = "testprefix\n" +
-            "{\nshape = []\ndata = [42.0]\n}\n";
+            "{\nshape = []\ndata = \n42.0\n}\n";
 
         verify(printStream).print(expectedOutput);
     }

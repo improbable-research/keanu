@@ -14,8 +14,22 @@ import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.fi
 public class DiagVertexTest {
 
     @Test
-    @Ignore
     public void changesMatchGradientForward() {
+        UniformVertex inputA = new UniformVertex(new long[]{2}, -10.0, 10.0);
+        DoubleVertex diag = inputA.diag();
+        DoubleVertex outputVertex = diag.times(
+            new ConstantDoubleVertex(DoubleTensor.arange(1, 3))
+        );
+
+        final double INCREMENT = 10;
+        final double DELTA = 1e-10;
+
+        finiteDifferenceMatchesForwardModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
+    }
+
+    @Test
+    @Ignore
+    public void changesMatchGradientBatchForward() {
         UniformVertex inputA = new UniformVertex(new long[]{2, 2}, -10.0, 10.0);
         DoubleVertex diag = inputA.diag();
         DoubleVertex outputVertex = diag.times(

@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionT
 import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
+import static io.improbable.keanu.tensor.TensorShape.incrementIndexByShape;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static io.improbable.keanu.tensor.jvm.JVMTensorBroadcast.broadcastIfNeeded;
 import static java.util.Arrays.copyOf;
@@ -401,19 +403,51 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     @Override
     public String toString() {
 
-        StringBuilder dataString = new StringBuilder();
-        if (buffer.getLength() > 20) {
-            dataString.append(Arrays.toString(buffer.asArray(0, 10)));
-            dataString.append("...");
-            dataString.append(Arrays.toString(buffer.asArray(buffer.getLength() - 10, buffer.getLength())));
-        } else {
-            dataString.append(Arrays.toString(buffer.asArray()));
-        }
-
         return "{\n" +
             "shape = " + Arrays.toString(shape) +
-            "\ndata = " + dataString.toString() +
+            "\ndata = \n" + arrayToString(buffer.asArray(), shape, stride) +
             "\n}";
+    }
+
+    private String arrayToString(Object[] array, long[] shape, long[] stride) {
+
+        if (shape.length == 0) {
+            return array[0].toString();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        arrayToString(sb, array, 0, shape, stride, new long[shape.length]);
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private void arrayToString(StringBuilder sb, Object[] array, int dimension, long[] shape, long[] stride,
+                               long[] index) {
+
+        if (dimension >= shape.length - 1) {
+            for (int i = 0; i < shape[dimension]; i++) {
+                sb.append(array[Ints.checkedCast(TensorShape.getFlatIndex(shape, stride, index))]);
+                incrementIndexByShape(shape, index);
+
+                if (i + 1 < shape[dimension]) {
+                    sb.append(", ");
+                }
+            }
+        } else {
+            for (int i = 0; i < shape[dimension]; i++) {
+                sb.append("[");
+                arrayToString(sb, array, dimension + 1, shape, stride, index);
+
+                sb.append("]");
+
+                if (i + 1 < shape[dimension]) {
+                    sb.append(",");
+                    sb.append(StringUtils.repeat("\n", shape.length - 1 - dimension));
+                    sb.append(StringUtils.repeat(" ", dimension + 1));
+                }
+            }
+        }
     }
 
     @Override

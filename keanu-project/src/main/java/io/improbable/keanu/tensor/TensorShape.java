@@ -460,6 +460,18 @@ public class TensorShape {
         return toFlatIndex;
     }
 
+    public static boolean incrementIndexByShape(long[] shape, long[] index) {
+
+        for (int i = shape.length - 1; i >= 0; i--) {
+            index[i] = (index[i] + 1) % shape[i];
+            if (index[i] != 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static boolean incrementIndexByShape(long[] shape, long[] index, int[] dimensionOrder) {
 
         for (int i : dimensionOrder) {
