@@ -92,11 +92,6 @@ public interface BooleanVertex extends
     }
 
     @Override
-    default List<BooleanVertex> split(int dimension, long... splitAtIndices) {
-        return null;
-    }
-
-    @Override
     default BooleanVertex slice(Slicer slicer) {
         return null;
     }

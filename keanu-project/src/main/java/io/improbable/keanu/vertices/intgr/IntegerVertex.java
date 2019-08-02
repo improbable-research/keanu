@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.In
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 import io.improbable.keanu.vertices.tensor.number.fixed.FixedPointTensorVertex;
 
-import java.util.List;
 import java.util.function.Function;
 
 public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPointTensorVertex<Integer, IntegerTensor, IntegerVertex> {
@@ -62,11 +61,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
 
     static IntegerVertex concat(int dimension, IntegerVertex... toConcat) {
         return new IntegerConcatenationVertex(dimension, toConcat);
-    }
-
-    @Override
-    default List<IntegerVertex> split(int dimension, long... splitAtIndices) {
-        return null;
     }
 
     @Override

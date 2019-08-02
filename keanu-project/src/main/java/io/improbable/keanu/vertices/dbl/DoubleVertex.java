@@ -17,7 +17,6 @@ import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ExpVe
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.SinVertex;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -61,6 +60,7 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
     }
 
     @Override
+
     default Class<?> ofType() {
         return DoubleTensor.class;
     }
@@ -77,11 +77,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
      */
     static DoubleVertex concat(int dimension, DoubleVertex... toConcat) {
         return new ConcatenationVertex(dimension, toConcat);
-    }
-
-    @Override
-    default List<DoubleVertex> split(int dimension, long... splitAtIndices) {
-        return null;
     }
 
     @Override
