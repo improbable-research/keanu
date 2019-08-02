@@ -61,6 +61,7 @@ public class LogProbGradientCalculator {
                 v -> v,
                 v -> {
                     Set<DoubleVertex> parents = v.getParents().stream()
+                        .filter(parent -> parent instanceof DoubleVertex)
                         .map(parent -> (DoubleVertex) parent)
                         .filter(parentToWrtVertices::containsKey)
                         .collect(Collectors.toSet());
