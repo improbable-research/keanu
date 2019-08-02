@@ -3,6 +3,7 @@
 ### Common
 
 * Made constructing the children set of a vertex more efficient by not constantly reconstructing the set.
+* Upgrade to nd4j 1.0.0-beta4
 
 ### Java
 
@@ -16,6 +17,34 @@
 - MultinomialVertex Functional changes:
     - The shape of p expected k to be the far left dimension. It is now the far right in order to allow for broadcasting semantics.
     - n and p parameter validation was semi-controllable but is now completely toggleable with `vertex.setValidationEnabled(true);`
+
+- Add more generic tensor slice that allows start stop and interval slicing.
+
+- Change name on DoubleTensor compare methods by removing get (e.g. `getGreaterThanMask(...))` -> `greaterThanMask(...)`)
+
+- BooleanTensor now uses boolean arrays instead of Nd4j doubles
+
+- Added custom distribution example to examples
+
+- Added to DoubleTensor operations inspired by numpy: 
+    - cumSum
+    - cumProd
+    - product
+    - logAddExp
+    - logAddExp2
+    - log10
+    - log2
+    - log1p
+    - exp2
+    - expM1
+    - tanh
+    - atanh
+    - sinh
+    - asinh
+    - cosh
+    - acosh
+
+- Fixed bug in NUTS where NaN gradients do not cause a step to be divergent
 
 ### Python
 
