@@ -10,7 +10,6 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.JVMFloatingPointTensor;
 import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.ResultWrapper;
-import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.special.Gamma;
@@ -35,6 +34,7 @@ import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LT_MA
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.MUL;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.RDIV;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.RSUB;
+import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.SAFE_LOG_TIMES;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.SUB;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
@@ -655,10 +655,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
-        TensorValidator.NAN_CATCHER.validate(this);
-        TensorValidator.NAN_CATCHER.validate(y);
-        DoubleTensor result = this.logInPlace().timesInPlace(y);
-        return TensorValidator.NAN_FIXER.validate(result);
+        return broadcastableBinaryOpWithAutoBroadcast(SAFE_LOG_TIMES, getAsJVMTensor(y));
     }
 
     @Override

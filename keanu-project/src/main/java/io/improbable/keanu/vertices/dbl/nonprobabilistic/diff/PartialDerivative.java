@@ -117,8 +117,7 @@ public class PartialDerivative {
             return this;
         }
 
-        DoubleTensor multiplierAlignedAlongWrt = alignAlongWrt(multiplier, partial.getRank());
-        DoubleTensor result = partial.times(multiplierAlignedAlongWrt);
+        DoubleTensor result = partial.times(multiplier);
 
         return new PartialDerivative(result);
     }
@@ -201,10 +200,5 @@ public class PartialDerivative {
         System.arraycopy(tensor.getShape(), 0, alongOfShape, partialOfRank - tensorRank, tensorRank);
 
         return tensor.reshape(alongOfShape);
-    }
-
-    private static DoubleTensor alignAlongWrt(DoubleTensor tensor, int partialRank) {
-        final long[] alongWrtShape = TensorShape.shapeToDesiredRankByPrependingOnes(tensor.getShape(), partialRank);
-        return tensor.reshape(alongWrtShape);
     }
 }

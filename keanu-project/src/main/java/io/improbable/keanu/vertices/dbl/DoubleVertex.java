@@ -211,11 +211,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return lessThanOrEqualToMask(new ConstantDoubleVertex(rhs));
     }
 
-    @Override
-    default DoubleVertex safeLogTimes(DoubleVertex y) {
-        return null;
-    }
-
     //////////////////////////
     ////  Floating Point Tensor Operations
     //////////////////////////

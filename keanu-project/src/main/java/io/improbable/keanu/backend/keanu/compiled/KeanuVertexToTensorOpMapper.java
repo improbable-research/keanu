@@ -62,6 +62,7 @@ import io.improbable.keanu.vertices.tensor.number.fixed.operators.unary.ModVerte
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.SafeLogTimesVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCoshVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinVertex;
@@ -230,6 +231,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(IsPositiveInfinityVertex.class, fluentUnaryOp("isPositiveInfinity"));
         opMappers.put(IsInfiniteVertex.class, fluentUnaryOp("isInfinite"));
         opMappers.put(IsFiniteVertex.class, fluentUnaryOp("isFinite"));
+        opMappers.put(SafeLogTimesVertex.class, fluentBinaryOp("safeLogTimes", "safeLogTimesInPlace"));
 
         //Fixed point ops
         opMappers.put(ModVertex.class, fluentBinaryOp("mod", "modInPlace"));

@@ -172,11 +172,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
         return pow(new ConstantIntegerVertex(exponent));
     }
 
-    @Override
-    default IntegerVertex safeLogTimes(IntegerVertex y) {
-        return null;
-    }
-
     static IntegerVertex min(IntegerVertex a, IntegerVertex b) {
         return a.min(b);
     }

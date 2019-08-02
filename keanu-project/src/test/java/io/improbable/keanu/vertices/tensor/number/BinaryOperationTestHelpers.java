@@ -195,35 +195,58 @@ public class BinaryOperationTestHelpers {
     }
 
     public static <T extends DoubleVertex> void finiteDifferenceMatchesElementwise(BiFunction<UniformVertex, UniformVertex, T> op) {
-        testWithFiniteDifference(op, new long[0], new long[0]);
-        testWithFiniteDifference(op, new long[]{3}, new long[]{3});
-        testWithFiniteDifference(op, new long[]{2, 3}, new long[]{2, 3});
-        testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{2, 2, 2});
+        final double leftFrom = -10;
+        final double leftTo = 10;
+        final double rightFrom = -10;
+        final double rightTo = 10;
+        finiteDifferenceMatchesElementwise(op, leftFrom, leftTo, rightFrom, rightTo);
+    }
+
+    public static <T extends DoubleVertex> void finiteDifferenceMatchesElementwise(BiFunction<UniformVertex, UniformVertex, T> op,
+                                                                                   double leftFrom, double leftTo,
+                                                                                   double rightFrom, double rightTo) {
+
+        testWithFiniteDifference(op, new long[0], new long[0], leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{3}, new long[]{3}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{2, 3}, new long[]{2, 3}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{2, 2, 2}, leftFrom, leftTo, rightFrom, rightTo);
     }
 
     public static <T extends DoubleVertex> void finiteDifferenceMatchesBroadcast(BiFunction<UniformVertex, UniformVertex, T> op) {
-        testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{1, 1, 1});
-        testWithFiniteDifference(op, new long[]{1, 1, 1}, new long[]{2, 2, 2});
-        testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{});
-        testWithFiniteDifference(op, new long[]{}, new long[]{2, 2, 2});
-        testWithFiniteDifference(op, new long[]{2, 4}, new long[]{4});
-        testWithFiniteDifference(op, new long[]{2, 4}, new long[]{1, 4});
-        testWithFiniteDifference(op, new long[]{4}, new long[]{2, 4});
-        testWithFiniteDifference(op, new long[]{1, 4}, new long[]{2, 4});
-        testWithFiniteDifference(op, new long[]{2, 1, 4}, new long[]{1, 1, 4});
-        testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{1, 3, 4});
-        testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{3, 4});
-        testWithFiniteDifference(op, new long[]{3, 4}, new long[]{2, 3, 4});
-        testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{4});
-        testWithFiniteDifference(op, new long[]{4}, new long[]{2, 3, 4});
+        final double leftFrom = -10;
+        final double leftTo = 10;
+        final double rightFrom = -10;
+        final double rightTo = 10;
+        finiteDifferenceMatchesBroadcast(op, leftFrom, leftTo, rightFrom, rightTo);
+    }
+
+    public static <T extends DoubleVertex> void finiteDifferenceMatchesBroadcast(BiFunction<UniformVertex, UniformVertex, T> op,
+                                                                                 double leftFrom, double leftTo,
+                                                                                 double rightFrom, double rightTo) {
+
+        testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{1, 1, 1}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{1, 1, 1}, new long[]{2, 2, 2}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{}, new long[]{2, 2, 2}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{2, 4}, new long[]{4}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{2, 4}, new long[]{1, 4}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{4}, new long[]{2, 4}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{1, 4}, new long[]{2, 4}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{2, 1, 4}, new long[]{1, 1, 4}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{1, 3, 4}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{3, 4}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{3, 4}, new long[]{2, 3, 4}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{4}, leftFrom, leftTo, rightFrom, rightTo);
+        testWithFiniteDifference(op, new long[]{4}, new long[]{2, 3, 4}, leftFrom, leftTo, rightFrom, rightTo);
     }
 
     public static <T extends DoubleVertex> void testWithFiniteDifference(BiFunction<UniformVertex, UniformVertex, T> op,
-                                                                         long[] leftShape,
-                                                                         long[] rightShape) {
-        UniformVertex A = new UniformVertex(leftShape, -10.0, 10.0);
-        UniformVertex B = new UniformVertex(rightShape, -10.0, 10.0);
+                                                                         long[] leftShape, long[] rightShape,
+                                                                         double leftFrom, double leftTo,
+                                                                         double rightFrom, double rightTo) {
+        UniformVertex A = new UniformVertex(leftShape, leftFrom, leftTo);
+        UniformVertex B = new UniformVertex(rightShape, rightFrom, rightTo);
 
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), op.apply(A, B), 1e-10, 1e-10);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), op.apply(A, B), 1e-8, 1e-12);
     }
 }

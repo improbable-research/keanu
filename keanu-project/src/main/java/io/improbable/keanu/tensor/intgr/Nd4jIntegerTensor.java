@@ -11,7 +11,6 @@ import io.improbable.keanu.tensor.ndj4.Nd4jFixedPointTensor;
 import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
 import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -133,11 +132,6 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
     public IntegerTensor setAllInPlace(Integer value) {
         tensor = Nd4j.valueArrayOf(getShape(), value);
         return this;
-    }
-
-    @Override
-    public IntegerTensor safeLogTimesInPlace(IntegerTensor y) {
-        throw new NotImplementedException("");
     }
 
     @Override

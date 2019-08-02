@@ -48,6 +48,17 @@ public enum BroadcastableDoubleOperations implements BiFunction<Double, Double, 
         }
     },
 
+    SAFE_LOG_TIMES {
+        @Override
+        public Double apply(Double left, Double right) {
+            if (right == 0.0) {
+                return 0.0;
+            } else {
+                return FastMath.log(left) * right;
+            }
+        }
+    },
+
     LOG_ADD_EXP {
         @Override
         public Double apply(Double a, Double b) {

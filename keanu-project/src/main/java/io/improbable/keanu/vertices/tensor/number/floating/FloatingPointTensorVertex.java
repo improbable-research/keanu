@@ -17,6 +17,7 @@ import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.binary.SafeLogTimesVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCoshVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinVertex;
@@ -124,6 +125,11 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
     }
 
     @Override
+    default VERTEX safeLogTimes(VERTEX y) {
+        return wrap(new SafeLogTimesVertex<>(this, y));
+    }
+
+    @Override
     default VERTEX log1p() {
         return wrap(new Log1pVertex<>(this));
     }
@@ -187,7 +193,6 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
     default VERTEX exp() {
         return wrap(new ExpVertex<>(this));
     }
-
 
     @Override
     default VERTEX log() {

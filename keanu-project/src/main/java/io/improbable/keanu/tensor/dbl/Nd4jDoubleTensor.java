@@ -11,7 +11,6 @@ import io.improbable.keanu.tensor.ndj4.INDArrayShim;
 import io.improbable.keanu.tensor.ndj4.Nd4jFloatingPointTensor;
 import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
 import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
-import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.special.Gamma;
 import org.nd4j.linalg.api.buffer.DataType;
@@ -246,10 +245,9 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
 
     @Override
     public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
-        TensorValidator.NAN_CATCHER.validate(getThis());
-        TensorValidator.NAN_CATCHER.validate(y);
-        DoubleTensor result = this.logInPlace().timesInPlace(y);
-        return TensorValidator.NAN_FIXER.validate(result);
+        BooleanTensor yNotZeroMask = y.elementwiseEquals(0.0);
+        DoubleTensor result = logInPlace().timesInPlace(y);
+        return DoubleTensor.scalar(0.0).where(yNotZeroMask, result);
     }
 
     @Override

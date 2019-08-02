@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.TensorFactories;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorTestHelper;
-import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
@@ -1408,46 +1407,6 @@ public class DoubleTensorTest {
         DoubleTensor zero = DoubleTensor.scalar(0.);
         assertThat(zero.safeLogTimes(zero), hasValue(0.));
         assertThat(zero.log().times(zero), hasValue(Double.NaN));
-    }
-
-    @Test
-    public void logTimesFailsIfYouPassInATensorThatAlreadyContainsNaN() {
-        expectedException.expect(TensorValueException.class);
-        expectedException.expectMessage("Invalid value found");
-
-        DoubleTensor x = DoubleTensor.create(1., 1.);
-        DoubleTensor y = DoubleTensor.create(1., Double.NaN);
-        x.safeLogTimes(y);
-    }
-
-    @Test
-    public void logTimesFailsIfYouPassInATensorThatAlreadyContainsNaNWithScalar() {
-        expectedException.expect(TensorValueException.class);
-        expectedException.expectMessage("Invalid value found");
-
-        DoubleTensor x = DoubleTensor.scalar(1.);
-        DoubleTensor y = DoubleTensor.scalar(Double.NaN);
-        x.safeLogTimes(y);
-    }
-
-    @Test
-    public void logTimesFailsIfYouStartWithATensorThatAlreadyContainsNaN() {
-        expectedException.expect(TensorValueException.class);
-        expectedException.expectMessage("Invalid value found");
-
-        DoubleTensor x = DoubleTensor.create(1., Double.NaN);
-        DoubleTensor y = DoubleTensor.create(1., 1.);
-        x.safeLogTimes(y);
-    }
-
-    @Test
-    public void logTimesFailsIfYouStartWithATensorThatAlreadyContainsNaNWithScalar() {
-        expectedException.expect(TensorValueException.class);
-        expectedException.expectMessage("Invalid value found");
-
-        DoubleTensor x = DoubleTensor.scalar(Double.NaN);
-        DoubleTensor y = DoubleTensor.scalar(1.);
-        x.safeLogTimes(y);
     }
 
     @Test

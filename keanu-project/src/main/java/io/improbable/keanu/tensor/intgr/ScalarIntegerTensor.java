@@ -415,11 +415,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor safeLogTimesInPlace(IntegerTensor y) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public BooleanTensor lessThan(Integer that) {
         return BooleanTensor.create(this.value < that, shape);
     }

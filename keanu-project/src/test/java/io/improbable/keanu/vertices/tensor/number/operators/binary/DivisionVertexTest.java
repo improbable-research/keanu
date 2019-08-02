@@ -92,11 +92,13 @@ public class DivisionVertexTest {
 
     @Test
     public void finiteDifferenceMatchesElementwise() {
-        BinaryOperationTestHelpers.finiteDifferenceMatchesElementwise(DoubleVertex::div);
+        BinaryOperationTestHelpers.finiteDifferenceMatchesElementwise(DoubleVertex::div, -10, 10, 0.5, 10);
+        BinaryOperationTestHelpers.finiteDifferenceMatchesElementwise(DoubleVertex::div, -10, 10, -0.5, -10);
     }
 
     @Test
     public void finiteDifferenceMatchesSimpleBroadcast() {
-        BinaryOperationTestHelpers.finiteDifferenceMatchesBroadcast(DoubleVertex::div);
+        BinaryOperationTestHelpers.finiteDifferenceMatchesBroadcast(DoubleVertex::div, -10, 10, 0.5, 10);
+        BinaryOperationTestHelpers.finiteDifferenceMatchesBroadcast(DoubleVertex::div, -10, 10, -0.5, -10);
     }
 }

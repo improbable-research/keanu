@@ -78,6 +78,11 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void compilesSafeLogTimes() {
+        assertBinaryDoubleMatches(DoubleVertex::safeLogTimes);
+    }
+
+    @Test
     public void compilesMatrixMultiply() {
         assertBinaryDoubleMatches(new long[]{2, 3}, new long[]{3, 2}, DoubleVertex::matrixMultiply);
     }
