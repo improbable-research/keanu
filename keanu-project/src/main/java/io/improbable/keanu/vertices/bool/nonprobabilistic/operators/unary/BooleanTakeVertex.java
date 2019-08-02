@@ -17,7 +17,7 @@ public class BooleanTakeVertex extends BooleanUnaryOpVertex<BooleanTensor> {
      * A vertex that extracts a scalar at a given index
      *
      * @param inputVertex the input vertex to extract from
-     * @param index the index to extract at
+     * @param index       the index to extract at
      */
     @ExportVertexToPythonBindings
     public BooleanTakeVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,

@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import io.improbable.keanu.tensor.TensorFactories;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -30,7 +31,7 @@ public class DoubleTensorBroadcastTest {
     }
 
     public DoubleTensorBroadcastTest(DoubleTensorFactory factory, String name) {
-        DoubleTensor.setFactory(factory);
+        TensorFactories.doubleTensorFactory = factory;
     }
 
     @Test
@@ -52,7 +53,7 @@ public class DoubleTensorBroadcastTest {
         assertTimesInPlaceOperationEquals(rank4, matrix, expected);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void canBroadcastMultiplyToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -313,7 +314,7 @@ public class DoubleTensorBroadcastTest {
         assertEquals(expected, result);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void canBroadcastAddToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -413,7 +414,7 @@ public class DoubleTensorBroadcastTest {
         assertEquals(expected, diff);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void canBroadcastSubtractToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -481,6 +482,27 @@ public class DoubleTensorBroadcastTest {
     }
 
     @Test
+    public void canBroadcastReverseDivide() {
+
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3}, new long[]{3, 1});
+        DoubleTensor s = DoubleTensor.create(new double[]{
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8
+        }, new long[]{3, 5});
+
+        DoubleTensor diff = s.reverseDiv(x);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            5 / 1.0, 2 / 1.0, 3 / 1.0, 7 / 1.0, 8 / 1.0,
+            5 / 2.0, 2 / 2.0, 3 / 2.0, 7 / 2.0, 8 / 2.0,
+            5 / 3.0, 2 / 3.0, 3 / 3.0, 7 / 3.0, 8 / 3.0
+        }, new long[]{3, 5}).reciprocalInPlace();
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
     public void canBroadcastDivideVector() {
 
         /*
@@ -517,7 +539,32 @@ public class DoubleTensorBroadcastTest {
         assertEquals(expected, diff);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    public void canReverseBroadcastDivideVector() {
+
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
+        DoubleTensor s = DoubleTensor.create(new double[]{
+            5, 5, 5,
+            2, 2, 2,
+            3, 3, 3,
+            7, 7, 7,
+            8, 8, 8
+        }, new long[]{5, 3});
+
+        DoubleTensor diff = s.reverseDiv(x);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            5 / 1.0, 5 / 2.0, 5 / 3.0,
+            2 / 1.0, 2 / 2.0, 2 / 3.0,
+            3 / 1.0, 3 / 2.0, 3 / 3.0,
+            7 / 1.0, 7 / 2.0, 7 / 3.0,
+            8 / 1.0, 8 / 2.0, 8 / 3.0
+        }, new long[]{5, 3}).reciprocalInPlace();
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
     public void canBroadcastDivideToHigherRankWithDimensionsOfOneTailing() {
 
         /*

@@ -68,7 +68,7 @@ public class TestGraphGenerator {
         return new PassThroughVertex(from, opCount, autoDiffCount, onOp);
     }
 
-    public static class SumVertex extends DoubleBinaryOpVertex implements Differentiable {
+    public static class SumVertex extends DoubleBinaryOpVertex implements Differentiable, NonSaveableVertex {
 
         private final AtomicInteger opCount;
         private final AtomicInteger autoDiffCount;
@@ -83,7 +83,7 @@ public class TestGraphGenerator {
             this.onOp = onOp;
         }
 
-        public SumVertex(@LoadVertexParam("left")DoubleVertex left, @LoadVertexParam("right")DoubleVertex right) {
+        public SumVertex(@LoadVertexParam("left") DoubleVertex left, @LoadVertexParam("right") DoubleVertex right) {
             super(left, right);
             this.opCount = new AtomicInteger();
             this.autoDiffCount = new AtomicInteger();

@@ -12,7 +12,7 @@ public class IntegerAdditionVertex extends IntegerBinaryOpVertex {
     /**
      * Adds one vertex to another
      *
-     * @param left a vertex to add
+     * @param left  a vertex to add
      * @param right a vertex to add
      */
     @ExportVertexToPythonBindings

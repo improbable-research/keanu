@@ -58,7 +58,7 @@ public class Loop {
     /**
      * package-private because it is intended to be created by the LoopBuilder
      *
-     * @param sequence                     the set of sequence, one for each iteration in the loop
+     * @param sequence                   the set of sequence, one for each iteration in the loop
      * @param throwWhenMaxCountIsReached optionally disable throwing and log a warning instead
      */
     Loop(Sequence sequence, boolean throwWhenMaxCountIsReached) {

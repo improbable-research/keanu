@@ -1,12 +1,13 @@
+import sys
 from typing import Union, List
 
 import numpy as np
 import pandas as pd
 import pytest
+from py4j.protocol import Py4JJavaError
 
 from keanu.tensor import Tensor
 from keanu.vartypes import primitive_types, numpy_types
-from keanu.vertex.base import JavaObjectWrapper
 
 
 @pytest.fixture
@@ -14,24 +15,15 @@ def generic():
     pass
 
 
-@pytest.mark.parametrize("num, expected_java_class", [(1, "ScalarIntegerTensor"),
-                                                      (np.array([1])[0], "ScalarIntegerTensor"),
-                                                      (1.3, "ScalarDoubleTensor"),
-                                                      (np.array([1.3])[0], "ScalarDoubleTensor"),
-                                                      (True, "SimpleBooleanTensor"),
-                                                      (np.array([True])[0], "SimpleBooleanTensor")])
-def test_num_passed_to_Tensor_creates_scalar_tensor(num: Union[primitive_types, numpy_types],
-                                                    expected_java_class: str) -> None:
+@pytest.mark.parametrize("num", [1, (np.array([1])[0]), 1.3, (np.array([1.3])[0]), True, (np.array([True])[0])])
+def test_num_passed_to_Tensor_creates_scalar_tensor(num: Union[primitive_types, numpy_types]) -> None:
     t = Tensor(num)
-    assert_java_class(t, expected_java_class)
     assert t.is_scalar()
     assert t.scalar() == num
 
 
-@pytest.mark.parametrize("data, expected_java_class", [([[1, 2], [3, 4]], "Nd4jIntegerTensor"),
-                                                       ([[1., 2.], [3., 4.]], "Nd4jDoubleTensor"),
-                                                       ([[True, False], [True, False]], "SimpleBooleanTensor")])
-def test_dataframe_passed_to_Tensor_creates_tensor(data: List[List[primitive_types]], expected_java_class: str) -> None:
+@pytest.mark.parametrize("data", [([[1, 2], [3, 4]]), ([[1., 2.], [3., 4.]]), ([[True, False], [True, False]])])
+def test_dataframe_passed_to_Tensor_creates_tensor(data: List[List[primitive_types]]) -> None:
     dataframe = pd.DataFrame(columns=['A', 'B'], data=data)
     t = Tensor(dataframe)
 
@@ -41,11 +33,8 @@ def test_dataframe_passed_to_Tensor_creates_tensor(data: List[List[primitive_typ
     assert np.array_equal(tensor_value, dataframe_value)
 
 
-@pytest.mark.parametrize("data, expected_java_class", [([1, 2], "Nd4jIntegerTensor"), ([1], "Nd4jIntegerTensor"),
-                                                       ([1., 2.], "Nd4jDoubleTensor"), ([1.], "Nd4jDoubleTensor"),
-                                                       ([True, False], "SimpleBooleanTensor"),
-                                                       ([True], "SimpleBooleanTensor")])
-def test_series_passed_to_Tensor_creates_tensor(data: List[primitive_types], expected_java_class: str) -> None:
+@pytest.mark.parametrize("data", [([1, 2]), ([1]), ([1., 2.]), ([1.]), ([True, False]), ([True])])
+def test_series_passed_to_Tensor_creates_tensor(data: List[primitive_types]) -> None:
     series = pd.Series(data)
     t = Tensor(series)
 
@@ -66,9 +55,8 @@ def test_cannot_pass_generic_to_Tensor(generic) -> None:
         Tensor(generic)
 
 
-@pytest.mark.parametrize("arr, expected_java_class", [([1, 2], "Nd4jIntegerTensor"), ([3.4, 2.], "Nd4jDoubleTensor"),
-                                                      ([True, False], "SimpleBooleanTensor")])
-def test_ndarray_passed_to_Tensor_creates_nonscalar_tensor(arr: primitive_types, expected_java_class: str) -> None:
+@pytest.mark.parametrize("arr", [([1, 2]), ([3.4, 2.]), ([True, False])])
+def test_ndarray_passed_to_Tensor_creates_nonscalar_tensor(arr: primitive_types) -> None:
     ndarray = np.array(arr)
     t = Tensor(ndarray)
 
@@ -94,10 +82,6 @@ def test_convert_java_tensor_to_ndarray(value: numpy_types) -> None:
     assert (value == ndarray).all()
 
 
-def assert_java_class(java_object_wrapper: JavaObjectWrapper, java_class_str: str) -> None:
-    assert java_object_wrapper._class == java_class_str
-
-
 @pytest.mark.parametrize("value, expected_result",
                          [(1., np.array([11.])), (1, np.array([11])),
                           (np.array([[1., 2.], [3., 4.]]), np.array([[11., 12.], [13., 14.]])),
@@ -107,3 +91,27 @@ def test_you_can_apply_a_function_to_a_tensor(value, expected_result):
     result = t.apply(lambda x: x + 10)
     ndarray = Tensor._to_ndarray(result)
     assert (ndarray == expected_result).all()
+
+
+@pytest.mark.parametrize("dtype", [np.int32, np.int64, np.float_])
+def test_you_can_create_tensors(dtype):
+    ones = np.ones((1, 1), dtype)
+    t = Tensor(ones)
+    ndarray = Tensor._to_ndarray(t.unwrap())
+    assert (ones == ndarray).all()
+
+
+@pytest.mark.parametrize("value", [[True, True], [True, False], [True, True, True, True, False, False, False, False],
+                                   [False, True, False, True, False, True, False, True]])
+def test_you_can_create_boolean_tensor(value):
+    bools = np.array(value)
+    t = Tensor(bools)
+    ndarray = Tensor._to_ndarray(t.unwrap())
+    assert (bools == ndarray).all()
+
+
+def test_fails_when_long_is_too_long() -> None:
+    ones = np.ones((1, 1), np.int64)
+    ones[0, 0] = sys.maxsize
+    with pytest.raises(Py4JJavaError):
+        Tensor(ones)

@@ -2,13 +2,15 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import io.improbable.keanu.tensor.FloatingPointTensor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-class TensorMulByMatrixMul {
+public class TensorMulByMatrixMul {
 
-    static DoubleTensor tensorMmul(DoubleTensor left, DoubleTensor right, int[] dimsLeft, int[] dimsRight) {
+    public static <T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>> TENSOR tensorMmul(TENSOR left, TENSOR right, int[] dimsLeft, int[] dimsRight) {
 
         long[] leftShape = left.getShape();
         long[] rightShape = right.getShape();
@@ -25,9 +27,9 @@ class TensorMulByMatrixMul {
         long[] leftTensorAsMatrixShape = {-1, dimsLength};
         long[] rightTensorAsMatrixShape = {dimsLength, -1};
 
-        DoubleTensor leftTensorAsMatrix = left.permute(leftDimsPermuted).reshape(leftTensorAsMatrixShape);
-        DoubleTensor rightTensorAsMatrix = right.permute(rightDimsPermuted).reshape(rightTensorAsMatrixShape);
-        DoubleTensor resultAsMatrix = leftTensorAsMatrix.matrixMultiply(rightTensorAsMatrix);
+        TENSOR leftTensorAsMatrix = left.permute(leftDimsPermuted).reshape(leftTensorAsMatrixShape);
+        TENSOR rightTensorAsMatrix = right.permute(rightDimsPermuted).reshape(rightTensorAsMatrixShape);
+        TENSOR resultAsMatrix = leftTensorAsMatrix.matrixMultiply(rightTensorAsMatrix);
 
         long[] leftKeptShape = getKeptShape(leftShape, leftDimsKept);
         long[] rightKeptShape = getKeptShape(rightShape, rightDimsKept);
@@ -49,6 +51,18 @@ class TensorMulByMatrixMul {
 
         int validationLength = Math.min(dimsLeft.length, dimsRight.length);
         for (int i = 0; i < validationLength; i++) {
+
+            if (leftShape.length <= dimsLeft[i]) {
+                throw new IllegalArgumentException(
+                    "Invalid left dimension " + dimsLeft[i] + " for shape " + Arrays.toString(leftShape)
+                );
+            }
+
+            if (rightShape.length <= dimsRight[i]) {
+                throw new IllegalArgumentException(
+                    "Invalid right dimension " + dimsRight[i] + " for shape " + Arrays.toString(rightShape)
+                );
+            }
 
             if (leftShape[dimsLeft[i]] != rightShape[dimsRight[i]]) {
                 throw new IllegalArgumentException("Size of the given axes at each dimension must be the same size.");

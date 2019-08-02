@@ -7,12 +7,12 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
@@ -121,8 +121,8 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
 
         if (withRespectTo.contains(this)) {
             DoubleTensor dLogPdx = DoubleTensor.zeros(this.xMax.getShape());
-            dLogPdx = dLogPdx.setWithMaskInPlace(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
-            dLogPdx = dLogPdx.setWithMaskInPlace(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
+            dLogPdx = dLogPdx.setWithMaskInPlace(value.greaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
+            dLogPdx = dLogPdx.setWithMaskInPlace(value.lessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
 
             return singletonMap(this, dLogPdx);
         }

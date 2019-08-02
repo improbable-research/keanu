@@ -40,6 +40,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PrintVertexTest {
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -85,10 +86,7 @@ public class PrintVertexTest {
 
         sut.calculate();
         final String expected = "Calculated Vertex:\n" +
-            "{\n" +
-            "data = [1.0]\n" +
-            "shape = []\n" +
-            "}\n";
+            "{\nshape = []\ndata = [1.0]\n}\n";
         verify(printStream).print(expected);
     }
 
@@ -119,10 +117,8 @@ public class PrintVertexTest {
 
         sut.calculate();
         final String expected = "my vertex\n" +
-            "{\n" +
-            "data = [1.0]\n" +
-            "shape = []\n" +
-            "}\n";
+            "{\nshape = []\ndata = [1.0]\n}\n";
+
         verify(printStream).print(expected);
     }
 
@@ -156,15 +152,13 @@ public class PrintVertexTest {
         PrintVertex.setPrintStream(printStream);
 
         final DoubleVertex A = new ConstantDoubleVertex(42);
-        A.print("testprefix", true);
+        A.print("testprefix\n", true);
 
         final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
         printVertex.getValue();
 
-        final String expectedOutput = "testprefix{\n" +
-            "data = [42.0]\n" +
-            "shape = []\n" +
-            "}\n";
+        final String expectedOutput = "testprefix\n" +
+            "{\nshape = []\ndata = [42.0]\n}\n";
 
         verify(printStream).print(expectedOutput);
     }

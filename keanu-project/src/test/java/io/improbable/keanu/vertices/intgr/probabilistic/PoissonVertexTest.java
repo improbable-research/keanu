@@ -79,7 +79,7 @@ public class PoissonVertexTest {
         assertThat(logProb100, closeTo(distribution.logProbability(100), 1e-6));
     }
 
-     @Test
+    @Test
     public void logProbGraphForValuesGreaterThanTwenty() {
         DoubleVertex mu = ConstantVertex.of(25.0);
 

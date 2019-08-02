@@ -13,7 +13,7 @@ public class IntegerSliceVertexTest {
 
     @Before
     public void setup() {
-       matrixA = new ConstantIntegerVertex(IntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6}, 2, 3));
+        matrixA = new ConstantIntegerVertex(IntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6}, 2, 3));
     }
 
     @Test

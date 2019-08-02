@@ -27,14 +27,14 @@ public class IntegerVertexSamples extends Samples<IntegerTensor> {
         return this.samples.stream()
             .reduce(IntegerTensor.zeros(shape), IntegerTensor::plusInPlace)
             .toDouble()
-            .divInPlace(samples.size());
+            .divInPlace((double) samples.size());
     }
 
     public Integer getScalarMode() {
         return getModeAtIndex(0, 0);
     }
 
-    public Integer getModeAtIndex(int... index) {
+    public Integer getModeAtIndex(long... index) {
 
         if (samples.isEmpty()) {
             throw new IllegalStateException("Mode for empty samples is undefined");

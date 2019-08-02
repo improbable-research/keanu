@@ -4,7 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
@@ -52,11 +52,12 @@ public class SmoothUniform implements ContinuousDistribution {
      * @param xMin          min value from body
      * @param xMax          max value from body
      * @param edgeSharpness sharpness as a percentage of the body width
-     * @return       a new ContinuousDistribution object
+     * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
         return new SmoothUniform(xMin, xMax, edgeSharpness);
     }
+
     private SmoothUniform(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
         this.xMin = xMin;
         this.xMax = xMax;
@@ -74,28 +75,28 @@ public class SmoothUniform implements ContinuousDistribution {
         final DoubleTensor rScaled = r1.timesInPlace(bodyWidth.plus(shoulderWidth)).plusInPlace(xMin.minus(shoulderWidth.div(2)));
         final DoubleTensor bodyHeight = bodyHeight(shoulderWidth, bodyWidth);
 
-        DoubleTensor firstConditional = rScaled.getGreaterThanOrEqualToMask(xMin);
-        firstConditional = firstConditional.timesInPlace(rScaled.getLessThanOrEqualToMask(xMax));
+        DoubleTensor firstConditional = rScaled.greaterThanOrEqualToMask(xMin);
+        firstConditional = firstConditional.timesInPlace(rScaled.lessThanOrEqualToMask(xMax));
         final DoubleTensor inverseFirstConditional = DoubleTensor.ones(firstConditional.getShape()).minusInPlace(firstConditional);
 
-        final DoubleTensor secondConditional = rScaled.getLessThanMask(xMin);
+        final DoubleTensor secondConditional = rScaled.lessThanMask(xMin);
         DoubleTensor spillOnToShoulder = xMin.minus(rScaled);
         DoubleTensor shoulderX = shoulderWidth.minus(spillOnToShoulder);
         DoubleTensor shoulderDensity = shoulder(shoulderWidth, bodyWidth, shoulderX);
         DoubleTensor acceptProbability = shoulderDensity.div(bodyHeight);
 
-        final DoubleTensor secondConditionalNestedTrue = secondConditional.times(r2.getLessThanOrEqualToMask(acceptProbability));
-        final DoubleTensor secondConditionalNestedFalse = secondConditional.timesInPlace(r2.getGreaterThanMask(acceptProbability));
+        final DoubleTensor secondConditionalNestedTrue = secondConditional.times(r2.lessThanOrEqualToMask(acceptProbability));
+        final DoubleTensor secondConditionalNestedFalse = secondConditional.timesInPlace(r2.greaterThanMask(acceptProbability));
         final DoubleTensor secondConditionalNestedFalseResult = xMin.minus(shoulderWidth).plusInPlace(spillOnToShoulder);
 
-        final DoubleTensor secondConditionalFalse = rScaled.getGreaterThanOrEqualToMask(xMin);
+        final DoubleTensor secondConditionalFalse = rScaled.greaterThanOrEqualToMask(xMin);
         spillOnToShoulder = rScaled.minus(xMax);
         shoulderX = shoulderWidth.minus(spillOnToShoulder);
         shoulderDensity = shoulder(shoulderWidth, bodyWidth, shoulderX);
         acceptProbability = shoulderDensity.divInPlace(bodyHeight);
 
-        final DoubleTensor secondConditionalFalseNestedTrue = secondConditionalFalse.times(r2.getLessThanOrEqualToMask(acceptProbability));
-        final DoubleTensor secondConditionalFalseNestedFalse = secondConditionalFalse.timesInPlace(r2.getGreaterThanMask(acceptProbability));
+        final DoubleTensor secondConditionalFalseNestedTrue = secondConditionalFalse.times(r2.lessThanOrEqualToMask(acceptProbability));
+        final DoubleTensor secondConditionalFalseNestedFalse = secondConditionalFalse.timesInPlace(r2.greaterThanMask(acceptProbability));
         final DoubleTensor secondConditionalFalseNestedFalseResult = shoulderWidth.plusInPlace(xMax).minusInPlace(spillOnToShoulder);
 
         return firstConditional.timesInPlace(rScaled)
@@ -112,16 +113,16 @@ public class SmoothUniform implements ContinuousDistribution {
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
 
-        DoubleTensor firstConditional = x.getGreaterThanOrEqualToMask(xMin);
-        firstConditional = firstConditional.timesInPlace(x.getLessThanOrEqualToMask(xMax));
+        DoubleTensor firstConditional = x.greaterThanOrEqualToMask(xMin);
+        firstConditional = firstConditional.timesInPlace(x.lessThanOrEqualToMask(xMax));
         final DoubleTensor firstConditionalResult = bodyHeight(shoulderWidth, bodyWidth);
 
-        DoubleTensor secondConditional = x.getLessThanMask(xMin);
-        secondConditional = secondConditional.timesInPlace(x.getGreaterThanMask(leftCutoff));
+        DoubleTensor secondConditional = x.lessThanMask(xMin);
+        secondConditional = secondConditional.timesInPlace(x.greaterThanMask(leftCutoff));
         final DoubleTensor secondConditionalResult = shoulder(shoulderWidth, bodyWidth, x.minus(leftCutoff));
 
-        DoubleTensor thirdConditional = x.getGreaterThanMask(xMax);
-        thirdConditional = thirdConditional.timesInPlace(x.getLessThanMask(rightCutoff));
+        DoubleTensor thirdConditional = x.greaterThanMask(xMax);
+        thirdConditional = thirdConditional.timesInPlace(x.lessThanMask(rightCutoff));
         final DoubleTensor thirdConditionalResult = shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(x).plusInPlace(xMax));
 
         return firstConditional.timesInPlace(firstConditionalResult)
@@ -163,12 +164,12 @@ public class SmoothUniform implements ContinuousDistribution {
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
 
-        DoubleTensor firstConditional = x.getLessThanMask(xMin);
-        firstConditional = firstConditional.timesInPlace(x.getGreaterThanMask(leftCutoff));
+        DoubleTensor firstConditional = x.lessThanMask(xMin);
+        firstConditional = firstConditional.timesInPlace(x.greaterThanMask(leftCutoff));
         final DoubleTensor firstConditionalResult = dShoulder(shoulderWidth, bodyWidth, x.minus(leftCutoff));
 
-        DoubleTensor secondConditional = x.getGreaterThanMask(xMax);
-        secondConditional = secondConditional.timesInPlace(x.getLessThanMask(rightCutoff));
+        DoubleTensor secondConditional = x.greaterThanMask(xMax);
+        secondConditional = secondConditional.timesInPlace(x.lessThanMask(rightCutoff));
         final DoubleTensor secondConditionalResult = dShoulder(shoulderWidth,
             bodyWidth,
             shoulderWidth.minus(x).plusInPlace(rightCutoff)
@@ -194,11 +195,11 @@ public class SmoothUniform implements ContinuousDistribution {
     private static DoubleTensor dShoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {
         final DoubleTensor A = getCubeCoefficient(Sw, Bw);
         final DoubleTensor B = getSquareCoefficient(Sw, Bw);
-        return A.timesInPlace(3).timesInPlace(x.pow(2)).plusInPlace(B.timesInPlace(x).timesInPlace(2));
+        return A.timesInPlace(3.0).timesInPlace(x.pow(2)).plusInPlace(B.timesInPlace(x).timesInPlace(2.0));
     }
 
     private static DoubleTensor getCubeCoefficient(DoubleTensor Sw, DoubleTensor Bw) {
-        return (Sw.pow(3).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(-2);
+        return (Sw.pow(3).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(-2.0);
     }
 
     private static DoubleVertex getCubeCoefficientVertex(DoubleVertex Sw, DoubleVertex Bw) {
@@ -206,7 +207,7 @@ public class SmoothUniform implements ContinuousDistribution {
     }
 
     private static DoubleTensor getSquareCoefficient(DoubleTensor Sw, DoubleTensor Bw) {
-        return (Sw.pow(2).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(3);
+        return (Sw.pow(2).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(3.0);
     }
 
     private static DoubleVertex getSquareCoefficientVertex(DoubleVertex Sw, DoubleVertex Bw) {

@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * A class for parsing a network from JSON format to a BayesianNetwork object.
- *
+ * <p>
  * Usage:
  * Create jsonLoader: JsonLoader jsonLoader = new JsonLoader();
  * Loading in a network: BayesianNetwork net = jsonLoader.loadNetwork(inputStream);

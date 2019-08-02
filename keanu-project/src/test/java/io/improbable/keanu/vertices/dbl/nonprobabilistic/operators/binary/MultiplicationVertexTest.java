@@ -72,7 +72,7 @@ public class MultiplicationVertexTest {
             2,
             DoubleTensor.create(1.0, 2.0, 3.0, 4.0),
             DoubleTensor.create(1.0, 2.0, 3.0, 4.0),
-            DoubleTensor.eye(4).timesInPlace(2).reshape(4, 4),
+            DoubleTensor.eye(4).timesInPlace(2.0).reshape(4, 4),
             DoubleVertex::multiply
         );
     }

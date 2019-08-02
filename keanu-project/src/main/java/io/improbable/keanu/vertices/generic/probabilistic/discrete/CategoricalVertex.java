@@ -2,10 +2,9 @@ package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.discrete.Categorical;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Probabilistic;
@@ -27,11 +26,13 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 import static java.util.stream.Collectors.toMap;
 
 
-public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extends GenericTensorVertex<TENSOR> implements Probabilistic<TENSOR>, NonSaveableVertex {
+public class CategoricalVertex<CATEGORY> extends GenericTensorVertex<CATEGORY> implements Probabilistic<GenericTensor<CATEGORY>>, NonSaveableVertex {
 
     private final Map<CATEGORY, DoubleVertex> selectableValues;
 
-    public static <CATEGORY, TENSOR extends Tensor<CATEGORY>> CategoricalVertex<CATEGORY, TENSOR> of(Map<CATEGORY, Double> selectableValues) {
+    public static <CATEGORY> CategoricalVertex<CATEGORY> of(
+        Map<CATEGORY, Double> selectableValues
+    ) {
         return new CategoricalVertex<>(toDoubleVertices(selectableValues));
     }
 
@@ -44,7 +45,9 @@ public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extend
             );
     }
 
-    public static <CATEGORY, TENSOR extends Tensor<CATEGORY>> CategoricalVertex<CATEGORY, TENSOR> of(DirichletVertex vertex, List<CATEGORY> categories) {
+    public static <CATEGORY> CategoricalVertex<CATEGORY> of(
+        DirichletVertex vertex, List<CATEGORY> categories
+    ) {
 
         final long length = TensorShape.getLength(vertex.getShape());
         if (length != categories.size()) {
@@ -63,7 +66,7 @@ public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extend
         return new CategoricalVertex<>(selectableValues);
     }
 
-    public static CategoricalVertex<Integer, IntegerTensor> of(DirichletVertex vertex) {
+    public static CategoricalVertex<Integer> of(DirichletVertex vertex) {
         final int categoriesCount = Math.toIntExact(TensorShape.getLength(vertex.getShape()));
         final IntStream categories = IntStream.range(0, categoriesCount);
         final List<Integer> categoriesList = categories.boxed().collect(Collectors.toList());
@@ -88,21 +91,21 @@ public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extend
     }
 
     @Override
-    public TENSOR sample(KeanuRandom random) {
-        Categorical<CATEGORY, TENSOR> categorical =
+    public GenericTensor<CATEGORY> sample(KeanuRandom random) {
+        Categorical<CATEGORY> categorical =
             Categorical.withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.sample(getShape(), random);
     }
 
     @Override
-    public double logProb(TENSOR value) {
-        Categorical<CATEGORY, TENSOR> categorical = Categorical.
+    public double logProb(GenericTensor<CATEGORY> value) {
+        Categorical<CATEGORY> categorical = Categorical.
             withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.logProb(value).sum();
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(TENSOR value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(GenericTensor<CATEGORY> value, Set<? extends Vertex> withRespectTo) {
         return Collections.emptyMap();
     }
 

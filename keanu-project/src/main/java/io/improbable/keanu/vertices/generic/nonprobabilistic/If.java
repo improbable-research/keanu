@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -26,7 +26,7 @@ public class If {
             this.predicate = predicate;
         }
 
-        public <T> IfThenElseBuilder<T> then(Vertex<? extends Tensor<T>> thn) {
+        public <T> IfThenElseBuilder<T> then(Vertex<GenericTensor<T>> thn) {
             return new IfThenElseBuilder<>(predicate, thn);
         }
 
@@ -58,15 +58,15 @@ public class If {
     public static class IfThenElseBuilder<T> {
 
         private final BooleanVertex predicate;
-        private final Vertex<? extends Tensor<T>> thn;
+        private final Vertex<GenericTensor<T>> thn;
 
         public IfThenElseBuilder(BooleanVertex predicate,
-                                 Vertex<? extends Tensor<T>> thn) {
+                                 Vertex<GenericTensor<T>> thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
 
-        public IfVertex<T> orElse(Vertex<? extends Tensor<T>> els) {
+        public IfVertex<T> orElse(Vertex<GenericTensor<T>> els) {
             return new IfVertex<>(predicate, thn, els);
         }
     }

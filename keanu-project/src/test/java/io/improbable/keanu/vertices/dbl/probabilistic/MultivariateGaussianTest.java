@@ -53,8 +53,8 @@ public class MultivariateGaussianTest {
 
     @Test
     public void throwsIfMuIsNotRank1() {
-        DoubleVertex mu = new ConstantDoubleVertex(new double[] {0.}, new long[] {1, 1});
-        DoubleVertex covariance = new ConstantDoubleVertex(new double[] {1.}, new long[] {1, 1});
+        DoubleVertex mu = new ConstantDoubleVertex(new double[]{0.}, new long[]{1, 1});
+        DoubleVertex covariance = new ConstantDoubleVertex(new double[]{1.}, new long[]{1, 1});
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Mu must be vector but was rank 2");

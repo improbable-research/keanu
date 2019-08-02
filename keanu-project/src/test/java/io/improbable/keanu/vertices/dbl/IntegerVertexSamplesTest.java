@@ -45,7 +45,7 @@ public class IntegerVertexSamplesTest {
 
         double[] expectedValues = stats.stream().mapToDouble(SummaryStatistics::getMean).toArray();
         assertThat(averages.asFlatDoubleArray(), equalTo(expectedValues));
-        assertThat(averages.asFlatDoubleArray(), equalTo(new double[] {2.0, 2.0, 7.0}));
+        assertThat(averages.asFlatDoubleArray(), equalTo(new double[]{2.0, 2.0, 7.0}));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class IntegerVertexSamplesTest {
         List<IntegerTensor> samplesAsList = samples.asList();
         IntegerTensor samplesAsTensor = samples.asTensor();
 
-        assertThat(samplesAsTensor.getShape(), equalTo(new long[] {4, 1, 3}));
+        assertThat(samplesAsTensor.getShape(), equalTo(new long[]{4, 1, 3}));
 
         List<IntegerTensor> samplesAsTensorSliced = new ArrayList<>();
         for (long i = 0; i < samplesAsTensor.getShape()[0]; i++) {

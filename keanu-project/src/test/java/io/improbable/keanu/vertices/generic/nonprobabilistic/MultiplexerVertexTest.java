@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.generic.GenericTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -41,12 +42,12 @@ public class MultiplexerVertexTest {
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup1 = new LinkedHashMap<>();
         optionGroup1.put(TestEnum.A, ConstantVertex.of(0.5));
         optionGroup1.put(TestEnum.B, ConstantVertex.of(0.5));
-        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select1 = new CategoricalVertex<>(optionGroup1);
+        CategoricalVertex<TestEnum> select1 = new CategoricalVertex<>(optionGroup1);
 
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup2 = new LinkedHashMap<>();
         optionGroup2.put(TestEnum.C, ConstantVertex.of(0.5));
         optionGroup2.put(TestEnum.D, ConstantVertex.of(0.5));
-        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select2 = new CategoricalVertex<>(optionGroup2);
+        CategoricalVertex<TestEnum> select2 = new CategoricalVertex<>(optionGroup2);
 
         MultiplexerVertex<GenericTensor<TestEnum>> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);
 
@@ -91,5 +92,12 @@ public class MultiplexerVertexTest {
 
     private enum TestEnum {
         A, B, C, D
+    }
+
+    @Test
+    public void canStaticMuxWithIntegerSelect() {
+        assertEquals(MultiplexerVertex.mux(IntegerTensor.scalar(0), "a", "b", "c"), "a");
+        assertEquals(MultiplexerVertex.mux(IntegerTensor.scalar(1), "a", "b", "c"), "b");
+        assertEquals(MultiplexerVertex.mux(IntegerTensor.scalar(2), "a", "b", "c"), "c");
     }
 }

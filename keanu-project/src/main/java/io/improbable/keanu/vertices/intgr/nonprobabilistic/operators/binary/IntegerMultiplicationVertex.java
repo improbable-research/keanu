@@ -12,7 +12,7 @@ public class IntegerMultiplicationVertex extends IntegerBinaryOpVertex {
     /**
      * Multiplies one vertex by another
      *
-     * @param left a vertex to be multiplied
+     * @param left  a vertex to be multiplied
      * @param right a vertex to be multiplied
      */
     @ExportVertexToPythonBindings

@@ -22,7 +22,7 @@ public class ParticleFilterBuilder {
 
     /**
      * @param numParticles the number of particles to generate (a larger number will yield better results but is more
-     *       computationally expensive)
+     *                     computationally expensive)
      * @return this
      */
     public ParticleFilterBuilder withNumParticles(int numParticles) {
@@ -42,7 +42,7 @@ public class ParticleFilterBuilder {
 
     /**
      * @param resamplingProportion the proportion of particles to cull (e.g. the 25% of least probably particles could
-     *                            be culled)
+     *                             be culled)
      * @return this
      */
     public ParticleFilterBuilder withResamplingProportion(double resamplingProportion) {

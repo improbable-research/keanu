@@ -254,11 +254,12 @@ public class SequenceBuilder<T> {
 
     /**
      * This function is best described by how it operates on labels passed to it:
-     *  1. `Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` becomes `proxy_for.LABEL`
-     *  2. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` becomes  `proxy_for.LABEL`
-     *  3. `Sequence_Item_INDEX.HASHCODE.LABEL` becomes `LABEL`
-     *  4. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.LABEL` becomes  `LABEL`
-     * @param proxyLabel Label to be unscoped
+     * 1. `Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` becomes `proxy_for.LABEL`
+     * 2. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.proxy_for.LABEL` becomes  `proxy_for.LABEL`
+     * 3. `Sequence_Item_INDEX.HASHCODE.LABEL` becomes `LABEL`
+     * 4. `IDENTIFYING_NAMESPACE.Sequence_Item_INDEX.HASHCODE.LABEL` becomes  `LABEL`
+     *
+     * @param proxyLabel      Label to be unscoped
      * @param hasSequenceName Whether the sequence has a name
      * @return unscoped label
      */

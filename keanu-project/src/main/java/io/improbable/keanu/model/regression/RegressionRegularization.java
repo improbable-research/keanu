@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 
 public enum RegressionRegularization {
     NONE {
-        public DoubleVertex getWeightsVertex(long featureCount,  DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnWeightsScaleParameter) {
+        public DoubleVertex getWeightsVertex(long featureCount, DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnWeightsScaleParameter) {
             return new GaussianVertex(new long[]{featureCount, 1}, priorOnWeightsMeans, priorOnWeightsScaleParameter).setLabel("weights");
         }
 
@@ -48,7 +48,7 @@ public enum RegressionRegularization {
         }
     };
 
-    public abstract DoubleVertex getWeightsVertex(long featureCount,  DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnWeightsScaleParameter);
+    public abstract DoubleVertex getWeightsVertex(long featureCount, DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnWeightsScaleParameter);
 
     public abstract DoubleVertex getInterceptVertex(DoubleVertex priorOnInterceptMean, DoubleVertex priorOnInterceptScaleParameter);
 

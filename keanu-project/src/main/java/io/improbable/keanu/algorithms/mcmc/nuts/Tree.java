@@ -276,7 +276,7 @@ class Tree {
 
         final double energyChange = energyAfterStep - startEnergy;
 
-        final boolean isDivergent = Math.abs(energyChange) >= maxEnergyChange;
+        final boolean isDivergent = Math.abs(energyChange) >= maxEnergyChange || Double.isNaN(energyChange);
 
         if (isDivergent) {
 

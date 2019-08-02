@@ -23,10 +23,10 @@ public class Propagation {
     }
 
     /**
-     * @param vertices     vertices to start propagation from
-     * @param nextVertices The next vertices to move to given a current vertex. E.g getChildren for downstream or
-     *                     getParents for upstream.
-     * @param shouldAdd    true when a given vertex should be included in the result, false otherwise
+     * @param vertices          vertices to start propagation from
+     * @param nextVertices      The next vertices to move to given a current vertex. E.g getChildren for downstream or
+     *                          getParents for upstream.
+     * @param shouldAdd         true when a given vertex should be included in the result, false otherwise
      * @param stoppingCondition true when a given vertex should be stopped at
      * @return A Set of vertices that are in the direction implied by nextVertices and filtered by shouldAdd
      */

@@ -200,12 +200,12 @@ public class BernoulliVertexTest {
         );
 
         expectedWrtA = expectedWrtA.setWithMaskInPlace(
-            AValue.times(BValue).getGreaterThanMask(DoubleTensor.scalar(1.0)),
+            AValue.times(BValue).greaterThanMask(DoubleTensor.scalar(1.0)),
             0.0
         );
 
         expectedWrtA = expectedWrtA.setWithMaskInPlace(
-            AValue.times(BValue).getLessThanOrEqualToMask(DoubleTensor.scalar(0.0)),
+            AValue.times(BValue).lessThanOrEqualToMask(DoubleTensor.scalar(0.0)),
             0.0
         );
 
@@ -215,12 +215,12 @@ public class BernoulliVertexTest {
         );
 
         expectedWrtB = expectedWrtB.setWithMaskInPlace(
-            AValue.times(BValue).getGreaterThanMask(DoubleTensor.scalar(1.0)),
+            AValue.times(BValue).greaterThanMask(DoubleTensor.scalar(1.0)),
             0.0
         );
 
         expectedWrtB = expectedWrtB.setWithMaskInPlace(
-            AValue.times(BValue).getLessThanOrEqualToMask(DoubleTensor.scalar(0.0)),
+            AValue.times(BValue).lessThanOrEqualToMask(DoubleTensor.scalar(0.0)),
             0.0
         );
 

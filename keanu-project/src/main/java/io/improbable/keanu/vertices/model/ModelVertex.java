@@ -21,7 +21,7 @@ public interface ModelVertex<T> extends NonProbabilistic<T> {
 
     boolean hasCalculated();
 
-    <U, T extends Tensor<U>> T getModelOutputValue(VertexLabel label);
+    <U, T extends Tensor<U, T>> T getModelOutputValue(VertexLabel label);
 
     default DoubleVertex getDoubleModelOutputVertex(VertexLabel label) {
         return new DoubleModelResultVertex(this, label);

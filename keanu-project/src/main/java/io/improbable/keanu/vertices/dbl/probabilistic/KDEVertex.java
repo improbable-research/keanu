@@ -61,8 +61,9 @@ public class KDEVertex extends DoubleVertex implements Differentiable, Probabili
     }
 
     private DoubleTensor getDiffs(DoubleTensor x) {
-        DoubleTensor diffs = DoubleTensor.zeros(samples.getShape()[0], x.getShape()[0]);
-        return diffs.plusInPlace(x.reshape(1, x.getShape()[0])).minusInPlace(samples.reshape(samples.getShape()[0], 1)).divInPlace(bandwidth);
+        return x.broadcast(samples.getShape()[0], x.getShape()[0])
+            .minusInPlace(samples.reshape(samples.getShape()[0], 1))
+            .divInPlace(bandwidth);
     }
 
     public DoubleTensor pdf(DoubleTensor x) {

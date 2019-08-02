@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
 
@@ -39,21 +40,22 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
 
     @Override
     public BooleanTensor calculate() {
-        assertion();
-        return predicate.getValue();
+        VertexLabel label = getLabel();
+        return assertion(predicate.getValue(), errorMessage, label != null ? label.getQualifiedName() : null);
     }
 
-    private void assertion() {
-        if (!predicate.getValue().allTrue()) {
-            throw new GraphAssertionException(buildAssertMessage());
+    public static BooleanTensor assertion(BooleanTensor predicateValue, String errorMessage, String labelQualifiedName) {
+        if (!predicateValue.allTrue()) {
+            throw new GraphAssertionException(buildAssertMessage(errorMessage, labelQualifiedName));
         }
+        return predicateValue;
     }
 
-    private String buildAssertMessage() {
+    private static String buildAssertMessage(String errorMessage, String labelQualifiedName) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("AssertVertex");
-        if (getLabel() != null) {
-            stringBuilder.append(" (" + getLabel().getQualifiedName() + ")");
+        if (labelQualifiedName != null) {
+            stringBuilder.append(" (" + labelQualifiedName + ")");
         }
         if (!errorMessage.equals("")) {
             stringBuilder.append(": " + errorMessage);

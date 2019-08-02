@@ -13,7 +13,10 @@ public interface NetworkLoader {
     BayesianNetwork loadNetwork(InputStream input) throws IOException;
 
     void loadValue(DoubleVertex vertex);
+
     void loadValue(BooleanVertex vertex);
+
     void loadValue(IntegerVertex vertex);
+
     void loadValue(Vertex vertex);
 }

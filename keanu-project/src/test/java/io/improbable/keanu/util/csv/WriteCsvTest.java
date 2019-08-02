@@ -63,7 +63,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeSamplesToCsv() throws IOException {
-        File file = WriteCsv.asSamples(samples, rowTensors).toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asSamples(samples, rowTensors).toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -79,7 +79,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeSamplesToCsvWithHeader() throws IOException {
-        File file = WriteCsv.asSamples(samples, rowTensors).withDefaultHeader().toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asSamples(samples, rowTensors).withDefaultHeader().toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
@@ -102,7 +102,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeColumnOfTensorsToCsv() throws IOException {
-        File file = WriteCsv.asColumns(columnTensors).toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asColumns(columnTensors).toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -115,7 +115,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeColumnOfTensorsToCsvWithCustomEmptyValue() throws IOException {
-        File file = WriteCsv.asColumns(columnTensors).withEmptyValue("None").toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asColumns(columnTensors).withEmptyValue("None").toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -128,7 +128,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeColumnOfIntegerTensorsToCsv() throws IOException {
-        File file = WriteCsv.asColumns(integerColumnTensors).toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asColumns(integerColumnTensors).toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -141,7 +141,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeColumnOfTensorsToCsvWithHeader() throws IOException {
-        File file = WriteCsv.asColumns(columnTensors).withDefaultHeader().toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asColumns(columnTensors).withDefaultHeader().toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
@@ -158,7 +158,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeRowOfTensorsToCsv() throws IOException {
-        File file = WriteCsv.asRows(rowTensors).toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asRows(rowTensors).toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -171,7 +171,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeRowOfTensorsToCsvWithCustomEmptyValue() throws IOException {
-        File file = WriteCsv.asRows(rowTensors).withEmptyValue("/").toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asRows(rowTensors).withEmptyValue("/").toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -184,7 +184,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeRowOfTensorsToCsvWithHeader() throws IOException {
-        File file = WriteCsv.asRows(rowTensors).withDefaultHeader().toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asRows(rowTensors).withDefaultHeader().toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
@@ -198,7 +198,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeRowOfScalarsToCsv() throws IOException {
-        File file = WriteCsv.asColumns(scalarTensors).toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asColumns(scalarTensors).toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -210,7 +210,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeRowOfScalarsToCsvWithHeader() throws IOException {
-        File file = WriteCsv.asColumns(scalarTensors).withDefaultHeader().toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asColumns(scalarTensors).withDefaultHeader().toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
@@ -227,7 +227,7 @@ public class WriteCsvTest {
     @Test
     public void writeRowOfScalarsToCsvWithCustomHeader() throws IOException {
         String[] customHeader = new String[]{"Temperature", "Humidity"};
-        File file = WriteCsv.asColumns(scalarTensors).withHeader(customHeader).toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asColumns(scalarTensors).withHeader(customHeader).toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
@@ -240,7 +240,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeRowOfScalarsToCsvWithCustomDelimiter() throws IOException {
-        File file = WriteCsv.asColumns(scalarTensors).withSeparator('\t').toFile(File.createTempFile("test",".csv"));
+        File file = WriteCsv.asColumns(scalarTensors).withSeparator('\t').toFile(File.createTempFile("test", ".csv"));
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false).withDelimiter("\t");
         List<List<String>> lines = reader.readLines();

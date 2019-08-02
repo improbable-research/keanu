@@ -10,6 +10,7 @@ public class IntegerAbsVertex extends IntegerUnaryOpVertex {
 
     /**
      * Takes the absolute value of a vertex
+     *
      * @param inputVertex the vertex
      */
     @ExportVertexToPythonBindings

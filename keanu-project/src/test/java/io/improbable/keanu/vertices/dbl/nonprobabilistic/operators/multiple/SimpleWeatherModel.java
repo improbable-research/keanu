@@ -28,12 +28,12 @@ public class SimpleWeatherModel {
         this.inputToModel = inputToModel;
 
         humidityReader = mock(BufferedReader.class);
-        when(humidityReader .readLine()).thenAnswer(
+        when(humidityReader.readLine()).thenAnswer(
             invocation -> String.valueOf(blackBoxHumidityModel(this.inputToModel.getValue().scalar()))
         );
 
         rainReader = mock(BufferedReader.class);
-        when(rainReader .readLine()).thenAnswer(
+        when(rainReader.readLine()).thenAnswer(
             invocation -> String.valueOf(blackBoxRainModel(this.inputToModel.getValue().scalar()))
         );
 
@@ -43,13 +43,13 @@ public class SimpleWeatherModel {
         );
 
         isSunnyReader = mock(BufferedReader.class);
-        when(isSunnyReader .readLine()).thenAnswer(
+        when(isSunnyReader.readLine()).thenAnswer(
             invocation -> String.valueOf(blackBoxIsSunnyModel(this.inputToModel.getValue().scalar()))
         );
     }
 
     public void modelExecution(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        double temperature = inputs.get(new VertexLabel("Temperature")).getValue().asFlatDoubleArray()[0];
+        double temperature = (Double) inputs.get(new VertexLabel("Temperature")).getValue().asFlatArray()[0];
         try {
             double chanceOfRain = blackBoxRainModel(temperature);
             double humidity = blackBoxHumidityModel(temperature);

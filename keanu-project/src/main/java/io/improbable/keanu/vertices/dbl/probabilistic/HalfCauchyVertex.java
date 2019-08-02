@@ -7,8 +7,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.Map;
@@ -83,7 +83,7 @@ public class HalfCauchyVertex extends CauchyVertex {
         } else {
             for (Map.Entry<Vertex, DoubleTensor> entry : logProb.entrySet()) {
                 DoubleTensor v = entry.getValue();
-                logProb.put(entry.getKey(), v.setWithMaskInPlace(value.getLessThanMask(DoubleTensor.scalar(LOC_ZERO)), 0.0));
+                logProb.put(entry.getKey(), v.setWithMaskInPlace(value.lessThanMask(DoubleTensor.scalar(LOC_ZERO)), 0.0));
             }
             return logProb;
         }

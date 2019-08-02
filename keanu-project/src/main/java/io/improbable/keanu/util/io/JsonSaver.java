@@ -24,19 +24,20 @@ import java.util.Map;
  * JSON output file contains information about the network (vertices, their types and connections),
  * network state (values for constant and observed vertices, if saveValues parameter is set to true),
  * as well as metadata (string key - value pairs, if metadata is passed in).
- *
+ * <p>
  * Usage:
  * Create jsonSaver: JsonSaver jsonSaver = new JsonSaver(yourBayesianNetwork);
  * or JsonSaver jsonSaver = new JsonSaver(yourBayesianNetwork, metadata);
  * where metadata is a map between some keys and values in string format (for instance, "author": "Jane Doe").
  * To output network to a JSON file: jsonSaver.save(outputStream, saveValues);
  */
-public class JsonSaver implements NetworkSaver{
+public class JsonSaver implements NetworkSaver {
 
     private final ProtobufSaver protobufSaver;
 
     /**
      * Sets up a new json saver for the given network.
+     *
      * @param net network that will be saved
      */
     public JsonSaver(BayesianNetwork net) {

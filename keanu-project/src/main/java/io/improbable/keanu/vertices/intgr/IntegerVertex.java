@@ -185,7 +185,9 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new EqualsVertex<>(this, rhs);
     }
 
-    public DoubleVertex toDouble() { return new CastToDoubleVertex(this); }
+    public DoubleVertex toDouble() {
+        return new CastToDoubleVertex(this);
+    }
 
     public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);
@@ -231,7 +233,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         super.observe(IntegerTensor.create(values));
     }
 
-    public int getValue(int... index) {
+    public int getValue(long... index) {
         return getValue().getValue(index);
     }
 

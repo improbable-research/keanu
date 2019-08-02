@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -104,7 +103,7 @@ public class MatrixInverseVertexTest {
 
     @Test
     public void scalarTensorsInvertCorrectly() {
-        DoubleTensor oneByOneMatrix = new ScalarDoubleTensor(2.0).reshape(1, 1);
+        DoubleTensor oneByOneMatrix = DoubleTensor.scalar(2.0).reshape(1, 1);
         DoubleVertex input = new ConstantDoubleVertex(oneByOneMatrix);
         DoubleVertex inverse = input.matrixInverse();
 

@@ -73,8 +73,8 @@ public class GaussianProposalDistributionTest {
         when(vertex1.getValue()).thenReturn(currentStateForVertex1);
         when(vertex2.getValue()).thenReturn(currentStateForVertex2);
 
-        when(vertex1.getShape()).thenReturn(new long[] {2});
-        when(vertex2.getShape()).thenReturn(new long[] {2});
+        when(vertex1.getShape()).thenReturn(new long[]{2});
+        when(vertex2.getShape()).thenReturn(new long[]{2});
 
         proposal = new Proposal();
         proposal.setProposal(vertex1, proposedStateForVertex1);

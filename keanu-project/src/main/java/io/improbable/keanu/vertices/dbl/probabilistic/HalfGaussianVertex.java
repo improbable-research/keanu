@@ -7,8 +7,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
@@ -84,7 +84,7 @@ public class HalfGaussianVertex extends GaussianVertex {
         } else {
             for (Map.Entry<Vertex, DoubleTensor> entry : dLogProb.entrySet()) {
                 DoubleTensor v = entry.getValue();
-                dLogProb.put(entry.getKey(), v.setWithMaskInPlace(value.getLessThanMask(DoubleTensor.scalar(MU_ZERO)), 0.0));
+                dLogProb.put(entry.getKey(), v.setWithMaskInPlace(value.lessThanMask(DoubleTensor.scalar(MU_ZERO)), 0.0));
             }
             return dLogProb;
         }

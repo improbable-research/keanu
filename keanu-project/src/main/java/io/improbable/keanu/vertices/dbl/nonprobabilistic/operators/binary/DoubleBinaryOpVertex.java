@@ -4,11 +4,12 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
-public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
+public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, VertexBinaryOp<DoubleVertex, DoubleVertex> {
 
     protected final DoubleVertex left;
     protected final DoubleVertex right;
@@ -46,11 +47,13 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
         return op(left.getValue(), right.getValue());
     }
 
+    @Override
     @SaveVertexParam(LEFT_NAME)
     public DoubleVertex getLeft() {
         return left;
     }
 
+    @Override
     @SaveVertexParam(RIGHT_NAME)
     public DoubleVertex getRight() {
         return right;

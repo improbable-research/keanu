@@ -61,14 +61,12 @@ public class DoubleVertexSamplesTest {
         assertThat(variances, allCloseTo(1e-8, expectedValues));
     }
 
-
-
     @Test
     public void canGetSamplesAsTensor() {
         List<DoubleTensor> samplesAsList = samples.asList();
         DoubleTensor samplesAsTensor = samples.asTensor();
 
-        assertThat(samplesAsTensor.getShape(), equalTo(new long[] {4, 1, 3}));
+        assertThat(samplesAsTensor.getShape(), equalTo(new long[]{4, 1, 3}));
 
         List<DoubleTensor> samplesAsTensorSliced = samplesAsTensor.sliceAlongDimension(0, 0, samplesAsTensor.getShape()[0]);
         for (int i = 0; i < samplesAsList.size(); i++) {
@@ -111,6 +109,6 @@ public class DoubleVertexSamplesTest {
         );
         DoubleVertexSamples scalarSamples = new DoubleVertexSamples(sampleValues);
         DoubleTensor expectedAutocorrelation = DoubleTensor.create(new double[]{1, -0.15, -0.3, -0.05}, new long[]{1, 4});
-        assertThat(scalarSamples.getAutocorrelation(),allCloseTo(1e-8, expectedAutocorrelation));
+        assertThat(scalarSamples.getAutocorrelation(), allCloseTo(1e-8, expectedAutocorrelation));
     }
 }

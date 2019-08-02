@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
 @Value
 public class CPTCondition {
 
-    private final List<Boolean> conditions;
+    private final List<?> conditions;
 
-    public static CPTCondition from(List<Vertex<? extends Tensor<Boolean>>> inputs,
-                                    Function<Vertex<? extends Tensor<Boolean>>, Boolean> mapper) {
+    public static CPTCondition from(List<Vertex<? extends Tensor<?, ?>>> inputs,
+                                    Function<Vertex<? extends Tensor<?, ?>>, ?> mapper) {
 
 
-        List<Boolean> condition = inputs.stream().map(mapper).collect(Collectors.toList());
+        List<?> condition = inputs.stream().map(mapper).collect(Collectors.toList());
         return new CPTCondition(condition);
     }
 }

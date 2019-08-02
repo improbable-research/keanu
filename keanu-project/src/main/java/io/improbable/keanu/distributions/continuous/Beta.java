@@ -5,7 +5,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
@@ -44,8 +44,8 @@ public class Beta implements ContinuousDistribution {
         final DoubleTensor lessThan = xMax.minus(y2.div(y1PlusY2).timesInPlace(range));
         final DoubleTensor greaterThan = xMin.plus(y1.div(y1PlusY2).timesInPlace(range));
 
-        final DoubleTensor lessMask = alpha.getLessThanMask(beta);
-        final DoubleTensor greaterMask = alpha.getGreaterThanOrEqualToMask(beta);
+        final DoubleTensor lessMask = alpha.lessThanMask(beta);
+        final DoubleTensor greaterMask = alpha.greaterThanOrEqualToMask(beta);
 
         return lessMask.timesInPlace(lessThan).plusInPlace(greaterMask.timesInPlace(greaterThan));
     }
@@ -77,7 +77,7 @@ public class Beta implements ContinuousDistribution {
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1);
+        final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1.0);
         final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).digammaInPlace();
         final DoubleTensor alphaMinusOneDivX = x.reciprocal().timesInPlace(alpha.minus(1));
 

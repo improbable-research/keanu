@@ -17,26 +17,26 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeC
 public class BooleanConcatenationVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
 
     private static final String DIMENSION_NAME = "dimension";
-    private static final String INPUT_NAME = "inputArray";
+    private static final String OPERANDS_NAME = "operands";
     private final int dimension;
-    private final BooleanVertex[] input;
+    private final BooleanVertex[] operands;
 
     /**
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
      * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param input     the input vertices to concatenate
+     * @param operands  the input vertices to concatenate
      */
-    public BooleanConcatenationVertex(int dimension, BooleanVertex... input) {
-        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, input)));
+    public BooleanConcatenationVertex(int dimension, BooleanVertex... operands) {
+        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, operands)));
         this.dimension = dimension;
-        this.input = input;
-        setParents(input);
+        this.operands = operands;
+        setParents(operands);
     }
 
     @ExportVertexToPythonBindings
     public BooleanConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
-                                      @LoadVertexParam(INPUT_NAME) Vertex[] input) {
+                                      @LoadVertexParam(OPERANDS_NAME) Vertex[] input) {
         this(dimension, convertVertexArrayToBooleanVertex(input));
     }
 
@@ -46,7 +46,7 @@ public class BooleanConcatenationVertex extends BooleanVertex implements NonProb
 
     @Override
     public BooleanTensor calculate() {
-        return op(extractFromInputs(BooleanTensor.class, Vertex::getValue, input));
+        return op(extractFromInputs(BooleanTensor.class, Vertex::getValue, operands));
     }
 
     protected BooleanTensor op(BooleanTensor... inputs) {
@@ -66,8 +66,8 @@ public class BooleanConcatenationVertex extends BooleanVertex implements NonProb
         return dimension;
     }
 
-    @SaveVertexParam(INPUT_NAME)
-    public BooleanVertex[] getInput() {
-        return input;
+    @SaveVertexParam(OPERANDS_NAME)
+    public BooleanVertex[] getOperands() {
+        return operands;
     }
 }

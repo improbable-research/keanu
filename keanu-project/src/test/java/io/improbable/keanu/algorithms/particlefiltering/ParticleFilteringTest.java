@@ -41,10 +41,10 @@ public class ParticleFilteringTest {
         int resamplingCycles = 3;
         double resamplingProportion = 0.5;
         ParticleFilter particleFilter = ParticleFilter.ofVertexInGraph(temperature)
-                .withNumParticles(numParticles)
-                .withResamplingCycles(resamplingCycles)
-                .withResamplingProportion(resamplingProportion)
-                .build();
+            .withNumParticles(numParticles)
+            .withResamplingCycles(resamplingCycles)
+            .withResamplingProportion(resamplingProportion)
+            .build();
 
         Particle mostProbableParticle = particleFilter.getMostProbableParticle();
 

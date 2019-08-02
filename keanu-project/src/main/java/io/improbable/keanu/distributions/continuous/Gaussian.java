@@ -4,7 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
@@ -55,7 +55,7 @@ public class Gaussian implements ContinuousDistribution {
 
         final DoubleTensor dLogPdmu = xMinusMu.div(variance);
         final DoubleTensor dLogPdx = dLogPdmu.unaryMinus();
-        final DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2)
+        final DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2.0)
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 

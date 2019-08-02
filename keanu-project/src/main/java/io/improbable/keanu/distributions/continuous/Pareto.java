@@ -4,7 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
@@ -28,7 +28,7 @@ public class Pareto implements ContinuousDistribution {
     @Override
     public Diffs dLogProb(DoubleTensor x) {
         DoubleTensor dLogPdx = scale.plus(1.0).divInPlace(x).unaryMinusInPlace();
-        DoubleTensor dLogPdLocation = DoubleTensor.zeros(x.getShape()).plusInPlace(scale).divInPlace(location);
+        DoubleTensor dLogPdLocation = scale.div(location).broadcast(x.getShape());
         DoubleTensor dLogPdScale = scale.reciprocal().plusInPlace(location.log()).minusInPlace(x.log());
 
         return new Diffs()
@@ -71,7 +71,7 @@ public class Pareto implements ContinuousDistribution {
     }
 
     private DoubleTensor setProbToZeroForInvalidX(DoubleTensor x, DoubleTensor result) {
-        DoubleTensor invalids = x.getLessThanOrEqualToMask(location);
+        DoubleTensor invalids = x.lessThanOrEqualToMask(location);
         result.setWithMaskInPlace(invalids, Double.NEGATIVE_INFINITY);
 
         return result;

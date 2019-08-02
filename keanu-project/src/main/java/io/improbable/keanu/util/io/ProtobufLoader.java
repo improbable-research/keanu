@@ -129,8 +129,8 @@ public class ProtobufLoader implements NetworkLoader {
         if (idTarget != null && labelTarget != null) {
             if (idTarget != labelTarget) {
                 throw new IllegalArgumentException("Label and VertexID don't refer to same Vertex: ("
-                        + storedValue.getVertexLabel() + ") ("
-                        + storedValue.getId().toString() + ")");
+                    + storedValue.getVertexLabel() + ") ("
+                    + storedValue.getId().toString() + ")");
             } else {
                 targetVertex = idTarget;
             }

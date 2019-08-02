@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -13,12 +14,13 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.Arrays;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShape.getSummationResultShape;
+import static io.improbable.keanu.tensor.TensorShape.getReductionResultShape;
 import static java.util.Collections.singletonMap;
 
 public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
 
     private static final String DIMENSIONS_NAME = "overDimensions";
+
     private final int[] overDimensions;
 
     /**
@@ -29,7 +31,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
      */
     public SumVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                      @LoadVertexParam(DIMENSIONS_NAME) int[] overDimensions) {
-        super(getSummationResultShape(inputVertex.getShape(), overDimensions), inputVertex);
+        super(getReductionResultShape(inputVertex.getShape(), overDimensions), inputVertex);
         this.overDimensions = overDimensions;
     }
 
@@ -40,18 +42,25 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
      */
     @ExportVertexToPythonBindings
     public SumVertex(DoubleVertex inputVertex) {
-        this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getRank()));
+        super(Tensor.SCALAR_SHAPE, inputVertex);
+        this.overDimensions = null;
     }
 
     @Override
     protected DoubleTensor op(DoubleTensor value) {
-        return value.sum(overDimensions);
+        if (overDimensions == null) {
+            return DoubleTensor.scalar(value.sum());
+        } else {
+            return value.sum(overDimensions);
+        }
     }
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return new PartialDerivative(dInputVertex.get().sum(overDimensions));
+        int operandRank = inputVertex.getValue().getRank();
+        int[] dimensionsToSum = overDimensions == null ? TensorShape.dimensionRange(0, operandRank) : overDimensions;
+        return new PartialDerivative(dInputVertex.get().sum(dimensionsToSum));
     }
 
     @Override
@@ -72,18 +81,22 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
             inputVertex.getShape()
         );
 
-        DoubleTensor broadcastedPartial = DoubleTensor
-            .zeros(resultShape)
-            .plus(partialDueToSummationShapeChange);
+        DoubleTensor broadcastedPartial = partialDueToSummationShapeChange.broadcast(resultShape);
 
         return singletonMap(inputVertex, new PartialDerivative(broadcastedPartial));
     }
 
     private static long[] summedOverShapeWithoutRankLoss(long[] shape, int[] sumOverDimensions) {
         long[] shapeCopy = Arrays.copyOf(shape, shape.length);
-        for (int sumOverDimension : sumOverDimensions) {
-            shapeCopy[sumOverDimension] = 1;
+
+        if (sumOverDimensions == null) {
+            Arrays.fill(shapeCopy, 1L);
+        } else {
+            for (int sumOverDimension : sumOverDimensions) {
+                shapeCopy[sumOverDimension] = 1L;
+            }
         }
+
         return shapeCopy;
     }
 

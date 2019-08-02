@@ -126,6 +126,7 @@ public class EvalPropagationTest {
             return null;
         }
     }
+
     @Test
     public void doesNotRedoWorkAlreadyDoneOnLazyEval() {
         AtomicInteger n = new AtomicInteger(0);

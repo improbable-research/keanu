@@ -15,7 +15,7 @@ public class DoubleLessThanMaskVertex extends DoubleBinaryOpVertex {
 
     @Override
     protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
-        return l.getLessThanMask(r);
+        return l.lessThanMask(r);
     }
 
 }

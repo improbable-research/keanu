@@ -247,7 +247,7 @@ public class BooleanVertexTest {
         return pA + pB - (pA * pB);
     }
 
-    public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean>> vertex, int sampleCount, KeanuRandom random) {
+    public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean, ?>> vertex, int sampleCount, KeanuRandom random) {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
 
         long trueCount = MetropolisHastings.withDefaultConfig(random)

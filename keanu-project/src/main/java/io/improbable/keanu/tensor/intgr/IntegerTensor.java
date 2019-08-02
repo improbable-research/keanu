@@ -1,25 +1,18 @@
 package io.improbable.keanu.tensor.intgr;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.kotlin.IntegerOperators;
-import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.FixedPointTensor;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.Arrays;
-import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
-public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
-
-    IntegerTensor ZERO_SCALAR = scalar(0);
-
-    IntegerTensor ONE_SCALAR = scalar(1);
-
-    IntegerTensor TWO_SCALAR = scalar(2);
+public interface IntegerTensor extends FixedPointTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
     static IntegerTensor create(int value, long[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
@@ -39,6 +32,28 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     static IntegerTensor create(int... values) {
         return create(values, values.length);
+    }
+
+    /**
+     * Creates an IntegerTensor from a long[]. Will throw an exception if any value in the long[] cannot be represented as an integer
+     *
+     * @param values long[] of values
+     * @param shape  shape of the tensor
+     * @return a new IntegerTensor
+     */
+    static IntegerTensor create(long[] values, long... shape) {
+        int[] ints = Arrays.stream(values).mapToInt(Ints::checkedCast).toArray();
+        return IntegerTensor.create(ints, shape);
+    }
+
+    /**
+     * Creates an IntegerTensor from a long[]. Will throw an exception if any value in the long[] cannot be represented as an integer
+     *
+     * @param values long[] of values
+     * @return a new IntegerTensor
+     */
+    static IntegerTensor create(long... values) {
+        return IntegerTensor.create(values, values.length);
     }
 
     static IntegerTensor ones(long... shape) {
@@ -117,7 +132,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {
-            concatAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toConcat[i]).dup();
+            concatAsINDArray[i] = Nd4jIntegerTensor.getAsINDArray(toConcat[i]).dup();
             if (concatAsINDArray[i].shape().length == 0) {
                 concatAsINDArray[i] = concatAsINDArray[i].reshape(1);
             }
@@ -134,102 +149,39 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return a.duplicate().maxInPlace(b);
     }
 
+    // Kotlin unboxes to the primitive but does not match the Java
     @Override
-    IntegerTensor setValue(Integer value, long... index);
-
-    @Override
-    IntegerTensor reshape(long... newShape);
-
-    @Override
-    IntegerTensor duplicate();
-
-    IntegerTensor diag();
-
-    IntegerTensor transpose();
-
-    IntegerTensor sum(int... overDimensions);
-
-    //New tensor Ops and transforms
-
-    IntegerTensor minus(int value);
-
-    IntegerTensor plus(int value);
-
-    IntegerTensor times(int value);
-
-    IntegerTensor div(int value);
-
-    IntegerTensor pow(int exponent);
-
-    IntegerTensor minus(IntegerTensor that);
-
-    default IntegerTensor reverseMinus(int that) {
-        return this.unaryMinus().plus(that);
+    default IntegerTensor plus(int value) {
+        return plus((Integer) value);
     }
 
-    IntegerTensor plus(IntegerTensor that);
-
-    IntegerTensor times(IntegerTensor that);
-
-    IntegerTensor matrixMultiply(IntegerTensor value);
-
-    IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight);
-
-    IntegerTensor div(IntegerTensor that);
-
-    default IntegerTensor reverseDiv(int that) {
-        return IntegerTensor.scalar(that).div(this);
+    @Override
+    default IntegerTensor minus(int value) {
+        return minus((Integer) value);
     }
 
-    IntegerTensor unaryMinus();
-
-    IntegerTensor abs();
-
-    IntegerTensor getGreaterThanMask(IntegerTensor greaterThanThis);
-
-    IntegerTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanThis);
-
-    IntegerTensor getLessThanMask(IntegerTensor lessThanThis);
-
-    IntegerTensor getLessThanOrEqualToMask(IntegerTensor lessThanThis);
-
-    IntegerTensor setWithMaskInPlace(IntegerTensor mask, Integer value);
-
-    IntegerTensor setWithMask(IntegerTensor mask, Integer value);
-
-    IntegerTensor apply(Function<Integer, Integer> function);
+    @Override
+    default IntegerTensor reverseMinus(int value) {
+        return reverseMinus((Integer) value);
+    }
 
     @Override
-    IntegerTensor slice(int dimension, long index);
+    default IntegerTensor times(int value) {
+        return times((Integer) value);
+    }
 
-    // In Place
+    @Override
+    default IntegerTensor div(int value) {
+        return div((Integer) value);
+    }
 
-    IntegerTensor minusInPlace(int value);
+    @Override
+    default IntegerTensor reverseDiv(int value) {
+        return reverseDiv((Integer) value);
+    }
 
-    IntegerTensor plusInPlace(int value);
-
-    IntegerTensor timesInPlace(int value);
-
-    IntegerTensor divInPlace(int value);
-
-    IntegerTensor powInPlace(int exponent);
-
-    // Comparisons
-
-    BooleanTensor lessThan(int value);
-
-    BooleanTensor lessThanOrEqual(int value);
-
-    BooleanTensor greaterThan(int value);
-
-    BooleanTensor greaterThanOrEqual(int value);
-
-    IntegerTensor minInPlace(IntegerTensor min);
-
-    IntegerTensor maxInPlace(IntegerTensor max);
-
-    int min();
-
-    int max();
-
+    @Override
+    default IntegerTensor pow(int exponent) {
+        return pow((Integer) exponent);
+    }
 }

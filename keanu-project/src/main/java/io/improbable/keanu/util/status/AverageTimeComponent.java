@@ -29,7 +29,7 @@ public class AverageTimeComponent extends TimeComponent {
         if (currentStepNow != 0) {
             averageStepTime = Duration.between(elapsedTime.getStartTime(), Instant.now()).dividedBy(currentStepNow);
             long averageStepTimeNanos = averageStepTime.toNanos();
-            if(averageStepTimeNanos != 0) {
+            if (averageStepTimeNanos != 0) {
                 double stepsSecond = (double) NANOS_IN_SECOND / averageStepTime.toNanos();
                 renderedString.append(", Steps per second: ");
                 renderedString.append(String.format("%.3f", stepsSecond));

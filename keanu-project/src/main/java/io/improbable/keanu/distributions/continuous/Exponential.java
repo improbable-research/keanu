@@ -4,7 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.LAMBDA;
@@ -31,7 +31,7 @@ public class Exponential implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor negXMinusADivB = x.unaryMinus().divInPlace(lambda);
         final DoubleTensor negXMinusADivBMinusLogB = negXMinusADivB.minusInPlace(lambda.log());
-        return negXMinusADivBMinusLogB.setWithMask(x.getLessThanMask(DoubleTensor.scalar(0.0)), Double.NEGATIVE_INFINITY);
+        return negXMinusADivBMinusLogB.setWithMask(x.lessThanMask(DoubleTensor.scalar(0.0)), Double.NEGATIVE_INFINITY);
     }
 
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex lambda) {

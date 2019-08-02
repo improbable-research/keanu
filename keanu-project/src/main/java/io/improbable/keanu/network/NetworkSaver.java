@@ -24,32 +24,32 @@ public interface NetworkSaver {
     void save(Vertex vertex);
 
     default void save(ConstantVertex vertex) {
-        save((Vertex)vertex);
+        save((Vertex) vertex);
     }
 
     default void save(ConstantDoubleVertex vertex) {
-        save((ConstantVertex)vertex);
+        save((ConstantVertex) vertex);
     }
 
     default void save(ConstantIntegerVertex vertex) {
-        save((ConstantVertex)vertex);
+        save((ConstantVertex) vertex);
     }
 
     default void save(ConstantBooleanVertex vertex) {
-        save((ConstantVertex)vertex);
+        save((ConstantVertex) vertex);
     }
 
     void saveValue(Vertex vertex);
 
     default void saveValue(DoubleVertex vertex) {
-        saveValue((Vertex)vertex);
+        saveValue((Vertex) vertex);
     }
 
-    default void saveValue(IntegerVertex vertex)  {
-        saveValue((Vertex)vertex);
+    default void saveValue(IntegerVertex vertex) {
+        saveValue((Vertex) vertex);
     }
 
-    default void saveValue(BooleanVertex vertex)  {
-        saveValue((Vertex)vertex);
+    default void saveValue(BooleanVertex vertex) {
+        saveValue((Vertex) vertex);
     }
 }

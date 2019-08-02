@@ -5,8 +5,8 @@ import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LogProbGraph.BooleanPlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.bool.BooleanPlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
@@ -54,10 +54,10 @@ public class Bernoulli implements Distribution<BooleanTensor> {
 
     public DoubleTensor dLogProb(BooleanTensor x) {
         DoubleTensor greaterThanMask = probTrue
-            .getGreaterThanMask(DoubleTensor.scalar(1.0));
+            .greaterThanMask(DoubleTensor.scalar(1.0));
 
         DoubleTensor lessThanOrEqualToMask = probTrue
-            .getLessThanOrEqualToMask(DoubleTensor.scalar(0.0));
+            .lessThanOrEqualToMask(DoubleTensor.scalar(0.0));
 
         DoubleTensor greaterThanOneOrLessThanZero = greaterThanMask.plusInPlace(lessThanOrEqualToMask);
 

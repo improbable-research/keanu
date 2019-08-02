@@ -4,11 +4,12 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
-public abstract class IntegerBinaryOpVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
+public abstract class IntegerBinaryOpVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor>, VertexBinaryOp<IntegerVertex, IntegerVertex> {
 
     protected final IntegerVertex left;
     protected final IntegerVertex right;
@@ -46,11 +47,13 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
 
     protected abstract IntegerTensor op(IntegerTensor l, IntegerTensor r);
 
+    @Override
     @SaveVertexParam(LEFT_NAME)
     public IntegerVertex getLeft() {
         return left;
     }
 
+    @Override
     @SaveVertexParam(RIGHT_NAME)
     public IntegerVertex getRight() {
         return right;

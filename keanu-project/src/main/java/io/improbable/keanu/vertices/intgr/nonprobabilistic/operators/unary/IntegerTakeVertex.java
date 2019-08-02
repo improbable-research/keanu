@@ -17,7 +17,7 @@ public class IntegerTakeVertex extends IntegerUnaryOpVertex {
      * A vertex that extracts a scalar at a given index
      *
      * @param inputVertex the input vertex to extract from
-     * @param index the index to extract at
+     * @param index       the index to extract at
      */
     @ExportVertexToPythonBindings
     public IntegerTakeVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,

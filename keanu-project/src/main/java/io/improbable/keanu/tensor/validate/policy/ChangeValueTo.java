@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
-public class ChangeValueTo<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValidationPolicy<TENSOR> {
+public class ChangeValueTo<DATATYPE, TENSOR extends Tensor<DATATYPE, TENSOR>> implements TensorValidationPolicy<DATATYPE, TENSOR> {
     private final DATATYPE value;
 
     // package private - because it's created by the factory method TensorValidationPolicy.changeValueTo

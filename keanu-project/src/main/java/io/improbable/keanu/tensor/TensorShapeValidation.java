@@ -2,7 +2,6 @@ package io.improbable.keanu.tensor;
 
 
 import com.google.common.base.Preconditions;
-import org.nd4j.linalg.api.shape.Shape;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -105,7 +104,16 @@ public class TensorShapeValidation {
     }
 
     public static long[] checkIsBroadcastable(long[] left, long[] right) {
-        return Shape.broadcastOutputShape(left, right);
+        return TensorShape.getBroadcastResultShape(left, right);
+    }
+
+    public static boolean isBroadcastable(long[] left, long[] right) {
+        try {
+            TensorShape.getBroadcastResultShape(left, right);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     /**
