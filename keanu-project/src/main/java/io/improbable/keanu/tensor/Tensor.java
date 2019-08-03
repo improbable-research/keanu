@@ -124,7 +124,7 @@ public interface Tensor<N, T extends Tensor<N, T>> extends BaseTensor<BooleanTen
      */
     List<T> split(int dimension, long... splitAtIndices);
 
-    T setAsSlice(T to, Slicer slicer);
+    T reverseSlice(T to, Slicer slicer);
 
     default List<N> asFlatList() {
         return Arrays.asList(asFlatArray());

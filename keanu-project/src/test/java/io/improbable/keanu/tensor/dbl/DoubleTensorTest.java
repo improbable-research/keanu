@@ -2178,7 +2178,7 @@ public class DoubleTensorTest {
         DoubleTensor sliced = a.slice(":,1");
 
         DoubleTensor expected = DoubleTensor.create(0, 1, 0, 3).reshape(2, 2);
-        DoubleTensor actual = sliced.setAsSlice(DoubleTensor.zeros(2, 2), Slicer.fromString(":,1"));
+        DoubleTensor actual = sliced.reverseSlice(DoubleTensor.zeros(2, 2), Slicer.fromString(":,1"));
 
         assertThat(actual, valuesAndShapesMatch(expected));
     }
@@ -2213,7 +2213,7 @@ public class DoubleTensorTest {
             14, 15
         ).reshape(4, 2, 2);
 
-        DoubleTensor actual = sliced.setAsSlice(DoubleTensor.zeros(4, 2, 2), Slicer.fromString("0:4:3"));
+        DoubleTensor actual = sliced.reverseSlice(DoubleTensor.zeros(4, 2, 2), Slicer.fromString("0:4:3"));
 
         assertThat(actual, valuesAndShapesMatch(expected));
     }

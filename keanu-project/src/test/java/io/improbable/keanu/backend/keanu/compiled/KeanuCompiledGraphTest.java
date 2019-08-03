@@ -177,6 +177,8 @@ public class KeanuCompiledGraphTest {
         assertUnaryDoubleMatches(DoubleVertex::exp);
         assertUnaryDoubleMatches(DoubleVertex::log);
         assertUnaryDoubleMatches(DoubleVertex::logGamma);
+        assertUnaryDoubleMatches(DoubleVertex::digamma);
+        assertUnaryDoubleMatches(DoubleVertex::trigamma);
         assertUnaryDoubleMatches(DoubleVertex::sin);
         assertUnaryDoubleMatches(DoubleVertex::asin);
         assertUnaryDoubleMatches(DoubleVertex::tan);

@@ -244,7 +244,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     }
 
     @Override
-    public TENSOR setAsSlice(TENSOR setTo, Slicer slicer) {
+    public TENSOR reverseSlice(TENSOR setTo, Slicer slicer) {
 
         JVMTensor.setAsSlice(
             getFlattenedView(),

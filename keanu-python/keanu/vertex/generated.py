@@ -154,6 +154,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floa
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.StandardizeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanhVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TrigammaVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.binary.AdditionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.binary.DifferenceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.binary.DivisionVertex")
@@ -864,6 +865,15 @@ def Tanh(input_vertex: vertex_constructor_param_types, label: Optional[str]=None
     :param input_vertex: the vertex
     """
     return Vertex(context.jvm_view().TanhVertex, label, cast_to_vertex(input_vertex))
+
+
+def Trigamma(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().TrigammaVertex, label, cast_to_vertex(input_vertex))
 
 
 def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

@@ -95,6 +95,7 @@ import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.Stand
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.StandardizeVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanhVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TrigammaVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.binary.DivisionVertex;
@@ -217,6 +218,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(ExpM1Vertex.class, fluentUnaryOp("expM1", "expM1InPlace"));
 
         opMappers.put(DigammaVertex.class, fluentUnaryOp("digamma", "digammaInPlace"));
+        opMappers.put(TrigammaVertex.class, fluentUnaryOp("trigamma", "trigammaInPlace"));
         opMappers.put(SigmoidVertex.class, fluentUnaryOp("sigmoid", "sigmoidInPlace"));
         opMappers.put(MatrixDeterminantVertex.class, fluentUnaryOp("matrixDeterminant"));
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));

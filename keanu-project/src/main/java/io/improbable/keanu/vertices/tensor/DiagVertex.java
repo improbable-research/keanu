@@ -36,9 +36,24 @@ public class DiagVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        Preconditions.checkArgument(inputVertex.getRank() == 1, "Forward mode autodiff for diag does not support batch diag");
         PartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return new PartialDerivative(partial.get().diag());
+
+        final long[] ofShape = inputVertex.getShape();
+        final long[] wrtShape = partial.getWrtShape(ofShape);
+        final long N = ofShape[ofShape.length - 1];
+        final long wrtShapeLength = TensorShape.getLength(wrtShape);
+        final long[] resultShape = TensorShape.concat(getShape(), wrtShape);
+        final DoubleTensor zeroes = DoubleTensor.zeros(resultShape).reshape(-1, N * N, wrtShapeLength);
+
+        DoubleTensor result = partial.get().reverseSlice(
+            zeroes,
+            Slicer.builder()
+                .all()
+                .slice(0L, null, N + 1L)
+                .build()
+        ).reshape(resultShape);
+
+        return new PartialDerivative(result);
     }
 
     @Override

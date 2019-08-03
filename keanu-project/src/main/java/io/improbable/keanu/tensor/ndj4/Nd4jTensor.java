@@ -112,7 +112,7 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     }
 
     @Override
-    public TENSOR setAsSlice(TENSOR setTo, Slicer slicer) {
+    public TENSOR reverseSlice(TENSOR setTo, Slicer slicer) {
 
         JVMTensor.setAsSlice(
             getFlattenedView(),
