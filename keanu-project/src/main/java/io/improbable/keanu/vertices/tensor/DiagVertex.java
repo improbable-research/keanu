@@ -53,15 +53,13 @@ public class DiagVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
         final long[] firstDims = ArrayUtils.subarray(pShape, 0, p.getRank() - 1);
         firstDims[firstDims.length - 1] = endDimsLength;
 
-        final Slicer.SlicerBuilder builder = Slicer.builder();
-
-        for (int i = 0; i < firstDims.length - 1; i++) {
-            builder.all();
-        }
-
-        final Slicer slicer = builder.slice(0L, endDimsLength, endDim + 1L).build();
-
-        final DoubleTensor inputResultPartial = partial.get().reshape(firstDims).slice(slicer);
+        final DoubleTensor inputResultPartial = partial.get()
+            .reshape(firstDims)
+            .slice(Slicer.builder()
+                .ellipsis()
+                .slice(0L, endDimsLength, endDim + 1L)
+                .build()
+            );
 
         final HashMap<Vertex, PartialDerivative> result = new HashMap<>();
         result.put(inputVertex, new PartialDerivative(inputResultPartial));

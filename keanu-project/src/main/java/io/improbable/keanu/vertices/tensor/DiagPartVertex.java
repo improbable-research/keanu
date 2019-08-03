@@ -58,8 +58,7 @@ public class DiagPartVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
             .slice(0L, inputMatrixLength, resultLength + 1L)
             .build();
 
-        DoubleTensor result = partial.get().reshape(TensorShape.concat(flatMatrixShape, wrtShape))
-            .slice(slicer);
+        DoubleTensor result = partial.get().reshape(TensorShape.concat(flatMatrixShape, wrtShape)).slice(slicer);
 
         return new PartialDerivative(result);
     }
