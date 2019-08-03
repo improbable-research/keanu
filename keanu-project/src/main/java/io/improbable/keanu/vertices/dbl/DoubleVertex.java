@@ -79,11 +79,6 @@ public interface DoubleVertex extends DoubleOperators<DoubleVertex>, FloatingPoi
         return new ConcatenationVertex(dimension, toConcat);
     }
 
-    @Override
-    default DoubleVertex slice(Slicer slicer) {
-        return null;
-    }
-
     //////////////////////////
     ////  Number Tensor Operations
     //////////////////////////

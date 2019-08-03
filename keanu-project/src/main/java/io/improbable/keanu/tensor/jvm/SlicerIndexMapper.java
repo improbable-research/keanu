@@ -1,12 +1,8 @@
 package io.improbable.keanu.tensor.jvm;
 
-import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import io.improbable.keanu.tensor.TensorShape;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
@@ -27,7 +23,6 @@ public final class SlicerIndexMapper implements IndexMapper {
 
     private final Slicer slicer;
 
-
     private final long[] sourceShape;
     private final long[] sourceStride;
 
@@ -40,41 +35,9 @@ public final class SlicerIndexMapper implements IndexMapper {
         this.sourceShape = sourceShape;
         this.sourceStride = sourceStride;
 
-        List<Long> shapeList = new ArrayList<>();
-        List<Integer> droppedList = new ArrayList<>();
-        List<Slicer.StartStopStep> slices = slicer.getSlices();
-        initialize(sourceShape, shapeList, droppedList, slices);
-
-        this.resultShapeWithoutRankLoss = Longs.toArray(shapeList);
+        this.resultShapeWithoutRankLoss = slicer.getResultShape(sourceShape, true);
         this.resultStrideWithoutRankLoss = TensorShape.getRowFirstStride(resultShapeWithoutRankLoss);
-        this.dimensionsDropped = Ints.toArray(droppedList);
-    }
-
-    private static void initialize(long[] sourceShape, List<Long> shapeList, List<Integer> droppedList, List<Slicer.StartStopStep> slices) {
-        Preconditions.checkArgument(slices.size() <= sourceShape.length, "Too many slices specified for shape");
-
-        for (int i = 0; i < sourceShape.length; i++) {
-
-            if (i >= slices.size() || slices.get(i) == Slicer.StartStopStep.ALL) {
-                shapeList.add(sourceShape[i]);
-            } else {
-
-                Slicer.StartStopStep slice = slices.get(i);
-
-                if (slice.getStop() == Slicer.StartStopStep.START_PLUS_ONE_STOP) {
-                    shapeList.add(1L);
-                    droppedList.add(i);
-
-                } else {
-
-                    final long stop = slice.getStop() == Slicer.StartStopStep.UPPER_BOUND_STOP ? sourceShape[i] : slice.getStop();
-                    final long absStep = Math.abs(slice.getStep());
-                    final long length = 1 + (stop - 1 - slice.getStart()) / absStep;
-                    shapeList.add(length);
-
-                }
-            }
-        }
+        this.dimensionsDropped = slicer.getDroppedDimensions();
     }
 
     /**

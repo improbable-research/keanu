@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.intgr;
 
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
@@ -61,11 +60,6 @@ public interface IntegerVertex extends IntegerOperators<IntegerVertex>, FixedPoi
 
     static IntegerVertex concat(int dimension, IntegerVertex... toConcat) {
         return new IntegerConcatenationVertex(dimension, toConcat);
-    }
-
-    @Override
-    default IntegerVertex slice(Slicer slicer) {
-        return null;
     }
 
     //////////////////////////

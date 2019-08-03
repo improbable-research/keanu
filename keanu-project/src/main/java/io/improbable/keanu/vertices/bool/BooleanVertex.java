@@ -91,11 +91,6 @@ public interface BooleanVertex extends
         return new AssertVertex(this, errorMessage);
     }
 
-    @Override
-    default BooleanVertex slice(Slicer slicer) {
-        return null;
-    }
-
     /////////////
     //// Boolean Ops
     /////////////

@@ -1,6 +1,9 @@
 package io.improbable.keanu.tensor.jvm;
 
+import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import lombok.Value;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +45,52 @@ public class Slicer {
     }
 
     private final List<StartStopStep> slices;
+
+    public long[] getResultShape(long[] sourceShape, boolean keepDims) {
+        Preconditions.checkArgument(slices.size() <= sourceShape.length, "Too many slices specified for shape");
+
+        long[] resultShapeWithoutRankLoss = new long[sourceShape.length];
+
+        for (int i = 0; i < sourceShape.length; i++) {
+
+            if (i >= slices.size() || slices.get(i) == Slicer.StartStopStep.ALL) {
+                resultShapeWithoutRankLoss[i] = sourceShape[i];
+            } else {
+
+                Slicer.StartStopStep slice = slices.get(i);
+
+                if (slice.getStop() == Slicer.StartStopStep.START_PLUS_ONE_STOP) {
+                    resultShapeWithoutRankLoss[i] = 1L;
+
+                } else {
+
+                    final long stop = slice.getStop() == Slicer.StartStopStep.UPPER_BOUND_STOP ? sourceShape[i] : slice.getStop();
+                    final long absStep = Math.abs(slice.getStep());
+                    final long length = 1 + (stop - 1 - slice.getStart()) / absStep;
+                    resultShapeWithoutRankLoss[i] = length;
+                }
+            }
+        }
+
+        if (keepDims) {
+            return resultShapeWithoutRankLoss;
+        } else {
+            return ArrayUtils.removeAll(resultShapeWithoutRankLoss, getDroppedDimensions());
+        }
+    }
+
+    public int[] getDroppedDimensions() {
+
+        List<Integer> droppedDimensions = new ArrayList<>();
+
+        for (int i = 0; i < slices.size(); i++) {
+            if (slices.get(i).getStop() == Slicer.StartStopStep.START_PLUS_ONE_STOP) {
+                droppedDimensions.add(i);
+            }
+        }
+
+        return Ints.toArray(droppedDimensions);
+    }
 
     public static class SlicerBuilder {
         private ArrayList<StartStopStep> slices = new ArrayList<>();
