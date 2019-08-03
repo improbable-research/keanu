@@ -28,11 +28,11 @@ public class StandardizeVertex<T extends Number, TENSOR extends FloatingPointTen
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }
