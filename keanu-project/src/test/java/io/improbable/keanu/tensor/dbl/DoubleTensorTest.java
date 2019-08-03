@@ -2172,6 +2172,53 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canSetAsSliceForMatrix() {
+        DoubleTensor a = DoubleTensor.arange(4).reshape(2, 2);
+
+        DoubleTensor sliced = a.slice(":,1");
+
+        DoubleTensor expected = DoubleTensor.create(0, 1, 0, 3).reshape(2, 2);
+        DoubleTensor actual = sliced.setAsSlice(DoubleTensor.zeros(2, 2), Slicer.fromString(":,1"));
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canSetAsSliceForMatrixOfMatrices() {
+        DoubleTensor a = DoubleTensor.arange(16).reshape(2, 2, 2, 2);
+
+        DoubleTensor sliced = a.reshape(4, 2, 2).slice("0:4:3");
+
+        DoubleTensor expectedSliced = DoubleTensor.create(
+            0, 1,
+            2, 3,
+
+            12, 13,
+            14, 15
+        ).reshape(2, 2, 2);
+
+        assertThat(sliced, valuesAndShapesMatch(expectedSliced));
+
+        DoubleTensor expected = DoubleTensor.create(
+            0, 1,
+            2, 3,
+
+            0, 0,
+            0, 0,
+
+            0, 0,
+            0, 0,
+
+            12, 13,
+            14, 15
+        ).reshape(4, 2, 2);
+
+        DoubleTensor actual = sliced.setAsSlice(DoubleTensor.zeros(4, 2, 2), Slicer.fromString("0:4:3"));
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
     public void canIsInfinity() {
         DoubleTensor a = DoubleTensor.create(
             Double.NEGATIVE_INFINITY, 1, Double.NaN,

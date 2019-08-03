@@ -243,6 +243,30 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         return new ResultWrapper<>(newBuffer, resultShape, resultStride);
     }
 
+    @Override
+    public TENSOR setAsSlice(TENSOR setTo, Slicer slicer) {
+
+        JVMTensor.setAsSlice(
+            getFlattenedView(),
+            setTo.getFlattenedView(),
+            new SlicerIndexMapper(slicer, setTo.getShape(), setTo.getStride())
+        );
+
+        return setTo;
+    }
+
+    public static <T> void setAsSlice(FlattenedView<T> from,
+                                      FlattenedView<T> to,
+                                      IndexMapper indexMapper) {
+
+        for (long i = 0; i < from.size(); i++) {
+
+            final long j = indexMapper.getSourceIndexFromResultIndex(i);
+            to.set(j, from.get(i));
+        }
+
+    }
+
     public static <T, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>>
     ResultWrapper<T, B> concat(JVMBuffer.ArrayWrapperFactory<T, B> factory,
                                Tensor[] tensors,

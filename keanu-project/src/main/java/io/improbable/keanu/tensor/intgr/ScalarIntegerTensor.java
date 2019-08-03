@@ -7,7 +7,9 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
+import io.improbable.keanu.tensor.jvm.SlicerIndexMapper;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
@@ -268,6 +270,12 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public List<IntegerTensor> split(int dimension, long... splitAtIndices) {
         throw new UnsupportedOperationException("Cannot split scalar!");
+    }
+
+    @Override
+    public IntegerTensor setAsSlice(IntegerTensor to, Slicer slicer) {
+        JVMTensor.setAsSlice(getFlattenedView(), to.getFlattenedView(), new SlicerIndexMapper(slicer, to.getShape(), to.getStride()));
+        return to;
     }
 
     @Override

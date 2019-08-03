@@ -4,7 +4,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
+import io.improbable.keanu.tensor.jvm.SlicerIndexMapper;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.shape.Diag;
 import org.nd4j.linalg.api.ops.impl.shape.DiagPart;
@@ -110,6 +112,18 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     }
 
     @Override
+    public TENSOR setAsSlice(TENSOR setTo, Slicer slicer) {
+
+        JVMTensor.setAsSlice(
+            getFlattenedView(),
+            setTo.getFlattenedView(),
+            new SlicerIndexMapper(slicer, setTo.getShape(), setTo.getStride())
+        );
+
+        return setTo;
+    }
+
+    @Override
     public TENSOR slice(int dimension, long index) {
         return create(tensor.slice(index, dimension));
     }
@@ -134,7 +148,7 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
             }
         }
 
-        return create(tensor.get(indArrayIndices));
+        return create(tensor.get(indArrayIndices).dup());
     }
 
     @Override

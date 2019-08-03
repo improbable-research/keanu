@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
@@ -122,6 +123,8 @@ public interface Tensor<N, T extends Tensor<N, T>> extends BaseTensor<BooleanTen
      * )
      */
     List<T> split(int dimension, long... splitAtIndices);
+
+    T setAsSlice(T to, Slicer slicer);
 
     default List<N> asFlatList() {
         return Arrays.asList(asFlatArray());
