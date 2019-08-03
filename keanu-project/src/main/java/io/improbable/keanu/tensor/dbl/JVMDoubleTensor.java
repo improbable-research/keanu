@@ -671,6 +671,12 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
+    public DoubleTensor trigammaInPlace() {
+        buffer.apply(Gamma::trigamma);
+        return this;
+    }
+
+    @Override
     public DoubleTensor sinInPlace() {
         buffer.apply(FastMath::sin);
         return this;

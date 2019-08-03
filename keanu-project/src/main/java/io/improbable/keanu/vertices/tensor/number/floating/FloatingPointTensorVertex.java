@@ -50,6 +50,7 @@ import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.Stand
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.StandardizeVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TanhVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.TrigammaVertex;
 
 public interface FloatingPointTensorVertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends FloatingPointTensorVertex<T, TENSOR, VERTEX>>
     extends NumberTensorVertex<T, TENSOR, VERTEX>, BaseFloatingPointTensor<BooleanVertex, IntegerVertex, DoubleVertex, T, VERTEX> {
@@ -202,6 +203,11 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
     @Override
     default VERTEX logGamma() {
         return wrap(new LogGammaVertex<>(this));
+    }
+
+    @Override
+    default VERTEX trigamma() {
+        return wrap(new TrigammaVertex<>(this));
     }
 
     @Override

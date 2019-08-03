@@ -11,6 +11,7 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class DigammaVertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
@@ -31,11 +32,16 @@ public class DigammaVertex<T extends Number, TENSOR extends FloatingPointTensor<
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return null;
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(inputVertex.getValue().toDouble().trigamma());
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        return null;
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+        PartialDerivative dOutputsWrtInputVertex =
+            derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(inputVertex.getValue().toDouble().trigamma());
+        partials.put(inputVertex, dOutputsWrtInputVertex);
+        return partials;
     }
 }

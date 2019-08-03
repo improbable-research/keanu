@@ -50,6 +50,8 @@ public interface BaseFloatingPointTensor<
 
     T digamma();
 
+    T trigamma();
+
     T sin();
 
     T cos();

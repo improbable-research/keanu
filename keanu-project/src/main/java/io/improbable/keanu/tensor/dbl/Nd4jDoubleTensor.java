@@ -261,6 +261,11 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     }
 
     @Override
+    public DoubleTensor trigammaInPlace() {
+        return applyInPlace(Gamma::trigamma);
+    }
+
+    @Override
     public DoubleTensor logAddExp2InPlace(DoubleTensor that) {
         //TODO: actually use Nd4j when logsumexp is fixed in next version
         JVMDoubleTensor asJVM = JVMDoubleTensor.create(tensor.toDoubleVector(), tensor.shape());

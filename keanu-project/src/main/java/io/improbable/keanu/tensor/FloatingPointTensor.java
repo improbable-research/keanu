@@ -67,6 +67,13 @@ public interface FloatingPointTensor<N extends Number, T extends FloatingPointTe
     T digammaInPlace();
 
     @Override
+    default T trigamma() {
+        return duplicate().trigammaInPlace();
+    }
+
+    T trigammaInPlace();
+
+    @Override
     default T sin() {
         return duplicate().sinInPlace();
     }
