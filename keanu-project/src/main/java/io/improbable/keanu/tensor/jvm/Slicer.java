@@ -11,8 +11,9 @@ import java.util.List;
 @Value
 public class Slicer {
 
-    private Slicer(List<StartStopStep> slices) {
+    private Slicer(List<Slice> slices, Integer ellipsisPosition) {
         this.slices = slices;
+        this.ellipsisPosition = ellipsisPosition;
     }
 
     public static SlicerBuilder builder() {
@@ -20,71 +21,148 @@ public class Slicer {
     }
 
     @Value
-    public static class StartStopStep {
+    public static class Slice {
         public static final long DEFAULT_START = 0;
-        public static final long UPPER_BOUND_STOP = -1;
-        public static final long START_PLUS_ONE_STOP = -2;
         public static final long DEFAULT_STEP = 1;
-        public static final StartStopStep ALL = new StartStopStep(DEFAULT_START, UPPER_BOUND_STOP, DEFAULT_STEP);
+        public static final Slice ALL = new Slice(DEFAULT_START, null, DEFAULT_STEP, false);
 
-        long start;
-        long stop;
-        long step;
+        private boolean upperBoundStop;
+        private boolean dropDimension;
+        private Long start;
+        private Long stop;
+        private Long step;
 
-        StartStopStep(Long start, Long stop, Long step) {
-            this.start = start != null ? start : DEFAULT_START;
-            this.stop = stop != null ? stop : UPPER_BOUND_STOP;
-            this.step = step != null ? step : DEFAULT_STEP;
+        Slice(Number start, Number stop, Number step, boolean dropDimension) {
+            this.start = start != null ? start.longValue() : DEFAULT_START;
+            this.stop = stop != null ? stop.longValue() : null;
+            this.step = step != null ? step.longValue() : DEFAULT_STEP;
+            Preconditions.checkArgument(this.step != 0, "Step cannot be 0");
+            this.upperBoundStop = stop == null;
+            this.dropDimension = dropDimension;
         }
 
-        StartStopStep(Integer start, Integer stop, Integer step) {
-            this.start = start != null ? start : DEFAULT_START;
-            this.stop = stop != null ? stop : UPPER_BOUND_STOP;
-            this.step = step != null ? step : DEFAULT_STEP;
+        public Long getStop(long dimLength) {
+            if (upperBoundStop) {
+                return dimLength;
+            } else if (stop < 0) {
+                return Math.max(0, dimLength + stop);
+            } else {
+                return Math.min(dimLength, stop);
+            }
+        }
+
+        public Long getStart(long dimLength) {
+            if (start < 0) {
+                return Math.max(0, dimLength + start);
+            } else {
+                return start;
+            }
         }
     }
 
-    private final List<StartStopStep> slices;
+    private final List<Slice> slices;
+    private final Integer ellipsisPosition;
 
-    public long[] getResultShape(long[] sourceShape, boolean keepDims) {
-        Preconditions.checkArgument(slices.size() <= sourceShape.length, "Too many slices specified for shape");
+    /**
+     * @param dimension        the dimension for which the slice is requested
+     * @param givenShapeLength the rank of the tensor being sliced. This is needed due to the ellipsis making this relative to a shape.
+     * @return a slice for a given dimension
+     */
+    public Slice getSlice(int dimension, int givenShapeLength) {
 
-        long[] resultShapeWithoutRankLoss = new long[sourceShape.length];
+        final int ellipsisStart;
+        final int ellipsisEnd;
+        final int ellipsisDimCount;
 
-        for (int i = 0; i < sourceShape.length; i++) {
+        if (ellipsisPosition != null) {
+            ellipsisStart = ellipsisPosition;
+            ellipsisDimCount = givenShapeLength - slices.size();
+            ellipsisEnd = ellipsisStart + ellipsisDimCount;
+        } else {
+            ellipsisStart = 0;
+            ellipsisDimCount = 0;
+            ellipsisEnd = 0;
+        }
 
-            if (i >= slices.size() || slices.get(i) == Slicer.StartStopStep.ALL) {
-                resultShapeWithoutRankLoss[i] = sourceShape[i];
+        final boolean takeAllByEllipsis = dimension >= ellipsisStart && dimension < ellipsisEnd;
+
+        if (takeAllByEllipsis) {
+            return Slice.ALL;
+        } else {
+            final int indexWithEllipsis = ellipsisPosition != null && dimension >= ellipsisEnd ? dimension - ellipsisDimCount : dimension;
+
+            if (indexWithEllipsis >= slices.size()) {
+                return Slice.ALL;
+            } else {
+                return slices.get(indexWithEllipsis);
+            }
+        }
+    }
+
+    /**
+     * @param givenShape the shape being sliced
+     * @param keepDims   true if no rank change is wanted false otherwise
+     * @return the resulting shape when this slicer is applied to the given shape
+     */
+    public long[] getResultShape(final long[] givenShape, final boolean keepDims) {
+
+        final long[] resultShapeWithoutRankLoss = new long[givenShape.length];
+
+        for (int i = 0; i < givenShape.length; i++) {
+
+            Slice slice = getSlice(i, givenShape.length);
+
+            if (slice == Slice.ALL) {
+                resultShapeWithoutRankLoss[i] = givenShape[i];
             } else {
 
-                Slicer.StartStopStep slice = slices.get(i);
-
-                if (slice.getStop() == Slicer.StartStopStep.START_PLUS_ONE_STOP) {
+                if (slice.isDropDimension()) {
                     resultShapeWithoutRankLoss[i] = 1L;
 
                 } else {
-
-                    final long stop = slice.getStop() == Slicer.StartStopStep.UPPER_BOUND_STOP ? sourceShape[i] : slice.getStop();
-                    final long absStep = Math.abs(slice.getStep());
-                    final long length = 1 + (stop - 1 - slice.getStart()) / absStep;
-                    resultShapeWithoutRankLoss[i] = length;
+                    resultShapeWithoutRankLoss[i] = getSliceLength(givenShape[i], slice);
                 }
             }
+
         }
 
         if (keepDims) {
             return resultShapeWithoutRankLoss;
         } else {
-            return ArrayUtils.removeAll(resultShapeWithoutRankLoss, getDroppedDimensions());
+            return ArrayUtils.removeAll(resultShapeWithoutRankLoss, getDroppedDimensions(givenShape));
         }
     }
 
-    public int[] getDroppedDimensions() {
+    /**
+     * @param dimLength the given dimension length for which this slice will be applied
+     * @param slice     the slice object that describes how the dimension will be sliced and therefore determines the
+     *                  length of the resulting dimension.
+     * @return the length of the dimension after the slice is applied
+     */
+    private long getSliceLength(long dimLength, Slice slice) {
+
+        final long stop = slice.getStop(dimLength);
+        final long start = slice.getStart(dimLength);
+        final long excludeStopOffset = (long) Math.signum(slice.getStep());
+        final long stepCount = (stop - excludeStopOffset - start) / slice.getStep();
+
+        if (stepCount >= 0) {
+            return 1 + stepCount;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * @param givenShape the shape that the slice is being applied to
+     * @return the dimensions that will be dropped when the slicer is applied
+     */
+    public int[] getDroppedDimensions(long[] givenShape) {
 
         List<Integer> droppedDimensions = new ArrayList<>();
 
-        for (int i = 0; i < slices.size(); i++) {
-            if (slices.get(i).getStop() == Slicer.StartStopStep.START_PLUS_ONE_STOP) {
+        for (int i = 0; i < givenShape.length; i++) {
+            if (getSlice(i, givenShape.length).isDropDimension()) {
                 droppedDimensions.add(i);
             }
         }
@@ -93,7 +171,8 @@ public class Slicer {
     }
 
     public static class SlicerBuilder {
-        private ArrayList<StartStopStep> slices = new ArrayList<>();
+        private ArrayList<Slice> slices = new ArrayList<>();
+        private Integer ellipsisPosition = null;
 
         /**
          * @param start index to start at
@@ -103,12 +182,12 @@ public class Slicer {
          * to the stop (exclusively) with a step of step.
          */
         public SlicerBuilder slice(Long start, Long stop, Long step) {
-            this.slices.add(new StartStopStep(start, stop, step));
+            this.slices.add(new Slice(start, stop, step, false));
             return this;
         }
 
         public SlicerBuilder slice(Integer start, Integer stop, Integer step) {
-            this.slices.add(new StartStopStep(start, stop, step));
+            this.slices.add(new Slice(start, stop, step, false));
             return this;
         }
 
@@ -119,12 +198,12 @@ public class Slicer {
          * to the stop (exclusively).
          */
         public SlicerBuilder slice(Long start, Long stop) {
-            this.slices.add(new StartStopStep(start, stop, StartStopStep.DEFAULT_STEP));
+            this.slices.add(new Slice(start, stop, Slice.DEFAULT_STEP, false));
             return this;
         }
 
         public SlicerBuilder slice(Integer start, Integer stop) {
-            this.slices.add(new StartStopStep(start, stop, (int) StartStopStep.DEFAULT_STEP));
+            this.slices.add(new Slice(start, stop, (int) Slice.DEFAULT_STEP, false));
             return this;
         }
 
@@ -133,12 +212,12 @@ public class Slicer {
          * @return a slice for dimension that takes all indices after (inclusively) the start.
          */
         public SlicerBuilder slice(Long start) {
-            this.slices.add(new StartStopStep(start, StartStopStep.START_PLUS_ONE_STOP, StartStopStep.DEFAULT_STEP));
+            this.slices.add(new Slice(start, null, null, true));
             return this;
         }
 
         public SlicerBuilder slice(Integer start) {
-            this.slices.add(new StartStopStep(start, (int) StartStopStep.START_PLUS_ONE_STOP, (int) StartStopStep.DEFAULT_STEP));
+            this.slices.add(new Slice(start, null, null, true));
             return this;
         }
 
@@ -148,7 +227,7 @@ public class Slicer {
          * @return a slice for dimension that takes all indices
          */
         public SlicerBuilder slice() {
-            this.slices.add(StartStopStep.ALL);
+            this.slices.add(Slice.ALL);
             return this;
         }
 
@@ -158,12 +237,27 @@ public class Slicer {
          * @return a slice for dimension that takes all indices
          */
         public SlicerBuilder all() {
-            this.slices.add(StartStopStep.ALL);
+            this.slices.add(Slice.ALL);
+            return this;
+        }
+
+        /**
+         * Means take all from this point. This can only be used once and could for example allow
+         * slicing dimensions from the right. e.g. a given shape of (2,3,4) could be sliced [...,2]
+         * which would be the same as [:,:,2].
+         *
+         * @return a slice for dimension that takes all indices
+         */
+        public SlicerBuilder ellipsis() {
+            if (ellipsisPosition != null) {
+                throw new IllegalStateException("Only 1 ellipsis is allowed.");
+            }
+            ellipsisPosition = slices.size();
             return this;
         }
 
         public Slicer build() {
-            return new Slicer(slices);
+            return new Slicer(slices, ellipsisPosition);
         }
     }
 
@@ -177,7 +271,7 @@ public class Slicer {
         for (String dimSlice : byDimension) {
 
             if (dimSlice.equals("...")) {
-                slicerBuilder.all();
+                slicerBuilder.ellipsis();
             } else {
                 String[] byColon = dimSlice.split(":", 3);
 
@@ -199,18 +293,18 @@ public class Slicer {
     }
 
     private static Long parseStart(String arg) {
-        return getOrDefault(arg, StartStopStep.DEFAULT_START);
+        return getOrDefault(arg, Slice.DEFAULT_START);
     }
 
     private static Long parseStop(String arg) {
-        return getOrDefault(arg, StartStopStep.UPPER_BOUND_STOP);
+        return getOrDefault(arg, null);
     }
 
     private static Long parseStep(String arg) {
-        return getOrDefault(arg, StartStopStep.DEFAULT_STEP);
+        return getOrDefault(arg, Slice.DEFAULT_STEP);
     }
 
-    private static Long getOrDefault(String arg, long defaultValue) {
+    private static Long getOrDefault(String arg, Long defaultValue) {
         try {
             return Long.parseLong(arg);
         } catch (NumberFormatException nfe) {

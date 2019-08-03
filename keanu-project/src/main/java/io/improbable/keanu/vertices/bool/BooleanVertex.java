@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.BaseBooleanTensor;
 import io.improbable.keanu.kotlin.BooleanOperators;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;

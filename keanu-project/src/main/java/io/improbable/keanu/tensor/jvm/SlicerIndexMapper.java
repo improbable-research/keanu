@@ -3,8 +3,6 @@ package io.improbable.keanu.tensor.jvm;
 import io.improbable.keanu.tensor.TensorShape;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.List;
-
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getShapeIndices;
 
@@ -37,7 +35,7 @@ public final class SlicerIndexMapper implements IndexMapper {
 
         this.resultShapeWithoutRankLoss = slicer.getResultShape(sourceShape, true);
         this.resultStrideWithoutRankLoss = TensorShape.getRowFirstStride(resultShapeWithoutRankLoss);
-        this.dimensionsDropped = slicer.getDroppedDimensions();
+        this.dimensionsDropped = slicer.getDroppedDimensions(sourceShape);
     }
 
     /**
@@ -77,12 +75,11 @@ public final class SlicerIndexMapper implements IndexMapper {
      */
     private long[] getIndicesOfSource(final long[] shapeIndices) {
 
-        final List<Slicer.StartStopStep> slices = slicer.getSlices();
-        for (int i = 0; i < slices.size(); i++) {
+        for (int i = 0; i < shapeIndices.length; i++) {
             if (resultShapeWithoutRankLoss[i] != sourceShape[i]) {
-                final Slicer.StartStopStep slice = slices.get(i);
+                final Slicer.Slice slice = slicer.getSlice(i, shapeIndices.length);
 
-                shapeIndices[i] = slice.getStart() + shapeIndices[i] * slice.getStep();
+                shapeIndices[i] = slice.getStart(sourceShape[i]) + shapeIndices[i] * slice.getStep();
             }
         }
 

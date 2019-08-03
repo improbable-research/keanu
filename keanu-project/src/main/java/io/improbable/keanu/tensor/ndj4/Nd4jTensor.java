@@ -117,23 +117,20 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     @Override
     public TENSOR slice(Slicer slicer) {
 
-        final List<Slicer.StartStopStep> slices = slicer.getSlices();
-        final INDArrayIndex[] indArrayIndices = new INDArrayIndex[slices.size()];
+        final long[] shape = tensor.shape();
+        final INDArrayIndex[] indArrayIndices = new INDArrayIndex[shape.length];
 
-        for (int i = 0; i < indArrayIndices.length; i++) {
-            final Slicer.StartStopStep s = slices.get(i);
-            long stop = s.getStop();
+        for (int i = 0; i < shape.length; i++) {
 
-            if (stop == Slicer.StartStopStep.START_PLUS_ONE_STOP) {
-                indArrayIndices[i] = NDArrayIndex.point(s.getStart());
+            final Slicer.Slice s = slicer.getSlice(i, shape.length);
+
+            final long dimLength = shape[i];
+            if (s.isDropDimension()) {
+                indArrayIndices[i] = NDArrayIndex.point(s.getStart(dimLength));
 
             } else {
 
-                if (stop == Slicer.StartStopStep.UPPER_BOUND_STOP) {
-                    stop = tensor.shape()[i];
-                }
-
-                indArrayIndices[i] = NDArrayIndex.interval(s.getStart(), s.getStep(), stop);
+                indArrayIndices[i] = NDArrayIndex.interval(s.getStart(dimLength), s.getStep(), s.getStop(dimLength));
             }
         }
 

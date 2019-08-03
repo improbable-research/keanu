@@ -121,6 +121,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixe
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.SafeLogTimesVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCosVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcCoshVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcSinVertex")
@@ -586,6 +587,10 @@ def LogAddExp2(left: vertex_constructor_param_types, right: vertex_constructor_p
 
 def LogAddExp(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     return Vertex(context.jvm_view().LogAddExpVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+
+
+def SafeLogTimes(x: vertex_constructor_param_types, y: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().SafeLogTimesVertex, label, cast_to_vertex(x), cast_to_vertex(y))
 
 
 def ArcCos(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

@@ -9,6 +9,7 @@ import io.improbable.keanu.tensor.TensorTestHelper;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
+import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 import org.apache.commons.math3.analysis.function.Sigmoid;
@@ -2115,6 +2116,59 @@ public class DoubleTensorTest {
 
         assertThat(b, valuesAndShapesMatch(DoubleTensor.create(0, 2, 12, 14, 24, 26).reshape(3, 2)));
         assertThat(c, valuesAndShapesMatch(DoubleTensor.create(0, 2, 12, 14, 24, 26).reshape(3, 2)));
+    }
+
+    @Test
+    public void canUseEllipsisInSlice() {
+        DoubleTensor a = DoubleTensor.arange(40).reshape(2, 2, 10);
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .ellipsis()
+            .slice(2)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("...,2");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(2, 12, 22, 32).reshape(2, 2)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(2, 12, 22, 32).reshape(2, 2)));
+    }
+
+    @Test
+    public void canUseNegativeIndicesAndNegativeStep() {
+        DoubleTensor a = DoubleTensor.arange(30).reshape(3, 10);
+
+        if (a instanceof Nd4jTensor) {
+            //TODO: ND4j does not support negative slice steps
+            return;
+        }
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .ellipsis()
+            .slice(-2, -4, -1)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("...,-2:-4:-1");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(8, 7, 18, 17, 28, 27).reshape(3, 2)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(8, 7, 18, 17, 28, 27).reshape(3, 2)));
+    }
+
+    @Test
+    public void canUseNegativeIndicesAndPositiveStep() {
+        DoubleTensor a = DoubleTensor.arange(30).reshape(3, 10);
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .ellipsis()
+            .slice(-7, -5)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("...,-7:-5");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(3, 4, 13, 14, 23, 24).reshape(3, 2)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(3, 4, 13, 14, 23, 24).reshape(3, 2)));
     }
 
     @Test

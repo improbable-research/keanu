@@ -19,7 +19,7 @@ public class SlicerTest {
 
         assertThat(Slicer.fromString("..."),
             equalTo(Slicer.builder()
-                .all()
+                .ellipsis()
                 .build()
             )
         );
@@ -118,7 +118,7 @@ public class SlicerTest {
         assertThat(Slicer.fromString("2:3:4,..."),
             equalTo(Slicer.builder()
                 .slice(2, 3, 4)
-                .all()
+                .ellipsis()
                 .build()
             )
         );
@@ -175,6 +175,15 @@ public class SlicerTest {
         assertThat(Slicer.fromString("2:3:6,4:5:7"),
             equalTo(Slicer.builder()
                 .slice(2, 3, 6)
+                .slice(4, 5, 7)
+                .build()
+            )
+        );
+
+        assertThat(Slicer.fromString("2:3:6,...,4:5:7"),
+            equalTo(Slicer.builder()
+                .slice(2, 3, 6)
+                .ellipsis()
                 .slice(4, 5, 7)
                 .build()
             )
