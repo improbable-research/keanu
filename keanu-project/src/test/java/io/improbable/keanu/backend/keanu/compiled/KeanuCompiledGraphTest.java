@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -143,6 +144,17 @@ public class KeanuCompiledGraphTest {
     @Test
     public void canSliceDouble() {
         assertUnaryDoubleMatches(new long[]{3, 4}, (a) -> a.slice(1, 2));
+    }
+
+    @Test
+    public void canSliceWithSlicer() {
+        assertUnaryDoubleMatches(new long[]{3, 4, 10}, (a) -> a.slice(
+            Slicer.builder()
+                .all()
+                .slice(2)
+                .slice(2, 8, 2).build()
+            )
+        );
     }
 
     @Test

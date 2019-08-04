@@ -27,7 +27,7 @@ public interface TensorVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extend
 
     @Override
     default VERTEX slice(Slicer slicer) {
-        return null;
+        return wrap(new StridedSliceVertex<>(this, slicer));
     }
 
     @Override

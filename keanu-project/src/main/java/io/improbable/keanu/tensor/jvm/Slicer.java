@@ -16,6 +16,16 @@ public class Slicer {
         this.ellipsisPosition = ellipsisPosition;
     }
 
+    public Slicer(long[] start, long[] end, long[] stride, Integer ellipsis, boolean[] upperBoundStop, boolean[] dropDimension) {
+        this.slices = new ArrayList<>();
+        this.ellipsisPosition = ellipsis;
+
+        for (int i = 0; i < start.length; i++) {
+            Slice slice = new Slice(start[i], upperBoundStop[i] ? null : end[i], stride[i], dropDimension[i]);
+            this.slices.add(slice);
+        }
+    }
+
     public static SlicerBuilder builder() {
         return new SlicerBuilder();
     }

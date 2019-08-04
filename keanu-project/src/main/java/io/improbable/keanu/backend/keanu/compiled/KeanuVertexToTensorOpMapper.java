@@ -1,7 +1,11 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
+import com.google.common.primitives.Booleans;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexUnaryOp;
@@ -56,6 +60,7 @@ import io.improbable.keanu.vertices.tensor.GetBooleanIndexVertex;
 import io.improbable.keanu.vertices.tensor.PermuteVertex;
 import io.improbable.keanu.vertices.tensor.ReshapeVertex;
 import io.improbable.keanu.vertices.tensor.SliceVertex;
+import io.improbable.keanu.vertices.tensor.StridedSliceVertex;
 import io.improbable.keanu.vertices.tensor.TakeVertex;
 import io.improbable.keanu.vertices.tensor.WhereVertex;
 import io.improbable.keanu.vertices.tensor.number.fixed.operators.unary.ModVertex;
@@ -154,6 +159,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(BroadcastVertex.class, KeanuVertexToTensorOpMapper::broadcastOp);
         opMappers.put(TakeVertex.class, KeanuVertexToTensorOpMapper::takeOp);
         opMappers.put(SliceVertex.class, KeanuVertexToTensorOpMapper::sliceOp);
+        opMappers.put(StridedSliceVertex.class, KeanuVertexToTensorOpMapper::stridedSliceOp);
         opMappers.put(DiagVertex.class, fluentUnaryOp("diag"));
         opMappers.put(DiagPartVertex.class, fluentUnaryOp("diagPart"));
         opMappers.put(GetBooleanIndexVertex.class, fluentBinaryOp("get"));
@@ -425,24 +431,31 @@ public class KeanuVertexToTensorOpMapper {
         return leftVariable.getName() + ".elementwiseEquals(" + rightVariable.getName() + ").not()";
     }
 
-    private static String toJavaArrayCreation(long[] array) {
-        return "new long[]{" + Arrays.stream(array).mapToObj(Long::toString).collect(Collectors.joining(",")) + "}";
-    }
-
     private static String sliceOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         SliceVertex sliceVertex = (SliceVertex) vertex;
         String variableName = lookup.get(sliceVertex.getInputVertex().getId()).getName();
         return variableName + ".slice(" + sliceVertex.getDimension() + "," + sliceVertex.getIndex() + ")";
     }
 
+    private static String stridedSliceOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        StridedSliceVertex sliceVertex = (StridedSliceVertex) vertex;
+        String variableName = lookup.get(sliceVertex.getInputVertex().getId()).getName();
+
+        String slicerClassName = Slicer.class.getCanonicalName();
+        return variableName + ".slice(new " + slicerClassName + "(" +
+            toJavaArrayCreation(sliceVertex.getStart()) + "," +
+            toJavaArrayCreation(sliceVertex.getEnd()) + "," +
+            toJavaArrayCreation(sliceVertex.getStride()) + "," +
+            sliceVertex.getEllipsis() + "," +
+            toJavaArrayCreation(sliceVertex.getUpperBoundStop()) + "," +
+            toJavaArrayCreation(sliceVertex.getDropDimension()) +
+            "))";
+    }
+
     private static String permuteOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         PermuteVertex permuteVertex = (PermuteVertex) vertex;
         String variableName = lookup.get(permuteVertex.getId()).getName();
         return variableName + ".permute(" + toJavaArrayCreation(permuteVertex.getRearrange()) + ")";
-    }
-
-    private static String toJavaArrayCreation(int[] array) {
-        return "new int[]{" + Arrays.stream(array).mapToObj(Long::toString).collect(Collectors.joining(",")) + "}";
     }
 
     private static String concatDoubleOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
@@ -694,5 +707,17 @@ public class KeanuVertexToTensorOpMapper {
             .collect(Collectors.joining(","));
 
         return MultiplexerVertex.class.getCanonicalName() + ".mux(" + select.getName() + "," + outputs + ")";
+    }
+
+    private static String toJavaArrayCreation(long[] array) {
+        return "new long[]{" + Longs.join(",", array) + "}";
+    }
+
+    private static String toJavaArrayCreation(int[] array) {
+        return "new int[]{" + Ints.join(",", array) + "}";
+    }
+
+    private static String toJavaArrayCreation(boolean[] array) {
+        return "new boolean[]{" + Booleans.join(",", array) + "}";
     }
 }
