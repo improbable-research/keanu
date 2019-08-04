@@ -57,5 +57,9 @@ def cast_to_int_array(input: Collection[int]) -> JavaArray:
     return k.to_java_int_array(input)
 
 
+def cast_to_boolean_array(input: Collection[bool]) -> JavaArray:
+    return k.to_java_boolean_array(input)
+
+
 def cast_to_vertex_array(input: Collection[Vertex]) -> JavaArray:
     return k.to_java_vertex_array(input)

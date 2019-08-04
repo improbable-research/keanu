@@ -11,7 +11,7 @@ import java.util.List;
 @Value
 public class Slicer {
 
-    private Slicer(List<Slice> slices, Integer ellipsisPosition) {
+    public Slicer(List<Slice> slices, Integer ellipsisPosition) {
         this.slices = slices;
         this.ellipsisPosition = ellipsisPosition;
     }

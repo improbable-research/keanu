@@ -19,6 +19,7 @@ from .vertex_casting import (
     cast_to_integer,
     cast_to_boolean,
     cast_to_long_array,
+    cast_to_boolean_array,
     cast_to_int_array,
     cast_to_vertex_array,
 )
@@ -115,6 +116,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.DiagVertex"
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.PermuteVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.ReshapeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.SliceVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.StridedSliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.TakeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.WhereVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.operators.unary.ModVertex")
@@ -558,6 +560,10 @@ def Slice(input_vertex: vertex_constructor_param_types, dimension: int, index: i
     :param index: the index of extraction
     """
     return Vertex(context.jvm_view().SliceVertex, label, cast_to_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
+
+
+def StridedSlice(input_vertex: vertex_constructor_param_types, start: Collection[int], end: Collection[int], stride: Collection[int], ellipsis: int, upper_bound_stop: Collection[bool], drop_dimension: Collection[bool], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().StridedSliceVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(start), cast_to_long_array(end), cast_to_long_array(stride), cast_to_integer(ellipsis), cast_to_boolean_array(upper_bound_stop), cast_to_boolean_array(drop_dimension))
 
 
 def Take(input_vertex: vertex_constructor_param_types, index: Collection[int], label: Optional[str]=None) -> Vertex:

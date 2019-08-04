@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.tensor;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -11,6 +12,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,7 @@ public class StridedSliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
 
     private final Slicer slicer;
 
+    @ExportVertexToPythonBindings
     public StridedSliceVertex(@LoadVertexParam(INPUT_NAME) TensorVertex<T, TENSOR, VERTEX> inputVertex,
                               @LoadVertexParam(START_NAME) long[] start,
                               @LoadVertexParam(END_NAME) long[] end,
@@ -44,12 +47,11 @@ public class StridedSliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
         this(inputVertex, new Slicer(start, end, stride, ellipsis, upperBoundStop, dropDimension));
     }
 
-    @ExportVertexToPythonBindings
     public StridedSliceVertex(TensorVertex<T, TENSOR, VERTEX> inputVertex, Slicer slicer) {
         super(slicer.getResultShape(inputVertex.getShape(), false), inputVertex, inputVertex.ofType());
         this.slicer = slicer;
 
-        List<Slicer.Slice> slices = slicer.getSlices();
+        final List<Slicer.Slice> slices = slicer.getSlices();
         this.ellipsis = slicer.getEllipsisPosition();
         this.start = new long[slices.size()];
         this.end = new long[slices.size()];
@@ -77,23 +79,51 @@ public class StridedSliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
     }
 
     @Override
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
+
+        return new PartialDerivative(dInputVertex.get().slice(alignOf(slicer, inputVertex.getRank())));
+    }
+
+    private Slicer alignOf(Slicer from, int ofRank) {
+
+        final List<Slicer.Slice> slices = new ArrayList<>();
+
+        for (int i = 0; i < ofRank; i++) {
+            slices.add(from.getSlice(i, ofRank));
+        }
+
+        return new Slicer(slices, ofRank);
+    }
+
+    @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
-        DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
+        final DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
 
-        DoubleTensor result = null;
+        final long[] wrtShape = getShape();
+        final long[] ofShape = derivativeOfOutputWithRespectToSelf.getOfShape(wrtShape);
+        final long[] resultShape = TensorShape.concat(ofShape, inputVertex.getShape());
+
+        final DoubleTensor zeroes = DoubleTensor.zeros(resultShape);
+
+        final DoubleTensor result = partial.reverseSlice(zeroes, alignWrt(slicer, inputVertex.getRank()));
 
         partials.put(inputVertex, new PartialDerivative(result));
 
         return partials;
     }
 
-    @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
+    private Slicer alignWrt(Slicer from, int wrtRank) {
 
-        return new PartialDerivative(dInputVertex.get().slice(slicer));
+        List<Slicer.Slice> slices = new ArrayList<>();
+
+        for (int i = 0; i < wrtRank; i++) {
+            slices.add(from.getSlice(i, wrtRank));
+        }
+
+        return new Slicer(slices, 0);
     }
 
     @SaveVertexParam(START_NAME)

@@ -124,6 +124,8 @@ class JavaVertexToPythonConverter {
         } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
             long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
             return "Collection[int]";
+        } else if (Boolean[].class.isAssignableFrom(parameterType) || boolean[].class.isAssignableFrom(parameterType)) {
+            return "Collection[bool]";
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "Collection[Vertex]";
         } else if (VertexLabel.class.isAssignableFrom(parameterType)) {
@@ -178,6 +180,8 @@ class JavaVertexToPythonConverter {
             return "cast_to_long_array(" + pythonParameter + ")";
         } else if (Integer[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
             return "cast_to_int_array(" + pythonParameter + ")";
+        } else if (Boolean[].class.isAssignableFrom(parameterType) || boolean[].class.isAssignableFrom(parameterType)) {
+            return "cast_to_boolean_array(" + pythonParameter + ")";
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex_array(" + pythonParameter + ")";
         } else if (VertexLabel.class.isAssignableFrom(parameterType)) {
