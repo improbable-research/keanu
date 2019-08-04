@@ -55,6 +55,8 @@ public interface BaseNumberTensor<
 
     T abs();
 
+    T sign();
+
     T minus(N value);
 
     T minus(T that);

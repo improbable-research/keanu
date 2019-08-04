@@ -60,6 +60,13 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>>
     T clampInPlace(T min, T max);
 
     @Override
+    default T sign() {
+        return duplicate().signInPlace();
+    }
+
+    T signInPlace();
+
+    @Override
     default T abs() {
         return duplicate().absInPlace();
     }

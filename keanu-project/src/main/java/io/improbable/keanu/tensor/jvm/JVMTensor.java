@@ -5,8 +5,8 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 

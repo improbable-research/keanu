@@ -184,6 +184,7 @@ public class KeanuCompiledGraphTest {
     @Test
     public void compilesSimpleUnaryOps() {
         assertUnaryDoubleMatches(DoubleVertex::abs);
+        assertUnaryDoubleMatches(DoubleVertex::sign);
         assertUnaryDoubleMatches(DoubleVertex::cos);
         assertUnaryDoubleMatches(DoubleVertex::acos);
         assertUnaryDoubleMatches(DoubleVertex::exp);

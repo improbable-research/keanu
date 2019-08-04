@@ -177,6 +177,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.oper
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.unary.MaxUnaryVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.unary.MinUnaryVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.unary.ProductVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.unary.SignVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.unary.SumVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.utility.AssertVertex")
 
@@ -1017,6 +1018,15 @@ def MinUnary(input_vertex: vertex_constructor_param_types, label: Optional[str]=
 
 def Product(input_vertex: vertex_constructor_param_types, over_dimensions: Collection[int], label: Optional[str]=None) -> Vertex:
     return Vertex(context.jvm_view().ProductVertex, label, cast_to_vertex(input_vertex), cast_to_int_array(over_dimensions))
+
+
+def Sign(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    Takes the sign of a vertex
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().SignVertex, label, cast_to_vertex(input_vertex))
 
 
 def Sum(input_vertex: vertex_constructor_param_types, over_dimensions: Collection[int], label: Optional[str]=None) -> Vertex:

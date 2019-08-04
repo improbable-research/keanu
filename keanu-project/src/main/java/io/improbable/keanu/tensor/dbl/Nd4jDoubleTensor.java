@@ -17,6 +17,7 @@ import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.scalar.ReplaceNans;
 import org.nd4j.linalg.api.ops.impl.transforms.bool.MatchConditionTransform;
+import org.nd4j.linalg.api.ops.impl.transforms.same.Sign;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 
@@ -350,6 +351,12 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     @Override
     public FlattenedView<Double> getFlattenedView() {
         return new Nd4jDoubleFlattenedView();
+    }
+
+    @Override
+    public DoubleTensor signInPlace() {
+        Nd4j.getExecutioner().exec(new Sign(tensor));
+        return this;
     }
 
     private class Nd4jDoubleFlattenedView implements FlattenedView<Double> {

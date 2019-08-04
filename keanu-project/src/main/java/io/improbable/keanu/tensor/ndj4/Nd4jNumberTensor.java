@@ -377,6 +377,12 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
+    public TENSOR signInPlace() {
+        Transforms.sign(tensor, false);
+        return set(tensor);
+    }
+
+    @Override
     public BooleanTensor greaterThan(T value) {
         return fromMask(tensor.gt(value));
     }

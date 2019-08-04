@@ -2,11 +2,11 @@ package io.improbable.keanu.tensor.bool;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.ResultWrapper;
+import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;

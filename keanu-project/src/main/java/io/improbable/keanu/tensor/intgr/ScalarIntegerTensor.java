@@ -484,6 +484,12 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor signInPlace() {
+        this.value = value > 0 ? 1 : value < 0 ? -1 : value;
+        return this;
+    }
+
+    @Override
     public IntegerTensor maxInPlace(IntegerTensor max) {
         if (max.isLengthOne()) {
             long[] newShape = calculateShapeForLengthOneBroadcast(shape, max.getShape());

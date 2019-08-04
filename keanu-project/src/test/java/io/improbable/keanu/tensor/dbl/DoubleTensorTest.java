@@ -1689,6 +1689,8 @@ public class DoubleTensorTest {
         assertUnaryOperation(Math::exp, DoubleTensor::expInPlace, tensorRangeWithNegatives());
         assertUnaryOperation(Math::abs, DoubleTensor::abs, tensorRangeWithNegatives());
         assertUnaryOperation(Math::abs, DoubleTensor::absInPlace, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::signum, DoubleTensor::sign, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::signum, DoubleTensor::signInPlace, tensorRangeWithNegatives());
         assertUnaryOperation(Gamma::digamma, DoubleTensor::digamma, tensorRangeWithNegatives());
         assertUnaryOperation(Gamma::digamma, DoubleTensor::digammaInPlace, tensorRangeWithNegatives());
         assertUnaryOperation(Math::ceil, DoubleTensor::ceil, tensorRangeWithNegatives());

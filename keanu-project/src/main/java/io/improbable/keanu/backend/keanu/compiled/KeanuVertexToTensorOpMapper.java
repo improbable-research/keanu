@@ -121,6 +121,7 @@ import io.improbable.keanu.vertices.tensor.number.operators.unary.CumSumVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.unary.MaxUnaryVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.unary.MinUnaryVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.unary.ProductVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.unary.SignVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.utility.AssertVertex;
 
@@ -182,6 +183,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(TensorMultiplicationVertex.class, KeanuVertexToTensorOpMapper::tensorMultiply);
         opMappers.put(PowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
         opMappers.put(AbsVertex.class, fluentUnaryOp("abs", "absInPlace"));
+        opMappers.put(SignVertex.class, fluentUnaryOp("sign", "signInPlace"));
 
         opMappers.put(GreaterThanOrEqualToMaskVertex.class, fluentBinaryOp("greaterThanOrEqualToMask"));
         opMappers.put(GreaterThanMaskVertex.class, fluentBinaryOp("greaterThanMask"));

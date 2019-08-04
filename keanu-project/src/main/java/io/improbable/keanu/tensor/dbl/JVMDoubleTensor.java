@@ -424,6 +424,12 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
+    public DoubleTensor signInPlace() {
+        buffer.apply(Math::signum);
+        return this;
+    }
+
+    @Override
     public DoubleTensor applyInPlace(Function<Double, Double> function) {
         buffer.apply(function);
         return this;

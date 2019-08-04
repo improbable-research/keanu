@@ -39,6 +39,7 @@ import io.improbable.keanu.vertices.tensor.number.operators.unary.CumSumVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.unary.MaxUnaryVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.unary.MinUnaryVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.unary.ProductVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.unary.SignVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.unary.SumVertex;
 
 import java.util.function.Function;
@@ -79,6 +80,11 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
     @Override
     default VERTEX abs() {
         return wrap(new AbsVertex<>(this));
+    }
+
+    @Override
+    default VERTEX sign() {
+        return wrap(new SignVertex<>(this));
     }
 
     @Override
