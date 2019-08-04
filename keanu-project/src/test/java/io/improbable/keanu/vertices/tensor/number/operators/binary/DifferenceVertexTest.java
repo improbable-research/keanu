@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.tensor.number.operators.binary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.BinaryOperationTestHelpers;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.tensor.number.BinaryOperationTestHelpers.calculatesDerivativeOfAScalarAndVector;

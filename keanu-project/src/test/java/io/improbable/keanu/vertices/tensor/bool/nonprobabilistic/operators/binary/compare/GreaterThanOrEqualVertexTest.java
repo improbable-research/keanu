@@ -1,0 +1,34 @@
+package io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare;
+
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class GreaterThanOrEqualVertexTest {
+
+    @Test
+    public void comparesIntegers() {
+        isGreaterThanOrEqual(0, 1, false);
+        isGreaterThanOrEqual(1, 1, true);
+        isGreaterThanOrEqual(2, 1, true);
+    }
+
+    @Test
+    public void comparesDoubles() {
+        isGreaterThanOrEqual(0.0, 0.5, false);
+        isGreaterThanOrEqual(0.5, 0.5, true);
+        isGreaterThanOrEqual(1.0, 0.5, true);
+    }
+
+    private void isGreaterThanOrEqual(int a, int b, boolean expected) {
+        BooleanVertex vertex = ConstantVertex.of(a).greaterThanOrEqual(ConstantVertex.of(b));
+        assertEquals(expected, vertex.eval().scalar());
+    }
+
+    private void isGreaterThanOrEqual(double a, double b, boolean expected) {
+        BooleanVertex vertex = ConstantVertex.of(a).greaterThanOrEqual(ConstantVertex.of(b));
+        assertEquals(expected, vertex.eval().scalar());
+    }
+}

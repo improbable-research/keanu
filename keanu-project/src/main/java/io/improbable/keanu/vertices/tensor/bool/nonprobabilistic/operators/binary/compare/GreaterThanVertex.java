@@ -1,0 +1,21 @@
+package io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare;
+
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
+
+public class GreaterThanVertex<A extends NumberTensor, B extends NumberTensor> extends BooleanBinaryOpVertex<A, B> {
+
+    @ExportVertexToPythonBindings
+    public GreaterThanVertex(@LoadVertexParam(A_NAME) Vertex<A, ?> a, @LoadVertexParam(B_NAME) Vertex<B, ?> b) {
+        super(a, b);
+    }
+
+    @Override
+    protected BooleanTensor op(A l, B r) {
+        return l.greaterThan(r);
+    }
+}

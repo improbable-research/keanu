@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;

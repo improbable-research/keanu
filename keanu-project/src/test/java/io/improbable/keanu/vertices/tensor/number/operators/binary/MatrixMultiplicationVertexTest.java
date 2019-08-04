@@ -3,11 +3,11 @@ package io.improbable.keanu.vertices.tensor.number.operators.binary;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.Differentiator;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiator;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialsOf;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
 import java.util.Arrays;

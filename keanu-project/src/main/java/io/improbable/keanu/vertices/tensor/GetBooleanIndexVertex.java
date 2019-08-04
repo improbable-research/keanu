@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexImpl;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
 
 public class GetBooleanIndexVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
     extends VertexImpl<TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, VertexBinaryOp<TensorVertex<T, TENSOR, VERTEX>, BooleanVertex> {

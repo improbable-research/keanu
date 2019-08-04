@@ -4,10 +4,10 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.FloatingPointTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
-import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 
 
 public class RoundVertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>

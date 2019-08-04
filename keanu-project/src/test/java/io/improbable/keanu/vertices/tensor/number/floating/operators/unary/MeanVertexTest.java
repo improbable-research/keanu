@@ -3,10 +3,10 @@ package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.FloatingPointTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.tensor.number.UnaryOperationTestHelpers;
 import io.improbable.keanu.vertices.tensor.number.floating.FloatingPointTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;

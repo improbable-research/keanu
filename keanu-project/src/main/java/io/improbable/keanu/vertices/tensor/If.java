@@ -5,14 +5,14 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.BooleanVertexWrapper;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertexWrapper;
-import io.improbable.keanu.vertices.generic.GenericTensorVertex;
-import io.improbable.keanu.vertices.generic.GenericVertexWrapper;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertexWrapper;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertexWrapper;
+import io.improbable.keanu.vertices.tensor.generic.GenericTensorVertex;
+import io.improbable.keanu.vertices.tensor.generic.GenericVertexWrapper;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertexWrapper;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper;
 
 public class If {
 

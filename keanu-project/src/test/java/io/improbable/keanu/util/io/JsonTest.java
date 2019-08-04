@@ -7,9 +7,9 @@ import com.google.protobuf.util.JsonFormat;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import io.improbable.mir.KeanuSavedBayesNet;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -111,7 +111,7 @@ public class JsonTest {
     @Test
     public void loadFailsIfInvalidVertexSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Unknown Vertex Type Specified: io.improbable.keanu.vertices.dbl.nonprobabilistic.NonExistentVertexType");
+        expectedException.expectMessage("Unknown Vertex Type Specified: io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.NonExistentVertexType");
         tryLoadingNetwork(JSON_INVALID_VERTEX_TYPE_FILE);
     }
 

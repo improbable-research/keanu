@@ -129,6 +129,132 @@
 <div class="section" id="module-keanu.vertex">
 <span id="vertices"></span><h2>Vertices<a class="headerlink" href="#module-keanu.vertex" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt id="keanu.vertex.Broadcast">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Broadcast</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>to_shape</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Broadcast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Broadcast" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.DiagPart">
+<code class="descclassname">keanu.vertex.</code><code class="descname">DiagPart</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#DiagPart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.DiagPart" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Diag">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Diag</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Diag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Diag" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Permute">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Permute</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>rearrange</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Permute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Permute" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Reshape">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Reshape</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>proposed_shape</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Reshape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Reshape" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Slice">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Slice</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>dimension</em>, <em>index</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Slice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes the slice along a given dimension and index of a vertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_vertex</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">floating</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool_</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">JavaObjectWrapper</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the input vertex</li>
+<li><strong>dimension</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – the dimension to extract along</li>
+<li><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – the index of extraction</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.StridedSlice">
+<code class="descclassname">keanu.vertex.</code><code class="descname">StridedSlice</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>start</em>, <em>end</em>, <em>stride</em>, <em>ellipsis</em>, <em>upper_bound_stop</em>, <em>drop_dimension</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#StridedSlice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.StridedSlice" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Take">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Take</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>index</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Take"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Take" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Where">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Where</code><span class="sig-paren">(</span><em>predicate</em>, <em>thn</em>, <em>els</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Where"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Where" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="keanu.vertex.BooleanProxy">
 <code class="descclassname">keanu.vertex.</code><code class="descname">BooleanProxy</code><span class="sig-paren">(</span><em>shape</em>, <em>label</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#BooleanProxy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.BooleanProxy" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -504,6 +630,205 @@ a matching shaped Bernoulli.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prob_true</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">floating</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool_</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">JavaObjectWrapper</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – probTrue with same shape as desired Bernoulli tensor or scalar</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Print">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Print</code><span class="sig-paren">(</span><em>parent</em>, <em>message</em>, <em>print_data</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Print" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.CastNumberToInteger">
+<code class="descclassname">keanu.vertex.</code><code class="descname">CastNumberToInteger</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#CastNumberToInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.CastNumberToInteger" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.ConstantInteger">
+<code class="descclassname">keanu.vertex.</code><code class="descname">ConstantInteger</code><span class="sig-paren">(</span><em>constant</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#ConstantInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ConstantInteger" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.IntegerProxy">
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerProxy</code><span class="sig-paren">(</span><em>shape</em>, <em>label</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerProxy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerProxy" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.IntegerConcatenation">
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerConcatenation</code><span class="sig-paren">(</span><em>dimension</em>, <em>input</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerConcatenation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerConcatenation" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.ArgMax">
+<code class="descclassname">keanu.vertex.</code><code class="descname">ArgMax</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>axis</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#ArgMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArgMax" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.ArgMin">
+<code class="descclassname">keanu.vertex.</code><code class="descname">ArgMin</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>axis</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#ArgMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArgMin" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.NaNArgMax">
+<code class="descclassname">keanu.vertex.</code><code class="descname">NaNArgMax</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>axis</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#NaNArgMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.NaNArgMax" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.NaNArgMin">
+<code class="descclassname">keanu.vertex.</code><code class="descname">NaNArgMin</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>axis</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#NaNArgMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.NaNArgMin" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Binomial">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Binomial</code><span class="sig-paren">(</span><em>p</em>, <em>n</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Binomial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Binomial" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Geometric">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Geometric</code><span class="sig-paren">(</span><em>p</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Geometric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Geometric" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Multinomial">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Multinomial</code><span class="sig-paren">(</span><em>n</em>, <em>p</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Multinomial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Multinomial" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Poisson">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Poisson</code><span class="sig-paren">(</span><em>mu</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Poisson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Poisson" title="Permalink to this definition">¶</a></dt>
+<dd><p>One to one constructor for mapping some shape of mu to
+a matching shaped Poisson.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mu</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">floating</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool_</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">JavaObjectWrapper</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – mu with same shape as desired Poisson tensor or scalar</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.UniformInt">
+<code class="descclassname">keanu.vertex.</code><code class="descname">UniformInt</code><span class="sig-paren">(</span><em>min</em>, <em>max</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#UniformInt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.UniformInt" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Mod">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Mod</code><span class="sig-paren">(</span><em>left</em>, <em>right</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Mod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Mod" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -896,331 +1221,6 @@ a matching shaped Uniform Vertex</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></p>
 </td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Print">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Print</code><span class="sig-paren">(</span><em>parent</em>, <em>message</em>, <em>print_data</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Print" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.CastNumberToInteger">
-<code class="descclassname">keanu.vertex.</code><code class="descname">CastNumberToInteger</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#CastNumberToInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.CastNumberToInteger" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.ConstantInteger">
-<code class="descclassname">keanu.vertex.</code><code class="descname">ConstantInteger</code><span class="sig-paren">(</span><em>constant</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#ConstantInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ConstantInteger" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.IntegerProxy">
-<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerProxy</code><span class="sig-paren">(</span><em>shape</em>, <em>label</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerProxy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerProxy" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.IntegerConcatenation">
-<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerConcatenation</code><span class="sig-paren">(</span><em>dimension</em>, <em>input</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerConcatenation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerConcatenation" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.ArgMax">
-<code class="descclassname">keanu.vertex.</code><code class="descname">ArgMax</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>axis</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#ArgMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArgMax" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.ArgMin">
-<code class="descclassname">keanu.vertex.</code><code class="descname">ArgMin</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>axis</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#ArgMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArgMin" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.NaNArgMax">
-<code class="descclassname">keanu.vertex.</code><code class="descname">NaNArgMax</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>axis</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#NaNArgMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.NaNArgMax" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.NaNArgMin">
-<code class="descclassname">keanu.vertex.</code><code class="descname">NaNArgMin</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>axis</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#NaNArgMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.NaNArgMin" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Binomial">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Binomial</code><span class="sig-paren">(</span><em>p</em>, <em>n</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Binomial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Binomial" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Geometric">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Geometric</code><span class="sig-paren">(</span><em>p</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Geometric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Geometric" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Multinomial">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Multinomial</code><span class="sig-paren">(</span><em>n</em>, <em>p</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Multinomial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Multinomial" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Poisson">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Poisson</code><span class="sig-paren">(</span><em>mu</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Poisson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Poisson" title="Permalink to this definition">¶</a></dt>
-<dd><p>One to one constructor for mapping some shape of mu to
-a matching shaped Poisson.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mu</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">floating</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool_</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">JavaObjectWrapper</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – mu with same shape as desired Poisson tensor or scalar</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.UniformInt">
-<code class="descclassname">keanu.vertex.</code><code class="descname">UniformInt</code><span class="sig-paren">(</span><em>min</em>, <em>max</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#UniformInt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.UniformInt" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Broadcast">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Broadcast</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>to_shape</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Broadcast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Broadcast" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.DiagPart">
-<code class="descclassname">keanu.vertex.</code><code class="descname">DiagPart</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#DiagPart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.DiagPart" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Diag">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Diag</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Diag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Diag" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Permute">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Permute</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>rearrange</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Permute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Permute" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Reshape">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Reshape</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>proposed_shape</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Reshape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Reshape" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Slice">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Slice</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>dimension</em>, <em>index</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Slice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Takes the slice along a given dimension and index of a vertex</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>input_vertex</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">floating</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool_</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">JavaObjectWrapper</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the input vertex</li>
-<li><strong>dimension</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – the dimension to extract along</li>
-<li><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – the index of extraction</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.StridedSlice">
-<code class="descclassname">keanu.vertex.</code><code class="descname">StridedSlice</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>start</em>, <em>end</em>, <em>stride</em>, <em>ellipsis</em>, <em>upper_bound_stop</em>, <em>drop_dimension</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#StridedSlice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.StridedSlice" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Take">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Take</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>index</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Take"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Take" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Where">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Where</code><span class="sig-paren">(</span><em>predicate</em>, <em>thn</em>, <em>els</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Where"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Where" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Mod">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Mod</code><span class="sig-paren">(</span><em>left</em>, <em>right</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Mod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Mod" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
 </tr>
 </tbody>
 </table>

@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;

@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import java.io.IOException;
 import java.util.Collections;

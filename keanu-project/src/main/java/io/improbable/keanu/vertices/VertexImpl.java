@@ -6,10 +6,10 @@ import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.generic.nonprobabilistic.PrintVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import java.util.Arrays;
 import java.util.Collection;

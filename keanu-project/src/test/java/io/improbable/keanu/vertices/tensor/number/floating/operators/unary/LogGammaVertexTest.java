@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.apache.commons.math3.special.Gamma;
 import org.junit.Rule;
 import org.junit.Test;

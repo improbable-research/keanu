@@ -4,8 +4,8 @@ import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 
 import java.util.List;
 import java.util.Map;

@@ -43,73 +43,6 @@ def cast_to_vertex(input: vertex_constructor_param_types) -> Vertex:
     return do_inferred_vertex_cast({bool: ConstantBoolean, int: ConstantInteger, float: ConstantDouble}, input)
 
 
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.CastNumberToBooleanVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.XorBinaryVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToDoubleMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanToIntegerMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllFalseVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AllTrueVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyFalseVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.AnyTrueVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsFiniteVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsInfiniteVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsNaNVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsNegativeInfinityVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.IsPositiveInfinityVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotNaNVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastNumberToDoubleVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.BetaVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.ChiSquaredVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.HalfCauchyVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.InverseGammaVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.KDEVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.LogNormalVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.LogisticVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.MultivariateGaussianVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.ParetoVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.SmoothUniformVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.StudentTVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.TriangularVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.CastNumberToIntegerVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.ArgMaxVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.ArgMinVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.NaNArgMaxVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.NaNArgMinVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.GeometricVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.MultinomialVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.BroadcastVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.DiagPartVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.DiagVertex")
@@ -119,7 +52,74 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.SliceVertex
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.StridedSliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.TakeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.WhereVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.BooleanProxyVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.CastNumberToBooleanVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.CastToBooleanVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.ConstantBooleanVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.AndBinaryVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.OrBinaryVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.XorBinaryVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.EqualsVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.LessThanVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.multiple.BooleanToDoubleMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.multiple.BooleanToIntegerMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.AllFalseVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.AllTrueVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.AnyFalseVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.AnyTrueVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.IsFiniteVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.IsInfiniteVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.IsNaNVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.IsNegativeInfinityVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.IsPositiveInfinityVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.NotBinaryVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.unary.NotNaNVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.generic.nonprobabilistic.PrintVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.CastNumberToIntegerVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.ConstantIntegerVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.IntegerProxyVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.operators.unary.ArgMaxVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.operators.unary.ArgMinVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.operators.unary.NaNArgMaxVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.operators.unary.NaNArgMinVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.BinomialVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.GeometricVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.MultinomialVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.PoissonVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.UniformIntVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.fixed.operators.unary.ModVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.CastNumberToDoubleVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.DoubleProxyVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.BetaVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.CauchyVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ChiSquaredVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.DirichletVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ExponentialVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GammaVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.HalfCauchyVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.HalfGaussianVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.InverseGammaVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.KDEVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.LaplaceVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.LogNormalVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.LogisticVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.MultivariateGaussianVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ParetoVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.SmoothUniformVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.StudentTVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.TriangularVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.ArcTan2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExp2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.binary.LogAddExpVertex")
@@ -179,6 +179,49 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.oper
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.unary.ProductVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.operators.unary.SumVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.utility.AssertVertex")
+
+
+def Broadcast(input_vertex: vertex_constructor_param_types, to_shape: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().BroadcastVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(to_shape))
+
+
+def DiagPart(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().DiagPartVertex, label, cast_to_vertex(input_vertex))
+
+
+def Diag(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().DiagVertex, label, cast_to_vertex(input_vertex))
+
+
+def Permute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().PermuteVertex, label, cast_to_vertex(input_vertex), cast_to_int_array(rearrange))
+
+
+def Reshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().ReshapeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(proposed_shape))
+
+
+def Slice(input_vertex: vertex_constructor_param_types, dimension: int, index: int, label: Optional[str]=None) -> Vertex:
+    """
+    Takes the slice along a given dimension and index of a vertex
+    
+    :param input_vertex: the input vertex
+    :param dimension: the dimension to extract along
+    :param index: the index of extraction
+    """
+    return Vertex(context.jvm_view().SliceVertex, label, cast_to_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
+
+
+def StridedSlice(input_vertex: vertex_constructor_param_types, start: Collection[int], end: Collection[int], stride: Collection[int], ellipsis: int, upper_bound_stop: Collection[bool], drop_dimension: Collection[bool], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().StridedSliceVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(start), cast_to_long_array(end), cast_to_long_array(stride), cast_to_integer(ellipsis), cast_to_boolean_array(upper_bound_stop), cast_to_boolean_array(drop_dimension))
+
+
+def Take(input_vertex: vertex_constructor_param_types, index: Collection[int], label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().TakeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(index))
+
+
+def Where(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().WhereVertex, label, cast_to_boolean_vertex(predicate), cast_to_vertex(thn), cast_to_vertex(els))
 
 
 def BooleanProxy(shape: Collection[int], label: str) -> Vertex:
@@ -301,6 +344,72 @@ def Bernoulli(prob_true: vertex_constructor_param_types, label: Optional[str]=No
     :param prob_true: probTrue with same shape as desired Bernoulli tensor or scalar
     """
     return Boolean(context.jvm_view().BernoulliVertex, label, cast_to_double_vertex(prob_true))
+
+
+def Print(parent: vertex_constructor_param_types, message: str, print_data: bool, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().PrintVertex, label, cast_to_vertex(parent), message, cast_to_boolean(print_data))
+
+
+def CastNumberToInteger(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().CastNumberToIntegerVertex, label, cast_to_vertex(input_vertex))
+
+
+def ConstantInteger(constant: tensor_arg_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().ConstantIntegerVertex, label, cast_to_integer_tensor(constant))
+
+
+def IntegerProxy(shape: Collection[int], label: str) -> Vertex:
+    return Integer(context.jvm_view().IntegerProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label))
+
+
+def IntegerConcatenation(dimension: int, input: Collection[Vertex], label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().IntegerConcatenationVertex, label, cast_to_integer(dimension), cast_to_vertex_array(input))
+
+
+def ArgMax(input_vertex: vertex_constructor_param_types, axis: int, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().ArgMaxVertex, label, cast_to_vertex(input_vertex), cast_to_integer(axis))
+
+
+def ArgMin(input_vertex: vertex_constructor_param_types, axis: int, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().ArgMinVertex, label, cast_to_vertex(input_vertex), cast_to_integer(axis))
+
+
+def NaNArgMax(input_vertex: vertex_constructor_param_types, axis: int, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().NaNArgMaxVertex, label, cast_to_vertex(input_vertex), cast_to_integer(axis))
+
+
+def NaNArgMin(input_vertex: vertex_constructor_param_types, axis: int, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().NaNArgMinVertex, label, cast_to_vertex(input_vertex), cast_to_integer(axis))
+
+
+def Binomial(p: vertex_constructor_param_types, n: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().BinomialVertex, label, cast_to_double_vertex(p), cast_to_integer_vertex(n))
+
+
+def Geometric(p: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().GeometricVertex, label, cast_to_double_vertex(p))
+
+
+def Multinomial(n: vertex_constructor_param_types, p: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().MultinomialVertex, label, cast_to_integer_vertex(n), cast_to_double_vertex(p))
+
+
+def Poisson(mu: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    One to one constructor for mapping some shape of mu to
+    a matching shaped Poisson.
+    
+    :param mu: mu with same shape as desired Poisson tensor or scalar
+    """
+    return Integer(context.jvm_view().PoissonVertex, label, cast_to_double_vertex(mu))
+
+
+def UniformInt(min: vertex_constructor_param_types, max: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Integer(context.jvm_view().UniformIntVertex, label, cast_to_integer_vertex(min), cast_to_integer_vertex(max))
+
+
+def Mod(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().ModVertex, label, cast_to_vertex(left), cast_to_vertex(right))
 
 
 def CastNumberToDouble(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
@@ -467,115 +576,6 @@ def Uniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_par
     :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
     """
     return Double(context.jvm_view().UniformVertex, label, cast_to_double_vertex(x_min), cast_to_double_vertex(x_max))
-
-
-def Print(parent: vertex_constructor_param_types, message: str, print_data: bool, label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().PrintVertex, label, cast_to_vertex(parent), message, cast_to_boolean(print_data))
-
-
-def CastNumberToInteger(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().CastNumberToIntegerVertex, label, cast_to_vertex(input_vertex))
-
-
-def ConstantInteger(constant: tensor_arg_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().ConstantIntegerVertex, label, cast_to_integer_tensor(constant))
-
-
-def IntegerProxy(shape: Collection[int], label: str) -> Vertex:
-    return Integer(context.jvm_view().IntegerProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label))
-
-
-def IntegerConcatenation(dimension: int, input: Collection[Vertex], label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().IntegerConcatenationVertex, label, cast_to_integer(dimension), cast_to_vertex_array(input))
-
-
-def ArgMax(input_vertex: vertex_constructor_param_types, axis: int, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().ArgMaxVertex, label, cast_to_vertex(input_vertex), cast_to_integer(axis))
-
-
-def ArgMin(input_vertex: vertex_constructor_param_types, axis: int, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().ArgMinVertex, label, cast_to_vertex(input_vertex), cast_to_integer(axis))
-
-
-def NaNArgMax(input_vertex: vertex_constructor_param_types, axis: int, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().NaNArgMaxVertex, label, cast_to_vertex(input_vertex), cast_to_integer(axis))
-
-
-def NaNArgMin(input_vertex: vertex_constructor_param_types, axis: int, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().NaNArgMinVertex, label, cast_to_vertex(input_vertex), cast_to_integer(axis))
-
-
-def Binomial(p: vertex_constructor_param_types, n: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().BinomialVertex, label, cast_to_double_vertex(p), cast_to_integer_vertex(n))
-
-
-def Geometric(p: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().GeometricVertex, label, cast_to_double_vertex(p))
-
-
-def Multinomial(n: vertex_constructor_param_types, p: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().MultinomialVertex, label, cast_to_integer_vertex(n), cast_to_double_vertex(p))
-
-
-def Poisson(mu: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    """
-    One to one constructor for mapping some shape of mu to
-    a matching shaped Poisson.
-    
-    :param mu: mu with same shape as desired Poisson tensor or scalar
-    """
-    return Integer(context.jvm_view().PoissonVertex, label, cast_to_double_vertex(mu))
-
-
-def UniformInt(min: vertex_constructor_param_types, max: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Integer(context.jvm_view().UniformIntVertex, label, cast_to_integer_vertex(min), cast_to_integer_vertex(max))
-
-
-def Broadcast(input_vertex: vertex_constructor_param_types, to_shape: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().BroadcastVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(to_shape))
-
-
-def DiagPart(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().DiagPartVertex, label, cast_to_vertex(input_vertex))
-
-
-def Diag(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().DiagVertex, label, cast_to_vertex(input_vertex))
-
-
-def Permute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().PermuteVertex, label, cast_to_vertex(input_vertex), cast_to_int_array(rearrange))
-
-
-def Reshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().ReshapeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(proposed_shape))
-
-
-def Slice(input_vertex: vertex_constructor_param_types, dimension: int, index: int, label: Optional[str]=None) -> Vertex:
-    """
-    Takes the slice along a given dimension and index of a vertex
-    
-    :param input_vertex: the input vertex
-    :param dimension: the dimension to extract along
-    :param index: the index of extraction
-    """
-    return Vertex(context.jvm_view().SliceVertex, label, cast_to_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
-
-
-def StridedSlice(input_vertex: vertex_constructor_param_types, start: Collection[int], end: Collection[int], stride: Collection[int], ellipsis: int, upper_bound_stop: Collection[bool], drop_dimension: Collection[bool], label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().StridedSliceVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(start), cast_to_long_array(end), cast_to_long_array(stride), cast_to_integer(ellipsis), cast_to_boolean_array(upper_bound_stop), cast_to_boolean_array(drop_dimension))
-
-
-def Take(input_vertex: vertex_constructor_param_types, index: Collection[int], label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().TakeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(index))
-
-
-def Where(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().WhereVertex, label, cast_to_boolean_vertex(predicate), cast_to_vertex(thn), cast_to_vertex(els))
-
-
-def Mod(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Vertex(context.jvm_view().ModVertex, label, cast_to_vertex(left), cast_to_vertex(right))
 
 
 def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

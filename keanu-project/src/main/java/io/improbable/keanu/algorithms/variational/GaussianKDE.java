@@ -5,9 +5,9 @@ import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.Samples;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
-import io.improbable.keanu.vertices.dbl.probabilistic.KDEVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexSamples;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.KDEVertex;
 
 import java.util.Arrays;
 import java.util.List;

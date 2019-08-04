@@ -2,13 +2,13 @@ package io.improbable.keanu.vertices.tensor.number.floating.operators.binary;
 
 import io.improbable.keanu.tensor.FloatingPointTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.Differentiator;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsWithRespectTo;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.tensor.number.BinaryOperationTestHelpers;
 import io.improbable.keanu.vertices.tensor.number.floating.FloatingPointTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiator;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialsOf;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialsWithRespectTo;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;

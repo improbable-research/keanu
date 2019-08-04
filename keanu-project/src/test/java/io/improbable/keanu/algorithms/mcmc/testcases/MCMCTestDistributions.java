@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc.testcases;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 
 import java.util.Arrays;
 import java.util.List;

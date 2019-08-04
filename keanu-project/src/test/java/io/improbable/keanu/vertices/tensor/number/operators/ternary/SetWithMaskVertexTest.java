@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.tensor.number.operators.ternary;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

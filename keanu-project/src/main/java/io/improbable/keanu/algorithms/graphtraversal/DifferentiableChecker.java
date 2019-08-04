@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;

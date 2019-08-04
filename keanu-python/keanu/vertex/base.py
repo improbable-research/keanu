@@ -236,11 +236,13 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def _from_java_vertex(java_vertex: JavaObject) -> 'Vertex':
         ctor = Vertex
 
-        if is_instance_of(k._gateway, java_vertex, "io.improbable.keanu.vertices.dbl.DoubleVertex"):
+        if is_instance_of(k._gateway, java_vertex,
+                          "io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex"):
             ctor = Double
-        elif is_instance_of(k._gateway, java_vertex, "io.improbable.keanu.vertices.intgr.IntegerVertex"):
+        elif is_instance_of(k._gateway, java_vertex,
+                            "io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex"):
             ctor = Integer
-        elif is_instance_of(k._gateway, java_vertex, "io.improbable.keanu.vertices.bool.BooleanVertex"):
+        elif is_instance_of(k._gateway, java_vertex, "io.improbable.keanu.vertices.tensor.bool.BooleanVertex"):
             ctor = Boolean
 
         return ctor(java_vertex, None)

@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.tensor.number.operators.unary;
 
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.tensor.number.UnaryOperationTestHelpers.operatesOn2x2MatrixVertexValues;

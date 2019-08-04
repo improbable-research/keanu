@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.tensor.number.floating.operators.binary;
 
 import io.improbable.keanu.tensor.FloatingPointTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.BinaryOperationTestHelpers;
 import io.improbable.keanu.vertices.tensor.number.floating.FloatingPointTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.junit.Ignore;
 import org.junit.Test;
 

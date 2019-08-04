@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.tensor.number.floating.operators.unary;
 
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.apache.commons.math3.util.FastMath;
 import org.junit.Test;
 

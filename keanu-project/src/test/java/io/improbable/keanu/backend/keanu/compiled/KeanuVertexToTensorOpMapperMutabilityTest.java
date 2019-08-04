@@ -2,9 +2,9 @@ package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.tensor.VertexWrapper;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.tensor.number.operators.binary.MultiplicationVertex;
 import org.junit.Before;
 import org.junit.Test;
