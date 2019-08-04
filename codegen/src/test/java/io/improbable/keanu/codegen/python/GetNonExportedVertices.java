@@ -1,7 +1,7 @@
 package io.improbable.keanu.codegen.python;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.vertices.VertexImpl;
+import io.improbable.keanu.vertices.Vertex;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Constructor;
@@ -13,7 +13,7 @@ public class GetNonExportedVertices {
     public static void main(String[] args) {
         Reflections reflections = new Reflections("io.improbable.keanu.vertices");
 
-        Set<Class<? extends VertexImpl>> vertices = reflections.getSubTypesOf(VertexImpl.class);
+        Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
 
         for (Class vertexClass : vertices) {
             if (!Modifier.isAbstract(vertexClass.getModifiers()) && vertexNotExportedToPython(vertexClass)) {

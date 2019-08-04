@@ -1,3 +1,27 @@
+## Version 0.0.27
+
+### Java
+
+#### Breaking changes
+- Moved `io.improbable.keanu.vertices.dbl` classes to `io.improbable.keanu.vertices.tensor.number.floating.dbl`
+- Moved `io.improbable.keanu.vertices.int` classes to `io.improbable.keanu.vertices.tensor.number.fixed.int`
+- Moved `io.improbable.keanu.vertices.bool` classes to `io.improbable.keanu.vertices.tensor.bool`
+- renamed DoubleTensor `determinant()` method `matrixDeterminant()`
+- renamed DoubleTensor `average()` to `mean()` and allowed it to be done on a given dimension
+
+### Common
+
+Previously some operations were available on the tensor classes but not the vertex classes. All operations
+on the tensor classes have been implemented with vertex operations now. A few operations have been added in order
+to accommodate autodiff for the new vertex operations.
+
+#### New operations
+
+- sign
+- strided slice
+- trigamma
+
+
 ## Version 0.0.26
 
 ### Common
