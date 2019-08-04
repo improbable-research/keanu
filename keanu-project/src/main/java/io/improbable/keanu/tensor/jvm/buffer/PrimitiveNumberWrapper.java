@@ -1,4 +1,4 @@
-package io.improbable.keanu.tensor.buffer;
+package io.improbable.keanu.tensor.jvm.buffer;
 
 public interface PrimitiveNumberWrapper<T extends Number, B extends JVMBuffer.PrimitiveArrayWrapper<T, B>> extends JVMBuffer.PrimitiveArrayWrapper<T, B> {
 

@@ -1,7 +1,7 @@
 package io.improbable.keanu.tensor.bool;
 
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.buffer.JVMBuffer;
+import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;

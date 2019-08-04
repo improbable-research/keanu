@@ -1,4 +1,4 @@
-package io.improbable.keanu.tensor.buffer;
+package io.improbable.keanu.tensor.jvm.buffer;
 
 import com.google.common.primitives.Ints;
 
