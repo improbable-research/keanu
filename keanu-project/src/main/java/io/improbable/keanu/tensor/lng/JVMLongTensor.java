@@ -26,7 +26,7 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
 
     @Override
     protected JVMBuffer.PrimitiveNumberWrapperFactory<Long, LongBuffer.PrimitiveLongWrapper> getFactory() {
-        return null;
+        return factory;
     }
 
     private JVMLongTensor(LongBuffer.PrimitiveLongWrapper buffer, long[] shape) {

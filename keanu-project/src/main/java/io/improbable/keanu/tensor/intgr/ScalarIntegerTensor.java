@@ -248,8 +248,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
         if (withMask.isLengthOne()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
-            return IntegerTensor.create(value, withMask.getShape())
-                .setWithMaskInPlace(withMask, valueToApply);
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + withMask.getLength());
         }
         return this;
     }
