@@ -1,4 +1,4 @@
-package io.improbable.keanu.tensor.dbl;
+package io.improbable.keanu.tensor.lng;
 
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
@@ -10,69 +10,69 @@ import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class DoubleBuffer {
+public class LongBuffer {
 
-    public static final class DoubleArrayWrapperFactory implements JVMBuffer.PrimitiveNumberWrapperFactory<Double, PrimitiveDoubleWrapper> {
+    public static final class LongArrayWrapperFactory implements JVMBuffer.PrimitiveNumberWrapperFactory<Long, PrimitiveLongWrapper> {
 
         @Override
-        public final PrimitiveDoubleWrapper createNew(final long size) {
+        public final PrimitiveLongWrapper createNew(final long size) {
             if (size == 1) {
-                return new DoubleWrapper(0);
+                return new LongWrapper(0);
             } else {
-                return new DoubleArrayWrapper(new double[Ints.checkedCast(size)]);
+                return new LongArrayWrapper(new long[Ints.checkedCast(size)]);
             }
         }
 
         @Override
-        public PrimitiveDoubleWrapper createNew(Double value) {
-            return new DoubleWrapper(value);
+        public PrimitiveLongWrapper createNew(Long value) {
+            return new LongWrapper(value);
         }
 
         @Override
-        public PrimitiveDoubleWrapper zeroes(final long size) {
+        public PrimitiveLongWrapper zeroes(final long size) {
             return createNew(size);
         }
 
         @Override
-        public PrimitiveDoubleWrapper ones(final long size) {
+        public PrimitiveLongWrapper ones(final long size) {
             if (size == 1) {
-                return new DoubleWrapper(1.0);
+                return new LongWrapper(1);
             } else {
-                double[] ones = new double[Ints.checkedCast(size)];
-                Arrays.fill(ones, 1.0);
-                return new DoubleArrayWrapper(ones);
+                long[] ones = new long[Ints.checkedCast(size)];
+                Arrays.fill(ones, 1);
+                return new LongArrayWrapper(ones);
             }
         }
 
-        public final PrimitiveDoubleWrapper create(final double[] data) {
+        public final PrimitiveLongWrapper create(final long[] data) {
             if (data.length == 1) {
-                return new DoubleWrapper(data[0]);
+                return new LongWrapper(data[0]);
             } else {
-                return new DoubleArrayWrapper(data);
+                return new LongArrayWrapper(data);
             }
         }
     }
 
-    public interface PrimitiveDoubleWrapper extends PrimitiveNumberWrapper<Double, PrimitiveDoubleWrapper> {
+    public interface PrimitiveLongWrapper extends PrimitiveNumberWrapper<Long, PrimitiveLongWrapper> {
         @Override
-        Double[] asArray();
+        Long[] asArray();
     }
 
-    public static final class DoubleArrayWrapper implements PrimitiveDoubleWrapper {
+    public static final class LongArrayWrapper implements PrimitiveLongWrapper {
 
-        private final double[] array;
+        private final long[] array;
 
-        public DoubleArrayWrapper(final double[] array) {
+        public LongArrayWrapper(final long[] array) {
             this.array = array;
         }
 
         @Override
-        public Double get(final long index) {
+        public Long get(final long index) {
             return array[Ints.checkedCast(index)];
         }
 
         @Override
-        public DoubleArrayWrapper set(final Double value, final long index) {
+        public LongArrayWrapper set(final Long value, final long index) {
             array[Ints.checkedCast(index)] = value;
             return this;
         }
@@ -83,14 +83,14 @@ public class DoubleBuffer {
         }
 
         @Override
-        public PrimitiveDoubleWrapper copy() {
-            return new DoubleArrayWrapper(Arrays.copyOf(array, array.length));
+        public PrimitiveLongWrapper copy() {
+            return new LongArrayWrapper(Arrays.copyOf(array, array.length));
         }
 
         @Override
-        public DoubleArrayWrapper copyFrom(JVMBuffer.PrimitiveArrayWrapper<Double, ?> src, long srcPos, long destPos, long length) {
-            if (src instanceof DoubleArrayWrapper) {
-                System.arraycopy(((DoubleArrayWrapper) src).array, Ints.checkedCast(srcPos), array, Ints.checkedCast(destPos), Ints.checkedCast(length));
+        public LongArrayWrapper copyFrom(JVMBuffer.PrimitiveArrayWrapper<Long, ?> src, long srcPos, long destPos, long length) {
+            if (src instanceof LongArrayWrapper) {
+                System.arraycopy(((LongArrayWrapper) src).array, Ints.checkedCast(srcPos), array, Ints.checkedCast(destPos), Ints.checkedCast(length));
             } else {
                 for (int i = 0; i < length; i++) {
                     array[Ints.checkedCast(destPos + i)] = src.get(srcPos + i);
@@ -100,8 +100,8 @@ public class DoubleBuffer {
         }
 
         @Override
-        public Double sum() {
-            double result = 0;
+        public Long sum() {
+            long result = 0;
             for (int i = 0; i < array.length; i++) {
                 result += array[i];
             }
@@ -109,8 +109,8 @@ public class DoubleBuffer {
         }
 
         @Override
-        public Double product() {
-            double result = 1.0;
+        public Long product() {
+            long result = 1;
             for (int i = 0; i < array.length; i++) {
                 result *= array[i];
             }
@@ -118,7 +118,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper times(Double that) {
+        public LongArrayWrapper times(Long that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] *= that;
             }
@@ -126,7 +126,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper div(Double that) {
+        public LongArrayWrapper div(Long that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] /= that;
             }
@@ -134,7 +134,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper plus(Double that) {
+        public LongArrayWrapper plus(Long that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] += that;
             }
@@ -142,19 +142,19 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper plus(long index, Double that) {
+        public LongArrayWrapper plus(long index, Long that) {
             array[Ints.checkedCast(index)] += that;
             return this;
         }
 
         @Override
-        public DoubleArrayWrapper times(long index, Double that) {
+        public LongArrayWrapper times(long index, Long that) {
             array[Ints.checkedCast(index)] *= that;
             return this;
         }
 
         @Override
-        public DoubleArrayWrapper minus(Double that) {
+        public LongArrayWrapper minus(Long that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] -= that;
             }
@@ -162,15 +162,15 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper pow(Double that) {
+        public LongArrayWrapper pow(Long that) {
             for (int i = 0; i < array.length; i++) {
-                array[i] = FastMath.pow(array[i], that);
+                array[i] = (long) FastMath.pow(array[i], that);
             }
             return this;
         }
 
         @Override
-        public DoubleArrayWrapper reverseDiv(Double that) {
+        public LongArrayWrapper reverseDiv(Long that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = that / array[i];
             }
@@ -178,7 +178,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper reverseMinus(Double that) {
+        public LongArrayWrapper reverseMinus(Long that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = that - array[i];
             }
@@ -186,7 +186,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper applyRight(BiFunction<Double, Double, Double> mapper, Double rightArg) {
+        public LongArrayWrapper applyRight(BiFunction<Long, Long, Long> mapper, Long rightArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i], rightArg);
             }
@@ -194,7 +194,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper applyLeft(BiFunction<Double, Double, Double> mapper, Double leftArg) {
+        public LongArrayWrapper applyLeft(BiFunction<Long, Long, Long> mapper, Long leftArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(leftArg, array[i]);
             }
@@ -202,7 +202,7 @@ public class DoubleBuffer {
         }
 
         @Override
-        public DoubleArrayWrapper apply(Function<Double, Double> mapper) {
+        public LongArrayWrapper apply(Function<Long, Long> mapper) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i]);
             }
@@ -221,28 +221,29 @@ public class DoubleBuffer {
 
         @Override
         public long[] asLongArray() {
-            long[] intBuffer = new long[array.length];
-            for (int i = 0; i < array.length; i++) {
-                intBuffer[i] = (long) array[i];
-            }
-            return intBuffer;
-        }
-
-        @Override
-        public double[] asDoubleArray() {
             return array;
         }
 
         @Override
-        public Double[] asArray() {
+        public double[] asDoubleArray() {
+
+            double[] dbls = new double[array.length];
+            for (int i = 0; i < dbls.length; i++) {
+                dbls[i] = array[i];
+            }
+            return dbls;
+        }
+
+        @Override
+        public Long[] asArray() {
             return ArrayUtils.toObject(array);
         }
 
         public boolean equals(final Object o) {
             if (o == this) return true;
-            if (!(o instanceof PrimitiveDoubleWrapper)) return false;
-            final PrimitiveDoubleWrapper other = (PrimitiveDoubleWrapper) o;
-            if (!Arrays.equals(this.array, other.asDoubleArray())) return false;
+            if (!(o instanceof PrimitiveLongWrapper)) return false;
+            final PrimitiveLongWrapper other = (PrimitiveLongWrapper) o;
+            if (!Arrays.equals(this.array, other.asLongArray())) return false;
             return true;
         }
 
@@ -254,72 +255,72 @@ public class DoubleBuffer {
         }
     }
 
-    public static final class DoubleWrapper extends JVMBuffer.SingleValueWrapper<Double, PrimitiveDoubleWrapper> implements PrimitiveDoubleWrapper {
+    public static final class LongWrapper extends JVMBuffer.SingleValueWrapper<Long, PrimitiveLongWrapper> implements PrimitiveLongWrapper {
 
-        public DoubleWrapper(final double value) {
+        public LongWrapper(final long value) {
             super(value);
         }
 
         @Override
-        public Double sum() {
+        public Long sum() {
             return value;
         }
 
         @Override
-        public Double product() {
+        public Long product() {
             return value;
         }
 
         @Override
-        public PrimitiveDoubleWrapper times(Double that) {
+        public PrimitiveLongWrapper times(Long that) {
             value *= that;
             return this;
         }
 
         @Override
-        public PrimitiveDoubleWrapper div(Double that) {
+        public PrimitiveLongWrapper div(Long that) {
             value /= that;
             return this;
         }
 
         @Override
-        public PrimitiveDoubleWrapper plus(Double that) {
+        public PrimitiveLongWrapper plus(Long that) {
             value += that;
             return this;
         }
 
         @Override
-        public PrimitiveDoubleWrapper plus(long index, Double that) {
+        public PrimitiveLongWrapper plus(long index, Long that) {
             value += that;
             return this;
         }
 
         @Override
-        public PrimitiveDoubleWrapper minus(Double that) {
+        public PrimitiveLongWrapper minus(Long that) {
             value -= that;
             return this;
         }
 
         @Override
-        public PrimitiveDoubleWrapper pow(Double that) {
-            value = FastMath.pow(value, that);
+        public PrimitiveLongWrapper pow(Long that) {
+            value = (long) FastMath.pow(value, that);
             return this;
         }
 
         @Override
-        public PrimitiveDoubleWrapper reverseDiv(Double that) {
+        public PrimitiveLongWrapper reverseDiv(Long that) {
             value = that / value;
             return this;
         }
 
         @Override
-        public PrimitiveDoubleWrapper reverseMinus(Double that) {
+        public PrimitiveLongWrapper reverseMinus(Long that) {
             value = that - value;
             return this;
         }
 
         @Override
-        public PrimitiveDoubleWrapper times(long index, Double that) {
+        public PrimitiveLongWrapper times(long index, Long that) {
             value *= that;
             return this;
         }
@@ -331,26 +332,26 @@ public class DoubleBuffer {
 
         @Override
         public long[] asLongArray() {
-            return new long[]{value.longValue()};
+            return new long[]{value};
         }
 
         @Override
         public double[] asDoubleArray() {
-            return new double[]{value};
+            return new double[]{value.doubleValue()};
         }
 
         @Override
-        public Double[] asArray() {
-            return new Double[]{value};
+        public Long[] asArray() {
+            return new Long[]{value};
         }
 
         @Override
-        public PrimitiveDoubleWrapper copy() {
-            return new DoubleWrapper(value);
+        public PrimitiveLongWrapper copy() {
+            return new LongWrapper(value);
         }
 
         @Override
-        protected PrimitiveDoubleWrapper getThis() {
+        protected PrimitiveLongWrapper getThis() {
             return this;
         }
     }

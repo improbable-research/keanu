@@ -4,6 +4,8 @@ public interface PrimitiveNumberWrapper<T extends Number, B extends JVMBuffer.Pr
 
     int[] asIntegerArray();
 
+    long[] asLongArray();
+
     double[] asDoubleArray();
 
     T sum();
