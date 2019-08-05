@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
@@ -47,7 +46,6 @@ import static org.bytedeco.openblas.global.openblas.cblas_dgemm;
 public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor, DoubleBuffer.PrimitiveDoubleWrapper> implements DoubleTensor {
 
     private static final DoubleBuffer.DoubleArrayWrapperFactory factory = new DoubleBuffer.DoubleArrayWrapperFactory();
-
 
     private JVMDoubleTensor(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
         super(buffer, shape, stride);
@@ -76,19 +74,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     @Override
     protected DoubleTensor create(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
         return new JVMDoubleTensor(buffer, shape, stride);
-    }
-
-    @Override
-    protected DoubleTensor set(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
-        this.buffer = buffer;
-        this.shape = shape;
-        this.stride = stride;
-        return this;
-    }
-
-    @Override
-    protected DoubleBuffer.DoubleArrayWrapperFactory getFactory() {
-        return factory;
     }
 
     public static JVMDoubleTensor scalar(double scalarValue) {
@@ -170,6 +155,19 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         return new JVMDoubleTensor(buffer, new long[]{buffer.length});
     }
 
+    @Override
+    protected DoubleTensor set(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
+        this.buffer = buffer;
+        this.shape = shape;
+        this.stride = stride;
+        return this;
+    }
+
+    @Override
+    protected DoubleBuffer.DoubleArrayWrapperFactory getFactory() {
+        return factory;
+    }
+
     private long[] shapeCopy() {
         return copyOf(shape, shape.length);
     }
@@ -208,26 +206,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         );
 
         return equalsMask.toBoolean();
-    }
-
-    @Override
-    public DoubleTensor where(BooleanTensor predicate, DoubleTensor els) {
-
-        final long[] resultShape = getBroadcastResultShape(getBroadcastResultShape(shape, predicate.getShape()), els.getShape());
-        final DoubleTensor broadcastedTrue = this.hasShape(resultShape) ? this : this.broadcast(resultShape);
-        final DoubleTensor broadcastedFalse = els.hasShape(resultShape) ? els : els.broadcast(resultShape);
-        final BooleanTensor broadcastedPredicate = predicate.hasShape(resultShape) ? predicate : predicate.broadcast(resultShape);
-
-        FlattenedView<Double> trueValuesFlattened = broadcastedTrue.getFlattenedView();
-        FlattenedView<Double> falseValuesFlattened = broadcastedFalse.getFlattenedView();
-        FlattenedView<Boolean> predicateValuesFlattened = broadcastedPredicate.getFlattenedView();
-
-        double[] result = new double[TensorShape.getLengthAsInt(resultShape)];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = predicateValuesFlattened.get(i) ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
-        }
-
-        return DoubleTensor.create(result, copyOf(resultShape, resultShape.length));
     }
 
     @Override
@@ -610,11 +588,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     public DoubleTensor sigmoidInPlace() {
         buffer.apply(sigmoid::value);
         return this;
-    }
-
-    @Override
-    public DoubleTensor take(long... index) {
-        return JVMDoubleTensor.scalar(getValue(index));
     }
 
     public static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {

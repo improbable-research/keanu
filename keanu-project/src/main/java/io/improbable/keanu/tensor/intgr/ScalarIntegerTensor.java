@@ -274,7 +274,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor reverseSlice(IntegerTensor to, Slicer slicer) {
-        JVMTensor.setAsSlice(getFlattenedView(), to.getFlattenedView(), new SlicerIndexMapper(slicer, to.getShape(), to.getStride()));
+        JVMTensor.reverseSlice(getFlattenedView(), to.getFlattenedView(), new SlicerIndexMapper(slicer, to.getShape(), to.getStride()));
         return to;
     }
 

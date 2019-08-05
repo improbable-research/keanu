@@ -12,7 +12,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.bool.BroadcastableBooleanOperations.AND;
 import static io.improbable.keanu.tensor.bool.BroadcastableBooleanOperations.OR;
@@ -112,25 +111,6 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    public BooleanTensor where(BooleanTensor predicate, BooleanTensor els) {
-        final long[] resultShape = getBroadcastResultShape(getBroadcastResultShape(shape, predicate.getShape()), els.getShape());
-        final BooleanTensor broadcastedTrue = this.hasShape(resultShape) ? this : this.broadcast(resultShape);
-        final BooleanTensor broadcastedFalse = els.hasShape(resultShape) ? els : els.broadcast(resultShape);
-        final BooleanTensor broadcastedPredicate = predicate.hasShape(resultShape) ? predicate : predicate.broadcast(resultShape);
-
-        FlattenedView<Boolean> trueValuesFlattened = broadcastedTrue.getFlattenedView();
-        FlattenedView<Boolean> falseValuesFlattened = broadcastedFalse.getFlattenedView();
-        FlattenedView<Boolean> predicateValuesFlattened = broadcastedPredicate.getFlattenedView();
-
-        boolean[] result = new boolean[TensorShape.getLengthAsInt(resultShape)];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = predicateValuesFlattened.get(i) ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
-        }
-
-        return BooleanTensor.create(result, copyOf(resultShape, resultShape.length));
-    }
-
-    @Override
     public BooleanTensor andInPlace(BooleanTensor that) {
         return broadcastableBinaryOpWithAutoBroadcast(AND, getAsJVMTensor(that));
     }
@@ -207,11 +187,6 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     public IntegerTensor toIntegerMask() {
         int[] doubles = asFlatIntegerArray();
         return IntegerTensor.create(doubles, copyOf(shape, shape.length));
-    }
-
-    @Override
-    public JVMBooleanTensor take(long... index) {
-        return new JVMBooleanTensor(getValue(index));
     }
 
     @Override

@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShape.convertFromFlatIndexToPermutedFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.tensor.TensorShape.getPermutationForDimensionToDimensionZero;
 import static io.improbable.keanu.tensor.TensorShape.getPermutedIndices;
 import static io.improbable.keanu.tensor.TensorShape.getReshapeAllowingWildcard;
@@ -215,6 +216,13 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     }
 
     @Override
+    public TENSOR take(long... index) {
+        B newBuffer = getFactory().createNew(1);
+        newBuffer.set(buffer.get(TensorShape.getFlatIndex(shape, stride, index)), 0);
+        return create(newBuffer, new long[0], new long[]{1});
+    }
+
+    @Override
     public TENSOR slice(int dimension, long index) {
         return createFromResultWrapper(slice(getFactory(), buffer, new DimensionIndexMapper(shape, stride, dimension, index)));
     }
@@ -246,7 +254,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     @Override
     public TENSOR reverseSlice(TENSOR setTo, Slicer slicer) {
 
-        JVMTensor.setAsSlice(
+        JVMTensor.reverseSlice(
             getFlattenedView(),
             setTo.getFlattenedView(),
             new SlicerIndexMapper(slicer, setTo.getShape(), setTo.getStride())
@@ -255,9 +263,9 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         return setTo;
     }
 
-    public static <T> void setAsSlice(FlattenedView<T> from,
-                                      FlattenedView<T> to,
-                                      IndexMapper indexMapper) {
+    public static <T> void reverseSlice(FlattenedView<T> from,
+                                        FlattenedView<T> to,
+                                        IndexMapper indexMapper) {
 
         for (long i = 0; i < from.size(); i++) {
 
@@ -345,6 +353,28 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
 
         return create(outputBuffer, toShape, outputStride);
+    }
+
+    @Override
+    public TENSOR where(BooleanTensor predicate, TENSOR els) {
+
+        final long[] resultShape = getBroadcastResultShape(getBroadcastResultShape(shape, predicate.getShape()), els.getShape());
+        final TENSOR broadcastedTrue = this.hasShape(resultShape) ? (TENSOR) this : this.broadcast(resultShape);
+        final TENSOR broadcastedFalse = els.hasShape(resultShape) ? els : els.broadcast(resultShape);
+        final BooleanTensor broadcastedPredicate = predicate.hasShape(resultShape) ? predicate : predicate.broadcast(resultShape);
+
+        FlattenedView<T> trueValuesFlattened = broadcastedTrue.getFlattenedView();
+        FlattenedView<T> falseValuesFlattened = broadcastedFalse.getFlattenedView();
+        FlattenedView<Boolean> predicateValuesFlattened = broadcastedPredicate.getFlattenedView();
+
+        B newBuffer = getFactory().createNew(TensorShape.getLengthAsInt(resultShape));
+        for (int i = 0; i < newBuffer.getLength(); i++) {
+            final T value = predicateValuesFlattened.get(i) ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
+            newBuffer.set(value, i);
+        }
+
+        final long[] resultStride = broadcastedTrue.getStride();
+        return create(newBuffer, copyOf(resultShape, resultShape.length), copyOf(resultStride, resultStride.length));
     }
 
     public IntegerTensor argCompare(BiFunction<T, T, Boolean> compareOp, int axis) {
