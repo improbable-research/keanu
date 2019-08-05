@@ -3,7 +3,12 @@ package io.improbable.keanu.tensor.lng;
 public class JVMLongTensorFactory implements LongTensorFactory {
 
     @Override
-    public LongTensor create(Long value, long[] shape) {
+    public LongTensor create(long value, long[] shape) {
+        return JVMLongTensor.create(value, shape);
+    }
+
+    @Override
+    public LongTensor create(int value, long[] shape) {
         return JVMLongTensor.create(value, shape);
     }
 
@@ -53,7 +58,12 @@ public class JVMLongTensorFactory implements LongTensorFactory {
     }
 
     @Override
-    public LongTensor scalar(Long scalarValue) {
+    public LongTensor scalar(long scalarValue) {
+        return JVMLongTensor.scalar(scalarValue);
+    }
+
+    @Override
+    public LongTensor scalar(int scalarValue) {
         return JVMLongTensor.scalar(scalarValue);
     }
 

@@ -4,8 +4,6 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensorFactory;
 import io.improbable.keanu.tensor.lng.JVMLongTensorFactory;
-import io.improbable.keanu.tensor.validate.TensorValidator;
-import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -26,8 +24,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+
 @RunWith(Parameterized.class)
-public class FixedPointTensorTest<N extends Number> {
+public class FixedPointTensorTest<N extends Number, T extends FixedPointTensor<N, T>> {
 
     @Parameterized.Parameters(name = "{index}: Test with {2}")
     public static Iterable<Object[]> data() {
@@ -36,17 +35,17 @@ public class FixedPointTensorTest<N extends Number> {
 
         return Arrays.asList(new Object[][]{
             {new JVMLongTensorFactory(), toLong, "JVM LongTensor"},
-            {new Nd4jIntegerTensorFactory(), toInt, "Nd4j IntegerTensor"}
+            {new Nd4jIntegerTensorFactory(), toInt, "Nd4jIntegerTensor"}
         });
     }
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private FixedPointTensorFactory<N, ?> factory;
+    private FixedPointTensorFactory<N, T> factory;
     private Function<Long, N> typed;
 
-    public FixedPointTensorTest(FixedPointTensorFactory<N, ?> factory, Function<Long, N> typed, String name) {
+    public FixedPointTensorTest(FixedPointTensorFactory<N, T> factory, Function<Long, N> typed, String name) {
         this.factory = factory;
         this.typed = typed;
     }
@@ -57,66 +56,66 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void youCanCreateARankZeroTensor() {
-        FixedPointTensor<N, ?> scalar = factory.scalar(typed(2));
+        FixedPointTensor<N, T> scalar = factory.scalar(2);
         assertEquals(typed(2), scalar.scalar());
         TestCase.assertEquals(0, scalar.getRank());
     }
 
     @Test
     public void youCanCreateARankOneTensor() {
-        FixedPointTensor<N, ?> vector = factory.create(new int[]{1, 2, 3, 4, 5}, new long[]{5});
+        FixedPointTensor<N, T> vector = factory.create(new int[]{1, 2, 3, 4, 5}, new long[]{5});
         assertEquals(typed(4), vector.getValue(3));
         TestCase.assertEquals(1, vector.getRank());
     }
 
     @Test
     public void doesMinusScalar() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrixA.minus(2);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.minus(typed(2));
         int[] expected = new int[]{-1, 0, 1, 2};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.minusInPlace(2);
+        FixedPointTensor<N, T> resultInPlace = matrixA.minusInPlace(typed(2));
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesPlusScalar() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrixA.plus(2);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.plus(typed(2));
         int[] expected = new int[]{3, 4, 5, 6};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.plusInPlace(2);
+        FixedPointTensor<N, T> resultInPlace = matrixA.plusInPlace(typed(2));
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesTimesScalar() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrixA.times(2);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.times(typed(2));
         int[] expected = new int[]{2, 4, 6, 8};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.timesInPlace(2);
+        FixedPointTensor<N, T> resultInPlace = matrixA.timesInPlace(typed(2));
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesDivideScalar() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrixA.div(2);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.div(typed(2));
         int[] expected = new int[]{0, 1, 1, 2};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.divInPlace(2);
+        FixedPointTensor<N, T> resultInPlace = matrixA.divInPlace(typed(2));
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
         assertArrayEquals(new double[]{0.0, 1.0, 1.0, 2.0}, matrixA.asFlatDoubleArray(), 0.0);
@@ -124,83 +123,83 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void doesElementwisePower() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor matrixB = IntegerTensor.create(new int[]{2, 3, 2, 0}, new long[]{2, 2});
-        IntegerTensor result = matrixA.pow(matrixB);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> matrixB = factory.create(new int[]{2, 3, 2, 0}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.pow((T) matrixB);
         int[] expected = new int[]{1, 8, 9, 1};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.powInPlace(matrixB);
+        FixedPointTensor<N, T> resultInPlace = matrixA.powInPlace((T) matrixB);
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesScalarPower() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrixA.pow(2);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.pow(typed(2));
         int[] expected = new int[]{1, 4, 9, 16};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.powInPlace(2);
+        FixedPointTensor<N, T> resultInPlace = matrixA.powInPlace(typed(2));
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesElementwiseMinus() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor matrixB = IntegerTensor.create(new int[]{2, 3, 2, 0}, new long[]{2, 2});
-        IntegerTensor result = matrixA.minus(matrixB);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> matrixB = factory.create(new int[]{2, 3, 2, 0}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.minus((T) matrixB);
         int[] expected = new int[]{-1, -1, 1, 4};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.minusInPlace(matrixB);
+        FixedPointTensor<N, T> resultInPlace = matrixA.minusInPlace((T) matrixB);
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesElementwisePlus() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor matrixB = IntegerTensor.create(new int[]{2, 3, 2, 0}, new long[]{2, 2});
-        IntegerTensor result = matrixA.plus(matrixB);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> matrixB = factory.create(new int[]{2, 3, 2, 0}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.plus((T) matrixB);
         int[] expected = new int[]{3, 5, 5, 4};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.plusInPlace(matrixB);
+        FixedPointTensor<N, T> resultInPlace = matrixA.plusInPlace((T) matrixB);
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesElementwiseTimes() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor matrixB = IntegerTensor.create(new int[]{2, 3, 2, 0}, new long[]{2, 2});
-        IntegerTensor result = matrixA.times(matrixB);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> matrixB = factory.create(new int[]{2, 3, 2, 0}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.times((T) matrixB);
         int[] expected = new int[]{2, 6, 6, 0};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.timesInPlace(matrixB);
+        FixedPointTensor<N, T> resultInPlace = matrixA.timesInPlace((T) matrixB);
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesElementwiseDivide() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor matrixC = IntegerTensor.create(new int[]{5, -1, 7, 2}, new long[]{2, 2});
-        IntegerTensor result = matrixA.div(matrixC);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> matrixC = factory.create(new int[]{5, -1, 7, 2}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.div((T) matrixC);
         int[] expected = new int[]{0, -2, 0, 2};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.divInPlace(matrixC);
+        FixedPointTensor<N, T> resultInPlace = matrixA.divInPlace((T) matrixC);
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
         assertArrayEquals(new double[]{0.0, -2.0, 0.0, 2.0}, matrixA.asFlatDoubleArray(), 0.0);
@@ -208,38 +207,38 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void doesElementwiseUnaryMinus() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrixA.unaryMinus();
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.unaryMinus();
         int[] expected = new int[]{-1, -2, -3, -4};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.unaryMinusInPlace();
+        FixedPointTensor<N, T> resultInPlace = matrixA.unaryMinusInPlace();
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesElementwiseAbsolute() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{-1, -2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrixA.abs();
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{-1, -2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.abs();
         int[] expected = new int[]{1, 2, 3, 4};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.absInPlace();
+        FixedPointTensor<N, T> resultInPlace = matrixA.absInPlace();
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesElementwiseGreaterThanMask() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{-1, -2, 3, 4}, new long[]{2, 2});
-        IntegerTensor matrixTwos = IntegerTensor.create(2, new long[]{2, 2});
-        IntegerTensor scalarTwo = IntegerTensor.scalar(2);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{-1, -2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> matrixTwos = factory.create(2, new long[]{2, 2});
+        FixedPointTensor<N, T> scalarTwo = factory.scalar(2);
 
-        IntegerTensor maskFromMatrix = matrix.greaterThanMask(matrixTwos);
-        IntegerTensor maskFromScalar = matrix.greaterThanMask(scalarTwo);
+        FixedPointTensor<N, T> maskFromMatrix = matrix.greaterThanMask((T) matrixTwos);
+        FixedPointTensor<N, T> maskFromScalar = matrix.greaterThanMask((T) scalarTwo);
 
         int[] expected = new int[]{0, 0, 1, 1};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -248,12 +247,12 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void doesElementwiseGreaterThanOrEqualToMask() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{-1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor matrixTwos = IntegerTensor.create(2, new long[]{2, 2});
-        IntegerTensor scalarTWo = IntegerTensor.scalar(2);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{-1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> matrixTwos = factory.create(2, new long[]{2, 2});
+        FixedPointTensor<N, T> scalarTWo = factory.scalar(2);
 
-        IntegerTensor maskFromMatrix = matrix.greaterThanOrEqualToMask(matrixTwos);
-        IntegerTensor maskFromScalar = matrix.greaterThanOrEqualToMask(scalarTWo);
+        FixedPointTensor<N, T> maskFromMatrix = matrix.greaterThanOrEqualToMask((T) matrixTwos);
+        FixedPointTensor<N, T> maskFromScalar = matrix.greaterThanOrEqualToMask((T) scalarTWo);
 
         int[] expected = new int[]{0, 1, 1, 1};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -262,12 +261,12 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void doesElementwiseLessThanMask() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{-1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor matrixTwos = IntegerTensor.create(2, new long[]{2, 2});
-        IntegerTensor scalarTwo = IntegerTensor.scalar(2);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{-1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> matrixTwos = factory.create(2, new long[]{2, 2});
+        FixedPointTensor<N, T> scalarTwo = factory.scalar(2);
 
-        IntegerTensor maskFromMatrix = matrix.lessThanMask(matrixTwos);
-        IntegerTensor maskFromScalar = matrix.lessThanMask(scalarTwo);
+        FixedPointTensor<N, T> maskFromMatrix = matrix.lessThanMask((T) matrixTwos);
+        FixedPointTensor<N, T> maskFromScalar = matrix.lessThanMask((T) scalarTwo);
 
         int[] expected = new int[]{1, 0, 0, 0};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -276,12 +275,12 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void doesElementwiseLessThanOrEqualToMask() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{-1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor matrixTwos = IntegerTensor.create(2, new long[]{2, 2});
-        IntegerTensor scalarTwo = IntegerTensor.scalar(2);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{-1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> matrixTwos = factory.create(2, new long[]{2, 2});
+        FixedPointTensor<N, T> scalarTwo = factory.scalar(2);
 
-        IntegerTensor maskFromMatrix = matrix.lessThanOrEqualToMask(matrixTwos);
-        IntegerTensor maskFromScalar = matrix.lessThanOrEqualToMask(scalarTwo);
+        FixedPointTensor<N, T> maskFromMatrix = matrix.lessThanOrEqualToMask((T) matrixTwos);
+        FixedPointTensor<N, T> maskFromScalar = matrix.lessThanOrEqualToMask((T) scalarTwo);
 
         int[] expected = new int[]{1, 1, 0, 0};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -290,175 +289,167 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void doesSetWithMask() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{-1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor mask = IntegerTensor.create(new int[]{1, 1, 0, 0}, new long[]{2, 2});
-        IntegerTensor expected = IntegerTensor.create(new int[]{100, 100, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{-1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> mask = factory.create(new int[]{1, 1, 0, 0}, new long[]{2, 2});
+        FixedPointTensor<N, T> expected = factory.create(new int[]{100, 100, 3, 4}, new long[]{2, 2});
 
-        IntegerTensor result = matrix.setWithMask(mask, 100);
+        FixedPointTensor<N, T> result = matrix.setWithMask((T) mask, typed(100));
         assertThat(result, valuesAndShapesMatch(expected));
 
-        IntegerTensor resultInPlace = matrix.setWithMaskInPlace(mask, 100);
+        FixedPointTensor<N, T> resultInPlace = matrix.setWithMaskInPlace((T) mask, typed(100));
         assertThat(resultInPlace, valuesAndShapesMatch(expected));
         assertThat(matrix, valuesAndShapesMatch(expected));
     }
 
     @Test
-    public void cannotCreateTensorWithLongsThatAreTooLong() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Out of range: " + Long.MAX_VALUE);
-
-        IntegerTensor.create(new long[]{Long.MAX_VALUE});
-    }
-
-    @Test
     public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
-        IntegerTensor tensor = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor mask = IntegerTensor.scalar(1);
+        FixedPointTensor<N, T> tensor = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> mask = factory.scalar(1);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
 
-        tensor.setWithMaskInPlace(mask, -2);
+        tensor.setWithMaskInPlace((T) mask, typed(-2));
     }
 
     @Test
     public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
-        IntegerTensor tensor = IntegerTensor.scalar(3);
-        IntegerTensor mask = IntegerTensor.create(new int[]{1, 1, 1, 1}, new long[]{2, 2});
+        FixedPointTensor<N, T> tensor = factory.scalar(3);
+        FixedPointTensor<N, T> mask = factory.create(new int[]{1, 1, 1, 1}, new long[]{2, 2});
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
 
-        tensor.setWithMaskInPlace(mask, -2);
+        tensor.setWithMaskInPlace((T) mask, typed(-2));
     }
 
     @Test
     public void doesApplyUnaryFunction() {
-        IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrixA.apply(v -> v + 1);
+        FixedPointTensor<N, T> matrixA = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrixA.apply(v -> typed(v.intValue() + 1));
         int[] expected = new int[]{2, 3, 4, 5};
         assertArrayEquals(expected, result.asFlatIntegerArray());
         assertFalse(Arrays.equals(expected, matrixA.asFlatIntegerArray()));
 
-        IntegerTensor resultInPlace = matrixA.applyInPlace(v -> v + 1);
+        FixedPointTensor<N, T> resultInPlace = matrixA.applyInPlace(v -> typed(v.intValue() + 1));
         assertArrayEquals(expected, resultInPlace.asFlatIntegerArray());
         assertArrayEquals(expected, matrixA.asFlatIntegerArray());
     }
 
     @Test
     public void doesCompareLessThanScalar() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        BooleanTensor result = matrix.lessThan(3);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        BooleanTensor result = matrix.lessThan(typed(3));
         Boolean[] expected = new Boolean[]{true, true, false, false};
         assertArrayEquals(expected, result.asFlatArray());
     }
 
     @Test
     public void doesCompareLessThanOrEqualScalar() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        BooleanTensor result = matrix.lessThanOrEqual(3);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        BooleanTensor result = matrix.lessThanOrEqual(typed(3));
         Boolean[] expected = new Boolean[]{true, true, true, false};
         assertArrayEquals(expected, result.asFlatArray());
     }
 
     @Test
     public void doesCompareLessThan() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor otherMatrix = IntegerTensor.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
-        BooleanTensor result = matrix.lessThan(otherMatrix);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> otherMatrix = factory.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
+        BooleanTensor result = matrix.lessThan((T) otherMatrix);
         Boolean[] expected = new Boolean[]{false, false, true, true};
         assertArrayEquals(expected, result.asFlatArray());
     }
 
     @Test
     public void doesCompareLessThanOrEqual() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor otherMatrix = IntegerTensor.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
-        BooleanTensor result = matrix.lessThanOrEqual(otherMatrix);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> otherMatrix = factory.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
+        BooleanTensor result = matrix.lessThanOrEqual((T) otherMatrix);
         Boolean[] expected = new Boolean[]{false, true, true, true};
         assertArrayEquals(expected, result.asFlatArray());
     }
 
     @Test
     public void doesCompareGreaterThan() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor otherMatrix = IntegerTensor.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
-        BooleanTensor result = matrix.greaterThan(otherMatrix);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> otherMatrix = factory.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
+        BooleanTensor result = matrix.greaterThan((T) otherMatrix);
         Boolean[] expected = new Boolean[]{true, false, false, false};
         assertArrayEquals(expected, result.asFlatArray());
     }
 
     @Test
     public void doesCompareGreaterThanOrEqual() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor otherMatrix = IntegerTensor.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
-        BooleanTensor result = matrix.greaterThanOrEqual(otherMatrix);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> otherMatrix = factory.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
+        BooleanTensor result = matrix.greaterThanOrEqual((T) otherMatrix);
         Boolean[] expected = new Boolean[]{true, true, false, false};
         assertArrayEquals(expected, result.asFlatArray());
     }
 
     @Test
     public void doesCompareGreaterThanScalar() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        BooleanTensor result = matrix.greaterThan(3);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        BooleanTensor result = matrix.greaterThan(typed(3));
         Boolean[] expected = new Boolean[]{false, false, false, true};
         assertArrayEquals(expected, result.asFlatArray());
     }
 
     @Test
     public void doesCompareGreaterThanOrEqualScalar() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        BooleanTensor result = matrix.greaterThanOrEqual(3);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        BooleanTensor result = matrix.greaterThanOrEqual(typed(3));
         Boolean[] expected = new Boolean[]{false, false, true, true};
         assertArrayEquals(expected, result.asFlatArray());
     }
 
     @Test
     public void doesCompareGreaterThanOrEqualScalarTensor() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        BooleanTensor result = matrix.greaterThanOrEqual(IntegerTensor.scalar(3));
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        BooleanTensor result = matrix.greaterThanOrEqual(factory.scalar(3));
         Boolean[] expected = new Boolean[]{false, false, true, true};
         assertArrayEquals(expected, result.asFlatArray());
     }
 
     @Test
     public void doesCompareGreaterThanMask() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor otherMatrix = IntegerTensor.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
-        IntegerTensor result = matrix.greaterThanMask(otherMatrix);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> otherMatrix = factory.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrix.greaterThanMask((T) otherMatrix);
         int[] expected = new int[]{1, 0, 0, 0};
         assertArrayEquals(expected, result.asFlatIntegerArray());
     }
 
     @Test
     public void doesCompareGreaterThanOrEqualMask() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor otherMatrix = IntegerTensor.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
-        IntegerTensor result = matrix.greaterThanOrEqualToMask(otherMatrix);
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> otherMatrix = factory.create(new int[]{0, 2, 4, 7}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrix.greaterThanOrEqualToMask((T) otherMatrix);
         int[] expected = new int[]{1, 1, 0, 0};
         assertArrayEquals(expected, result.asFlatIntegerArray());
     }
 
     @Test
     public void doesCompareGreaterThanScalarMask() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrix.greaterThanMask(IntegerTensor.scalar(3));
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrix.greaterThanMask(factory.scalar(3));
         int[] expected = new int[]{0, 0, 0, 1};
         assertArrayEquals(expected, result.asFlatIntegerArray());
     }
 
     @Test
     public void doesCompareGreaterThanOrEqualScalarMask() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrix.greaterThanOrEqualToMask(IntegerTensor.scalar(3));
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrix.greaterThanOrEqualToMask(factory.scalar(3));
         int[] expected = new int[]{0, 0, 1, 1};
         assertArrayEquals(expected, result.asFlatIntegerArray());
     }
 
     @Test
     public void doesCompareGreaterThanOrEqualTensorMask() {
-        IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor result = matrix.greaterThanOrEqualToMask(IntegerTensor.create(0, 4));
+        FixedPointTensor<N, T> matrix = factory.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        FixedPointTensor<N, T> result = matrix.greaterThanOrEqualToMask(factory.create(0, 4));
         int[] expected = new int[]{1, 0, 1, 1};
         assertArrayEquals(expected, result.asFlatIntegerArray());
     }
@@ -467,26 +458,26 @@ public class FixedPointTensorTest<N extends Number> {
     public void canElementwiseEqualsAScalarValue() {
         int value = 42;
         int otherValue = 43;
-        IntegerTensor allTheSame = IntegerTensor.create(value, new long[]{2, 3});
-        IntegerTensor notAllTheSame = allTheSame.duplicate();
-        notAllTheSame.setValue(otherValue, 1, 1);
+        FixedPointTensor<N, T> allTheSame = factory.create(value, new long[]{2, 3});
+        FixedPointTensor<N, T> notAllTheSame = allTheSame.duplicate();
+        notAllTheSame.setValue(typed(otherValue), 1, 1);
 
-        assertThat(allTheSame.elementwiseEquals(value).allTrue().scalar(), equalTo(true));
-        assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
+        assertThat(allTheSame.elementwiseEquals(typed(value)).allTrue().scalar(), equalTo(true));
+        assertThat(notAllTheSame.elementwiseEquals(typed(value)), hasValue(true, true, true, true, false, true));
     }
 
     @Test
     public void canBroadcastAdd() {
-        IntegerTensor x = IntegerTensor.create(new int[]{1, 2, 3}, new long[]{3, 1});
-        IntegerTensor s = IntegerTensor.create(new int[]{
+        FixedPointTensor<N, T> x = factory.create(new int[]{1, 2, 3}, new long[]{3, 1});
+        FixedPointTensor<N, T> s = factory.create(new int[]{
             -5, -2, -3, -7, -8,
             -5, -2, -3, -7, -8,
             -5, -2, -3, -7, -8
         }, new long[]{3, 5});
 
-        IntegerTensor diff = s.plus(x);
+        FixedPointTensor<N, T> diff = s.plus((T) x);
 
-        IntegerTensor expected = IntegerTensor.create(new int[]{
+        FixedPointTensor<N, T> expected = factory.create(new int[]{
             -4, -1, -2, -6, -7,
             -3, 0, -1, -5, -6,
             -2, 1, 0, -4, -5
@@ -497,16 +488,16 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void canBroadcastSubtract() {
-        IntegerTensor x = IntegerTensor.create(new int[]{-1, -2, -3}, new long[]{3, 1});
-        IntegerTensor s = IntegerTensor.create(new int[]{
+        FixedPointTensor<N, T> x = factory.create(new int[]{-1, -2, -3}, new long[]{3, 1});
+        FixedPointTensor<N, T> s = factory.create(new int[]{
             -5, -2, -3, -7, -8,
             -5, -2, -3, -7, -8,
             -5, -2, -3, -7, -8
         }, new long[]{3, 5});
 
-        IntegerTensor diff = s.minus(x);
+        FixedPointTensor<N, T> diff = s.minus((T) x);
 
-        IntegerTensor expected = IntegerTensor.create(new int[]{
+        FixedPointTensor<N, T> expected = factory.create(new int[]{
             -4, -1, -2, -6, -7,
             -3, 0, -1, -5, -6,
             -2, 1, 0, -4, -5
@@ -517,16 +508,16 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void canBroadcastDivide() {
-        IntegerTensor x = IntegerTensor.create(new int[]{1, 2, 3}, new long[]{3, 1});
-        IntegerTensor s = IntegerTensor.create(new int[]{
+        FixedPointTensor<N, T> x = factory.create(new int[]{1, 2, 3}, new long[]{3, 1});
+        FixedPointTensor<N, T> s = factory.create(new int[]{
             5, 2, 3, 7, 8,
             5, 2, 3, 7, 8,
             5, 2, 3, 7, 8
         }, new long[]{3, 5});
 
-        IntegerTensor diff = s.div(x);
+        FixedPointTensor<N, T> diff = s.div((T) x);
 
-        IntegerTensor expected = IntegerTensor.create(new int[]{
+        FixedPointTensor<N, T> expected = factory.create(new int[]{
             5 / 1, 2 / 1, 3 / 1, 7 / 1, 8 / 1,
             5 / 2, 2 / 2, 3 / 2, 7 / 2, 8 / 2,
             5 / 3, 2 / 3, 3 / 3, 7 / 3, 8 / 3
@@ -557,72 +548,30 @@ public class FixedPointTensorTest<N extends Number> {
 
     private void assertDropsFractionCorrectlyOnDivision(int numerator, int denominator) {
         int expected = numerator / denominator;
-        IntegerTensor tensor = IntegerTensor.create(
+        FixedPointTensor<N, T> tensor = factory.create(
             new int[]{numerator, numerator, numerator, numerator},
             new long[]{2, 2}
         );
-        IntegerTensor result = tensor.div(denominator);
+        FixedPointTensor<N, T> result = tensor.div(typed(denominator));
         assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
-    }
-
-    @Test
-    public void canResultInMaxInteger() {
-        IntegerTensor tensor = IntegerTensor.create(
-            new int[]{0, 0, 0, 0},
-            new long[]{2, 2}
-        );
-        IntegerTensor result = tensor.plus(Integer.MAX_VALUE);
-        int expected = Integer.MAX_VALUE;
-        assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
-    }
-
-    @Test
-    public void canResultInMinInteger() {
-        IntegerTensor tensor = IntegerTensor.create(
-            new int[]{0, 0, 0, 0},
-            new long[]{2, 2}
-        );
-        IntegerTensor result = tensor.plus(Integer.MIN_VALUE);
-        int expected = Integer.MIN_VALUE;
-        assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
-    }
-
-    @Test
-    public void canRepresentAllValues() {
-        IntegerTensor tensor = IntegerTensor.create(
-            new int[]{0, 0, 0, 0},
-            new long[]{2, 2}
-        );
-
-        /*
-         * Construct a value that has the most significant two bits and the least significant bit set to 1 with all
-         * others set to 0.  This value will stretch any floating point backing representation by requiring at least a
-         * <Num bits> - 1 length Mantissa.  Simply using INT MAX often doesn't work for this test as the closest
-         * floating point value is usually > INT MAX and when converting back, the value will be clamped back to max
-         */
-        final int biggestBitRange = (0x3 << Integer.SIZE - 2) + 1;
-
-        tensor.plusInPlace(biggestBitRange);
-        assertArrayEquals(new int[]{biggestBitRange, biggestBitRange, biggestBitRange, biggestBitRange},
-            tensor.asFlatIntegerArray());
     }
 
     @Test
     public void canFindScalarMinAndMax() {
-        IntegerTensor a = IntegerTensor.create(5, 4, 3, 2).reshape(2, 2);
-        int min = a.min().scalar();
-        int max = a.max().scalar();
-        assertEquals(2, min);
-        assertEquals(5, max);
+        FixedPointTensor<N, T> a = factory.create(5, 4, 3, 2).reshape(2, 2);
+        N min = a.min().scalar();
+        N max = a.max().scalar();
+        assertEquals(typed(2), min);
+        assertEquals(typed(5), max);
     }
 
     @Test
     public void canFindMinAndMaxFromScalarToTensor() {
-        IntegerTensor a = IntegerTensor.create(5, 4, 3, 2).reshape(1, 4);
-        IntegerTensor b = IntegerTensor.scalar(3);
+        FixedPointTensor<N, T> a = factory.create(5, 4, 3, 2).reshape(1, 4);
+        FixedPointTensor<N, T> b = factory.scalar(3);
 
-        IntegerTensor min = IntegerTensor.min(a, b);
-        IntegerTensor max = IntegerTensor.max(a, b);
+        FixedPointTensor<N, T> min = a.min((T) b);
+        FixedPointTensor<N, T> max = a.max((T) b);
 
         assertArrayEquals(new int[]{3, 3, 3, 2}, min.asFlatIntegerArray());
         assertArrayEquals(new int[]{5, 4, 3, 3}, max.asFlatIntegerArray());
@@ -630,11 +579,11 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void canFindElementWiseMinAndMax() {
-        IntegerTensor a = IntegerTensor.create(1, 2, 3, 4).reshape(1, 4);
-        IntegerTensor b = IntegerTensor.create(2, 3, 1, 4).reshape(1, 4);
+        FixedPointTensor<N, T> a = factory.create(1, 2, 3, 4).reshape(1, 4);
+        FixedPointTensor<N, T> b = factory.create(2, 3, 1, 4).reshape(1, 4);
 
-        IntegerTensor min = IntegerTensor.min(a, b);
-        IntegerTensor max = IntegerTensor.max(a, b);
+        FixedPointTensor<N, T> min = a.min((T) b);
+        FixedPointTensor<N, T> max = a.max((T) b);
 
         assertArrayEquals(new int[]{1, 2, 1, 4}, min.asFlatIntegerArray());
         assertArrayEquals(new int[]{2, 3, 3, 4}, max.asFlatIntegerArray());
@@ -642,7 +591,7 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void canFindArgMaxOfRowVector() {
-        IntegerTensor tensorRow = IntegerTensor.create(1, 3, 4, 5, 2).reshape(1, 5);
+        FixedPointTensor<N, T> tensorRow = factory.create(1, 3, 4, 5, 2).reshape(1, 5);
 
         assertThat(tensorRow.argMax().scalar(), equalTo(3));
         assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
@@ -651,7 +600,7 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void canFindArgMaxOfColumnVector() {
-        IntegerTensor tensorCol = IntegerTensor.create(1, 3, 4, 5, 2).reshape(5, 1);
+        FixedPointTensor<N, T> tensorCol = factory.create(1, 3, 4, 5, 2).reshape(5, 1);
 
         assertThat(tensorCol.argMax().scalar(), equalTo(3));
         assertThat(tensorCol.argMax(0), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
@@ -660,7 +609,7 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void canFindArgMaxOfMatrix() {
-        IntegerTensor tensor = IntegerTensor.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
+        FixedPointTensor<N, T> tensor = factory.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
 
         assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 0, 0, 0)));
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(2, 0)));
@@ -669,7 +618,7 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void canFindArgMinOfMatrix() {
-        IntegerTensor tensor = IntegerTensor.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
+        FixedPointTensor<N, T> tensor = factory.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
 
         assertThat(tensor.argMin(0), valuesAndShapesMatch(IntegerTensor.create(0, 1, 1, 1)));
         assertThat(tensor.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, 1)));
@@ -678,7 +627,7 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void canFindArgMaxOfHighRank() {
-        IntegerTensor tensor = IntegerTensor.create(IntStream.range(0, 512).toArray()).reshape(2, 8, 4, 2, 4);
+        FixedPointTensor<N, T> tensor = factory.create(IntStream.range(0, 512).toArray()).reshape(2, 8, 4, 2, 4);
 
         assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.ones(8, 4, 2, 4)));
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(7, new long[]{2, 4, 2, 4})));
@@ -689,176 +638,43 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test(expected = IllegalArgumentException.class)
     public void argMaxFailsForAxisTooHigh() {
-        IntegerTensor tensor = IntegerTensor.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
+        FixedPointTensor<N, T> tensor = factory.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
         tensor.argMax(2);
     }
 
     @Test
-    public void youCanCheckForZeros() {
-        IntegerTensor containsZero = IntegerTensor.create(new int[]{
-                0, -1, Integer.MAX_VALUE,
-                Integer.MIN_VALUE, -0, 1},
-            3, 2);
-
-        BooleanTensor expectedMask = BooleanTensor.create(new boolean[]{
-                false, true, true,
-                true, false, true},
-            3, 2);
-
-        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatExpectsNotToFind(0);
-        assertThat(validator.check(containsZero), equalTo(expectedMask));
-    }
-
-    @Test
-    public void youCanFixAValidationIssueByReplacingTheValue() {
-        IntegerTensor containsMinusOne = IntegerTensor.create(1, 0, -1);
-        IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
-
-        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatReplaces(-1, 0);
-        containsMinusOne = validator.validate(containsMinusOne);
-        assertThat(containsMinusOne, equalTo(expectedResult));
-    }
-
-    @Test
-    public void youCanFixACustomValidationIssueByReplacingTheValue() {
-        IntegerTensor containsMinusOne = IntegerTensor.create(1, 0, -1);
-        IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
-
-        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatFixesElementwise(x -> x >= 0, (TensorValidationPolicy<Integer, IntegerTensor>) TensorValidationPolicy.changeValueTo(0));
-        containsMinusOne = validator.validate(containsMinusOne);
-        assertThat(containsMinusOne, equalTo(expectedResult));
-    }
-
-    @Test
-    public void comparesIntegerTensorWithScalar() {
-        IntegerTensor value = IntegerTensor.create(1, 2, 3);
-        IntegerTensor differentValue = IntegerTensor.scalar(1);
-        BooleanTensor result = value.elementwiseEquals(differentValue);
+    public void comparesWithScalar() {
+        FixedPointTensor<N, T> value = factory.create(1, 2, 3);
+        FixedPointTensor<N, T> differentValue = factory.scalar(1);
+        BooleanTensor result = value.elementwiseEquals((T) differentValue);
         assertThat(result, hasValue(true, false, false));
     }
 
     @Test
     public void canSliceRank3To2() {
-        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4, 1, 2, 3, 4).reshape(2, 2, 2);
+        FixedPointTensor<N, T> x = factory.create(1, 2, 3, 4, 1, 2, 3, 4).reshape(2, 2, 2);
         TensorTestHelper.doesDownRankOnSliceRank3To2(x);
     }
 
     @Test
     public void canSliceRank2To1() {
-        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4).reshape(2, 2);
+        FixedPointTensor<N, T> x = factory.create(1, 2, 3, 4).reshape(2, 2);
         TensorTestHelper.doesDownRankOnSliceRank2To1(x);
     }
 
     @Test
     public void canSliceRank1ToScalar() {
-        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4).reshape(4);
+        FixedPointTensor<N, T> x = factory.create(1, 2, 3, 4).reshape(4);
         TensorTestHelper.doesDownRankOnSliceRank1ToScalar(x);
     }
 
     @Test
-    public void canConcatScalars() {
-        IntegerTensor x = IntegerTensor.scalar(2);
-        IntegerTensor y = IntegerTensor.scalar(3);
-
-        IntegerTensor concat = IntegerTensor.concat(x, y);
-        assertEquals(IntegerTensor.create(2, 3), concat);
-    }
-
-    @Test
-    public void canConcatVectors() {
-        IntegerTensor x = IntegerTensor.create(2, 3);
-        IntegerTensor y = IntegerTensor.create(4, 5);
-
-        IntegerTensor concat = IntegerTensor.concat(x, y);
-        assertEquals(IntegerTensor.create(2, 3, 4, 5), concat);
-    }
-
-    @Test
-    public void canConcatMatrices() {
-        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
-        IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
-
-        IntegerTensor concat = IntegerTensor.concat(0, x, y);
-        assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(2, 2), concat);
-    }
-
-    @Test
-    public void canStackScalars() {
-        IntegerTensor x = IntegerTensor.scalar(2);
-        IntegerTensor y = IntegerTensor.scalar(3);
-
-        assertThat(IntegerTensor.create(2, 3).reshape(2), TensorMatchers.valuesAndShapesMatch(IntegerTensor.stack(0, x, y)));
-    }
-
-    @Test
-    public void canStackVectors() {
-        IntegerTensor x = IntegerTensor.create(2, 3);
-        IntegerTensor y = IntegerTensor.create(4, 5);
-
-        assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(2, 2), IntegerTensor.stack(0, x, y));
-        assertEquals(IntegerTensor.create(2, 4, 3, 5).reshape(2, 2), IntegerTensor.stack(1, x, y));
-    }
-
-    @Test
-    public void canStackMatrices() {
-        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
-        IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
-
-        assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(2, 1, 2), IntegerTensor.stack(0, x, y));
-        assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(1, 2, 2), IntegerTensor.stack(1, x, y));
-       /*
-        Result in numpy when dimension is equal to array length:
-        >>> a
-        array([[2, 3]])
-        >>> b
-        array([[4, 5]])
-        >>> np.stack([a, b], axis=2)
-        array([[[2, 4],
-                [3, 5]]])
-        */
-        assertEquals(IntegerTensor.create(2, 4, 3, 5).reshape(1, 2, 2), IntegerTensor.stack(2, x, y));
-    }
-
-    @Test
-    public void canStackIfDimensionIsNegative() {
-        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
-        IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
-
-        assertThat(IntegerTensor.create(2, 3, 4, 5).reshape(2, 1, 2), valuesAndShapesMatch(IntegerTensor.stack(-3, x, y)));
-        assertThat(IntegerTensor.create(2, 3, 4, 5).reshape(1, 2, 2), valuesAndShapesMatch(IntegerTensor.stack(-2, x, y)));
-        assertThat(IntegerTensor.create(2, 4, 3, 5).reshape(1, 2, 2), valuesAndShapesMatch(IntegerTensor.stack(-1, x, y)));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotStackIfPositiveDimensionIsOutOfBounds() {
-        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
-        IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
-        IntegerTensor.stack(3, x, y);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotStackIfNegativeDimensionIsOutOfBounds() {
-        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
-        IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
-        IntegerTensor.stack(-4, x, y);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void throwsWhenNeedsDimensionSpecifiedForConcat() {
-        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
-        IntegerTensor y = IntegerTensor.create(4, 5, 6).reshape(1, 3);
-
-        IntegerTensor concat = IntegerTensor.concat(0, x, y);
-        assertEquals(IntegerTensor.create(2, 3, 4, 5, 6), concat);
-    }
-
-    @Test
     public void canBroadcastToShape() {
-        FixedPointTensor<N, ?> a = factory.create(
+        FixedPointTensor<N, T> a = factory.create(
             1, 2, 3
         ).reshape(3);
 
-        FixedPointTensor<N, ?> expectedByRow = factory.create(
+        FixedPointTensor<N, T> expectedByRow = factory.create(
             1, 2, 3,
             1, 2, 3,
             1, 2, 3
@@ -866,7 +682,7 @@ public class FixedPointTensorTest<N extends Number> {
 
         Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expectedByRow));
 
-        FixedPointTensor<N, ?> expectedByColumn = factory.create(
+        FixedPointTensor<N, T> expectedByColumn = factory.create(
             1, 1, 1,
             2, 2, 2,
             3, 3, 3
@@ -878,7 +694,7 @@ public class FixedPointTensorTest<N extends Number> {
 
     @Test
     public void canMod() {
-        FixedPointTensor<N, ?> value = factory.create(4, 5);
+        FixedPointTensor<N, T> value = factory.create(4, 5);
 
         assertThat(value.mod(typed(3)), equalTo(factory.create(1, 2)));
         assertThat(value.mod(typed(2)), equalTo(factory.create(0, 1)));

@@ -20,13 +20,13 @@ import static java.util.Arrays.copyOf;
 
 public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanBuffer.PrimitiveBooleanWrapper> implements BooleanTensor {
 
-    private static final BooleanBuffer.BooleanArrayWrapperFactory factory = new BooleanBuffer.BooleanArrayWrapperFactory();
+    private static final BooleanBuffer.BooleanArrayWrapperFactory factory = BooleanBuffer.factory;
 
-    private JVMBooleanTensor(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
+    public JVMBooleanTensor(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
         super(buffer, shape, stride);
     }
 
-    private JVMBooleanTensor(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape) {
+    public JVMBooleanTensor(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape) {
         super(buffer, shape, getRowFirstStride(shape));
     }
 

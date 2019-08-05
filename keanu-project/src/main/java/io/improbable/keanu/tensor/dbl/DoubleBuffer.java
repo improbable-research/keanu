@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.bool.BooleanBuffer;
 import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.jvm.buffer.PrimitiveNumberWrapper;
 import org.apache.commons.lang3.ArrayUtils;
@@ -186,6 +187,42 @@ public class DoubleBuffer {
         }
 
         @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper greaterThan(Double that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i] > that, i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper lessThan(Double that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i] < that, i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper greaterThanOrEqual(Double that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i] >= that, i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper lessThanOrEqual(Double that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i] <= that, i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
         public DoubleArrayWrapper applyRight(BiFunction<Double, Double, Double> mapper, Double rightArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i], rightArg);
@@ -316,6 +353,26 @@ public class DoubleBuffer {
         public PrimitiveDoubleWrapper reverseMinus(Double that) {
             value = that - value;
             return this;
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper greaterThan(Double that) {
+            return BooleanBuffer.factory.createNew(value > that);
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper lessThan(Double that) {
+            return BooleanBuffer.factory.createNew(value < that);
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper greaterThanOrEqual(Double that) {
+            return BooleanBuffer.factory.createNew(value >= that);
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper lessThanOrEqual(Double that) {
+            return BooleanBuffer.factory.createNew(value <= that);
         }
 
         @Override

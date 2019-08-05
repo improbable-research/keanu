@@ -10,6 +10,8 @@ import java.util.function.Function;
 
 public class BooleanBuffer {
 
+    public static final BooleanArrayWrapperFactory factory = new BooleanArrayWrapperFactory();
+
     public static final class BooleanArrayWrapperFactory implements JVMBuffer.ArrayWrapperFactory<Boolean, PrimitiveBooleanWrapper> {
 
         @Override

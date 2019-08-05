@@ -5,7 +5,12 @@ import com.google.common.primitives.Ints;
 public class Nd4jIntegerTensorFactory implements IntegerTensorFactory {
 
     @Override
-    public IntegerTensor create(Integer value, long[] shape) {
+    public IntegerTensor create(long value, long[] shape) {
+        return Nd4jIntegerTensor.create(Ints.checkedCast(value), shape);
+    }
+
+    @Override
+    public IntegerTensor create(int value, long[] shape) {
         return Nd4jIntegerTensor.create(value, shape);
     }
 
@@ -55,7 +60,12 @@ public class Nd4jIntegerTensorFactory implements IntegerTensorFactory {
     }
 
     @Override
-    public IntegerTensor scalar(Integer scalarValue) {
+    public IntegerTensor scalar(long scalarValue) {
+        return Nd4jIntegerTensor.scalar(Ints.checkedCast(scalarValue));
+    }
+
+    @Override
+    public IntegerTensor scalar(int scalarValue) {
         return Nd4jIntegerTensor.scalar(scalarValue);
     }
 
