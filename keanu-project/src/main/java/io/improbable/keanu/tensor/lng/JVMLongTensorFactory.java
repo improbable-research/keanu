@@ -3,7 +3,7 @@ package io.improbable.keanu.tensor.lng;
 public class JVMLongTensorFactory implements LongTensorFactory {
 
     @Override
-    public LongTensor create(long value, long[] shape) {
+    public LongTensor create(Long value, long[] shape) {
         return JVMLongTensor.create(value, shape);
     }
 
@@ -13,8 +13,18 @@ public class JVMLongTensorFactory implements LongTensorFactory {
     }
 
     @Override
+    public LongTensor create(int[] values, long[] shape) {
+        return create(toLongs(values), shape);
+    }
+
+    @Override
     public LongTensor create(long[] values) {
-        return JVMLongTensor.create(values);
+        return JVMLongTensor.create(values, values.length);
+    }
+
+    @Override
+    public LongTensor create(int[] values) {
+        return create(toLongs(values));
     }
 
     @Override
@@ -33,22 +43,30 @@ public class JVMLongTensorFactory implements LongTensorFactory {
     }
 
     @Override
-    public LongTensor arange(long start, long end) {
+    public LongTensor arange(Long start, Long end) {
         return JVMLongTensor.arange(start, end);
     }
 
     @Override
-    public LongTensor arange(long start, long end, long stepSize) {
+    public LongTensor arange(Long start, Long end, Long stepSize) {
         return JVMLongTensor.arange(start, end, stepSize);
     }
 
     @Override
-    public LongTensor scalar(long scalarValue) {
+    public LongTensor scalar(Long scalarValue) {
         return JVMLongTensor.scalar(scalarValue);
     }
 
     @Override
     public LongTensor concat(int dimension, LongTensor... toConcat) {
         return JVMLongTensor.concat(dimension, toConcat);
+    }
+
+    private long[] toLongs(int[] ints) {
+        final long[] lngs = new long[ints.length];
+        for (int i = 0; i < ints.length; i++) {
+            lngs[i] = ints[i];
+        }
+        return lngs;
     }
 }

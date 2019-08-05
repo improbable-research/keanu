@@ -159,6 +159,69 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     }
 
     @Override
+    public TENSOR applyInPlace(Function<T, T> function) {
+        buffer.apply(function);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR clampInPlace(TENSOR min, TENSOR max) {
+        maxInPlace(min);
+        minInPlace(max);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR minusInPlace(T value) {
+        buffer.minus(value);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR timesInPlace(T value) {
+        buffer.times(value);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR divInPlace(T that) {
+        buffer.div(that);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR reverseDivInPlace(T value) {
+        buffer.reverseDiv(value);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR reverseMinusInPlace(T value) {
+        buffer.reverseMinus(value);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR plusInPlace(T value) {
+        buffer.plus(value);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR powInPlace(T exponent) {
+        buffer.pow(exponent);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR setAllInPlace(T value) {
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.set(value, i);
+        }
+        return (TENSOR) this;
+    }
+
+    @Override
     protected abstract JVMBuffer.PrimitiveNumberWrapperFactory<T, B> getFactory();
 
 }

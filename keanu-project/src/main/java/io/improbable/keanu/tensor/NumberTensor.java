@@ -5,6 +5,7 @@ import io.improbable.keanu.kotlin.NumberOperators;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.lng.LongTensor;
 
 import java.util.function.Function;
 
@@ -20,9 +21,13 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>>
     @Override
     IntegerTensor toInteger();
 
+    LongTensor toLong();
+
     double[] asFlatDoubleArray();
 
     int[] asFlatIntegerArray();
+
+    long[] asFlatLongArray();
 
     @Override
     default T cumSum(int requestedDimension) {

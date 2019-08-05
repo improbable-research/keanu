@@ -10,6 +10,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.tensor.jvm.SlicerIndexMapper;
+import io.improbable.keanu.tensor.lng.LongTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
@@ -85,6 +86,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public IntegerTensor toInteger() {
         return this;
+    }
+
+    @Override
+    public LongTensor toLong() {
+        return LongTensor.scalar(value);
     }
 
     @Override
@@ -597,6 +603,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public int[] asFlatIntegerArray() {
         return new int[]{value};
+    }
+
+    @Override
+    public long[] asFlatLongArray() {
+        return new long[]{value};
     }
 
     @Override

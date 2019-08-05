@@ -10,6 +10,8 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.JVMFloatingPointTensor;
 import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.ResultWrapper;
+import io.improbable.keanu.tensor.lng.JVMLongTensor;
+import io.improbable.keanu.tensor.lng.LongTensor;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.special.Gamma;
@@ -17,11 +19,9 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.FastMath;
 
 import java.util.Arrays;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.DIV;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.GTE_MASK;
@@ -235,6 +235,11 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
+    public LongTensor toLong() {
+        return JVMLongTensor.create(buffer.asLongArray(), shapeCopy());
+    }
+
+    @Override
     public DoubleTensor choleskyDecomposition() {
 
         if (shape.length != 2 || shape[0] != shape[1]) {
@@ -408,12 +413,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor applyInPlace(Function<Double, Double> function) {
-        buffer.apply(function);
-        return this;
-    }
-
-    @Override
     public DoubleTensor greaterThanMask(DoubleTensor greaterThanThis) {
         return duplicate().broadcastableBinaryOpWithAutoBroadcast(GT_MASK, getAsJVMTensor(greaterThanThis));
     }
@@ -455,20 +454,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
                     + ", mask length: " + mask.getLength()
             );
         }
-    }
-
-    @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
-        checkShapesMatch(shape, mask.getShape());
-
-        DoubleBuffer.PrimitiveDoubleWrapper newBuffer = factory.createNew(buffer.getLength());
-        DoubleBuffer.PrimitiveDoubleWrapper maskBuffer = getAsJVMTensor(mask).buffer;
-
-        for (int i = 0; i < buffer.getLength(); i++) {
-            newBuffer.set(maskBuffer.get(i) == 1.0 ? value : buffer.get(i), i);
-        }
-
-        return new JVMDoubleTensor(newBuffer, shapeCopy());
     }
 
     @Override
@@ -536,20 +521,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor powInPlace(DoubleTensor exponent) {
-        if (exponent.isScalar()) {
-            return powInPlace(exponent.scalar());
-        }
-        return broadcastableBinaryOpWithAutoBroadcast(FastMath::pow, getAsJVMTensor(exponent));
-    }
-
-    @Override
-    public DoubleTensor powInPlace(Double exponent) {
-        buffer.pow(exponent);
-        return this;
-    }
-
-    @Override
     public DoubleTensor atan2InPlace(Double y) {
         buffer.applyLeft(FastMath::atan2, y);
         return this;
@@ -607,6 +578,11 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     @Override
     public int[] asFlatIntegerArray() {
         return buffer.asIntegerArray();
+    }
+
+    @Override
+    public long[] asFlatLongArray() {
+        return buffer.asLongArray();
     }
 
     @Override
@@ -802,13 +778,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
-        maxInPlace(min);
-        minInPlace(max);
-        return this;
-    }
-
-    @Override
     public DoubleTensor ceilInPlace() {
         buffer.apply(FastMath::ceil);
         return this;
@@ -847,14 +816,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor setAllInPlace(Double value) {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(value, i);
-        }
-        return this;
-    }
-
-    @Override
     public BooleanTensor notNaN() {
         return isApply(v -> !Double.isNaN(v));
     }
@@ -885,12 +846,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor minusInPlace(Double value) {
-        buffer.minus(value);
-        return this;
-    }
-
-    @Override
     public DoubleTensor minusInPlace(DoubleTensor that) {
         if (this.isScalar()) {
             return that.reverseMinus(buffer.get(0));
@@ -911,18 +866,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor reverseMinusInPlace(Double value) {
-        buffer.reverseMinus(value);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor plusInPlace(Double value) {
-        buffer.plus(value);
-        return this;
-    }
-
-    @Override
     public DoubleTensor plusInPlace(DoubleTensor that) {
         if (this.isScalar()) {
             return that.plus(buffer.get(0));
@@ -930,12 +873,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
             return plusInPlace(that.scalar());
         }
         return broadcastableBinaryOpWithAutoBroadcast(ADD, getAsJVMTensor(that));
-    }
-
-    @Override
-    public DoubleTensor timesInPlace(Double value) {
-        buffer.times(value);
-        return this;
     }
 
     @Override
@@ -949,12 +886,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor divInPlace(Double that) {
-        buffer.div(that);
-        return this;
-    }
-
-    @Override
     public DoubleTensor divInPlace(DoubleTensor that) {
         if (this.isScalar()) {
             return that.reverseDiv(buffer.get(0));
@@ -962,12 +893,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
             return divInPlace(that.scalar());
         }
         return broadcastableBinaryOpWithAutoBroadcast(DIV, getAsJVMTensor(that));
-    }
-
-    @Override
-    public DoubleTensor reverseDivInPlace(Double value) {
-        buffer.reverseDiv(value);
-        return this;
     }
 
     @Override
@@ -981,12 +906,11 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public FlattenedView<Double> getFlattenedView() {
-        if (buffer.getLength() == 1) {
-            return new ScalarJVMFlattenedView();
-        } else {
-            return new TensorJVMDoubleFlattenedView();
+    public DoubleTensor powInPlace(DoubleTensor exponent) {
+        if (exponent.isScalar()) {
+            return powInPlace(exponent.scalar());
         }
+        return broadcastableBinaryOpWithAutoBroadcast(FastMath::pow, getAsJVMTensor(exponent));
     }
 
     private static JVMDoubleTensor getAsJVMTensor(NumberTensor tensor) {
@@ -994,35 +918,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
             return ((JVMDoubleTensor) tensor);
         } else {
             return new JVMDoubleTensor(factory.create(tensor.asFlatDoubleArray()), tensor.getShape(), tensor.getStride());
-        }
-    }
-
-    private class JVMDoubleFlattenedView {
-        public long size() {
-            return buffer.getLength();
-        }
-
-        public Double get(long index) {
-            return buffer.get(index);
-        }
-
-        public void set(long index, Double value) {
-            buffer.set(value, index);
-        }
-
-    }
-
-    private class TensorJVMDoubleFlattenedView extends JVMDoubleFlattenedView implements FlattenedView<Double> {
-        @Override
-        public Double getOrScalar(long index) {
-            return get(index);
-        }
-    }
-
-    private class ScalarJVMFlattenedView extends JVMDoubleFlattenedView implements FlattenedView<Double> {
-        @Override
-        public Double getOrScalar(long index) {
-            return buffer.get(0);
         }
     }
 

@@ -47,7 +47,7 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
         return new Nd4jIntegerTensor(Nd4j.scalar(scalarValue));
     }
 
-    public static Nd4jIntegerTensor create(int[] values, long[] shape) {
+    public static Nd4jIntegerTensor create(int[] values, long... shape) {
         return new Nd4jIntegerTensor(values, shape);
     }
 
@@ -71,10 +71,10 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
         return new Nd4jIntegerTensor(TypedINDArrayFactory.arange(start, end));
     }
 
-    public static Nd4jDoubleTensor arange(int start, int end, int stepSize) {
+    public static Nd4jIntegerTensor arange(int start, int end, int stepSize) {
         int stepCount = (end - start) / stepSize;
         INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount).muli(stepSize).addi(start);
-        return new Nd4jDoubleTensor(arangeWithStep);
+        return new Nd4jIntegerTensor(arangeWithStep);
     }
 
     static INDArray getAsINDArray(Tensor that) {

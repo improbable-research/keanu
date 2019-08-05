@@ -15,7 +15,6 @@ import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.jvm.JVMTensorBroadcast.broadcastIfNeeded;
-import static java.util.Arrays.copyOf;
 
 public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuffer.PrimitiveGenericWrapper<T>> implements Tensor<T, GenericTensor<T>> {
 
@@ -67,16 +66,6 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
     }
 
     @Override
-    public GenericTensor<T> duplicate() {
-        return new GenericTensor<>(buffer.copy(), copyOf(shape, shape.length), copyOf(stride, stride.length));
-    }
-
-    @Override
-    public FlattenedView<T> getFlattenedView() {
-        return new BaseSimpleFlattenedView();
-    }
-
-    @Override
     public BooleanTensor elementwiseEquals(T value) {
         boolean[] result = new boolean[Ints.checkedCast(buffer.getLength())];
         for (int i = 0; i < buffer.getLength(); i++) {
@@ -101,34 +90,6 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
                 return BooleanTensor.create();
             }
         }
-    }
-
-    private class BaseSimpleFlattenedView implements FlattenedView<T> {
-
-        @Override
-        public long size() {
-            return buffer.getLength();
-        }
-
-        @Override
-        public T get(long index) {
-            return buffer.get(index);
-        }
-
-        @Override
-        public T getOrScalar(long index) {
-            if (buffer.getLength() == 1) {
-                return get(0);
-            } else {
-                return get(index);
-            }
-        }
-
-        @Override
-        public void set(long index, T value) {
-            buffer.set(value, index);
-        }
-
     }
 
     @Override

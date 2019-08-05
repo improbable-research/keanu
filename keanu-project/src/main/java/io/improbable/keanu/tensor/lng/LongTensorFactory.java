@@ -1,24 +1,41 @@
 package io.improbable.keanu.tensor.lng;
 
-public interface LongTensorFactory {
+import io.improbable.keanu.tensor.FixedPointTensorFactory;
 
-    LongTensor create(long value, long[] shape);
+public interface LongTensorFactory extends FixedPointTensorFactory<Long, LongTensor> {
 
+    @Override
+    LongTensor create(Long value, long[] shape);
+
+    @Override
     LongTensor create(long[] values, long[] shape);
 
+    @Override
+    LongTensor create(int[] values, long[] shape);
+
+    @Override
     LongTensor create(long[] values);
 
+    @Override
+    LongTensor create(int[] values);
+
+    @Override
     LongTensor ones(long[] shape);
 
+    @Override
     LongTensor zeros(long[] shape);
 
+    @Override
     LongTensor eye(long n);
 
-    LongTensor arange(long start, long end);
+    @Override
+    LongTensor arange(Long start, Long end);
 
-    LongTensor arange(long start, long end, long stepSize);
+    @Override
+    LongTensor arange(Long start, Long end, Long stepSize);
 
-    LongTensor scalar(long scalarValue);
+    @Override
+    LongTensor scalar(Long scalarValue);
 
     LongTensor concat(int dimension, LongTensor... toConcat);
 }

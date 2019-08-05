@@ -62,6 +62,11 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     }
 
     @Override
+    public TENSOR duplicate() {
+        return create(buffer.copy(), Arrays.copyOf(shape, shape.length), Arrays.copyOf(stride, stride.length));
+    }
+
+    @Override
     public TENSOR get(BooleanTensor booleanIndex) {
 
         List<Long> indices = new ArrayList<>();
@@ -444,6 +449,43 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         }
 
         return BooleanTensor.create(newBuffer, Arrays.copyOf(shape, shape.length));
+    }
+
+    @Override
+    public FlattenedView<T> getFlattenedView() {
+        if (buffer.getLength() == 1) {
+            return new ScalarJVMFlattenedView();
+        } else {
+            return new TensorJVMFlattenedView();
+        }
+    }
+
+    private class JVMFlattenedView {
+        public long size() {
+            return buffer.getLength();
+        }
+
+        public T get(long index) {
+            return buffer.get(index);
+        }
+
+        public void set(long index, T value) {
+            buffer.set(value, index);
+        }
+    }
+
+    private class TensorJVMFlattenedView extends JVMFlattenedView implements FlattenedView<T> {
+        @Override
+        public T getOrScalar(long index) {
+            return get(index);
+        }
+    }
+
+    private class ScalarJVMFlattenedView extends JVMFlattenedView implements FlattenedView<T> {
+        @Override
+        public T getOrScalar(long index) {
+            return buffer.get(0);
+        }
     }
 
     @Override

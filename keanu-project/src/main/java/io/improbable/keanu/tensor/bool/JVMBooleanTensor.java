@@ -190,11 +190,6 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    public JVMBooleanTensor duplicate() {
-        return new JVMBooleanTensor(buffer.copy(), copyOf(shape, shape.length), copyOf(stride, stride.length));
-    }
-
-    @Override
     public BooleanTensor elementwiseEquals(Boolean value) {
         return value ? duplicate() : not();
     }
@@ -202,40 +197,6 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     @Override
     public BooleanTensor elementwiseEquals(BooleanTensor that) {
         return xor(that).notInPlace();
-    }
-
-    @Override
-    public FlattenedView<Boolean> getFlattenedView() {
-        return new JVMBooleanFlattenedView();
-    }
-
-
-    private class JVMBooleanFlattenedView implements FlattenedView<Boolean> {
-
-        @Override
-        public long size() {
-            return buffer.getLength();
-        }
-
-        @Override
-        public Boolean get(long index) {
-            return buffer.get(index);
-        }
-
-        @Override
-        public Boolean getOrScalar(long index) {
-            if (buffer.getLength() == 1) {
-                return get(0);
-            } else {
-                return get(index);
-            }
-        }
-
-        @Override
-        public void set(long index, Boolean value) {
-            buffer.set(value, index);
-        }
-
     }
 
     @Override

@@ -9,6 +9,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import io.improbable.keanu.tensor.lng.LongTensor;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -513,6 +514,11 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
+    public long[] asFlatLongArray() {
+        return tensor.dup().data().asLong();
+    }
+
+    @Override
     public BooleanTensor toBoolean() {
         return BooleanTensor.create(asBoolean(tensor.castTo(DataType.BOOL)), getShape());
     }
@@ -526,6 +532,13 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     public IntegerTensor toInteger() {
         return new Nd4jIntegerTensor(tensor.castTo(DataType.INT));
     }
+
+    @Override
+    public LongTensor toLong() {
+
+        return LongTensor.create( tensor.dup().data().asLong(), tensor.shape());
+    }
+
 
     protected final BooleanTensor fromMask(INDArray mask) {
         long[] shape = mask.shape();
