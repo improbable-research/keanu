@@ -254,7 +254,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     @Override
     public TENSOR reverseSlice(TENSOR setTo, Slicer slicer) {
 
-        JVMTensor.setAsSlice(
+        JVMTensor.reverseSlice(
             getFlattenedView(),
             setTo.getFlattenedView(),
             new SlicerIndexMapper(slicer, setTo.getShape(), setTo.getStride())
@@ -263,9 +263,9 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         return setTo;
     }
 
-    public static <T> void setAsSlice(FlattenedView<T> from,
-                                      FlattenedView<T> to,
-                                      IndexMapper indexMapper) {
+    public static <T> void reverseSlice(FlattenedView<T> from,
+                                        FlattenedView<T> to,
+                                        IndexMapper indexMapper) {
 
         for (long i = 0; i < from.size(); i++) {
 

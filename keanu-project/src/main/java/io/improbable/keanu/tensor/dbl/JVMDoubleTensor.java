@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesMatch;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.ADD;
