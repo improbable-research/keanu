@@ -1,9 +1,11 @@
 package io.improbable.keanu.tensor;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensorFactory;
 import io.improbable.keanu.tensor.lng.JVMLongTensorFactory;
+import io.improbable.keanu.tensor.lng.LongTensor;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -459,15 +461,53 @@ public class FixedPointTensorTest<N extends Number, T extends FixedPointTensor<N
     }
 
     @Test
+    public void canMatrixMultiply() {
+        T leftFixedPoint = factory.arange(typed(0), typed(6)).reshape(2, 3);
+
+        if (!(leftFixedPoint instanceof IntegerTensor)) {
+            //matrix multiply is only supported for ints at the moment.
+            return;
+        }
+
+        T rightixedPoint = factory.arange(typed(6), typed(12)).reshape(3, 2);
+        LongTensor actual = leftFixedPoint.matrixMultiply(rightixedPoint).toLong();
+
+        DoubleTensor left = DoubleTensor.arange(6).reshape(2, 3);
+        DoubleTensor right = DoubleTensor.arange(6, 12).reshape(3, 2);
+        LongTensor expected = left.matrixMultiply(right).toLong();
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canTensorMultiply() {
+        T leftFixedPoint = factory.arange(typed(0), typed(12)).reshape(2, 3, 2);
+
+        if (!(leftFixedPoint instanceof IntegerTensor)) {
+            //matrix multiply is only supported for ints at the moment.
+            return;
+        }
+
+        T rightixedPoint = factory.arange(typed(6), typed(18)).reshape(3, 2, 2);
+        LongTensor actual = leftFixedPoint.tensorMultiply(rightixedPoint, new int[]{1}, new int[]{0}).toLong();
+
+        DoubleTensor left = DoubleTensor.arange(12).reshape(2, 3, 2);
+        DoubleTensor right = DoubleTensor.arange(6, 18).reshape(3, 2, 2);
+        LongTensor expected = left.tensorMultiply(right, new int[]{1}, new int[]{0}).toLong();
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
     public void canBroadcastAdd() {
-        FixedPointTensor<N, T> x = factory.create(new int[]{1, 2, 3}, new long[]{3, 1});
-        FixedPointTensor<N, T> s = factory.create(new int[]{
+        T x = factory.create(new int[]{1, 2, 3}, new long[]{3, 1});
+        T s = factory.create(new int[]{
             -5, -2, -3, -7, -8,
             -5, -2, -3, -7, -8,
             -5, -2, -3, -7, -8
         }, new long[]{3, 5});
 
-        FixedPointTensor<N, T> diff = s.plus((T) x);
+        FixedPointTensor<N, T> diff = s.plus(x);
 
         FixedPointTensor<N, T> expected = factory.create(new int[]{
             -4, -1, -2, -6, -7,

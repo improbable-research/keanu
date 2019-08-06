@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.TensorMulByMatrixMul;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.tensor.lng.LongTensor;
@@ -500,12 +501,15 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
 
     @Override
     public TENSOR matrixMultiply(TENSOR value) {
-        return set(tensor.mmul(getTensor(value)));
+        INDArray right = getTensor(value);
+        right = right.dataType().isFPType() ? right : right.castTo(DataType.DOUBLE);
+        INDArray left = tensor.dataType().isFPType() ? tensor : tensor.castTo(DataType.DOUBLE);
+        return set(left.mmul(right));
     }
 
     @Override
     public TENSOR tensorMultiply(TENSOR value, int[] dimLeft, int[] dimsRight) {
-        return set(Nd4j.tensorMmul(tensor, getTensor(value), new int[][]{dimLeft, dimsRight}));
+        return TensorMulByMatrixMul.tensorMmul((TENSOR) this, value, dimLeft, dimsRight);
     }
 
     @Override
@@ -540,10 +544,8 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
 
     @Override
     public LongTensor toLong() {
-
         return LongTensor.create(tensor.dup().data().asLong(), tensor.shape());
     }
-
 
     protected final BooleanTensor fromMask(INDArray mask) {
         long[] shape = mask.shape();

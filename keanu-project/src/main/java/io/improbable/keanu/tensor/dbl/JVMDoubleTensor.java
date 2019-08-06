@@ -310,11 +310,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor tensorMultiply(DoubleTensor that, int[] dimsLeft, int[] dimsRight) {
-        return TensorMulByMatrixMul.tensorMmul(this, that, dimsLeft, dimsRight);
-    }
-
-    @Override
     public IntegerTensor argMax() {
         return IntegerTensor.scalar(argCompare((value, min) -> value > min));
     }

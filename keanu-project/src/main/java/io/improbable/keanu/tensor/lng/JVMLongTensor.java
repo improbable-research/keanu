@@ -185,12 +185,9 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
 
     @Override
     public LongTensor matrixMultiply(LongTensor that) {
-        return null;
-    }
-
-    @Override
-    public LongTensor tensorMultiply(LongTensor value, int[] dimLeft, int[] dimsRight) {
-        return null;
+        throw new UnsupportedOperationException(
+            "Long mmul is not currently supported. Convert to double, matrix multiply, and then convert back to long."
+        );
     }
 
     @Override

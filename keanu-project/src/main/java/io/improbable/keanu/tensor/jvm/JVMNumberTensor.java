@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
+import io.improbable.keanu.tensor.dbl.TensorMulByMatrixMul;
 import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.jvm.buffer.PrimitiveNumberWrapper;
 import org.apache.commons.lang3.ArrayUtils;
@@ -159,6 +160,11 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
         } while (incrementIndexByShape(shape, index, dimensionOrder));
 
         return set(buffer, shape, stride);
+    }
+
+    @Override
+    public TENSOR tensorMultiply(TENSOR that, int[] dimsLeft, int[] dimsRight) {
+        return TensorMulByMatrixMul.tensorMmul((TENSOR) this, that, dimsLeft, dimsRight);
     }
 
     @Override
