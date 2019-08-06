@@ -1,7 +1,7 @@
 package io.improbable.keanu.tensor.jvm;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.JVMDoubleTensor;
+import io.improbable.keanu.tensor.dbl.JVMDoubleTensorFactory;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -11,7 +11,7 @@ public class JVMTensorTest {
 
     @Test
     public void canToStringRank3() {
-        DoubleTensor matrix = JVMDoubleTensor.arange(0, 8).reshape(2, 2, 2);
+        DoubleTensor matrix = JVMDoubleTensorFactory.INSTANCE.arange(0, 8).reshape(2, 2, 2);
         String actual = matrix.toString();
 
         assertThat(actual, equalTo(
@@ -28,7 +28,7 @@ public class JVMTensorTest {
 
     @Test
     public void canToStringMatrix() {
-        DoubleTensor matrix = JVMDoubleTensor.arange(0, 9).reshape(3, 3);
+        DoubleTensor matrix = JVMDoubleTensorFactory.INSTANCE.arange(0, 9).reshape(3, 3);
         String actual = matrix.toString();
 
         assertThat(actual, equalTo(
@@ -42,7 +42,7 @@ public class JVMTensorTest {
 
     @Test
     public void canToStringVector() {
-        DoubleTensor vector = JVMDoubleTensor.arange(0, 3);
+        DoubleTensor vector = JVMDoubleTensorFactory.INSTANCE.arange(0, 3);
         String actual = vector.toString();
 
         assertThat(actual, equalTo(
@@ -55,7 +55,7 @@ public class JVMTensorTest {
 
     @Test
     public void canToStringScalar() {
-        DoubleTensor scalar = JVMDoubleTensor.scalar(9);
+        DoubleTensor scalar = JVMDoubleTensorFactory.INSTANCE.scalar(9);
         String actual = scalar.toString();
 
         assertThat(actual, equalTo(

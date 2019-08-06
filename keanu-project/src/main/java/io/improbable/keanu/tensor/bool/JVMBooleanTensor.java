@@ -26,7 +26,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
         super(buffer, shape, stride);
     }
 
-    public JVMBooleanTensor(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape) {
+    private JVMBooleanTensor(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape) {
         super(buffer, shape, getRowFirstStride(shape));
     }
 

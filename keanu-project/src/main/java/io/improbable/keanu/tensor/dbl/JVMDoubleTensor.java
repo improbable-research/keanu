@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.dbl;
 
-import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.NumberScalarOperations;
 import io.improbable.keanu.tensor.TensorShape;
@@ -12,16 +11,13 @@ import io.improbable.keanu.tensor.jvm.JVMFloatingPointTensor;
 import io.improbable.keanu.tensor.jvm.JVMNumberTensor;
 import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.ResultWrapper;
-import io.improbable.keanu.tensor.lng.JVMLongTensor;
+import io.improbable.keanu.tensor.lng.JVMLongTensorFactory;
 import io.improbable.keanu.tensor.lng.LongTensor;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.FastMath;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LOG_ADD_EXP;
@@ -36,114 +32,35 @@ import static org.bytedeco.openblas.global.openblas.cblas_dgemm;
 
 public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor, DoubleBuffer.PrimitiveDoubleWrapper> implements DoubleTensor {
 
-    private static final DoubleBuffer.DoubleArrayWrapperFactory factory = new DoubleBuffer.DoubleArrayWrapperFactory();
+    static final DoubleBuffer.DoubleArrayWrapperFactory factory = new DoubleBuffer.DoubleArrayWrapperFactory();
 
-    private JVMDoubleTensor(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
+    JVMDoubleTensor(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
         super(buffer, shape, stride);
     }
 
-    private JVMDoubleTensor(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape) {
+    JVMDoubleTensor(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape) {
         super(buffer, shape, getRowFirstStride(shape));
     }
 
-    private JVMDoubleTensor(ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> resultWrapper) {
+    JVMDoubleTensor(ResultWrapper<Double, DoubleBuffer.PrimitiveDoubleWrapper> resultWrapper) {
         this(resultWrapper.outputBuffer, resultWrapper.outputShape, resultWrapper.outputStride);
     }
 
-    private JVMDoubleTensor(double[] data, long[] shape, long[] stride) {
+    JVMDoubleTensor(double[] data, long[] shape, long[] stride) {
         this(factory.create(data), shape, stride);
     }
 
-    private JVMDoubleTensor(double[] data, long[] shape) {
+    JVMDoubleTensor(double[] data, long[] shape) {
         this(factory.create(data), shape);
     }
 
-    private JVMDoubleTensor(double value) {
+    JVMDoubleTensor(double value) {
         super(new DoubleBuffer.DoubleWrapper(value), new long[0], new long[0]);
     }
 
     @Override
     protected DoubleTensor create(DoubleBuffer.PrimitiveDoubleWrapper buffer, long[] shape, long[] stride) {
         return new JVMDoubleTensor(buffer, shape, stride);
-    }
-
-    public static JVMDoubleTensor scalar(double scalarValue) {
-        return new JVMDoubleTensor(scalarValue);
-    }
-
-    public static JVMDoubleTensor create(double[] values, long... shape) {
-        if (values.length != TensorShape.getLength(shape)) {
-            throw new IllegalArgumentException("Shape " + Arrays.toString(shape) + " does not match buffer size " + values.length);
-        }
-        return new JVMDoubleTensor(values, shape);
-    }
-
-    public static JVMDoubleTensor create(double value, long... shape) {
-        final int length = TensorShape.getLengthAsInt(shape);
-
-        if (length > 1) {
-            final double[] buffer = new double[length];
-            if (value != 0) {
-                Arrays.fill(buffer, value);
-            }
-
-            return new JVMDoubleTensor(buffer, shape);
-        } else {
-            return new JVMDoubleTensor(new DoubleBuffer.DoubleWrapper(value), shape);
-        }
-    }
-
-    public static JVMDoubleTensor ones(long... shape) {
-        return create(1.0, shape);
-    }
-
-    public static JVMDoubleTensor zeros(long... shape) {
-        return create(0.0, shape);
-    }
-
-    public static JVMDoubleTensor eye(long n) {
-
-        if (n == 1) {
-            return create(1.0, 1, 1);
-        } else {
-
-            double[] buffer = new double[Ints.checkedCast(n * n)];
-            int nInt = Ints.checkedCast(n);
-            for (int i = 0; i < n; i++) {
-                buffer[i * nInt + i] = 1;
-            }
-            return new JVMDoubleTensor(buffer, new long[]{n, n});
-        }
-    }
-
-    public static JVMDoubleTensor arange(double start, double end) {
-        return arange(start, end, 1.0);
-    }
-
-    public static JVMDoubleTensor arange(double start, double end, double stepSize) {
-        Preconditions.checkArgument(stepSize != 0);
-        int steps = (int) Math.ceil((end - start) / stepSize);
-
-        return linearBufferCreate(start, steps, stepSize);
-    }
-
-    public static JVMDoubleTensor linspace(double start, double end, int numberOfPoints) {
-        Preconditions.checkArgument(numberOfPoints > 0);
-        double stepSize = (end - start) / (numberOfPoints - 1);
-
-        return linearBufferCreate(start, numberOfPoints, stepSize);
-    }
-
-    private static JVMDoubleTensor linearBufferCreate(double start, int numberOfPoints, double stepSize) {
-        Preconditions.checkArgument(numberOfPoints > 0);
-        double[] buffer = new double[numberOfPoints];
-
-        double currentValue = start;
-        for (int i = 0; i < buffer.length; i++, currentValue += stepSize) {
-            buffer[i] = currentValue;
-        }
-
-        return new JVMDoubleTensor(buffer, new long[]{buffer.length});
     }
 
     @Override
@@ -169,7 +86,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         return asJVM(that);
     }
 
-    private static JVMNumberTensor<Double, DoubleTensor, DoubleBuffer.PrimitiveDoubleWrapper> asJVM(DoubleTensor that) {
+    static JVMNumberTensor<Double, DoubleTensor, DoubleBuffer.PrimitiveDoubleWrapper> asJVM(DoubleTensor that) {
         if (that instanceof JVMDoubleTensor) {
             return ((JVMDoubleTensor) that);
         } else {
@@ -194,7 +111,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public LongTensor toLong() {
-        return new JVMLongTensor(buffer.asLongArray(), getShape());
+        return JVMLongTensorFactory.INSTANCE.create(buffer.asLongArray(), getShape());
     }
 
     @Override
@@ -396,15 +313,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     public DoubleTensor sigmoidInPlace() {
         buffer.apply(sigmoid::value);
         return this;
-    }
-
-    public static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
-        return new JVMDoubleTensor(
-            JVMTensor.concat(factory, toConcat, dimension,
-                Arrays.stream(toConcat)
-                    .map(tensor -> asJVM(tensor).getBuffer())
-                    .collect(Collectors.toList())
-            ));
     }
 
     @Override

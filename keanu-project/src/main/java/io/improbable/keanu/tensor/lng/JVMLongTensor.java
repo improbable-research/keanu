@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.JVMDoubleTensor;
+import io.improbable.keanu.tensor.dbl.JVMDoubleTensorFactory;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.JVMFixedPointTensor;
 import io.improbable.keanu.tensor.jvm.JVMTensor;
@@ -18,29 +18,29 @@ import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 
 public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuffer.PrimitiveLongWrapper> implements LongTensor {
 
-    public static final LongBuffer.LongArrayWrapperFactory factory = new LongBuffer.LongArrayWrapperFactory();
+    static final LongBuffer.LongArrayWrapperFactory factory = new LongBuffer.LongArrayWrapperFactory();
 
-    public JVMLongTensor(LongBuffer.PrimitiveLongWrapper buffer, long[] shape, long[] stride) {
+    JVMLongTensor(LongBuffer.PrimitiveLongWrapper buffer, long[] shape, long[] stride) {
         super(buffer, shape, stride);
     }
 
-    public JVMLongTensor(LongBuffer.PrimitiveLongWrapper buffer, long[] shape) {
+    JVMLongTensor(LongBuffer.PrimitiveLongWrapper buffer, long[] shape) {
         super(buffer, shape, getRowFirstStride(shape));
     }
 
-    public JVMLongTensor(ResultWrapper<Long, LongBuffer.PrimitiveLongWrapper> resultWrapper) {
+    JVMLongTensor(ResultWrapper<Long, LongBuffer.PrimitiveLongWrapper> resultWrapper) {
         this(resultWrapper.outputBuffer, resultWrapper.outputShape, resultWrapper.outputStride);
     }
 
-    public JVMLongTensor(long[] data, long[] shape, long[] stride) {
+    JVMLongTensor(long[] data, long[] shape, long[] stride) {
         this(factory.create(data), shape, stride);
     }
 
-    public JVMLongTensor(long[] data, long[] shape) {
+    JVMLongTensor(long[] data, long[] shape) {
         this(factory.create(data), shape);
     }
 
-    public JVMLongTensor(long value) {
+    JVMLongTensor(long value) {
         super(new LongBuffer.LongWrapper(value), new long[0], new long[0]);
     }
 
@@ -82,12 +82,12 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
 
     @Override
     public BooleanTensor toBoolean() {
-        return new JVMBooleanTensor(buffer.equal(1L), getShape(), getStride());
+        return JVMBooleanTensor.create(buffer.equal(1L).asBooleanArray(), getShape());
     }
 
     @Override
     public DoubleTensor toDouble() {
-        return JVMDoubleTensor.create(buffer.asDoubleArray(), Arrays.copyOf(shape, shape.length));
+        return JVMDoubleTensorFactory.INSTANCE.create(buffer.asDoubleArray(), Arrays.copyOf(shape, shape.length));
     }
 
     @Override

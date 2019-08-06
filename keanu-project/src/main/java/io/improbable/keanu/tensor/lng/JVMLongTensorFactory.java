@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 public class JVMLongTensorFactory implements LongTensorFactory {
 
+    public static final JVMLongTensorFactory INSTANCE = new JVMLongTensorFactory();
+
     @Override
     public LongTensor create(int[] values, long[] shape) {
         return create(toLongs(values), shape);

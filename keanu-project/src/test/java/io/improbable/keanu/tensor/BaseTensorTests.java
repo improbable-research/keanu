@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.tensor.dbl.JVMDoubleTensor;
+import io.improbable.keanu.tensor.dbl.JVMDoubleTensorFactory;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
@@ -53,7 +54,7 @@ public class BaseTensorTests {
         ));
 
         tensorImpls.add(new TensorImpl(
-            (shape) -> JVMDoubleTensor.arange(0, getLength(shape)).reshape(shape), JVMDoubleTensor.class
+            (shape) -> JVMDoubleTensorFactory.INSTANCE.arange(0, getLength(shape)).reshape(shape), JVMDoubleTensor.class
         ));
 
         tensorImpls.add(new TensorImpl(
@@ -65,7 +66,7 @@ public class BaseTensorTests {
         ));
 
         tensorImpls.add(new TensorImpl(
-            (shape) -> GenericTensor.create(JVMDoubleTensor.arange(0, getLength(shape)).asFlatArray(), shape), GenericTensor.class
+            (shape) -> GenericTensor.create(JVMDoubleTensorFactory.INSTANCE.arange(0, getLength(shape)).asFlatArray(), shape), GenericTensor.class
         ));
 
         return tensorImpls.stream()

@@ -144,7 +144,7 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     public DoubleTensor diag() {
         if (getRank() > 1) {
             //TODO: use nd4j if they support this at later versions
-            return new Nd4jDoubleTensor(JVMDoubleTensor.create(asFlatDoubleArray(), getShape()).diag());
+            return new Nd4jDoubleTensor(JVMDoubleTensorFactory.INSTANCE.create(asFlatDoubleArray(), getShape()).diag());
         } else {
             return super.diag();
         }
@@ -160,7 +160,7 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     public DoubleTensor diagPart() {
         if (tensor.size(0) != tensor.size(1)) {
             //TODO: use nd4j if they support this at later versions
-            return new Nd4jDoubleTensor(JVMDoubleTensor.create(asFlatDoubleArray(), getShape()).diagPart());
+            return new Nd4jDoubleTensor(JVMDoubleTensorFactory.INSTANCE.create(asFlatDoubleArray(), getShape()).diagPart());
         } else {
             return super.diagPart();
         }
@@ -269,7 +269,7 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     @Override
     public DoubleTensor logAddExp2InPlace(DoubleTensor that) {
         //TODO: actually use Nd4j when logsumexp is fixed in next version
-        JVMDoubleTensor asJVM = JVMDoubleTensor.create(tensor.toDoubleVector(), tensor.shape());
+        JVMDoubleTensor asJVM = JVMDoubleTensorFactory.INSTANCE.create(tensor.toDoubleVector(), tensor.shape());
         DoubleTensor result = asJVM.logAddExp2InPlace(that);
         return Nd4jDoubleTensor.create(result.asFlatDoubleArray(), result.getShape());
     }
@@ -277,7 +277,7 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     @Override
     public DoubleTensor logAddExpInPlace(DoubleTensor that) {
         //TODO: actually use Nd4j when logsumexp is fixed in next version
-        JVMDoubleTensor asJVM = JVMDoubleTensor.create(tensor.toDoubleVector(), tensor.shape());
+        JVMDoubleTensor asJVM = JVMDoubleTensorFactory.INSTANCE.create(tensor.toDoubleVector(), tensor.shape());
         DoubleTensor result = asJVM.logAddExpInPlace(that);
         return Nd4jDoubleTensor.create(result.asFlatDoubleArray(), result.getShape());
     }
