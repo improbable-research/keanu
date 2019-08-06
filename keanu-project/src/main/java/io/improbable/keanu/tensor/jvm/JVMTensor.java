@@ -4,7 +4,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanBuffer;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import org.apache.commons.lang3.ArrayUtils;
@@ -337,10 +339,37 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
             getFactory(),
             buffer, shape, stride, buffer.getLength(),
             right.buffer, right.shape, right.stride, right.buffer.getLength(),
+            op, false
+        );
+
+        return create(result.outputBuffer, result.outputShape, result.outputStride);
+    }
+
+    protected TENSOR broadcastableBinaryOpWithAutoBroadcastInPlace(BiFunction<T, T, T> op,
+                                                                   JVMTensor<T, TENSOR, B> right) {
+
+        final ResultWrapper<T, B> result = broadcastIfNeeded(
+            getFactory(),
+            buffer, shape, stride, buffer.getLength(),
+            right.buffer, right.shape, right.stride, right.buffer.getLength(),
             op, true
         );
 
         return set(result.outputBuffer, result.outputShape, result.outputStride);
+    }
+
+    protected BooleanTensor broadcastableBinaryOpToBooleanWithAutoBroadcast(BiFunction<T, T, Boolean> op,
+                                                                            JVMTensor<T, TENSOR, B> right) {
+
+
+        final ResultWrapper<Boolean, BooleanBuffer.PrimitiveBooleanWrapper> result = broadcastIfNeeded(
+            BooleanBuffer.factory,
+            buffer, shape, stride, buffer.getLength(),
+            right.buffer, right.shape, right.stride, right.buffer.getLength(),
+            op, false
+        );
+
+        return new JVMBooleanTensor(result.outputBuffer, result.outputShape, result.outputStride);
     }
 
     @Override

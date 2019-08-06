@@ -39,4 +39,6 @@ public interface PrimitiveNumberWrapper<T extends Number, B extends JVMBuffer.Pr
     BooleanBuffer.PrimitiveBooleanWrapper greaterThanOrEqual(T that);
 
     BooleanBuffer.PrimitiveBooleanWrapper lessThanOrEqual(T that);
+
+    BooleanBuffer.PrimitiveBooleanWrapper equal(T that);
 }

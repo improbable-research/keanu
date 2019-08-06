@@ -223,6 +223,15 @@ public class LongBuffer {
         }
 
         @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper equal(Long that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i] == that, i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
         public LongArrayWrapper applyRight(BiFunction<Long, Long, Long> mapper, Long rightArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i], rightArg);
@@ -374,6 +383,11 @@ public class LongBuffer {
         @Override
         public BooleanBuffer.PrimitiveBooleanWrapper lessThanOrEqual(Long that) {
             return BooleanBuffer.factory.createNew(value <= that);
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper equal(Long that) {
+            return BooleanBuffer.factory.createNew(value.equals(that));
         }
 
         @Override

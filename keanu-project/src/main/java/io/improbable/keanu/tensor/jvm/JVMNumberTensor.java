@@ -3,10 +3,13 @@ package io.improbable.keanu.tensor.jvm;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.jvm.buffer.PrimitiveNumberWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -219,6 +222,26 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
             buffer.set(value, i);
         }
         return (TENSOR) this;
+    }
+
+    @Override
+    public BooleanTensor lessThan(T value) {
+        return new JVMBooleanTensor(buffer.lessThan(value), Arrays.copyOf(shape, shape.length), Arrays.copyOf(stride, stride.length));
+    }
+
+    @Override
+    public BooleanTensor lessThanOrEqual(T value) {
+        return new JVMBooleanTensor(buffer.lessThanOrEqual(value), Arrays.copyOf(shape, shape.length), Arrays.copyOf(stride, stride.length));
+    }
+
+    @Override
+    public BooleanTensor greaterThan(T value) {
+        return new JVMBooleanTensor(buffer.greaterThan(value), Arrays.copyOf(shape, shape.length), Arrays.copyOf(stride, stride.length));
+    }
+
+    @Override
+    public BooleanTensor greaterThanOrEqual(T value) {
+        return new JVMBooleanTensor(buffer.greaterThanOrEqual(value), Arrays.copyOf(shape, shape.length), Arrays.copyOf(stride, stride.length));
     }
 
     @Override

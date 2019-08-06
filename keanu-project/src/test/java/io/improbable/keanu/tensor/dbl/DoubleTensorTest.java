@@ -524,24 +524,17 @@ public class DoubleTensorTest {
     }
 
     @Test
-    public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
-        DoubleTensor tensor = DoubleTensor.create(new double[]{1., 2., 3., 4.}, new long[]{2, 2});
-        DoubleTensor mask = DoubleTensor.scalar(1.);
-
-        thrown.expect(IllegalArgumentException.class);
-
-        tensor.setWithMaskInPlace(mask, -2.0);
+    public void canBroadcastSetIfMask() {
+        DoubleTensor tensor = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        DoubleTensor mask = DoubleTensor.scalar(1);
+        assertThat(tensor.setWithMask(mask, -2.0), valuesAndShapesMatch(DoubleTensor.create(-2, new long[]{2, 2})));
     }
 
     @Test
     public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
-        DoubleTensor tensor = DoubleTensor.create(3);
-        DoubleTensor mask = DoubleTensor.ones(2, 2);
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
-
-        tensor.setWithMaskInPlace(mask, -2.0);
+        DoubleTensor tensor = DoubleTensor.scalar(3);
+        DoubleTensor mask = DoubleTensor.create(new double[]{1, 1, 0, 1}, 2, 2);
+        assertThat(tensor.setWithMask(mask, -2.0), valuesAndShapesMatch(DoubleTensor.create(new double[]{-2, -2, 3, -2}, 2, 2)));
     }
 
     @Test

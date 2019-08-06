@@ -112,7 +112,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
 
     @Override
     public BooleanTensor andInPlace(BooleanTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcast(AND, getAsJVMTensor(that));
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(AND, getAsJVMTensor(that));
     }
 
     @Override
@@ -125,7 +125,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
 
     @Override
     public BooleanTensor orInPlace(BooleanTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcast(OR, getAsJVMTensor(that));
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(OR, getAsJVMTensor(that));
     }
 
     @Override
@@ -138,7 +138,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
 
     @Override
     public BooleanTensor xorInPlace(BooleanTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcast(XOR, getAsJVMTensor(that));
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(XOR, getAsJVMTensor(that));
     }
 
     @Override

@@ -284,28 +284,6 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
-    public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
-        IntegerTensor tensor = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor mask = Nd4jIntegerTensor.scalar(1);
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
-
-        tensor.setWithMaskInPlace(mask, -2);
-    }
-
-    @Test
-    public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
-        IntegerTensor tensor = Nd4jIntegerTensor.scalar(3);
-        IntegerTensor mask = Nd4jIntegerTensor.create(new int[]{1, 1, 1, 1}, new long[]{2, 2});
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
-
-        tensor.setWithMaskInPlace(mask, -2);
-    }
-
-    @Test
     public void doesApplyUnaryFunction() {
         IntegerTensor matrixA = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor result = matrixA.apply(v -> v + 1);

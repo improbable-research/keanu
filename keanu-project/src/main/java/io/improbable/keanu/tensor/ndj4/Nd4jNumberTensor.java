@@ -20,6 +20,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 import static com.google.common.primitives.Ints.checkedCast;
@@ -34,15 +35,19 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
 
     @Override
     public TENSOR setWithMaskInPlace(TENSOR mask, T value) {
-        if (this.getLength() != mask.getLength()) {
-            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
-        }
 
         INDArray maskINDArray = getTensor(mask);
 
         //Nd4j compare and set only works for fp types
         INDArray dblBuffer = tensor.dataType() == DataType.DOUBLE ? tensor : tensor.castTo(DataType.DOUBLE);
         INDArray dblMask = maskINDArray.dataType() == DataType.DOUBLE ? maskINDArray : maskINDArray.castTo(DataType.DOUBLE);
+
+        if (!Arrays.equals(dblBuffer.shape(), dblMask.shape())) {
+            long[] broadcastShape = TensorShape.getBroadcastResultShape(dblBuffer.shape(), dblMask.shape());
+            dblBuffer = dblBuffer.broadcast(broadcastShape);
+            dblMask = dblMask.broadcast(broadcastShape);
+        }
+
         double dblValue = value.doubleValue();
 
         double trueValue = 1.0;
@@ -536,7 +541,7 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     @Override
     public LongTensor toLong() {
 
-        return LongTensor.create( tensor.dup().data().asLong(), tensor.shape());
+        return LongTensor.create(tensor.dup().data().asLong(), tensor.shape());
     }
 
 
