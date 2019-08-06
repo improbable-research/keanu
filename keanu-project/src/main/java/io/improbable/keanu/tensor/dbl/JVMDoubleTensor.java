@@ -184,7 +184,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor toDouble() {
-        return duplicate();
+        return this;
     }
 
     @Override

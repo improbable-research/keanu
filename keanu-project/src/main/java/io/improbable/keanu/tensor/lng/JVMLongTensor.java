@@ -182,7 +182,7 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
 
     @Override
     public LongTensor toLong() {
-        return duplicate();
+        return this;
     }
 
     @Override
