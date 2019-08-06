@@ -43,6 +43,12 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         this.stride = stride;
     }
 
+    public B getBuffer() {
+        return buffer;
+    }
+
+    protected abstract JVMTensor<T, TENSOR, B> getAsJVMTensor(TENSOR that);
+
     @Override
     public int getRank() {
         return shape.length;
@@ -515,6 +521,11 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         public T getOrScalar(long index) {
             return buffer.get(0);
         }
+    }
+
+    @Override
+    public BooleanTensor elementwiseEquals(T value) {
+        return new JVMBooleanTensor(buffer.equal(value), Arrays.copyOf(shape, shape.length), Arrays.copyOf(stride, stride.length));
     }
 
     @Override

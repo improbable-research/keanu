@@ -1,11 +1,13 @@
 package io.improbable.keanu.tensor.jvm;
 
+import io.improbable.keanu.tensor.NumberScalarOperations;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.tensor.dbl.TensorMulByMatrixMul;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.jvm.buffer.PrimitiveNumberWrapper;
 import org.apache.commons.lang3.ArrayUtils;
@@ -163,6 +165,26 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     }
 
     @Override
+    public IntegerTensor argMax() {
+        return IntegerTensor.scalar(argCompare(getOperations()::gt));
+    }
+
+    @Override
+    public IntegerTensor argMax(int axis) {
+        return argCompare(getOperations()::gt, axis);
+    }
+
+    @Override
+    public IntegerTensor argMin(int axis) {
+        return argCompare(getOperations()::lt, axis);
+    }
+
+    @Override
+    public IntegerTensor argMin() {
+        return IntegerTensor.scalar(argCompare(getOperations()::lt));
+    }
+
+    @Override
     public TENSOR tensorMultiply(TENSOR that, int[] dimsLeft, int[] dimsRight) {
         return TensorMulByMatrixMul.tensorMmul((TENSOR) this, that, dimsLeft, dimsRight);
     }
@@ -187,9 +209,29 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     }
 
     @Override
+    public TENSOR minusInPlace(TENSOR that) {
+        if (this.isScalar()) {
+            return that.reverseMinus(buffer.get(0));
+        } else if (that.isScalar()) {
+            return minusInPlace(that.scalar());
+        }
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(getOperations()::sub, getAsJVMTensor(that));
+    }
+
+    @Override
     public TENSOR timesInPlace(T value) {
         buffer.times(value);
         return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR timesInPlace(TENSOR that) {
+        if (this.isScalar()) {
+            return that.times(buffer.get(0));
+        } else if (that.isScalar()) {
+            return timesInPlace(that.scalar());
+        }
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(getOperations()::mul, getAsJVMTensor(that));
     }
 
     @Override
@@ -199,9 +241,29 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     }
 
     @Override
+    public TENSOR divInPlace(TENSOR that) {
+        if (this.isScalar()) {
+            return that.reverseDiv(buffer.get(0));
+        } else if (that.isScalar()) {
+            return divInPlace(that.scalar());
+        }
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(getOperations()::div, getAsJVMTensor(that));
+    }
+
+    @Override
     public TENSOR reverseDivInPlace(T value) {
         buffer.reverseDiv(value);
         return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR reverseDivInPlace(TENSOR that) {
+        if (this.isScalar()) {
+            return that.div(buffer.get(0));
+        } else if (that.isScalar()) {
+            return reverseDivInPlace(that.scalar());
+        }
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(getOperations()::rdiv, getAsJVMTensor(that));
     }
 
     @Override
@@ -211,9 +273,29 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     }
 
     @Override
+    public TENSOR reverseMinusInPlace(TENSOR that) {
+        if (this.isScalar()) {
+            return that.minus(buffer.get(0));
+        } else if (that.isScalar()) {
+            return reverseMinusInPlace(that.scalar());
+        }
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(getOperations()::rsub, getAsJVMTensor(that));
+    }
+
+    @Override
     public TENSOR plusInPlace(T value) {
         buffer.plus(value);
         return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR plusInPlace(TENSOR that) {
+        if (this.isScalar()) {
+            return that.plus(buffer.get(0));
+        } else if (that.isScalar()) {
+            return plusInPlace(that.scalar());
+        }
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(getOperations()::add, getAsJVMTensor(that));
     }
 
     @Override
@@ -223,11 +305,32 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     }
 
     @Override
+    public TENSOR powInPlace(TENSOR exponent) {
+        if (exponent.isScalar()) {
+            return powInPlace(exponent.scalar());
+        }
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(getOperations()::pow, getAsJVMTensor(exponent));
+    }
+
+    @Override
     public TENSOR setAllInPlace(T value) {
         for (int i = 0; i < buffer.getLength(); i++) {
             buffer.set(value, i);
         }
         return (TENSOR) this;
+    }
+
+    @Override
+    public BooleanTensor elementwiseEquals(TENSOR that) {
+        if (isScalar()) {
+            return that.elementwiseEquals(this.scalar());
+        } else if (that.isScalar()) {
+            return elementwiseEquals(that.scalar());
+        } else {
+            return broadcastableBinaryOpToBooleanWithAutoBroadcast(
+                getOperations()::equalTo, getAsJVMTensor(that)
+            );
+        }
     }
 
     @Override
@@ -251,6 +354,47 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     }
 
     @Override
+    public TENSOR greaterThanMask(TENSOR greaterThanThis) {
+        return broadcastableBinaryOpWithAutoBroadcast(getOperations()::gtMask, getAsJVMTensor(greaterThanThis));
+    }
+
+    @Override
+    public TENSOR greaterThanOrEqualToMask(TENSOR greaterThanThis) {
+        return broadcastableBinaryOpWithAutoBroadcast(getOperations()::gteMask, getAsJVMTensor(greaterThanThis));
+    }
+
+    @Override
+    public TENSOR lessThanMask(TENSOR lessThanThis) {
+        return broadcastableBinaryOpWithAutoBroadcast(getOperations()::ltMask, getAsJVMTensor(lessThanThis));
+    }
+
+    @Override
+    public TENSOR lessThanOrEqualToMask(TENSOR lessThanThis) {
+        return broadcastableBinaryOpWithAutoBroadcast(getOperations()::lteMask, getAsJVMTensor(lessThanThis));
+    }
+
+    @Override
+    public BooleanTensor lessThan(TENSOR that) {
+        return broadcastableBinaryOpToBooleanWithAutoBroadcast(getOperations()::lt, getAsJVMTensor(that));
+    }
+
+    @Override
+    public BooleanTensor lessThanOrEqual(TENSOR that) {
+        return broadcastableBinaryOpToBooleanWithAutoBroadcast(getOperations()::lte, getAsJVMTensor(that));
+    }
+
+    @Override
+    public BooleanTensor greaterThan(TENSOR that) {
+        return broadcastableBinaryOpToBooleanWithAutoBroadcast(getOperations()::gt, getAsJVMTensor(that));
+    }
+
+    @Override
+    public BooleanTensor greaterThanOrEqual(TENSOR that) {
+        return broadcastableBinaryOpToBooleanWithAutoBroadcast(getOperations()::gte, getAsJVMTensor(that));
+    }
+
+    @Override
     protected abstract JVMBuffer.PrimitiveNumberWrapperFactory<T, B> getFactory();
 
+    protected abstract NumberScalarOperations<T> getOperations();
 }

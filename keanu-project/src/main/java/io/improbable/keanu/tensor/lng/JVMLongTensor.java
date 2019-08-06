@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.lng;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.NumberScalarOperations;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -18,17 +19,6 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.ADD;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.DIV;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.GTE_MASK;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.GT_MASK;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.LTE_MASK;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.LT_MASK;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.MUL;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.POW;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.RDIV;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.RSUB;
-import static io.improbable.keanu.tensor.lng.BroadcastableLongOperations.SUB;
 
 public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuffer.PrimitiveLongWrapper> implements LongTensor {
 
@@ -36,11 +26,6 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
 
     private JVMLongTensor(LongBuffer.PrimitiveLongWrapper buffer, long[] shape, long[] stride) {
         super(buffer, shape, stride);
-    }
-
-    @Override
-    protected JVMBuffer.PrimitiveNumberWrapperFactory<Long, LongBuffer.PrimitiveLongWrapper> getFactory() {
-        return factory;
     }
 
     private JVMLongTensor(LongBuffer.PrimitiveLongWrapper buffer, long[] shape) {
@@ -61,6 +46,29 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
 
     private JVMLongTensor(long value) {
         super(new LongBuffer.LongWrapper(value), new long[0], new long[0]);
+    }
+
+    @Override
+    protected JVMTensor<Long, LongTensor, LongBuffer.PrimitiveLongWrapper> getAsJVMTensor(LongTensor that) {
+        return asJVM(that);
+    }
+
+    private static JVMLongTensor asJVM(NumberTensor tensor) {
+        if (tensor instanceof JVMLongTensor) {
+            return ((JVMLongTensor) tensor);
+        } else {
+            return new JVMLongTensor(factory.create(tensor.asFlatLongArray()), tensor.getShape(), tensor.getStride());
+        }
+    }
+
+    @Override
+    protected JVMBuffer.PrimitiveNumberWrapperFactory<Long, LongBuffer.PrimitiveLongWrapper> getFactory() {
+        return factory;
+    }
+
+    @Override
+    protected NumberScalarOperations<Long> getOperations() {
+        return LongScalarOperations.INSTANCE;
     }
 
     @Override
@@ -152,20 +160,14 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
         return new JVMLongTensor(
             JVMTensor.concat(factory, toConcat, dimension,
                 Arrays.stream(toConcat)
-                    .map(tensor -> getAsJVMTensor(tensor).buffer)
+                    .map(tensor -> asJVM(tensor).buffer)
                     .collect(Collectors.toList())
             ));
     }
 
     @Override
     public BooleanTensor toBoolean() {
-        boolean[] boolBuffer = new boolean[Ints.checkedCast(buffer.getLength())];
-
-        for (int i = 0; i < buffer.getLength(); i++) {
-            boolBuffer[i] = buffer.get(i) == 1L;
-        }
-
-        return BooleanTensor.create(boolBuffer, getShape());
+        return new JVMBooleanTensor(buffer.equal(1L), getShape(), getStride());
     }
 
     @Override
@@ -191,26 +193,6 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
     }
 
     @Override
-    public IntegerTensor argMax() {
-        return IntegerTensor.scalar(argCompare((value, min) -> value > min));
-    }
-
-    @Override
-    public IntegerTensor argMax(int axis) {
-        return argCompare((value, max) -> value > max, axis);
-    }
-
-    @Override
-    public IntegerTensor argMin(int axis) {
-        return argCompare((value, min) -> value < min, axis);
-    }
-
-    @Override
-    public IntegerTensor argMin() {
-        return IntegerTensor.scalar(argCompare((value, min) -> value < min));
-    }
-
-    @Override
     public double[] asFlatDoubleArray() {
         return buffer.asDoubleArray();
     }
@@ -223,6 +205,11 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
     @Override
     public long[] asFlatLongArray() {
         return buffer.copy().asLongArray();
+    }
+
+    @Override
+    public Long[] asFlatArray() {
+        return buffer.asArray();
     }
 
     @Override
@@ -281,96 +268,8 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
     }
 
     @Override
-    public LongTensor minusInPlace(LongTensor that) {
-        if (this.isScalar()) {
-            return that.reverseMinus(buffer.get(0));
-        } else if (that.isScalar()) {
-            return minusInPlace(that.scalar());
-        }
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(SUB, getAsJVMTensor(that));
-    }
-
-    @Override
-    public LongTensor reverseMinusInPlace(LongTensor that) {
-        if (this.isScalar()) {
-            return that.minus(buffer.get(0));
-        } else if (that.isScalar()) {
-            return reverseMinusInPlace(that.scalar());
-        }
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(RSUB, getAsJVMTensor(that));
-    }
-
-    @Override
-    public LongTensor plusInPlace(LongTensor that) {
-        if (this.isScalar()) {
-            return that.plus(buffer.get(0));
-        } else if (that.isScalar()) {
-            return plusInPlace(that.scalar());
-        }
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(ADD, getAsJVMTensor(that));
-    }
-
-    @Override
-    public LongTensor timesInPlace(LongTensor that) {
-        if (this.isScalar()) {
-            return that.times(buffer.get(0));
-        } else if (that.isScalar()) {
-            return timesInPlace(that.scalar());
-        }
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(MUL, getAsJVMTensor(that));
-    }
-
-    @Override
-    public LongTensor divInPlace(LongTensor that) {
-        if (this.isScalar()) {
-            return that.reverseDiv(buffer.get(0));
-        } else if (that.isScalar()) {
-            return divInPlace(that.scalar());
-        }
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(DIV, getAsJVMTensor(that));
-    }
-
-    @Override
-    public LongTensor reverseDivInPlace(LongTensor that) {
-        if (this.isScalar()) {
-            return that.div(buffer.get(0));
-        } else if (that.isScalar()) {
-            return reverseDivInPlace(that.scalar());
-        }
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(RDIV, getAsJVMTensor(that));
-    }
-
-    @Override
-    public LongTensor powInPlace(LongTensor exponent) {
-        if (exponent.isScalar()) {
-            return powInPlace(exponent.scalar());
-        }
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(POW, getAsJVMTensor(exponent));
-    }
-
-    @Override
     public LongTensor setWithMaskInPlace(LongTensor mask, final Long value) {
         return broadcastableBinaryOpWithAutoBroadcastInPlace((l, r) -> r == 1L ? value : l, getAsJVMTensor(mask));
-    }
-
-    @Override
-    public BooleanTensor lessThan(LongTensor that) {
-        return broadcastableBinaryOpToBooleanWithAutoBroadcast((l, r) -> l < r, getAsJVMTensor(that));
-    }
-
-    @Override
-    public BooleanTensor lessThanOrEqual(LongTensor that) {
-        return broadcastableBinaryOpToBooleanWithAutoBroadcast((l, r) -> l <= r, getAsJVMTensor(that));
-    }
-
-    @Override
-    public BooleanTensor greaterThan(LongTensor that) {
-        return broadcastableBinaryOpToBooleanWithAutoBroadcast((l, r) -> l > r, getAsJVMTensor(that));
-    }
-
-    @Override
-    public BooleanTensor greaterThanOrEqual(LongTensor that) {
-        return broadcastableBinaryOpToBooleanWithAutoBroadcast((l, r) -> l >= r, getAsJVMTensor(that));
     }
 
     @Override
@@ -380,46 +279,4 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
         );
     }
 
-    @Override
-    public BooleanTensor elementwiseEquals(LongTensor that) {
-        return broadcastableBinaryOpToBooleanWithAutoBroadcast(Long::equals, getAsJVMTensor(that));
-    }
-
-    @Override
-    public BooleanTensor elementwiseEquals(Long value) {
-        return new JVMBooleanTensor(buffer.equal(value), Arrays.copyOf(shape, shape.length), Arrays.copyOf(stride, stride.length));
-    }
-
-    @Override
-    public LongTensor greaterThanMask(LongTensor greaterThanThis) {
-        return broadcastableBinaryOpWithAutoBroadcast(GT_MASK, getAsJVMTensor(greaterThanThis));
-    }
-
-    @Override
-    public LongTensor greaterThanOrEqualToMask(LongTensor greaterThanThis) {
-        return broadcastableBinaryOpWithAutoBroadcast(GTE_MASK, getAsJVMTensor(greaterThanThis));
-    }
-
-    @Override
-    public LongTensor lessThanMask(LongTensor lessThanThis) {
-        return broadcastableBinaryOpWithAutoBroadcast(LT_MASK, getAsJVMTensor(lessThanThis));
-    }
-
-    @Override
-    public LongTensor lessThanOrEqualToMask(LongTensor lessThanThis) {
-        return broadcastableBinaryOpWithAutoBroadcast(LTE_MASK, getAsJVMTensor(lessThanThis));
-    }
-
-    @Override
-    public Long[] asFlatArray() {
-        return buffer.asArray();
-    }
-
-    private static JVMLongTensor getAsJVMTensor(NumberTensor tensor) {
-        if (tensor instanceof JVMLongTensor) {
-            return ((JVMLongTensor) tensor);
-        } else {
-            return new JVMLongTensor(factory.create(tensor.asFlatLongArray()), tensor.getShape(), tensor.getStride());
-        }
-    }
 }

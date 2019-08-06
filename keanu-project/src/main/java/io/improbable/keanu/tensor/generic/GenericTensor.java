@@ -43,6 +43,19 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
         super(buffer, shape, stride);
     }
 
+    @Override
+    protected JVMTensor<T, GenericTensor<T>, GenericBuffer.PrimitiveGenericWrapper<T>> getAsJVMTensor(GenericTensor<T> that) {
+        return asJVM(that);
+    }
+
+    private static <T> GenericTensor<T> asJVM(Tensor<T, ?> tensor) {
+        if (tensor instanceof GenericTensor) {
+            return ((GenericTensor<T>) tensor);
+        } else {
+            return new GenericTensor<T>(factory.create(tensor.asFlatArray()), tensor.getShape(), tensor.getStride());
+        }
+    }
+
     private GenericTensor(GenericBuffer.PrimitiveGenericWrapper<T> buffer, long[] shape) {
         super(buffer, shape, getRowFirstStride(shape));
     }
@@ -63,15 +76,6 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
         Object[] data = new Object[TensorShape.getLengthAsInt(shape)];
         Arrays.fill(data, value);
         return (T[]) data;
-    }
-
-    @Override
-    public BooleanTensor elementwiseEquals(T value) {
-        boolean[] result = new boolean[Ints.checkedCast(buffer.getLength())];
-        for (int i = 0; i < buffer.getLength(); i++) {
-            result[i] = buffer.get(i).equals(value);
-        }
-        return BooleanTensor.create(result, shape);
     }
 
     @Override
@@ -122,18 +126,10 @@ public class GenericTensor<T> extends JVMTensor<T, GenericTensor<T>, GenericBuff
         return factory;
     }
 
-    private static <T> GenericTensor<T> getRawBufferIfJVMTensor(Tensor<T, ?> tensor) {
-        if (tensor instanceof GenericTensor) {
-            return ((GenericTensor<T>) tensor);
-        } else {
-            return new GenericTensor<T>(factory.create(tensor.asFlatArray()), tensor.getShape(), tensor.getStride());
-        }
-    }
-
     public <R> GenericTensor<R> apply(Tensor<T, ?> right,
                                       BiFunction<T, T, R> op) {
 
-        final GenericTensor<T> rightTensor = getRawBufferIfJVMTensor(right);
+        final GenericTensor<T> rightTensor = asJVM(right);
 
         final ResultWrapper<R, GenericBuffer.PrimitiveGenericWrapper<R>> result = broadcastIfNeeded(
             factory, buffer, shape, stride, buffer.getLength(),

@@ -104,6 +104,11 @@ public class BooleanBuffer {
         }
 
         @Override
+        public PrimitiveBooleanWrapper equal(Boolean that) {
+            return apply(value -> value == that);
+        }
+
+        @Override
         public BooleanArrayWrapper apply(Function<Boolean, Boolean> mapper) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i]);
@@ -166,6 +171,11 @@ public class BooleanBuffer {
         @Override
         public PrimitiveBooleanWrapper copy() {
             return new BooleanWrapper(value);
+        }
+
+        @Override
+        public PrimitiveBooleanWrapper equal(Boolean that) {
+            return new BooleanWrapper(value == that);
         }
 
         @Override

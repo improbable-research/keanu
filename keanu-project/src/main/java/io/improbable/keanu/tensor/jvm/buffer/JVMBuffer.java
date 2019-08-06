@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.jvm.buffer;
 
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.bool.BooleanBuffer;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -36,6 +37,8 @@ public class JVMBuffer {
         IMPL applyRight(BiFunction<T, T, T> mapper, T rightArg);
 
         IMPL applyLeft(BiFunction<T, T, T> mapper, T leftArg);
+
+        BooleanBuffer.PrimitiveBooleanWrapper equal(T that);
     }
 
     public static abstract class SingleValueWrapper<T, IMPL extends PrimitiveArrayWrapper<T, IMPL>> implements PrimitiveArrayWrapper<T, IMPL> {

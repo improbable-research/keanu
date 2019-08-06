@@ -97,12 +97,16 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
         return new JVMBooleanTensor(
             JVMTensor.concat(factory, toConcat, dimension,
                 Arrays.stream(toConcat)
-                    .map(tensor -> getAsJVMTensor(tensor).buffer)
+                    .map(tensor -> asJVM(tensor).buffer)
                     .collect(Collectors.toList())
             ));
     }
 
-    private static JVMBooleanTensor getAsJVMTensor(BooleanTensor tensor) {
+    protected JVMTensor<Boolean, BooleanTensor, BooleanBuffer.PrimitiveBooleanWrapper> getAsJVMTensor(BooleanTensor that) {
+        return asJVM(that);
+    }
+
+    private static JVMBooleanTensor asJVM(BooleanTensor tensor) {
         if (tensor instanceof JVMBooleanTensor) {
             return ((JVMBooleanTensor) tensor);
         } else {

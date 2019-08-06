@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.generic;
 
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.bool.BooleanBuffer;
 import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 
 import java.util.Arrays;
@@ -100,6 +101,15 @@ public class GenericBuffer {
         }
 
         @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper equal(T that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i].equals(that), i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
         public GenericArrayWrapper<T> apply(Function<T, T> mapper) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply((T) array[i]);
@@ -138,6 +148,11 @@ public class GenericBuffer {
         @Override
         public PrimitiveGenericWrapper<T> copy() {
             return new GenericWrapper<>(value);
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper equal(T that) {
+            return BooleanBuffer.factory.createNew(value.equals(that));
         }
 
         @Override

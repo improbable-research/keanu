@@ -365,6 +365,12 @@ public class DoubleBuffer {
         }
 
         @Override
+        public PrimitiveDoubleWrapper times(long index, Double that) {
+            value *= that;
+            return this;
+        }
+
+        @Override
         public BooleanBuffer.PrimitiveBooleanWrapper greaterThan(Double that) {
             return BooleanBuffer.factory.createNew(value > that);
         }
@@ -387,12 +393,6 @@ public class DoubleBuffer {
         @Override
         public BooleanBuffer.PrimitiveBooleanWrapper equal(Double that) {
             return BooleanBuffer.factory.createNew(value.equals(that));
-        }
-
-        @Override
-        public PrimitiveDoubleWrapper times(long index, Double that) {
-            value *= that;
-            return this;
         }
 
         @Override
