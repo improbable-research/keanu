@@ -194,7 +194,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public LongTensor toLong() {
-        return JVMLongTensor.create(buffer.asLongArray(), getShape());
+        return new JVMLongTensor(buffer.asLongArray(), getShape());
     }
 
     @Override
