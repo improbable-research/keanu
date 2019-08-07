@@ -1,9 +1,31 @@
 package io.improbable.keanu.tensor.dbl
 
-import io.improbable.keanu.tensor.NumberScalarOperations
+import io.improbable.keanu.tensor.FloatingPointScalarOperations
 import org.apache.commons.math3.util.FastMath
 
-object DoubleScalarOperations : NumberScalarOperations<Double> {
+object DoubleScalarOperations : FloatingPointScalarOperations<Double> {
+
+    //Floating point
+
+    override fun safeLogTimes(left: Double, right: Double): Double {
+        if (right == 0.0) {
+            return 0.0
+        } else {
+            return FastMath.log(left) * right;
+        }
+    }
+
+    override fun logAddExp(left: Double, right: Double): Double {
+        val max = Math.max(left, right)
+        return max + FastMath.log(FastMath.exp(left - max) + FastMath.exp(right - max));
+    }
+
+    private val LOG2 = FastMath.log(2.0)
+
+    override fun logAddExp2(left: Double, right: Double): Double {
+        val max = Math.max(left, right);
+        return max + FastMath.log(FastMath.pow(2.0, left - max) + FastMath.pow(2.0, right - max)) / LOG2;
+    }
 
     // Number Ops
     override fun sub(left: Double, right: Double): Double {
@@ -34,7 +56,7 @@ object DoubleScalarOperations : NumberScalarOperations<Double> {
         return FastMath.pow(left, right)
     }
 
-    //Comparisons
+//Comparisons
 
     override fun equalToMask(left: Double, right: Double): Double {
         return if (left == right) 1.0 else 0.0

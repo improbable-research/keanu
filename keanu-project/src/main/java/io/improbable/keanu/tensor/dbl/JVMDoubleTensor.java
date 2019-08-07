@@ -1,7 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.NumberScalarOperations;
+import io.improbable.keanu.tensor.FloatingPointScalarOperations;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -20,9 +20,6 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.FastMath;
 
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
-import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LOG_ADD_EXP;
-import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.LOG_ADD_EXP2;
-import static io.improbable.keanu.tensor.dbl.BroadcastableDoubleOperations.SAFE_LOG_TIMES;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotrf;
@@ -77,7 +74,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    protected NumberScalarOperations<Double> getOperations() {
+    protected FloatingPointScalarOperations<Double> getOperations() {
         return DoubleScalarOperations.INSTANCE;
     }
 
@@ -354,11 +351,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(SAFE_LOG_TIMES, getAsJVMTensor(y));
-    }
-
-    @Override
     public DoubleTensor logGammaInPlace() {
         buffer.apply(Gamma::logGamma);
         return this;
@@ -452,16 +444,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     public DoubleTensor expInPlace() {
         buffer.apply(FastMath::exp);
         return this;
-    }
-
-    @Override
-    public DoubleTensor logAddExp2InPlace(DoubleTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(LOG_ADD_EXP2, getAsJVMTensor(that));
-    }
-
-    @Override
-    public DoubleTensor logAddExpInPlace(DoubleTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(LOG_ADD_EXP, getAsJVMTensor(that));
     }
 
     @Override
