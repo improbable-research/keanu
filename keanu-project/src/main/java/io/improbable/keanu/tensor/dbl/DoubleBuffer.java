@@ -119,6 +119,24 @@ public class DoubleBuffer {
         }
 
         @Override
+        public Double max() {
+            double result = -Double.MAX_VALUE;
+            for (int i = 0; i < array.length; i++) {
+                result = Math.max(array[i], result);
+            }
+            return result;
+        }
+
+        @Override
+        public Double min() {
+            double result = Double.MAX_VALUE;
+            for (int i = 0; i < array.length; i++) {
+                result = Math.min(array[i], result);
+            }
+            return result;
+        }
+
+        @Override
         public DoubleArrayWrapper times(Double that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] *= that;
@@ -313,6 +331,16 @@ public class DoubleBuffer {
 
         @Override
         public Double product() {
+            return value;
+        }
+
+        @Override
+        public Double max() {
+            return value;
+        }
+
+        @Override
+        public Double min() {
             return value;
         }
 

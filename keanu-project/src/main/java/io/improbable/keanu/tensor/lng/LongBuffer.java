@@ -119,6 +119,24 @@ public class LongBuffer {
         }
 
         @Override
+        public Long max() {
+            long result = Long.MIN_VALUE;
+            for (int i = 0; i < array.length; i++) {
+                result = Math.max(array[i], result);
+            }
+            return result;
+        }
+
+        @Override
+        public Long min() {
+            long result = Long.MAX_VALUE;
+            for (int i = 0; i < array.length; i++) {
+                result = Math.min(array[i], result);
+            }
+            return result;
+        }
+
+        @Override
         public LongArrayWrapper times(Long that) {
             for (int i = 0; i < array.length; i++) {
                 array[i] *= that;
@@ -314,6 +332,16 @@ public class LongBuffer {
 
         @Override
         public Long product() {
+            return value;
+        }
+
+        @Override
+        public Long max() {
+            return value;
+        }
+
+        @Override
+        public Long min() {
             return value;
         }
 

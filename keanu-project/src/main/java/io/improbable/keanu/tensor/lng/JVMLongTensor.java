@@ -1,6 +1,6 @@
 package io.improbable.keanu.tensor.lng;
 
-import io.improbable.keanu.tensor.NumberScalarOperations;
+import io.improbable.keanu.tensor.FixedPointScalarOperations;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
@@ -63,7 +63,7 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
     }
 
     @Override
-    protected NumberScalarOperations<Long> getOperations() {
+    protected FixedPointScalarOperations<Long> getOperations() {
         return LongScalarOperations.INSTANCE;
     }
 
@@ -128,70 +128,8 @@ public class JVMLongTensor extends JVMFixedPointTensor<Long, LongTensor, LongBuf
     }
 
     @Override
-    public LongTensor min() {
-        long result = Long.MAX_VALUE;
-        for (int i = 0; i < buffer.getLength(); i++) {
-            result = Math.min(result, buffer.get(i));
-        }
-        return new JVMLongTensor(result);
-    }
-
-    @Override
-    public LongTensor minInPlace(LongTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(Math::min, getAsJVMTensor(that));
-    }
-
-    @Override
-    public LongTensor max() {
-        long result = Long.MIN_VALUE;
-        for (int i = 0; i < buffer.getLength(); i++) {
-            result = Math.max(result, buffer.get(i));
-        }
-        return new JVMLongTensor(result);
-    }
-
-    @Override
-    public LongTensor maxInPlace(LongTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(Math::max, getAsJVMTensor(that));
-    }
-
-    @Override
-    public LongTensor signInPlace() {
-        return applyInPlace(v -> v > 0 ? 1L : v < 0 ? -1 : 0);
-    }
-
-    @Override
-    public LongTensor absInPlace() {
-        return applyInPlace(Math::abs);
-    }
-
-    @Override
-    public LongTensor unaryMinusInPlace() {
-        buffer.apply((v) -> -v);
-        return this;
-    }
-
-    @Override
-    public LongTensor modInPlace(Long that) {
-        buffer.apply(v -> v % that);
-        return this;
-    }
-
-    @Override
-    public LongTensor modInPlace(LongTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcastInPlace((l, r) -> l % r, getAsJVMTensor(that));
-    }
-
-    @Override
     public LongTensor setWithMaskInPlace(LongTensor mask, final Long value) {
         return broadcastableBinaryOpWithAutoBroadcastInPlace((l, r) -> r == 1L ? value : l, getAsJVMTensor(mask));
-    }
-
-    @Override
-    public BooleanTensor equalsWithinEpsilon(LongTensor that, Long epsilon) {
-        return broadcastableBinaryOpToBooleanWithAutoBroadcast(
-            (l, r) -> Math.abs(l - r) <= epsilon, getAsJVMTensor(that)
-        );
     }
 
 }

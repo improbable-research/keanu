@@ -313,6 +313,44 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     }
 
     @Override
+    public TENSOR signInPlace() {
+        buffer.apply(getOperations()::sign);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR absInPlace() {
+        buffer.apply(getOperations()::abs);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR unaryMinusInPlace() {
+        buffer.apply(getOperations()::unaryMinus);
+        return (TENSOR) this;
+    }
+
+    @Override
+    public TENSOR minInPlace(TENSOR that) {
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(getOperations()::min, getAsJVMTensor(that));
+    }
+
+    @Override
+    public TENSOR maxInPlace(TENSOR that) {
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(getOperations()::max, getAsJVMTensor(that));
+    }
+
+    @Override
+    public TENSOR min() {
+        return create(getFactory().createNew(buffer.min()), new long[0], new long[0]);
+    }
+
+    @Override
+    public TENSOR max() {
+        return create(getFactory().createNew(buffer.max()), new long[0], new long[0]);
+    }
+
+    @Override
     public TENSOR setAllInPlace(T value) {
         for (int i = 0; i < buffer.getLength(); i++) {
             buffer.set(value, i);
@@ -331,6 +369,14 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
                 getOperations()::equalTo, getAsJVMTensor(that)
             );
         }
+    }
+
+    @Override
+    public BooleanTensor equalsWithinEpsilon(TENSOR that, T epsilon) {
+        NumberScalarOperations<T> ops = getOperations();
+        return broadcastableBinaryOpToBooleanWithAutoBroadcast(
+            (l, r) -> ops.equalToWithinEpsilon(l, r, epsilon), getAsJVMTensor(that)
+        );
     }
 
     @Override

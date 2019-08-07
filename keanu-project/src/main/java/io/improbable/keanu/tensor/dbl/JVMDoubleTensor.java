@@ -242,31 +242,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor unaryMinusInPlace() {
-        buffer.apply((v) -> -v);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor absInPlace() {
-        buffer.apply(Math::abs);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor signInPlace() {
-        buffer.apply(Math::signum);
-        return this;
-    }
-
-    @Override
-    public BooleanTensor equalsWithinEpsilon(DoubleTensor that, Double epsilon) {
-        return broadcastableBinaryOpToBooleanWithAutoBroadcast(
-            (l, r) -> Math.abs(l - r) <= epsilon, getAsJVMTensor(that)
-        );
-    }
-
-    @Override
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
         return broadcastableBinaryOpWithAutoBroadcastInPlace((l, r) -> r == 1L ? value : l, getAsJVMTensor(mask));
     }
@@ -474,34 +449,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     public DoubleTensor expM1InPlace() {
         buffer.apply(FastMath::expm1);
         return this;
-    }
-
-    @Override
-    public DoubleTensor min() {
-        double result = Double.MAX_VALUE;
-        for (int i = 0; i < buffer.getLength(); i++) {
-            result = Math.min(result, buffer.get(i));
-        }
-        return new JVMDoubleTensor(result);
-    }
-
-    @Override
-    public DoubleTensor minInPlace(DoubleTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(Math::min, getAsJVMTensor(that));
-    }
-
-    @Override
-    public DoubleTensor max() {
-        double result = -Double.MAX_VALUE;
-        for (int i = 0; i < buffer.getLength(); i++) {
-            result = Math.max(result, buffer.get(i));
-        }
-        return new JVMDoubleTensor(result);
-    }
-
-    @Override
-    public DoubleTensor maxInPlace(DoubleTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcastInPlace(Math::max, getAsJVMTensor(that));
     }
 
     @Override

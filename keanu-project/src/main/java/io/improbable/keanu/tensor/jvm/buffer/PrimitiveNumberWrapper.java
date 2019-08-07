@@ -14,6 +14,10 @@ public interface PrimitiveNumberWrapper<T extends Number, B extends JVMBuffer.Pr
 
     T product();
 
+    T max();
+
+    T min();
+
     B times(T that);
 
     B times(long index, T that);

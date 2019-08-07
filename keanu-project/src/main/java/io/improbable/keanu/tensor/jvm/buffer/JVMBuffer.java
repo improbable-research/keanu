@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.jvm.buffer;
 
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.bool.BooleanBuffer;
 
 import java.util.Objects;
@@ -12,15 +11,6 @@ public class JVMBuffer {
     public interface PrimitiveArrayWrapper<T, IMPL extends PrimitiveArrayWrapper<T, IMPL>> {
 
         Object[] asArray();
-
-        default Object[] asArray(long from, long to) {
-            Object[] temp = new Object[Ints.checkedCast(to - from)];
-
-            for (long i = from; i < to; i++) {
-                temp[(int) (i - from)] = get(i);
-            }
-            return temp;
-        }
 
         T get(long index);
 
@@ -37,6 +27,14 @@ public class JVMBuffer {
         IMPL applyRight(BiFunction<T, T, T> mapper, T rightArg);
 
         IMPL applyLeft(BiFunction<T, T, T> mapper, T leftArg);
+
+        default T reduce(T initial, BiFunction<T, T, T> reducer) {
+            T result = initial;
+            for (int i = 0; i < getLength(); i++) {
+                result = reducer.apply(result, get(i));
+            }
+            return result;
+        }
 
         BooleanBuffer.PrimitiveBooleanWrapper equal(T that);
     }
@@ -90,6 +88,11 @@ public class JVMBuffer {
         public IMPL applyLeft(BiFunction<T, T, T> mapper, T leftArg) {
             value = mapper.apply(leftArg, value);
             return getThis();
+        }
+
+        @Override
+        public T reduce(T initial, BiFunction<T, T, T> reducer) {
+            return reducer.apply(initial, value);
         }
 
         protected abstract IMPL getThis();
