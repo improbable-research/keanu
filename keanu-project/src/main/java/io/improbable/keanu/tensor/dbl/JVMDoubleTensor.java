@@ -13,11 +13,8 @@ import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.ResultWrapper;
 import io.improbable.keanu.tensor.lng.JVMLongTensorFactory;
 import io.improbable.keanu.tensor.lng.LongTensor;
-import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.SingularMatrixException;
-import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.util.FastMath;
 
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
@@ -109,6 +106,26 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     @Override
     public LongTensor toLong() {
         return JVMLongTensorFactory.INSTANCE.create(buffer.asLongArray(), getShape());
+    }
+
+    @Override
+    public double[] asFlatDoubleArray() {
+        return buffer.copy().asDoubleArray();
+    }
+
+    @Override
+    public int[] asFlatIntegerArray() {
+        return buffer.asIntegerArray();
+    }
+
+    @Override
+    public long[] asFlatLongArray() {
+        return buffer.asLongArray();
+    }
+
+    @Override
+    public Double[] asFlatArray() {
+        return buffer.asArray();
     }
 
     @Override
@@ -222,39 +239,8 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public IntegerTensor nanArgMax(int axis) {
-        return argCompare((value, max) -> Double.isNaN(max) || !Double.isNaN(value) && value > max, axis);
-    }
-
-    @Override
-    public IntegerTensor nanArgMax() {
-        return IntegerTensor.scalar(argCompare((value, max) -> Double.isNaN(max) || !Double.isNaN(value) && value > max));
-    }
-
-    @Override
-    public IntegerTensor nanArgMin(int axis) {
-        return argCompare((value, min) -> Double.isNaN(min) || !Double.isNaN(value) && value < min, axis);
-    }
-
-    @Override
-    public IntegerTensor nanArgMin() {
-        return IntegerTensor.scalar(argCompare((value, min) -> Double.isNaN(min) || !Double.isNaN(value) && value < min));
-    }
-
-    @Override
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
-        return broadcastableBinaryOpWithAutoBroadcastInPlace((l, r) -> r == 1L ? value : l, getAsJVMTensor(mask));
-    }
-
-    @Override
-    public DoubleTensor atan2InPlace(Double y) {
-        buffer.applyLeft(FastMath::atan2, y);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor atan2InPlace(DoubleTensor y) {
-        return broadcastableBinaryOpWithAutoBroadcastInPlace((left, right) -> FastMath.atan2(right, left), getAsJVMTensor(y));
+        return broadcastableBinaryOpWithAutoBroadcastInPlace((l, r) -> r == 1.0 ? value : l, getAsJVMTensor(mask));
     }
 
     @Override
@@ -279,244 +265,10 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         return new JVMDoubleTensor(stats.getStandardDeviation());
     }
 
-    private static final Sigmoid sigmoid = new Sigmoid();
-
-    @Override
-    public DoubleTensor sigmoidInPlace() {
-        buffer.apply(sigmoid::value);
-        return this;
-    }
-
-    @Override
-    public double[] asFlatDoubleArray() {
-        return buffer.copy().asDoubleArray();
-    }
-
-    @Override
-    public int[] asFlatIntegerArray() {
-        return buffer.asIntegerArray();
-    }
-
-    @Override
-    public long[] asFlatLongArray() {
-        return buffer.asLongArray();
-    }
-
-    @Override
-    public Double[] asFlatArray() {
-        return buffer.asArray();
-    }
-
-    @Override
-    public DoubleTensor reciprocalInPlace() {
-        buffer.reverseDiv(1.0);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor sqrtInPlace() {
-        buffer.apply(FastMath::sqrt);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor logInPlace() {
-        buffer.apply(FastMath::log);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor logGammaInPlace() {
-        buffer.apply(Gamma::logGamma);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor digammaInPlace() {
-        buffer.apply(Gamma::digamma);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor trigammaInPlace() {
-        buffer.apply(Gamma::trigamma);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor sinInPlace() {
-        buffer.apply(FastMath::sin);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor cosInPlace() {
-        buffer.apply(FastMath::cos);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor tanInPlace() {
-        buffer.apply(FastMath::tan);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor atanInPlace() {
-        buffer.apply(FastMath::atan);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor asinInPlace() {
-        buffer.apply(FastMath::asin);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor acosInPlace() {
-        buffer.apply(FastMath::acos);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor sinhInPlace() {
-        buffer.apply(FastMath::sinh);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor coshInPlace() {
-        buffer.apply(FastMath::cosh);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor tanhInPlace() {
-        buffer.apply(FastMath::tanh);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor asinhInPlace() {
-        buffer.apply(FastMath::asinh);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor acoshInPlace() {
-        buffer.apply(FastMath::acosh);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor atanhInPlace() {
-        buffer.apply(FastMath::atanh);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor expInPlace() {
-        buffer.apply(FastMath::exp);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor log1pInPlace() {
-        buffer.apply(FastMath::log1p);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor log2InPlace() {
-        buffer.apply(v -> FastMath.log(v) / FastMath.log(2));
-        return this;
-    }
-
-    @Override
-    public DoubleTensor log10InPlace() {
-        buffer.apply(FastMath::log10);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor exp2InPlace() {
-        buffer.apply(v -> FastMath.pow(2, v));
-        return this;
-    }
-
-    @Override
-    public DoubleTensor expM1InPlace() {
-        buffer.apply(FastMath::expm1);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor ceilInPlace() {
-        buffer.apply(FastMath::ceil);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor floorInPlace() {
-        buffer.apply(FastMath::floor);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor roundInPlace() {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            if (buffer.get(i) >= 0.0) {
-                buffer.set(FastMath.floor(buffer.get(i) + 0.5), i);
-            } else {
-                buffer.set(FastMath.ceil(buffer.get(i) - 0.5), i);
-            }
-        }
-
-        return this;
-    }
-
-    @Override
-    public DoubleTensor standardizeInPlace() {
-        return this.minusInPlace(mean()).divInPlace(standardDeviation());
-    }
-
     @Override
     public DoubleTensor replaceNaNInPlace(Double value) {
-        for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.set(Double.isNaN(buffer.get(i)) ? value : buffer.get(i), i);
-        }
+        buffer.apply(v -> Double.isNaN(v) ? value : v);
         return this;
-    }
-
-    @Override
-    public BooleanTensor notNaN() {
-        return isApply(v -> !Double.isNaN(v));
-    }
-
-    @Override
-    public BooleanTensor isNaN() {
-        return isApply(v -> Double.isNaN(v));
-    }
-
-    @Override
-    public BooleanTensor isFinite() {
-        return isApply(Double::isFinite);
-    }
-
-    @Override
-    public BooleanTensor isInfinite() {
-        return isApply(v -> Double.isInfinite(v));
-    }
-
-    @Override
-    public BooleanTensor isNegativeInfinity() {
-        return isApply(v -> v == Double.NEGATIVE_INFINITY);
-    }
-
-    @Override
-    public BooleanTensor isPositiveInfinity() {
-        return isApply(v -> v == Double.POSITIVE_INFINITY);
     }
 
 }
