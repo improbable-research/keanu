@@ -166,8 +166,13 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
         if (withRespectTo.contains(covariance)) {
 
             final DoubleTensor covInvTranspose = covInv.transpose();
-            final DoubleTensor dLogProbWrtCovarianceForBatch = covInvTranspose.matrixMultiply(covInvTranspose)
-                .times(xMinusMu.pow(2).sum(-1).reshape(TensorShape.concat(batchShape, new long[]{1, 1})))
+
+            final DoubleTensor xMinusMuMatrix = xMinusMu.reshape(TensorShape.concat(xMinusMu.getShape(), new long[]{1}));
+
+            final DoubleTensor dLogProbWrtCovarianceForBatch = covInvTranspose
+                .matrixMultiply(
+                    xMinusMuMatrix.matrixMultiply(xMinusMuMatrix.swapAxis(-2, -1)).matrixMultiply(covInvTranspose)
+                )
                 .minus(covInvTranspose)
                 .times(0.5);
 

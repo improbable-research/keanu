@@ -58,7 +58,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
                 covInv.matrixMultiply(xMinusMu.reshape(fromRightShape))
             );
 
-        return DoubleTensor.scalar(-0.5 * (xmuCovXmu.sumNumber() + kLog2Pi + logCovDet));
+        return xmuCovXmu.plus(kLog2Pi + logCovDet).sum().times(-0.5);
     }
 
     @Override
@@ -71,9 +71,17 @@ public class MultivariateGaussian implements ContinuousDistribution {
         final DoubleVertex logCovDet = covariance.matrixDeterminant().log();
         final DoubleVertex xMinusMu = x.minus(mu);
         final DoubleVertex covInv = covariance.matrixInverse();
-        final DoubleVertex scalar = xMinusMu.matrixMultiply(covInv.matrixMultiply(xMinusMu));
 
-        return scalar.plus(kLog2Pi).plus(logCovDet).times(-0.5);
+        long[] xMinusMuShape = xMinusMu.getShape();
+        long[] fromLeftShape = ArrayUtils.insert(xMinusMuShape.length - 1, xMinusMuShape, 1);
+        long[] fromRightShape = ArrayUtils.add(xMinusMuShape, 1);
+
+        final DoubleVertex xmuCovXmu = xMinusMu.reshape(fromLeftShape)
+            .matrixMultiply(
+                covInv.matrixMultiply(xMinusMu.reshape(fromRightShape))
+            );
+
+        return xmuCovXmu.plus(kLog2Pi).plus(logCovDet).sum().times(-0.5);
     }
 
 }

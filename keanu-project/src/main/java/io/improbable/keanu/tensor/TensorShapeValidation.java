@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -281,14 +282,21 @@ public class TensorShapeValidation {
     }
 
     public static long[] getMatrixMultiplicationResultingShape(long[] left, long[] right) {
-        if (left.length != 2 || right.length != 2) {
+        if (left.length < 2 || right.length < 2) {
             throw new IllegalArgumentException("Matrix multiply must be used on matrices");
         }
 
-        if (left[1] != right[0]) {
+        if (left[left.length - 1] != right[right.length - 2]) {
             throw new IllegalArgumentException("Can not multiply matrices of shapes " + Arrays.toString(left) + " X " + Arrays.toString(right));
         }
 
-        return new long[]{left[0], right[1]};
+        if (left.length == 2 && right.length == 2) {
+            return new long[]{left[0], right[1]};
+        } else {
+            final long[] leftBatchShape = ArrayUtils.subarray(left, 0, left.length - 2);
+            final long[] rightBatchShape = ArrayUtils.subarray(right, 0, right.length - 2);
+            final long[] batchShape = TensorShape.getBroadcastResultShape(leftBatchShape, rightBatchShape);
+            return TensorShape.concat(batchShape, new long[]{left[left.length - 1], right[right.length - 2]});
+        }
     }
 }

@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 
 public class LaplaceVertexTest {
 
-    private static final double DELTA = 0.0001;
+    private static final double DELTA = 0.001;
 
     private KeanuRandom random;
 
@@ -142,8 +142,8 @@ public class LaplaceVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            DoubleTensor.scalar(1.0),
-            DoubleTensor.scalar(1.5),
+            DoubleTensor.scalar(-2),
+            DoubleTensor.scalar(-1),
             0.1,
             uniformA,
             laplace,

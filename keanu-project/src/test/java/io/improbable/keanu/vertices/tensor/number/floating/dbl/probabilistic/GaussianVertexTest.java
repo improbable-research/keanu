@@ -44,6 +44,15 @@ public class GaussianVertexTest {
     }
 
     @Test
+    public void logProbMatchesKnownLogDensity() {
+
+        NormalDistribution distribution = new NormalDistribution(0.0, 1.5);
+        GaussianVertex tensorGaussianVertex = new GaussianVertex(0, 1.5);
+        double expectedDensity = distribution.logDensity(0.5);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGaussianVertex, 0.5, expectedDensity);
+    }
+
+    @Test
     public void logProbGraphMatchesKnownLogDensityOfScalar() {
         DoubleVertex mu = ConstantVertex.of(0.);
         DoubleVertex sigma = ConstantVertex.of(1.);

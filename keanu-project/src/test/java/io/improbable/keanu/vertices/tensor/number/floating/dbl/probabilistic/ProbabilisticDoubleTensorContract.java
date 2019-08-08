@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
@@ -9,15 +10,13 @@ import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiator;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.LogProbGradients;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.Pair;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -119,30 +118,6 @@ public class ProbabilisticDoubleTensorContract {
     }
 
     public static <V extends DoubleVertex & ProbabilisticDouble>
-    void samplingProducesRealisticMeanAndStandardDeviation(int numberOfSamples,
-                                                           V vertexUnderTest,
-                                                           double expectedMean,
-                                                           double expectedStandardDeviation,
-                                                           double maxError,
-                                                           KeanuRandom random) {
-        List<Double> samples = new ArrayList<>();
-
-        for (int i = 0; i < numberOfSamples; i++) {
-            double sample = vertexUnderTest.sample(random).scalar();
-            samples.add(sample);
-        }
-
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        double mean = stats.getMean();
-        double sd = stats.getStandardDeviation();
-
-        assertThat("Problem with mean", expectedMean, closeTo(mean, maxError));
-        assertThat("Problem with standard deviation", expectedStandardDeviation, closeTo(sd, maxError));
-    }
-
-    public static <V extends DoubleVertex & ProbabilisticDouble>
     void moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(DoubleTensor hyperParameterStartValue,
                                                                             DoubleTensor hyperParameterEndValue,
                                                                             double hyperParameterValueIncrement,
@@ -153,7 +128,7 @@ public class ProbabilisticDoubleTensorContract {
                                                                             double vertexValueIncrement,
                                                                             double gradientDelta) {
 
-        for (DoubleTensor value = vertexStartValue; value.scalar() <= vertexEndValue.scalar(); value.plusInPlace(vertexValueIncrement)) {
+        for (DoubleTensor value = vertexStartValue; value.lessThanOrEqual(vertexEndValue).allTrue().scalar(); value.plusInPlace(vertexValueIncrement)) {
             vertexUnderTest.setAndCascade(value);
             testGradientAcrossMultipleHyperParameterValues(
                 hyperParameterStartValue,
@@ -173,12 +148,30 @@ public class ProbabilisticDoubleTensorContract {
                                                                       Probabilistic<?> vertexUnderTest,
                                                                       double gradientDelta) {
 
-        for (DoubleTensor parameterValue = hyperParameterStartValue; parameterValue.scalar() <= hyperParameterEndValue.scalar(); parameterValue.plusInPlace(hyperParameterValueIncrement)) {
+        DoubleTensor hyperInc = DoubleTensor.zeros(hyperParameterStartValue.getShape());
+        int hyperParamLength = Ints.checkedCast(hyperInc.getLength());
+
+        for (DoubleTensor parameterValue = hyperParameterStartValue; parameterValue.lessThan(hyperParameterEndValue).anyTrue().scalar(); parameterValue = parameterValue.plusInPlace(hyperInc)) {
+
+            DoubleTensor gradientMask = DoubleTensor.zeros(hyperParameterStartValue.getShape());
+
+            for (int i = 0; i < hyperParamLength; i++) {
+                if (parameterValue.getValue(i) < hyperParameterEndValue.getValue(i)) {
+                    hyperInc = DoubleTensor.zeros(hyperParameterStartValue.getShape());
+                    hyperInc.setValue(hyperParameterValueIncrement, i);
+
+                    gradientMask = DoubleTensor.zeros(hyperParameterStartValue.getShape());
+                    gradientMask.setValue(1.0, i);
+                    break;
+                }
+            }
+
             testGradientAtHyperParameterValue(
                 parameterValue,
                 hyperParameterVertex,
                 vertexUnderTest,
-                gradientDelta
+                gradientDelta,
+                gradientMask
             );
         }
     }
@@ -186,12 +179,14 @@ public class ProbabilisticDoubleTensorContract {
     public static void testGradientAtHyperParameterValue(DoubleTensor hyperParameterValue,
                                                          DoubleVertex hyperParameterVertex,
                                                          Probabilistic<?> vertexUnderTest,
-                                                         double gradientDelta) {
+                                                         double gradientDelta,
+                                                         DoubleTensor gradientMask) {
 
-        hyperParameterVertex.setAndCascade(hyperParameterValue.minus(gradientDelta));
+        DoubleTensor delta = gradientMask.times(gradientDelta);
+        hyperParameterVertex.setAndCascade(hyperParameterValue.minus(delta));
         double lnDensityA1 = vertexUnderTest.logProbAtValue();
 
-        hyperParameterVertex.setAndCascade(hyperParameterValue.plus(gradientDelta));
+        hyperParameterVertex.setAndCascade(hyperParameterValue.plus(delta));
         double lnDensityA2 = vertexUnderTest.logProbAtValue();
 
         double diffLnDensityApproxExpected = 0.0;
@@ -201,9 +196,10 @@ public class ProbabilisticDoubleTensorContract {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
-        Map<Vertex, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue(hyperParameterVertex);
+        LogProbGradientCalculator gradient = new LogProbGradientCalculator(ImmutableList.of((Vertex) vertexUnderTest), ImmutableList.of(hyperParameterVertex));
+        Map<VertexId, DoubleTensor> diffln = gradient.getJointLogProbGradientWrtLatents();
 
-        double actualDiffLnDensity = diffln.get(hyperParameterVertex).scalar();
+        double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).times(gradientMask).sumNumber();
 
         assertEquals("Diff ln density problem at " + vertexUnderTest.getValue() + " hyper param value " + hyperParameterValue,
             diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);

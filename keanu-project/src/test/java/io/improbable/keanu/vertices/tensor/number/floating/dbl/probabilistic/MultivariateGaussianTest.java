@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 
+import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
@@ -10,8 +11,13 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiator;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialsOf;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,9 +27,13 @@ import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
+import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 
@@ -97,9 +107,10 @@ public class MultivariateGaussianTest {
 
     @Test
     public void logProbMatchesLogDensityOfScalar() {
-        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(5, 1);
+        double sigma = 1.5;
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(5, sigma * sigma);
 
-        double expectedDensity = new NormalDistribution(5.0, 1).logDensity(0.5);
+        double expectedDensity = new NormalDistribution(5.0, sigma).logDensity(0.5);
         double density = mvg.logPdf(DoubleTensor.scalar(0.5));
 
         assertEquals(expectedDensity, density, 1e-2);
@@ -107,7 +118,8 @@ public class MultivariateGaussianTest {
 
     @Test
     public void logProbGraphMatchesLogDensityOfScalar() {
-        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(5., 1.);
+        double sigma = 1.5;
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(5., sigma * sigma);
         DoubleVertex mu = mvg.getMu();
         DoubleVertex covariance = mvg.getCovariance();
         LogProbGraph logProbGraph = mvg.logProbGraph();
@@ -116,8 +128,26 @@ public class MultivariateGaussianTest {
         LogProbGraphValueFeeder.feedValue(logProbGraph, covariance, covariance.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, mvg, DoubleTensor.scalar(0.5));
 
-        double expectedDensity = new NormalDistribution(5.0, 1).logDensity(0.5);
+        double expectedDensity = new NormalDistribution(5.0, sigma).logDensity(0.5);
         LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void bivariateGaussianLogProbMatchesLogDensity() {
+        DoubleVertex mu = ConstantVertex.of(new double[]{-1, 2});
+        DoubleVertex covariance = ConstantVertex.of(DoubleTensor.create(0.5, 0, 0, 1).reshape(2, 2));
+
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covariance);
+
+        double expectedDensity1 = new NormalDistribution(-1, Math.sqrt(0.5)).logDensity(8);
+        double expectedDensity12 = new NormalDistribution(-1, Math.sqrt(0.5)).logDensity(4);
+        double expectedDensity2 = new NormalDistribution(2, Math.sqrt(1)).logDensity(10);
+        double expectedDensity22 = new NormalDistribution(2, Math.sqrt(1)).logDensity(5);
+        double expectedDensity = expectedDensity1 + expectedDensity12 + expectedDensity2 + expectedDensity22;
+
+        double density = mvg.logPdf(DoubleTensor.create(new double[]{8, 10, 4, 5}, 2, 2));
+
+        assertEquals(expectedDensity, density, 0.0001);
     }
 
     @Test
@@ -247,26 +277,210 @@ public class MultivariateGaussianTest {
     }
 
     @Test
-    public void inferHyperParamsFromSamples() {
+    public void dlogProbMatchesBivariateDiagonalGaussian() {
+        UniformVertex mu = new UniformVertex(new long[]{2}, 0, 1);
+        mu.setValue(DoubleTensor.create(-1, 2));
+        UniformVertex sigma = new UniformVertex(new long[]{2}, 0, 1);
+        sigma.setValue(DoubleTensor.create(0.5, 1.0));
+        DoubleVertex covariance = sigma.pow(2).diag();
 
-        DoubleTensor trueMu = DoubleTensor.create(-1, 2);
-        DoubleTensor trueCovariance = DoubleTensor.create(1, 0.6, 0.6, 2).reshape(2, 2);
+        GaussianVertex g = new GaussianVertex(mu, sigma);
+        g.setValue(DoubleTensor.create(0.5, 3));
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covariance);
+        mvg.setValue(DoubleTensor.create(0.5, 3));
+
+        LogProbGradientCalculator gradienOfG = new LogProbGradientCalculator(ImmutableList.of(g), ImmutableList.of(mu, sigma));
+        LogProbGradientCalculator gradienOfMVG = new LogProbGradientCalculator(ImmutableList.of(mvg), ImmutableList.of(mu, sigma));
+        Map<VertexId, DoubleTensor> gDLogProb = gradienOfG.getJointLogProbGradientWrtLatents();
+        Map<VertexId, DoubleTensor> mvgDLogProb = gradienOfMVG.getJointLogProbGradientWrtLatents();
+
+        assertThat(gDLogProb.get(mu.getId()), valuesAndShapesMatch(mvgDLogProb.get(mu.getId())));
+        assertThat(gDLogProb.get(sigma.getId()), valuesAndShapesMatch(mvgDLogProb.get(sigma.getId())));
+    }
+
+    @Test
+    public void dlogProbMatchesUnivariateGaussian() {
+        UniformVertex mu = new UniformVertex(new long[]{1}, 0, 1);
+        mu.setValue(DoubleTensor.create(-1));
+        UniformVertex sigma = new UniformVertex(new long[]{1}, 0, 1);
+        sigma.setValue(DoubleTensor.create(0.5));
+        DoubleVertex variance = sigma.pow(2).diag();
+
+        GaussianVertex g = new GaussianVertex(mu, sigma);
+        g.setValue(DoubleTensor.create(0.5));
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, variance);
+        mvg.setValue(DoubleTensor.create(0.5));
+
+        LogProbGradientCalculator gradienOfG = new LogProbGradientCalculator(ImmutableList.of(g), ImmutableList.of(mu, sigma));
+        LogProbGradientCalculator gradienOfMVG = new LogProbGradientCalculator(ImmutableList.of(mvg), ImmutableList.of(mu, sigma));
+        Map<VertexId, DoubleTensor> gDLogProb = gradienOfG.getJointLogProbGradientWrtLatents();
+        Map<VertexId, DoubleTensor> mvgDLogProb = gradienOfMVG.getJointLogProbGradientWrtLatents();
+
+        assertThat(gDLogProb.get(mu.getId()), valuesAndShapesMatch(mvgDLogProb.get(mu.getId())));
+        assertThat(gDLogProb.get(sigma.getId()), valuesAndShapesMatch(mvgDLogProb.get(sigma.getId())));
+    }
+
+    @Test
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdCoVariance() {
+        UniformVertex uniformA = new UniformVertex(new long[]{2}, -100, 100);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(ConstantVertex.of(-1., 2.), uniformA.diag());
+
+        DoubleTensor vertexStartValue = DoubleTensor.create(-10, 3);
+        DoubleTensor vertexEndValue = DoubleTensor.create(-9.5, 3.5);
+        double vertexIncrement = 0.1;
+
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
+            DoubleTensor.create(0.1, 0.1),
+            DoubleTensor.create(3.0, 3.0),
+            0.1,
+            uniformA,
+            mvg,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            0.0001);
+    }
+
+    @Test
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdMu() {
+        UniformVertex uniformA = new UniformVertex(new long[]{2}, -100, 100);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(uniformA, ConstantVertex.of(0.5, 2).diag());
+
+        DoubleTensor vertexStartValue = DoubleTensor.create(-10, 3);
+        DoubleTensor vertexEndValue = DoubleTensor.create(-9.5, 3.5);
+        double vertexIncrement = 0.1;
+
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
+            DoubleTensor.create(-3, -3),
+            DoubleTensor.create(3.0, 3.0),
+            0.1,
+            uniformA,
+            mvg,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            0.0001);
+    }
+
+    @Test
+    public void gradientOfLogProbGraphMatchesUnivariateGaussian() {
+
+        UniformVertex mu = new UniformVertex(new long[]{1}, 0, 1);
+        mu.setValue(DoubleTensor.create(0));
+        UniformVertex variance = new UniformVertex(new long[]{1, 1}, 0, 1);
+        variance.setValue(DoubleTensor.create(1.5).reshape(1, 1));
+
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, variance);
+        mvg.setValue(DoubleTensor.create(0.5));
+
+        Map<Vertex, DoubleTensor> mvgDLogProb = mvg.dLogProbAtValue(mu, variance);
+
+        LogProbGraph logProbGraph = mvg.logProbGraph();
+        logProbGraph.getPlaceholder(mu).setValue(mu.getValue());
+        logProbGraph.getPlaceholder(variance).setValue(variance.getValue());
+        logProbGraph.getPlaceholder(mvg).setValue(mvg.getValue());
+
+        PartialsOf partialsOf = Differentiator.reverseModeAutoDiff(
+            logProbGraph.getLogProbOutput(),
+            logProbGraph.getPlaceholder(mu),
+            logProbGraph.getPlaceholder(variance)
+        );
+
+        DoubleTensor wrtMu = partialsOf.withRespectTo(logProbGraph.getPlaceholder(mu));
+        DoubleTensor wrtSigma = partialsOf.withRespectTo(logProbGraph.getPlaceholder(variance));
+
+        assertThat(wrtMu, valuesAndShapesMatch(mvgDLogProb.get(mu)));
+        assertThat(wrtSigma, valuesAndShapesMatch(mvgDLogProb.get(variance)));
+    }
+
+    @Test
+    public void infer1DCovarianceParamsFromSamples() {
+
+        DoubleTensor trueCovarianceDiag = DoubleTensor.create(1.5);
 
         List<DoubleVertex> muCov = new ArrayList<>();
+        muCov.add(ConstantVertex.of(trueCovarianceDiag));
+
+        List<DoubleVertex> latentMuCov = new ArrayList<>();
+        UniformVertex latentCovDiag = new UniformVertex(new long[]{2}, 0.01, 10.0);
+        latentCovDiag.setAndCascade(DoubleTensor.create(0.5));
+        latentMuCov.add(latentCovDiag);
+
+        int numSamples = 200;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 1}, ConstantVertex.of(DoubleTensor.create(-1)), hyperParams.get(0).diag()),
+            muCov,
+            latentMuCov,
+            random
+        );
+    }
+
+
+    @Test
+    public void infer2DCovarianceParamsFromSamples() {
+
+        DoubleTensor trueCovarianceDiag = DoubleTensor.create(1, 2);
+
+        List<DoubleVertex> muCov = new ArrayList<>();
+        muCov.add(ConstantVertex.of(trueCovarianceDiag));
+
+        List<DoubleVertex> latentMuCov = new ArrayList<>();
+        UniformVertex latentCovDiag = new UniformVertex(new long[]{2}, 0.01, 10.0);
+        latentCovDiag.setAndCascade(DoubleTensor.create(4, 7));
+        latentMuCov.add(latentCovDiag);
+
+        int numSamples = 200;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2}, ConstantVertex.of(DoubleTensor.create(-1, 2)), hyperParams.get(0).diag()),
+            muCov,
+            latentMuCov,
+            random
+        );
+    }
+
+    @Test
+    public void infer2DMuParamFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(-1, 2);
+        List<DoubleVertex> muCov = new ArrayList<>();
         muCov.add(ConstantVertex.of(trueMu));
-        muCov.add(ConstantVertex.of(trueCovariance));
 
         List<DoubleVertex> latentMuCov = new ArrayList<>();
         UniformVertex latentMu = new UniformVertex(new long[]{2}, -10, 10.0);
         latentMu.setAndCascade(DoubleTensor.create(9, -9));
-        UniformVertex latentCov = new UniformVertex(new long[]{2, 2}, 0.01, 10.0);
-        latentCov.setAndCascade(DoubleTensor.create(0.5, 0.2, 0.2, 1).reshape(2, 2));
         latentMuCov.add(latentMu);
-        latentMuCov.add(latentCov);
 
-        int numSamples = 2000;
+        int numSamples = 200;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2}, hyperParams.get(0), ConstantVertex.of(DoubleTensor.create(1, 2).diag())),
+            muCov,
+            latentMuCov,
+            random
+        );
+    }
+
+    @Test
+    public void infer2DMuAndDiagonalCovarianceParamFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(-1, 2);
+        DoubleTensor trueCovarianceDiag = DoubleTensor.create(1, 2);
+
+        List<DoubleVertex> muCov = new ArrayList<>();
+        muCov.add(ConstantVertex.of(trueMu));
+        muCov.add(ConstantVertex.of(trueCovarianceDiag));
+
+        List<DoubleVertex> latentMuCov = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(new long[]{2}, -100, 100.0);
+        latentMu.setAndCascade(DoubleTensor.create(3, 3));
+        latentMuCov.add(latentMu);
+
+        UniformVertex latentCovDiag = new UniformVertex(new long[]{2}, 0.01, 100.0);
+        latentCovDiag.setAndCascade(DoubleTensor.create(0.5, 1));
+        latentMuCov.add(latentCovDiag);
+
+        int numSamples = 200;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2}, hyperParams.get(0), hyperParams.get(1).diag()),
             muCov,
             latentMuCov,
             random
