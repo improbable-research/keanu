@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
@@ -17,8 +18,10 @@ import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -113,9 +116,71 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
             .build();
     }
 
+
+    /**
+     * Math credit to:
+     * https://math.stackexchange.com/questions/1599966/derivative-of-multivariate-normal-distribution-wrt-mean-and-covariance
+     *
+     * @param x             at value
+     * @param withRespectTo list of parents to differentiate with respect to
+     * @return the derivative of the logProb wrt given vertices
+     */
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        throw new UnsupportedOperationException();
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor x, Set<? extends Vertex> withRespectTo) {
+
+        final DoubleTensor covInv = covariance.getValue().matrixInverse();
+        final DoubleTensor xMinusMu = x.minus(mu.getValue());
+
+        final long[] batchShape = ArrayUtils.subarray(x.getShape(), 0, x.getShape().length - 1);
+        final long dims = x.getShape()[x.getShape().length - 1];
+
+        final boolean wrtMu = withRespectTo.contains(mu);
+        final boolean wrtX = withRespectTo.contains(this);
+
+        Map<Vertex, DoubleTensor> diff = new HashMap<>();
+        if (wrtMu || wrtX) {
+
+            final DoubleTensor dLogProbWrtMuForBatch = covInv.matrixMultiply(
+                xMinusMu.reshape(TensorShape.concat(batchShape, new long[]{dims, 1}))
+            ).reshape(TensorShape.concat(batchShape, new long[]{dims}));
+
+            if (wrtX) {
+                final DoubleTensor dLogProbWrtX = dLogProbWrtMuForBatch
+                    .sum(TensorShape.dimensionRange(
+                        0,
+                        dLogProbWrtMuForBatch.getShape().length - x.getShape().length
+                    )).unaryMinus();
+                diff.put(this, dLogProbWrtX);
+            }
+
+            if (wrtMu) {
+                final DoubleTensor dLogProbWrtMu = dLogProbWrtMuForBatch
+                    .sum(TensorShape.dimensionRange(
+                        0,
+                        dLogProbWrtMuForBatch.getShape().length - mu.getShape().length
+                    ));
+                diff.put(mu, dLogProbWrtMu);
+            }
+        }
+
+        if (withRespectTo.contains(covariance)) {
+
+            final DoubleTensor covInvTranspose = covInv.transpose();
+            final DoubleTensor dLogProbWrtCovarianceForBatch = covInvTranspose.matrixMultiply(covInvTranspose)
+                .times(xMinusMu.pow(2).sum(-1).reshape(TensorShape.concat(batchShape, new long[]{1, 1})))
+                .minus(covInvTranspose)
+                .times(0.5);
+
+            final DoubleTensor dLogProbWrtCovariance = dLogProbWrtCovarianceForBatch
+                .sum(TensorShape.dimensionRange(
+                    0,
+                    dLogProbWrtCovarianceForBatch.getShape().length - covariance.getShape().length
+                ));
+
+            diff.put(covariance, dLogProbWrtCovariance);
+        }
+
+        return diff;
     }
 
     @Override

@@ -331,6 +331,76 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canBatchMatrixMultiplyTwo2x2s() {
+
+        DoubleTensor left = DoubleTensor.create(new double[]{
+            1, 2, 3, 4,
+            5, 6, 7, 8
+        }, 2, 2, 2);
+
+        DoubleTensor right = DoubleTensor.create(new double[]{
+            5, 6, 7, 8,
+            9, 10, 11, 12
+        }, 2, 2, 2);
+
+        DoubleTensor result = left.matrixMultiply(right);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            19, 22, 43, 50,
+            111, 122, 151, 166
+        }, 2, 2, 2);
+
+        assertThat(result, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canBatchMatrixMultiplyA2AndA2x2() {
+
+        DoubleTensor left = DoubleTensor.create(new double[]{
+            5, 6,
+            7, 8
+        }, 2, 2);
+
+        DoubleTensor right = DoubleTensor.create(new double[]{
+            1, 2, 3, 4,
+            5, 6, 7, 8
+        }, 2, 2, 2);
+
+        DoubleTensor result = left.matrixMultiply(right);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            23, 34, 31, 46,
+            67, 78, 91, 106
+        }, 2, 2, 2);
+
+        assertThat(result, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canBatchMatrixMultiplyA2x2x3AndA2x1x3x2() {
+
+        DoubleTensor left = DoubleTensor.arange(1, 13).reshape(2, 2, 3);
+        DoubleTensor right = DoubleTensor.arange(1, 13).reshape(2, 1, 3, 2);
+        DoubleTensor result = left.matrixMultiply(right);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            22, 28,
+            49, 64,
+
+            76, 100,
+            103, 136,
+
+            58, 64,
+            139, 154,
+
+            220, 244,
+            301, 334
+        }, 2, 2, 2, 2);
+
+        assertThat(result, valuesAndShapesMatch(expected));
+    }
+
+    @Test
     public void canFindDeterminantOf2By2Matrix() {
         DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
         double expected = 1 * 4 - 2 * 3;
@@ -1879,7 +1949,7 @@ public class DoubleTensorTest {
     @Test
     public void doesThrowOnMatrixMultiplyWhenRank0() {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Matrix multiply must be used on matrices");
+        expectedException.expectMessage("Cannot matrix multiply with shapes [] and [2, 2]");
 
         DoubleTensor lengthOne = DoubleTensor.scalar(2);
         DoubleTensor matrix = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);

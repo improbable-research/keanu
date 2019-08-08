@@ -19,6 +19,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
 import static org.junit.Assert.assertEquals;
@@ -241,6 +244,33 @@ public class MultivariateGaussianTest {
 
         ContinuousDistribution mvg = MultivariateGaussian.withParameters(mu, sigma);
         mvg.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
+    }
+
+    @Test
+    public void inferHyperParamsFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(-1, 2);
+        DoubleTensor trueCovariance = DoubleTensor.create(1, 0.6, 0.6, 2).reshape(2, 2);
+
+        List<DoubleVertex> muCov = new ArrayList<>();
+        muCov.add(ConstantVertex.of(trueMu));
+        muCov.add(ConstantVertex.of(trueCovariance));
+
+        List<DoubleVertex> latentMuCov = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(new long[]{2}, -10, 10.0);
+        latentMu.setAndCascade(DoubleTensor.create(9, -9));
+        UniformVertex latentCov = new UniformVertex(new long[]{2, 2}, 0.01, 10.0);
+        latentCov.setAndCascade(DoubleTensor.create(0.5, 0.2, 0.2, 1).reshape(2, 2));
+        latentMuCov.add(latentMu);
+        latentMuCov.add(latentCov);
+
+        int numSamples = 2000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2}, hyperParams.get(0), hyperParams.get(1)),
+            muCov,
+            latentMuCov,
+            random
+        );
     }
 
 }

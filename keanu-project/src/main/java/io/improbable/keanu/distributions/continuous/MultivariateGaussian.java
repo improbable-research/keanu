@@ -3,10 +3,13 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
-import io.improbable.keanu.tensor.TensorShapeValidation;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Arrays;
 
 public class MultivariateGaussian implements ContinuousDistribution {
 
@@ -25,27 +28,37 @@ public class MultivariateGaussian implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, mu.getShape());
+        validateXShape(shape, mu.getShape());
+        long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 1);
         final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
-        final DoubleTensor variateSamples = random.nextGaussian(mu.getShape())
-            .reshape(mu.getLength(), 1);
-        final DoubleTensor covTimesVariates = isUnivariate() ?
-            choleskyCov.times(variateSamples) : choleskyCov.matrixMultiply(variateSamples);
-        return covTimesVariates.reshape(mu.getShape()).plus(mu);
+        final DoubleTensor variateSamples = random.nextGaussian(TensorShape.concat(batchShape, new long[]{mu.getShape()[0], 1}));
+        final DoubleTensor covTimesVariates = choleskyCov.matrixMultiply(variateSamples);
+        return covTimesVariates.reshape(shape).plus(mu);
+    }
+
+    private void validateXShape(long[] xShape, long[] muShape) {
+        if (xShape[xShape.length - 1] != muShape[muShape.length - 1]) {
+            throw new IllegalArgumentException("Illegal x shape " + Arrays.toString(xShape) + " for mu shape " + Arrays.toString(muShape));
+        }
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final long dimensions = numberOfDimensions();
-        final double kLog2Pi = dimensions * LOG_2_PI;
+        final double kLog2Pi = mu.getShape()[0] * LOG_2_PI;
         final double logCovDet = covariance.matrixDeterminant().log().scalar();
-        DoubleTensor xMinusMu = x.minus(mu).reshape(dimensions, 1);
-        DoubleTensor xMinusMuT = xMinusMu.reshape(1, dimensions);
-        DoubleTensor covInv = covariance.matrixInverse();
+        final DoubleTensor xMinusMu = x.minus(mu);
+        final DoubleTensor covInv = covariance.matrixInverse();
 
-        double scalar = xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu)).scalar();
+        long[] xMinusMuShape = xMinusMu.getShape();
+        long[] fromLeftShape = ArrayUtils.insert(xMinusMuShape.length - 1, xMinusMuShape, 1);
+        long[] fromRightShape = ArrayUtils.add(xMinusMuShape, 1);
 
-        return DoubleTensor.scalar(-0.5 * (scalar + kLog2Pi + logCovDet));
+        final DoubleTensor xmuCovXmu = xMinusMu.reshape(fromLeftShape)
+            .matrixMultiply(
+                covInv.matrixMultiply(xMinusMu.reshape(fromRightShape))
+            );
+
+        return DoubleTensor.scalar(-0.5 * (xmuCovXmu.sumNumber() + kLog2Pi + logCovDet));
     }
 
     @Override
@@ -54,31 +67,13 @@ public class MultivariateGaussian implements ContinuousDistribution {
     }
 
     public static DoubleVertex logProbGraph(DoublePlaceholderVertex x, DoublePlaceholderVertex mu, DoublePlaceholderVertex covariance) {
-        final long dimensions = numberOfDimensions(mu.getShape());
-        final double kLog2Pi = dimensions * LOG_2_PI;
+        final double kLog2Pi = mu.getShape()[0] * LOG_2_PI;
         final DoubleVertex logCovDet = covariance.matrixDeterminant().log();
-        DoubleVertex xMinusMu = x.minus(mu).reshape(dimensions, 1);
-        DoubleVertex xMinusMuT = xMinusMu.reshape(1, dimensions);
-        DoubleVertex covInv = covariance.matrixInverse();
-
-        DoubleVertex scalar = xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu));
+        final DoubleVertex xMinusMu = x.minus(mu);
+        final DoubleVertex covInv = covariance.matrixInverse();
+        final DoubleVertex scalar = xMinusMu.matrixMultiply(covInv.matrixMultiply(xMinusMu));
 
         return scalar.plus(kLog2Pi).plus(logCovDet).times(-0.5);
     }
 
-    private boolean isUnivariate() {
-        return isUnivariate(numberOfDimensions());
-    }
-
-    private static boolean isUnivariate(long numberOfDimensions) {
-        return numberOfDimensions == 1;
-    }
-
-    private long numberOfDimensions() {
-        return numberOfDimensions(mu.getShape());
-    }
-
-    private static long numberOfDimensions(long[] muShape) {
-        return muShape[0];
-    }
 }

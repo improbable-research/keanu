@@ -11,7 +11,8 @@ import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class VertexVariationalMAP {
 
@@ -34,7 +35,7 @@ public class VertexVariationalMAP {
         doInferenceOn(latentsToInfer.get(0), random);
 
         for (int i = 0; i < latentsToInfer.size(); i++) {
-            assertEquals(hyperParamsForSampling.get(i).getValue().scalar(), latentsToInfer.get(i).getValue().scalar(), 0.1);
+            assertThat(latentsToInfer.get(i).getValue(), valuesWithinEpsilonAndShapesMatch(hyperParamsForSampling.get(i).getValue(), 0.1));
         }
     }
 
