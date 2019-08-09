@@ -3,8 +3,10 @@ package io.improbable.keanu.tensor.intgr;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.JVMDoubleTensorFactory;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.ndj4.INDArrayShim;
 import io.improbable.keanu.tensor.ndj4.Nd4jFixedPointTensor;
@@ -121,6 +123,20 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
         } else {
             return super.diagPart();
         }
+    }
+
+    @Override
+    public IntegerTensor matrixMultiply(IntegerTensor value) {
+        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
+        if (tensor.shape().length > 2 || value.getShape().length > 2) {
+            return asJVMTensor().toDouble().matrixMultiply(value.toDouble()).toInteger();
+        }
+        INDArray mmulResult = tensor.castTo(DataType.DOUBLE).mmul(getTensor(value).castTo(DataType.DOUBLE)).castTo(DataType.INT);
+        return create(mmulResult);
+    }
+
+    private DoubleTensor asJVMTensor() {
+        return JVMDoubleTensorFactory.INSTANCE.create(asFlatDoubleArray(), getShape());
     }
 
     @Override

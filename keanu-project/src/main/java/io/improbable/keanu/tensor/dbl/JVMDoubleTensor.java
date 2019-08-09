@@ -297,8 +297,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
             final int k = Ints.checkedCast(getBroadcastedFlatIndex(resultPosition, batchResultStride, batchLeftShape, batchLeftStride));
             final int j = Ints.checkedCast(getBroadcastedFlatIndex(resultPosition, batchResultStride, batchRightShape, batchRightStride));
 
-            //outputBuffer.set(op.apply(leftBuffer.get(k), rightBuffer.get(j)), i);
-
             final java.nio.DoubleBuffer bufferA = java.nio.DoubleBuffer.wrap(sourceA, k, batchSizeA);
             final java.nio.DoubleBuffer bufferB = java.nio.DoubleBuffer.wrap(sourceB, j, batchSizeB);
             final java.nio.DoubleBuffer bufferC = java.nio.DoubleBuffer.wrap(sourceC, resultPosition, resultBatchSize);

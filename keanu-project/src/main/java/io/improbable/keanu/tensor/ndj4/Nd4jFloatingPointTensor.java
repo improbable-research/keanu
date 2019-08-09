@@ -1,7 +1,6 @@
 package io.improbable.keanu.tensor.ndj4;
 
 import io.improbable.keanu.tensor.FloatingPointTensor;
-import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.TensorMulByMatrixMul;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -38,13 +37,6 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
         INDArray dup = tensor.dup();
         Nd4j.getBlasWrapper().lapack().potrf(dup, true);
         return create(dup);
-    }
-
-    @Override
-    public TENSOR matrixMultiply(TENSOR value) {
-        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
-        INDArray mmulResult = tensor.mmul(getTensor(value));
-        return create(mmulResult);
     }
 
     @Override

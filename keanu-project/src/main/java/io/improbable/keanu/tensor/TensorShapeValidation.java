@@ -283,11 +283,11 @@ public class TensorShapeValidation {
 
     public static long[] getMatrixMultiplicationResultingShape(long[] left, long[] right) {
         if (left.length < 2 || right.length < 2) {
-            throw new IllegalArgumentException("Matrix multiply must be used on matrices");
+            throw new IllegalArgumentException("Cannot matrix multiply with shapes " + Arrays.toString(left) + " and " + Arrays.toString(right));
         }
 
         if (left[left.length - 1] != right[right.length - 2]) {
-            throw new IllegalArgumentException("Can not multiply matrices of shapes " + Arrays.toString(left) + " X " + Arrays.toString(right));
+            throw new IllegalArgumentException("Cannot matrix multiply with shapes " + Arrays.toString(left) + " and " + Arrays.toString(right));
         }
 
         if (left.length == 2 && right.length == 2) {

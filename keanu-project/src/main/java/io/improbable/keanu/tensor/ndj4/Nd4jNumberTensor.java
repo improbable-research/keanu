@@ -500,14 +500,6 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     }
 
     @Override
-    public TENSOR matrixMultiply(TENSOR value) {
-        INDArray right = getTensor(value);
-        right = right.dataType().isFPType() ? right : right.castTo(DataType.DOUBLE);
-        INDArray left = tensor.dataType().isFPType() ? tensor : tensor.castTo(DataType.DOUBLE);
-        return set(left.mmul(right));
-    }
-
-    @Override
     public TENSOR tensorMultiply(TENSOR value, int[] dimLeft, int[] dimsRight) {
         return TensorMulByMatrixMul.tensorMmul((TENSOR) this, value, dimLeft, dimsRight);
     }
