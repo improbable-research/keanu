@@ -19,7 +19,7 @@ public class Beta implements ContinuousDistribution {
     private final DoubleTensor xMin;
     private final DoubleTensor xMax;
 
-    public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
+    public static Beta withParameters(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
         return new Beta(alpha, beta, xMin, xMax);
     }
 
@@ -75,7 +75,6 @@ public class Beta implements ContinuousDistribution {
         return alphaMinusOneTimesLnX.plus(betaMinusOneTimesOneMinusXLn).minus(betaFunction);
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1.0);
         final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).digammaInPlace();

@@ -18,7 +18,7 @@ public class Cauchy implements ContinuousDistribution {
     private final DoubleTensor location;
     private final DoubleTensor scale;
 
-    public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
+    public static Cauchy withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Cauchy(location, scale);
     }
 
@@ -53,7 +53,6 @@ public class Cauchy implements ContinuousDistribution {
         return negLnScaleMinusLnPi.minus(lnXMinusLocationOverScalePow2Plus1);
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor xMinusLocation = x.minus(location);
         final DoubleTensor xMinusLocationPow2 = xMinusLocation.pow(2.0);

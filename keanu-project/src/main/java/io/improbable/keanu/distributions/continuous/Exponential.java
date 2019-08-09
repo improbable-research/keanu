@@ -14,7 +14,7 @@ public class Exponential implements ContinuousDistribution {
 
     private final DoubleTensor lambda;
 
-    public static ContinuousDistribution withParameters(DoubleTensor lambda) {
+    public static Exponential withParameters(DoubleTensor lambda) {
         return new Exponential(lambda);
     }
 
@@ -40,7 +40,6 @@ public class Exponential implements ContinuousDistribution {
         return negXMinusADivBMinusLogB.setWithMask(x.lessThanMask(0.), Double.NEGATIVE_INFINITY);
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor dLogPdx = DoubleTensor.zeros(x.getShape()).minusInPlace(lambda).reciprocalInPlace();
         final DoubleTensor dLogPdlambda = x.minus(lambda).divInPlace(lambda.pow(2));

@@ -2,7 +2,6 @@ package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
@@ -17,7 +16,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
     private final DoubleTensor mu;
     private final DoubleTensor covariance;
 
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor covariance) {
+    public static MultivariateGaussian withParameters(DoubleTensor mu, DoubleTensor covariance) {
         return new MultivariateGaussian(mu, covariance);
     }
 
@@ -61,9 +60,64 @@ public class MultivariateGaussian implements ContinuousDistribution {
         return xmuCovXmu.plus(kLog2Pi + logCovDet).sum().times(-0.5);
     }
 
-    @Override
-    public Diffs dLogProb(DoubleTensor x) {
-        throw new UnsupportedOperationException();
+    public DoubleTensor[] dLogProb(DoubleTensor x, boolean wrtX, boolean wrtMu, boolean wrtCovariance) {
+
+        final DoubleTensor covInv = covariance.matrixInverse();
+        final DoubleTensor xMinusMu = x.minus(mu);
+
+        final long[] batchShape = ArrayUtils.subarray(x.getShape(), 0, x.getShape().length - 1);
+        final long dims = x.getShape()[x.getShape().length - 1];
+
+        DoubleTensor[] diff = new DoubleTensor[3];
+        if (wrtMu || wrtX) {
+
+            final DoubleTensor dLogProbWrtMuForBatch = covInv.matrixMultiply(
+                xMinusMu.reshape(TensorShape.concat(batchShape, new long[]{dims, 1}))
+            ).reshape(TensorShape.concat(batchShape, new long[]{dims}));
+
+            if (wrtX) {
+                final DoubleTensor dLogProbWrtX = dLogProbWrtMuForBatch
+                    .sum(TensorShape.dimensionRange(
+                        0,
+                        dLogProbWrtMuForBatch.getShape().length - x.getShape().length
+                    )).unaryMinus();
+
+                diff[0] = dLogProbWrtX;
+            }
+
+            if (wrtMu) {
+                final DoubleTensor dLogProbWrtMu = dLogProbWrtMuForBatch
+                    .sum(TensorShape.dimensionRange(
+                        0,
+                        dLogProbWrtMuForBatch.getShape().length - mu.getShape().length
+                    ));
+                diff[1] = dLogProbWrtMu;
+            }
+        }
+
+        if (wrtCovariance) {
+
+            final DoubleTensor covInvTranspose = covInv.transpose();
+
+            final DoubleTensor xMinusMuMatrix = xMinusMu.reshape(TensorShape.concat(xMinusMu.getShape(), new long[]{1}));
+
+            final DoubleTensor dLogProbWrtCovarianceForBatch = covInvTranspose
+                .matrixMultiply(
+                    xMinusMuMatrix.matrixMultiply(xMinusMuMatrix.swapAxis(-2, -1)).matrixMultiply(covInvTranspose)
+                )
+                .minus(covInvTranspose)
+                .times(0.5);
+
+            final DoubleTensor dLogProbWrtCovariance = dLogProbWrtCovarianceForBatch
+                .sum(TensorShape.dimensionRange(
+                    0,
+                    dLogProbWrtCovarianceForBatch.getShape().length - covariance.getShape().length
+                ));
+
+            diff[2] = dLogProbWrtCovariance;
+        }
+
+        return diff;
     }
 
     public static DoubleVertex logProbGraph(DoublePlaceholderVertex x, DoublePlaceholderVertex mu, DoublePlaceholderVertex covariance) {

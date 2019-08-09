@@ -54,7 +54,7 @@ public class SmoothUniform implements ContinuousDistribution {
      * @param edgeSharpness sharpness as a percentage of the body width
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
+    public static SmoothUniform withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
         return new SmoothUniform(xMin, xMax, edgeSharpness);
     }
 
@@ -157,7 +157,6 @@ public class SmoothUniform implements ContinuousDistribution {
             .log();
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor bodyWidth = xMax.minus(xMin);
         final DoubleTensor shoulderWidth = bodyWidth.times(edgeSharpness);

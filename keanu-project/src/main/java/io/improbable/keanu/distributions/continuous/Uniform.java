@@ -23,7 +23,7 @@ public class Uniform implements ContinuousDistribution {
      * @param xMax maximum x value
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax) {
+    public static Uniform withParameters(DoubleTensor xMin, DoubleTensor xMax) {
         return new Uniform(xMin, xMax);
     }
 
@@ -56,7 +56,6 @@ public class Uniform implements ContinuousDistribution {
         return logOfWithinBounds;
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }

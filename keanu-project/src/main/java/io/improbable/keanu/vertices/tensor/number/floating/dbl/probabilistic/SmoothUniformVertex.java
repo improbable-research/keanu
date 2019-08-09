@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
@@ -171,7 +170,7 @@ public class SmoothUniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
         if (withRespectTo.contains(this)) {
             final DoubleTensor min = xMin.getValue();
             final DoubleTensor max = xMax.getValue();
-            ContinuousDistribution distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);
+            SmoothUniform distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);
             final DoubleTensor dPdx = distribution.dLogProb(value).get(X).getValue();
             final DoubleTensor density = distribution.logProb(value);
             final DoubleTensor dLogPdx = dPdx.divInPlace(density);

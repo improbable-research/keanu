@@ -77,7 +77,6 @@ public class Triangular implements ContinuousDistribution {
         return (conditionalResult.times(conditionalAnd).plus(elseIfConditionalResult.times(elseIfConditionalAnd))).log();
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }

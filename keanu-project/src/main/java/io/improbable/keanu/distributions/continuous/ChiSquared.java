@@ -14,7 +14,7 @@ public class ChiSquared implements ContinuousDistribution {
     private static final double LOG_TWO = Math.log(2);
     private final IntegerTensor k;
 
-    public static ContinuousDistribution withParameters(IntegerTensor k) {
+    public static ChiSquared withParameters(IntegerTensor k) {
         return new ChiSquared(k);
     }
 
@@ -42,7 +42,6 @@ public class ChiSquared implements ContinuousDistribution {
         return numerator.minus(denominator);
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }

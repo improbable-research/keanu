@@ -21,7 +21,7 @@ public class Logistic implements ContinuousDistribution {
      * @param s  scale parameter (b greater than 0)
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor s) {
+    public static Logistic withParameters(DoubleTensor mu, DoubleTensor s) {
         return new Logistic(mu, s);
     }
 
@@ -53,7 +53,6 @@ public class Logistic implements ContinuousDistribution {
             xMinusAOverB.exp().plus(1.).log().times(2.));
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor expAOverB = mu.div(s).expInPlace();
         final DoubleTensor expXOverB = x.div(s).expInPlace();

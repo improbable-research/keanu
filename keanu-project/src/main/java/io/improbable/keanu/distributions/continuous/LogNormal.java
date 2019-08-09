@@ -22,7 +22,7 @@ public class LogNormal implements ContinuousDistribution {
      * @param sigma square root of variance (greater than 0)
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
+    public static LogNormal withParameters(DoubleTensor mu, DoubleTensor sigma) {
         return new LogNormal(mu, sigma);
     }
 
@@ -51,7 +51,6 @@ public class LogNormal implements ContinuousDistribution {
         return lnXMinusMuSquaredOver2Variance.plus(lnSigmaX).plus(LN_SQRT_2PI).unaryMinus();
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor lnXMinusMu = x.log().minusInPlace(mu);

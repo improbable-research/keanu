@@ -17,7 +17,7 @@ public class Dirichlet implements ContinuousDistribution {
     private static final double EPSILON = 0.00001;
     private final DoubleTensor concentration;
 
-    public static ContinuousDistribution withParameters(DoubleTensor concentration) {
+    public static Dirichlet withParameters(DoubleTensor concentration) {
         return new Dirichlet(concentration);
     }
 
@@ -57,7 +57,6 @@ public class Dirichlet implements ContinuousDistribution {
         return sumConcentrationLogged.minus(sumLogGammaConcentration).plus(logGammaSumConcentration);
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor dLogPdc = x.log()
             .minusInPlace(concentration.digamma())

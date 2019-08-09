@@ -18,7 +18,7 @@ public class Gaussian implements ContinuousDistribution {
     private final DoubleTensor mu;
     private final DoubleTensor sigma;
 
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
+    public static Gaussian withParameters(DoubleTensor mu, DoubleTensor sigma) {
         return new Gaussian(mu, sigma);
     }
 
@@ -48,7 +48,6 @@ public class Gaussian implements ContinuousDistribution {
         return xMinusMuSquaredOver2Variance.plus(lnSigma).plus(LN_SQRT_2PI).unaryMinus();
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor xMinusMu = x.minus(mu);

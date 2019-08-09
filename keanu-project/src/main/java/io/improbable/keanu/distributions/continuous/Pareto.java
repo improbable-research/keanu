@@ -16,7 +16,7 @@ public class Pareto implements ContinuousDistribution {
     private final DoubleTensor location;
     private final DoubleTensor scale;
 
-    public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
+    public static Pareto withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Pareto(location, scale);
     }
 
@@ -25,7 +25,6 @@ public class Pareto implements ContinuousDistribution {
         this.scale = scale;
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         DoubleTensor dLogPdx = scale.plus(1.0).divInPlace(x).unaryMinusInPlace();
         DoubleTensor dLogPdLocation = scale.div(location).broadcast(x.getShape());

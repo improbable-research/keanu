@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -57,7 +56,7 @@ public class BetaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implement
         setParents(alpha, beta);
     }
 
-    ContinuousDistribution distribution() {
+    Beta distribution() {
         return Beta.withParameters(alpha.getValue(), beta.getValue(), DoubleTensor.scalar(0.), DoubleTensor.scalar(1.));
     }
 

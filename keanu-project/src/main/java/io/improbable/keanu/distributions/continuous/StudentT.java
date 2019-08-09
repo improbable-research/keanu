@@ -31,7 +31,7 @@ public class StudentT implements ContinuousDistribution {
      * @param v Degrees of Freedom
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(IntegerTensor v) {
+    public static StudentT withParameters(IntegerTensor v) {
         return new StudentT(v);
     }
 
@@ -86,7 +86,6 @@ public class StudentT implements ContinuousDistribution {
             );
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor t) {
         DoubleTensor vAsDouble = v.toDouble();
         DoubleTensor dPdt = t.unaryMinus()

@@ -23,7 +23,7 @@ public class Laplace implements ContinuousDistribution {
      * @param beta shape
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor beta) {
+    public static Laplace withParameters(DoubleTensor mu, DoubleTensor beta) {
         return new Laplace(mu, beta);
     }
 
@@ -70,7 +70,6 @@ public class Laplace implements ContinuousDistribution {
         return muMinusXAbsNegDivBeta.plus(logTwoBeta).unaryMinus();
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor muMinusX = mu.minus(x);
         final DoubleTensor muMinusXAbs = muMinusX.abs();
