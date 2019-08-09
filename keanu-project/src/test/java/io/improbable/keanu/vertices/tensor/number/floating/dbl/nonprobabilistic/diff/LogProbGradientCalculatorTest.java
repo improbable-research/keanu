@@ -31,7 +31,7 @@ public class LogProbGradientCalculatorTest {
         DoubleTensor dALogProbWrtAValue = gradient.get(A.getId());
 
         Gaussian distribution = Gaussian.withParameters(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));
-        DoubleTensor expected = distribution.dLogProb(DoubleTensor.scalar(0.5)).get(Diffs.X).getValue();
+        DoubleTensor expected = distribution.dLogProb(DoubleTensor.scalar(0.5), true, false, false)[0];
 
         assertThat(dALogProbWrtAValue, equalTo(expected));
     }

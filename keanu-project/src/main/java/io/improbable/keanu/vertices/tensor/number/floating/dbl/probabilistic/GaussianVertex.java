@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
-import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -22,9 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
@@ -122,20 +118,25 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Diffs dlnP = Gaussian.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
 
-        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+        final boolean wrtX = withRespectTo.contains(this);
+        final boolean wrtMu = withRespectTo.contains(mu);
+        final boolean wrtSigma = withRespectTo.contains(sigma);
 
-        if (withRespectTo.contains(mu)) {
-            dLogProbWrtParameters.put(mu, dlnP.get(MU).getValue());
+        final DoubleTensor[] dlnP = Gaussian.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value, wrtX, wrtMu, wrtSigma);
+
+        final Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+
+        if (withRespectTo.contains(this)) {
+            dLogProbWrtParameters.put(this, dlnP[0]);
+        }
+
+        if (wrtMu) {
+            dLogProbWrtParameters.put(mu, dlnP[1]);
         }
 
         if (withRespectTo.contains(sigma)) {
-            dLogProbWrtParameters.put(sigma, dlnP.get(SIGMA).getValue());
-        }
-
-        if (withRespectTo.contains(this)) {
-            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
+            dLogProbWrtParameters.put(sigma, dlnP[2]);
         }
 
         return dLogProbWrtParameters;

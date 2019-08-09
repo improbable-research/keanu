@@ -89,13 +89,13 @@ public class KDEApproximationTest {
         KDEVertex KDE = GaussianKDE.approximate(samples);
 
         DoubleTensor xTensor = DoubleTensor.linspace(-1. + mu, 1. + mu, 10);
-        Diffs diffLog = Gaussian.withParameters(
+        DoubleTensor[] diffLog = Gaussian.withParameters(
             DoubleTensor.scalar(mu),
             DoubleTensor.scalar(sigma)
-        ).dLogProb(xTensor);
+        ).dLogProb(xTensor, true, false, false);
 
         DoubleTensor approximateDerivative = KDE.dLogPdf(xTensor, KDE).get(KDE);
-        DoubleTensor expectedDerivative = diffLog.get(Diffs.X).getValue();
+        DoubleTensor expectedDerivative = diffLog[0];
         isCloseMostOfTheTime(expectedDerivative, approximateDerivative, correctPercentage, DELTA);
     }
 
