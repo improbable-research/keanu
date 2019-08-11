@@ -45,6 +45,16 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
         return getAsINDArray(tensor);
     }
 
+    @Override
+    protected IntegerTensor toJVM() {
+        throw new IllegalStateException("No JVM Integer tensor implementation");
+    }
+
+    @Override
+    protected IntegerTensor fromJVM(IntegerTensor jvmTensor) {
+        return new Nd4jIntegerTensor(jvmTensor.asFlatIntegerArray(), jvmTensor.getShape());
+    }
+
     public static Nd4jIntegerTensor scalar(int scalarValue) {
         return new Nd4jIntegerTensor(Nd4j.scalar(scalarValue));
     }
@@ -129,13 +139,28 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
     public IntegerTensor matrixMultiply(IntegerTensor value) {
         TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
         if (tensor.shape().length > 2 || value.getShape().length > 2) {
-            return asJVMTensor().toDouble().matrixMultiply(value.toDouble()).toInteger();
+            return asJVMDoubleTensor().matrixMultiply(value.toDouble()).toInteger();
         }
         INDArray mmulResult = tensor.castTo(DataType.DOUBLE).mmul(getTensor(value).castTo(DataType.DOUBLE)).castTo(DataType.INT);
         return create(mmulResult);
     }
 
-    private DoubleTensor asJVMTensor() {
+    @Override
+    public IntegerTensor fillTriangular(boolean fillUpper, boolean fillLower) {
+        return fromJVM(asJVMDoubleTensor().fillTriangular(fillUpper, fillLower).toInteger());
+    }
+
+    @Override
+    public IntegerTensor triUpper(int k) {
+        return fromJVM(asJVMDoubleTensor().triUpper(k).toInteger());
+    }
+
+    @Override
+    public IntegerTensor triLower(int k) {
+        return fromJVM(asJVMDoubleTensor().triLower(k).toInteger());
+    }
+
+    private DoubleTensor asJVMDoubleTensor() {
         return JVMDoubleTensorFactory.INSTANCE.create(asFlatDoubleArray(), getShape());
     }
 

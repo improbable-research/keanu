@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.distributions.continuous.Gaussian;
-import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.VertexId;

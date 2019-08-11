@@ -132,7 +132,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
         final long endDim = shape[shape.length - 1];
         final long bufferLength = buffer.getLength();
-        final B newBuffer = factory.createNew(buffer.getLength() * endDim);
+        final B newBuffer = factory.createNew(bufferLength * endDim);
 
         for (long i = 0; i < bufferLength; i++) {
             final long pos = i + endDim * i - (i / endDim) * endDim;
@@ -141,6 +141,99 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
         final long[] newShape = TensorShape.getDiagResultShape(shape);
         return new ResultWrapper<>(newBuffer, newShape, TensorShape.getRowFirstStride(newShape));
+    }
+
+    @Override
+    public TENSOR triUpper(int k) {
+        Preconditions.checkArgument(shape.length >= 2, "Tri Lower input must be rank >= 2");
+
+        long N = shape[shape.length - 2];
+        long M = shape[shape.length - 1];
+        B toBuffer = getFactory().createNew(N * M);
+        copyUpperTriangle(N, M, toBuffer, buffer, k);
+
+        return create(toBuffer, getShape(), getStride());
+    }
+
+    private void copyUpperTriangle(long N, long M, B to, B from, int k) {
+        for (long i = 0; i < N; i++) {
+            for (long j = Math.max(0, i + k); j < M; j++) {
+                final long index = i * M + j;
+                to.set(from.get(index), index);
+            }
+        }
+    }
+
+    @Override
+    public TENSOR triLower(int k) {
+        Preconditions.checkArgument(shape.length >= 2, "Tri Lower input must be rank >= 2");
+
+        long N = shape[shape.length - 2];
+        long M = shape[shape.length - 1];
+        B toBuffer = getFactory().createNew(N * M);
+
+        copyLowerTriangle(N, M, toBuffer, buffer, k);
+
+        return create(toBuffer, getShape(), getStride());
+    }
+
+    private void copyLowerTriangle(long N, long M, B to, B from, int k) {
+        for (long i = 0; i < N; i++) {
+            for (long j = 0; j < Math.min(M, i - k + 1); j++) {
+                final long index = i * M + j;
+                to.set(from.get(index), index);
+            }
+        }
+    }
+
+    @Override
+    public TENSOR fillTriangular(boolean fillUpper, boolean fillLower) {
+        Preconditions.checkArgument(shape.length >= 1, "fill symmetric works on rank >= 1");
+
+        final long endDim = shape[shape.length - 1];
+        double a = Math.sqrt(1 + 8 * endDim);
+
+        Preconditions.checkArgument(
+            a == Math.floor(a),
+            "Length " + endDim + " is not the correct number of elements for a triangular matrix"
+        );
+
+        final long n = ((long) a - 1) / 2;
+        final long n2 = n * n;
+        long[] resultShape = TensorShape.concat(ArrayUtils.subarray(shape, 0, shape.length - 1), new long[]{n, n});
+        final B newBuffer = getFactory().createNew(TensorShape.getLength(resultShape));
+
+        long row = 0;
+        long col = 0;
+        final long bufferLength = buffer.getLength();
+        for (long i = 0; i < bufferLength; i++) {
+
+            final long batchNum = i / endDim;
+            final long batchOffset = batchNum * n2;
+
+            if (i % endDim == 0) {
+                row = 0;
+                col = 0;
+            }
+
+            final long upperPos = batchOffset + row * n + col;
+            if (fillUpper) {
+                newBuffer.set(buffer.get(i), upperPos);
+            }
+
+            if (fillLower) {
+                final long lowerPos = upperPos + (col - row) * (n - 1);
+                newBuffer.set(buffer.get(i), lowerPos);
+            }
+
+            col++;
+            if (col == n) {
+                row++;
+                col = row;
+            }
+        }
+
+        return create(newBuffer, resultShape, TensorShape.getRowFirstStride(resultShape));
     }
 
     @Override

@@ -2330,4 +2330,284 @@ public class DoubleTensorTest {
         assertThat(result, valuesAndShapesMatch(DoubleTensor.create(4, 5, 6)));
     }
 
+    @Test
+    public void canFillUpperTriangular() {
+        DoubleTensor a = DoubleTensor.create(1, 2, 3, 4, 5, 6);
+        DoubleTensor result = a.fillTriangular(true, false);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 4, 5,
+            0, 0, 6
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canFillLowerTriangular() {
+        DoubleTensor a = DoubleTensor.create(1, 2, 3, 4, 5, 6);
+        DoubleTensor result = a.fillTriangular(false, true);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            2, 4, 0,
+            3, 5, 6
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canBatchFillUpperTriangular() {
+        DoubleTensor a = DoubleTensor.create(
+            1, 2, 3, 4, 5, 6,
+            7, 8, 9, 10, 11, 12
+        ).reshape(2, 6);
+
+        DoubleTensor result = a.fillTriangular(true, false);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 4, 5,
+            0, 0, 6,
+
+            7, 8, 9,
+            0, 10, 11,
+            0, 0, 12
+        ).reshape(2, 3, 3)));
+    }
+
+    @Test
+    public void canBatchFillLowerTriangular() {
+        DoubleTensor a = DoubleTensor.create(
+            1, 2, 3, 4, 5, 6,
+            7, 8, 9, 10, 11, 12
+        ).reshape(2, 6);
+
+        DoubleTensor result = a.fillTriangular(false, true);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            2, 4, 0,
+            3, 5, 6,
+
+            7, 0, 0,
+            8, 10, 0,
+            9, 11, 12
+        ).reshape(2, 3, 3)));
+    }
+
+    @Test
+    public void canTriUpperAtK0() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triUpper(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 5, 6,
+            0, 0, 9
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriUpperAtK1of3() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triUpper(1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            0, 2, 3,
+            0, 0, 6,
+            0, 0, 0
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriUpperAtK2o3() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triUpper(2);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            0, 0, 3,
+            0, 0, 0,
+            0, 0, 0
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriUpperWithMoreRowsThanColumns() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12
+        ).reshape(4, 3).triUpper(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 5, 6,
+            0, 0, 9,
+            0, 0, 0
+        ).reshape(4, 3)));
+    }
+
+    @Test
+    public void canTrUpperAtK1WithMoreRowsThanColumns() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12
+        ).reshape(4, 3).triUpper(1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            0, 2, 3,
+            0, 0, 6,
+            0, 0, 0,
+            0, 0, 0
+        ).reshape(4, 3)));
+    }
+
+    @Test
+    public void canTriUpperAtK0WithMoreColumnsThanRows() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3, 4,
+            5, 6, 7, 8,
+            9, 10, 11, 12
+        ).reshape(3, 4).triUpper(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3, 4,
+            0, 6, 7, 8,
+            0, 0, 11, 12
+        ).reshape(3, 4)));
+    }
+
+    @Test
+    public void canTriUpperAtKNeg1() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triUpper(-1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            0, 8, 9
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriLowerAtK0() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triLower(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            4, 5, 0,
+            7, 8, 9
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriLowerAtK1() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triLower(1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            0, 0, 0,
+            4, 0, 0,
+            7, 8, 0
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriLowerAtKNeg1() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triLower(-1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 0,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriLowerWithMoreRowsThanColumns() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12
+        ).reshape(4, 3).triLower(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            4, 5, 0,
+            7, 8, 9,
+            10, 11, 12
+        ).reshape(4, 3)));
+    }
+
+    @Test
+    public void canTriLowerAtK1WithMoreRowsThanColumns() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12
+        ).reshape(4, 3).triLower(1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            0, 0, 0,
+            4, 0, 0,
+            7, 8, 0,
+            10, 11, 12
+        ).reshape(4, 3)));
+    }
+
+    @Test
+    public void canTriLowerAtK0WithMoreColumnsThanRows() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3, 4,
+            5, 6, 7, 8,
+            9, 10, 11, 12
+        ).reshape(3, 4).triLower(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0, 0,
+            5, 6, 0, 0,
+            9, 10, 11, 0
+        ).reshape(3, 4)));
+    }
+
 }

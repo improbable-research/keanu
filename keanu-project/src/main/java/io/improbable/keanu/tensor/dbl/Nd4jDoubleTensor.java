@@ -144,7 +144,7 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     public DoubleTensor diag() {
         if (getRank() > 1) {
             //TODO: use nd4j if they support this at later versions
-            return new Nd4jDoubleTensor(asJVMTensor().diag());
+            return new Nd4jDoubleTensor(toJVM().diag());
         } else {
             return super.diag();
         }
@@ -160,7 +160,7 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     public DoubleTensor diagPart() {
         if (tensor.size(0) != tensor.size(1)) {
             //TODO: use nd4j if they support this at later versions
-            return new Nd4jDoubleTensor(asJVMTensor().diagPart());
+            return new Nd4jDoubleTensor(toJVM().diagPart());
         } else {
             return super.diagPart();
         }
@@ -170,14 +170,20 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     public DoubleTensor matrixMultiply(DoubleTensor value) {
         TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
         if (tensor.shape().length > 2 || value.getShape().length > 2) {
-            return asJVMTensor().matrixMultiply(value);
+            return fromJVM(toJVM().matrixMultiply(value));
         }
         INDArray mmulResult = tensor.mmul(getTensor(value));
         return create(mmulResult);
     }
 
-    private DoubleTensor asJVMTensor() {
+    @Override
+    protected DoubleTensor toJVM() {
         return JVMDoubleTensorFactory.INSTANCE.create(asFlatDoubleArray(), getShape());
+    }
+
+    @Override
+    protected DoubleTensor fromJVM(DoubleTensor jvmTensor) {
+        return new Nd4jDoubleTensor(jvmTensor);
     }
 
     @Override

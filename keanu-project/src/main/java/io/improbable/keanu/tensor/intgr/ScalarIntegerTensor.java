@@ -139,6 +139,21 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor fillTriangular(boolean fillUpper, boolean fillLower) {
+        return this.reshape(1, 1);
+    }
+
+    @Override
+    public IntegerTensor triUpper(int k) {
+        return duplicate();
+    }
+
+    @Override
+    public IntegerTensor triLower(int k) {
+        return duplicate();
+    }
+
+    @Override
     public IntegerTensor transpose() {
         return duplicate();
     }

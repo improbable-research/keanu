@@ -41,6 +41,21 @@ public interface TensorVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extend
     }
 
     @Override
+    default VERTEX fillTriangular(boolean fillUpper, boolean fillLower) {
+        return null;
+    }
+
+    @Override
+    default VERTEX triUpper(int k) {
+        return null;
+    }
+
+    @Override
+    default VERTEX triLower(int k) {
+        return null;
+    }
+
+    @Override
     default VERTEX where(BooleanVertex predicate, VERTEX els) {
         return wrap(new WhereVertex<>(predicate, this, els));
     }

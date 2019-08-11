@@ -61,6 +61,11 @@ public class MultivariateGaussian implements ContinuousDistribution {
     }
 
     public DoubleTensor[] dLogProb(DoubleTensor x, boolean wrtX, boolean wrtMu, boolean wrtCovariance) {
+        DoubleTensor[] diff = new DoubleTensor[3];
+
+        if (!wrtX && !wrtMu && !wrtCovariance) {
+            return diff;
+        }
 
         final DoubleTensor covInv = covariance.matrixInverse();
         final DoubleTensor xMinusMu = x.minus(mu);
@@ -68,7 +73,6 @@ public class MultivariateGaussian implements ContinuousDistribution {
         final long[] batchShape = ArrayUtils.subarray(x.getShape(), 0, x.getShape().length - 1);
         final long dims = x.getShape()[x.getShape().length - 1];
 
-        DoubleTensor[] diff = new DoubleTensor[3];
         if (wrtMu || wrtX) {
 
             final DoubleTensor dLogProbWrtMuForBatch = covInv.matrixMultiply(
@@ -76,31 +80,18 @@ public class MultivariateGaussian implements ContinuousDistribution {
             ).reshape(TensorShape.concat(batchShape, new long[]{dims}));
 
             if (wrtX) {
-                final DoubleTensor dLogProbWrtX = dLogProbWrtMuForBatch
-                    .sum(TensorShape.dimensionRange(
-                        0,
-                        dLogProbWrtMuForBatch.getShape().length - x.getShape().length
-                    )).unaryMinus();
-
-                diff[0] = dLogProbWrtX;
+                diff[0] = sumOverBatch(dLogProbWrtMuForBatch, x.getShape()).unaryMinus();
             }
 
             if (wrtMu) {
-                final DoubleTensor dLogProbWrtMu = dLogProbWrtMuForBatch
-                    .sum(TensorShape.dimensionRange(
-                        0,
-                        dLogProbWrtMuForBatch.getShape().length - mu.getShape().length
-                    ));
-                diff[1] = dLogProbWrtMu;
+                diff[1] = sumOverBatch(dLogProbWrtMuForBatch, mu.getShape());
             }
         }
 
         if (wrtCovariance) {
 
             final DoubleTensor covInvTranspose = covInv.transpose();
-
             final DoubleTensor xMinusMuMatrix = xMinusMu.reshape(TensorShape.concat(xMinusMu.getShape(), new long[]{1}));
-
             final DoubleTensor dLogProbWrtCovarianceForBatch = covInvTranspose
                 .matrixMultiply(
                     xMinusMuMatrix.matrixMultiply(xMinusMuMatrix.swapAxis(-2, -1)).matrixMultiply(covInvTranspose)
@@ -108,16 +99,14 @@ public class MultivariateGaussian implements ContinuousDistribution {
                 .minus(covInvTranspose)
                 .times(0.5);
 
-            final DoubleTensor dLogProbWrtCovariance = dLogProbWrtCovarianceForBatch
-                .sum(TensorShape.dimensionRange(
-                    0,
-                    dLogProbWrtCovarianceForBatch.getShape().length - covariance.getShape().length
-                ));
-
-            diff[2] = dLogProbWrtCovariance;
+            diff[2] = sumOverBatch(dLogProbWrtCovarianceForBatch, covariance.getShape());
         }
 
         return diff;
+    }
+
+    private static DoubleTensor sumOverBatch(DoubleTensor batched, long[] targetShape) {
+        return batched.sum(TensorShape.dimensionRange(0, batched.getShape().length - targetShape.length));
     }
 
     public static DoubleVertex logProbGraph(DoublePlaceholderVertex x, DoublePlaceholderVertex mu, DoublePlaceholderVertex covariance) {

@@ -99,6 +99,21 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     }
 
     @Override
+    public TENSOR fillTriangular(boolean fillUpper, boolean fillLower) {
+        return fromJVM(toJVM().fillTriangular(fillUpper, fillLower));
+    }
+
+    @Override
+    public TENSOR triUpper(int k) {
+        return fromJVM(toJVM().triUpper(k));
+    }
+
+    @Override
+    public TENSOR triLower(int k) {
+        return fromJVM(toJVM().triLower(k));
+    }
+
+    @Override
     public TENSOR duplicate() {
         return create(tensor.dup());
     }
@@ -199,6 +214,10 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     }
 
     protected abstract INDArray getTensor(Tensor<T, ?> tensor);
+
+    protected abstract TENSOR toJVM();
+
+    protected abstract TENSOR fromJVM(TENSOR jvmTensor);
 
     protected abstract TENSOR create(INDArray tensor);
 

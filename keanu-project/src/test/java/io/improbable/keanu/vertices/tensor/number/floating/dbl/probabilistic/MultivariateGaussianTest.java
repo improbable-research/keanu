@@ -321,7 +321,7 @@ public class MultivariateGaussianTest {
     }
 
     @Test
-    public void dLogProbMatchesFiniteDifferenceCalculationFordPdCoVariance() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdDiagonalCovariance() {
         UniformVertex uniformA = new UniformVertex(new long[]{2}, -100, 100);
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(ConstantVertex.of(-1., 2.), uniformA.diag());
 
@@ -415,9 +415,31 @@ public class MultivariateGaussianTest {
         );
     }
 
-
     @Test
     public void infer2DCovarianceParamsFromSamples() {
+
+        DoubleTensor trueCovarianceDiag = DoubleTensor.create(1, 0.6, 0.6, 2).reshape(2, 2);
+
+        List<DoubleVertex> muCov = new ArrayList<>();
+        muCov.add(ConstantVertex.of(trueCovarianceDiag));
+
+        List<DoubleVertex> latentMuCov = new ArrayList<>();
+        UniformVertex latentCovDiag = new UniformVertex(new long[]{2, 2}, 0.01, 100.0);
+        latentCovDiag.setAndCascade(DoubleTensor.create(1, 1.5, 1.5, 2).reshape(2, 2));
+        latentMuCov.add(latentCovDiag);
+
+        int numSamples = 500;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2}, ConstantVertex.of(DoubleTensor.create(-1, 2)), hyperParams.get(0)),
+            muCov,
+            latentMuCov,
+            random
+        );
+    }
+
+
+    @Test
+    public void infer2DDiagonalCovarianceParamsFromSamples() {
 
         DoubleTensor trueCovarianceDiag = DoubleTensor.create(1, 2);
 

@@ -69,6 +69,17 @@ public interface BaseTensor<
 
     T diagPart();
 
+    /**
+     * @param fillUpper fill the upper triangle if true
+     * @param fillLower fill the lower triangle if false
+     * @return a matrix with the upper and/or lower triangular filled with these values
+     */
+    T fillTriangular(boolean fillUpper, boolean fillLower);
+
+    T triUpper(int k);
+
+    T triLower(int k);
+
     default T transpose() {
         Preconditions.checkArgument(
             getRank() == 2,
