@@ -109,7 +109,22 @@ public interface BaseFloatingPointTensor<
 
     T sigmoid();
 
+    /**
+     * Operates on a (..., M, M) symmetric and positive definite inputs. Only the lower triangular of the input matrix
+     * will be used and the upper triangle will assumed to be values consistent with being symmetric.
+     *
+     * @return the Cholesky decomposition of the input
+     */
     T choleskyDecomposition();
+
+    /**
+     * Operates on a (..., M, M) Cholesky decomposition of a matrix or batch of matrices shaped (M, M) to produce the
+     * inverse(s) of the input to the cholesky decomposition.
+     *
+     * @return the inverse of the matrix that the cholesky decomposition is of. The lower triangle will be filled
+     * and the upper triangle is implied to be consistent with being symmetric.
+     */
+    T choleskyInverse();
 
     T matrixDeterminant();
 

@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.FloatingPointScalarOperations;
 import io.improbable.keanu.tensor.TensorShape;
@@ -23,6 +24,7 @@ import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotrf;
+import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotri;
 import static org.bytedeco.openblas.global.openblas.CblasNoTrans;
 import static org.bytedeco.openblas.global.openblas.CblasRowMajor;
 import static org.bytedeco.openblas.global.openblas.cblas_dgemm;
@@ -141,13 +143,30 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         int N = Ints.checkedCast(shape[0]);
         double[] newBuffer = buffer.copy().asDoubleArray();
 
-        int result = dpotrf(KeanuLapack.Triangular.LOWER, N, newBuffer);
+        int factorizationResult = dpotrf(KeanuLapack.Triangular.LOWER, N, newBuffer);
 
-        if (result != 0) {
+        if (factorizationResult != 0) {
             throw new IllegalStateException("Cholesky decomposition failed");
         }
 
         zeroOutUpperTriangle(N, newBuffer);
+
+        return new JVMDoubleTensor(newBuffer, getShape(), getStride());
+    }
+
+    @Override
+    public DoubleTensor choleskyInverse() {
+
+        final int M = Ints.checkedCast(shape[shape.length - 2]);
+        final int N = Ints.checkedCast(shape[shape.length - 1]);
+        Preconditions.checkArgument(M == N, "Cholesky inverse input must be square");
+
+        final double[] newBuffer = buffer.copy().asDoubleArray();
+        int inverseResult = dpotri(KeanuLapack.Triangular.LOWER, N, newBuffer);
+
+        if (inverseResult != 0) {
+            throw new IllegalStateException("Cholesky inverse failed");
+        }
 
         return new JVMDoubleTensor(newBuffer, getShape(), getStride());
     }
@@ -164,7 +183,6 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor matrixDeterminant() {
-
         final int m = Ints.checkedCast(shape[0]);
         final int n = Ints.checkedCast(shape[1]);
         final double[] newBuffer = buffer.copy().asDoubleArray();

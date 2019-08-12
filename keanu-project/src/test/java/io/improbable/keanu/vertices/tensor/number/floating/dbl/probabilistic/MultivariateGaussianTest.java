@@ -2,9 +2,11 @@ package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
@@ -389,8 +392,8 @@ public class MultivariateGaussianTest {
         DoubleTensor wrtMu = partialsOf.withRespectTo(logProbGraph.getPlaceholder(mu));
         DoubleTensor wrtSigma = partialsOf.withRespectTo(logProbGraph.getPlaceholder(variance));
 
-        assertThat(wrtMu, valuesAndShapesMatch(mvgDLogProb.get(mu)));
-        assertThat(wrtSigma, valuesAndShapesMatch(mvgDLogProb.get(variance)));
+        assertThat(wrtMu, valuesWithinEpsilonAndShapesMatch(mvgDLogProb.get(mu), 1e-3));
+        assertThat(wrtSigma, valuesWithinEpsilonAndShapesMatch(mvgDLogProb.get(variance), 1e-3));
     }
 
     @Test
@@ -420,23 +423,30 @@ public class MultivariateGaussianTest {
 
         DoubleTensor trueCovarianceDiag = DoubleTensor.create(1, 0.6, 0.6, 2).reshape(2, 2);
 
-        List<DoubleVertex> muCov = new ArrayList<>();
-        muCov.add(ConstantVertex.of(trueCovarianceDiag));
-
-        List<DoubleVertex> latentMuCov = new ArrayList<>();
         UniformVertex latentCovDiag = new UniformVertex(new long[]{2, 2}, 0.01, 100.0);
-        latentCovDiag.setAndCascade(DoubleTensor.create(1, 1.5, 1.5, 2).reshape(2, 2));
-        latentMuCov.add(latentCovDiag);
+        latentCovDiag.setAndCascade(DoubleTensor.create(3, 2.5, 1.5, 7).reshape(2, 2));
 
-        int numSamples = 500;
-        VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2}, ConstantVertex.of(DoubleTensor.create(-1, 2)), hyperParams.get(0)),
-            muCov,
-            latentMuCov,
-            random
+        long sampleCount = 500;
+        MultivariateGaussianVertex testDataGenerator = new MultivariateGaussianVertex(
+            new long[]{sampleCount, 2},
+            ConstantVertex.of(DoubleTensor.create(-1, 2)),
+            ConstantVertex.of(trueCovarianceDiag)
         );
-    }
 
+        DoubleTensor data = testDataGenerator.sample();
+
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(
+            ConstantVertex.of(DoubleTensor.create(-1, 2)),
+            latentCovDiag
+        );
+
+        mvg.observe(data);
+
+        BayesianNetwork inferNet = new BayesianNetwork(mvg.getConnectedGraph());
+        Keanu.Optimizer.Gradient.of(inferNet).maxAPosteriori();
+
+        assertThat(latentCovDiag.getValue().triLower(0), valuesWithinEpsilonAndShapesMatch(trueCovarianceDiag.triLower(0), 0.1));
+    }
 
     @Test
     public void infer2DDiagonalCovarianceParamsFromSamples() {

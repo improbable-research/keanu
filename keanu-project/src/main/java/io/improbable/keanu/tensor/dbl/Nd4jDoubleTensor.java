@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -13,6 +14,7 @@ import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
 import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.special.Gamma;
+import org.bytedeco.javacpp.DoublePointer;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.scalar.ReplaceNans;
@@ -26,6 +28,8 @@ import java.util.Arrays;
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.tensor.ndj4.INDArrayExtensions.asBoolean;
 import static java.util.Arrays.copyOf;
+import static org.bytedeco.openblas.global.openblas.LAPACKE_dpotri;
+import static org.bytedeco.openblas.global.openblas.LAPACK_ROW_MAJOR;
 
 /**
  * Class for representing n-dimensional arrays of doubles. This is
@@ -174,6 +178,27 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
         }
         INDArray mmulResult = tensor.mmul(getTensor(value));
         return create(mmulResult);
+    }
+
+    @Override
+    public DoubleTensor choleskyInverse() {
+        INDArray newBuffer = tensor.dup();
+
+        int N = Ints.checkedCast(getShape()[0]);
+
+        int inverseResult = LAPACKE_dpotri(
+            LAPACK_ROW_MAJOR,
+            (byte) 'L',
+            N,
+            (DoublePointer) newBuffer.data().pointer(),
+            N
+        );
+
+        if (inverseResult != 0) {
+            throw new IllegalStateException("Cholesky inverse failed");
+        }
+
+        return create(newBuffer);
     }
 
     @Override

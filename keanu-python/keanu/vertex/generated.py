@@ -132,6 +132,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floa
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanhVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CeilVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecompositionVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyInverseVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CosVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CoshVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.operators.unary.DigammaVertex")
@@ -672,6 +673,15 @@ def CholeskyDecomposition(input_vertex: vertex_constructor_param_types, label: O
     :param input_vertex: the vertex
     """
     return Vertex(context.jvm_view().CholeskyDecompositionVertex, label, cast_to_vertex(input_vertex))
+
+
+def CholeskyInverse(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+    """
+    
+    
+    :param input_vertex: the vertex
+    """
+    return Vertex(context.jvm_view().CholeskyInverseVertex, label, cast_to_vertex(input_vertex))
 
 
 def Cos(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

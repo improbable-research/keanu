@@ -26,6 +26,7 @@ import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTa
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanhVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CeilVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecompositionVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyInverseVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CosVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CoshVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.DigammaVertex;
@@ -223,6 +224,11 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
     @Override
     default VERTEX choleskyDecomposition() {
         return wrap(new CholeskyDecompositionVertex<>(this));
+    }
+
+    @Override
+    default VERTEX choleskyInverse() {
+        return wrap(new CholeskyInverseVertex<>(this));
     }
 
     @Override

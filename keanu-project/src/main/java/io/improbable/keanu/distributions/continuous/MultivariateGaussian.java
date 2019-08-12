@@ -43,21 +43,29 @@ public class MultivariateGaussian implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final double kLog2Pi = mu.getShape()[0] * LOG_2_PI;
-        final double logCovDet = covariance.matrixDeterminant().log().scalar();
-        final DoubleTensor xMinusMu = x.minus(mu);
-        final DoubleTensor covInv = covariance.matrixInverse();
+        try {
+            final DoubleTensor choleskyOfCovariance = covariance.choleskyDecomposition();
+            final double kLog2Pi = mu.getShape()[0] * LOG_2_PI;
+            final double logCovDet = choleskyOfCovariance.diagPart().log().sum().scalar() * 2;
+            final DoubleTensor xMinusMu = x.minus(mu);
 
-        long[] xMinusMuShape = xMinusMu.getShape();
-        long[] fromLeftShape = ArrayUtils.insert(xMinusMuShape.length - 1, xMinusMuShape, 1);
-        long[] fromRightShape = ArrayUtils.add(xMinusMuShape, 1);
+            DoubleTensor covInv = choleskyOfCovariance.choleskyInverse();
+            covInv = covInv.plus(covInv.triLower(1).transpose());
 
-        final DoubleTensor xmuCovXmu = xMinusMu.reshape(fromLeftShape)
-            .matrixMultiply(
-                covInv.matrixMultiply(xMinusMu.reshape(fromRightShape))
-            );
+            long[] xMinusMuShape = xMinusMu.getShape();
+            long[] fromLeftShape = ArrayUtils.insert(xMinusMuShape.length - 1, xMinusMuShape, 1);
+            long[] fromRightShape = ArrayUtils.add(xMinusMuShape, 1);
 
-        return xmuCovXmu.plus(kLog2Pi + logCovDet).sum().times(-0.5);
+            final DoubleTensor xmuCovXmu = xMinusMu.reshape(fromLeftShape)
+                .matrixMultiply(
+                    covInv.matrixMultiply(xMinusMu.reshape(fromRightShape))
+                );
+
+            return xmuCovXmu.plus(kLog2Pi + logCovDet).sum().times(-0.5);
+
+        } catch (IllegalStateException ise) {
+            return DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
+        }
     }
 
     public DoubleTensor[] dLogProb(DoubleTensor x, boolean wrtX, boolean wrtMu, boolean wrtCovariance) {
@@ -66,8 +74,10 @@ public class MultivariateGaussian implements ContinuousDistribution {
         if (!wrtX && !wrtMu && !wrtCovariance) {
             return diff;
         }
+        
+        DoubleTensor covInv = covariance.choleskyDecomposition().choleskyInverse();
+        covInv = covInv.plus(covInv.triLower(1).transpose());
 
-        final DoubleTensor covInv = covariance.matrixInverse();
         final DoubleTensor xMinusMu = x.minus(mu);
 
         final long[] batchShape = ArrayUtils.subarray(x.getShape(), 0, x.getShape().length - 1);

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import static org.bytedeco.openblas.global.openblas.LAPACKE_dgetrf;
 import static org.bytedeco.openblas.global.openblas.LAPACKE_dgetri;
 import static org.bytedeco.openblas.global.openblas.LAPACKE_dpotrf;
+import static org.bytedeco.openblas.global.openblas.LAPACKE_dpotri;
 import static org.bytedeco.openblas.global.openblas.LAPACK_ROW_MAJOR;
 
 
@@ -35,6 +36,20 @@ public class KeanuLapack {
      */
     public static int dpotrf(Triangular upperLower, int N, double[] buffer) {
         return LAPACKE_dpotrf(LAPACK_ROW_MAJOR, upperLower.lapackChar, N, buffer, N);
+    }
+
+    /**
+     * https://software.intel.com/en-us/mkl-developer-reference-c-potri
+     * <p>
+     * Computes the inverse byt using the Cholesky factorization of a symmetric (Hermitian) positive-definite matrix.
+     *
+     * @param upperLower either upper triangular or lower triangular specifies format of result
+     * @param N          length of one dimension in the square matrix to operate on
+     * @param buffer     The cholesky decoposition of and buffer to store result
+     * @return 0 if successful, -i if error at i index, or positive if matrix is not positive-definite
+     */
+    public static int dpotri(Triangular upperLower, int N, double[] buffer) {
+        return LAPACKE_dpotri(LAPACK_ROW_MAJOR, upperLower.lapackChar, N, buffer, N);
     }
 
     /**

@@ -76,6 +76,7 @@ import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTa
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.ArcTanhVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CeilVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyDecompositionVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CholeskyInverseVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CosVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.CoshVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.operators.unary.DigammaVertex;
@@ -231,6 +232,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(MatrixDeterminantVertex.class, fluentUnaryOp("matrixDeterminant"));
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));
         opMappers.put(CholeskyDecompositionVertex.class, fluentUnaryOp("choleskyDecomposition"));
+        opMappers.put(CholeskyInverseVertex.class, fluentUnaryOp("choleskyInverse"));
         opMappers.put(StandardizeVertex.class, fluentUnaryOp("standardize"));
         opMappers.put(MeanVertex.class, KeanuVertexToTensorOpMapper::meanOp);
         opMappers.put(StandardDeviationVertex.class, fluentUnaryOp("standardDeviation"));

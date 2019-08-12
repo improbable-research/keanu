@@ -452,6 +452,21 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canFindInverseFromCholeskyDecomposition() {
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            4, 12, -16,
+            12, 37, -43,
+            -16, -43, 98
+        }, 3, 3);
+
+        DoubleTensor expected = A.matrixInverse().triLower(0);
+
+        DoubleTensor actual = A.choleskyDecomposition().choleskyInverse();
+
+        assertThat(actual, valuesWithinEpsilonAndShapesMatch(expected, 1e-10));
+    }
+
+    @Test
     public void canElementWiseMultiplyMatrix() {
         DoubleTensor result = matrixA.times(matrixB);
         assertArrayEquals(new double[]{1, 4, 9, 16}, result.asFlatDoubleArray(), 0.0);
