@@ -2,6 +2,9 @@ package io.improbable.keanu.tensor.dbl;
 
 import lombok.AllArgsConstructor;
 
+import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
+
 import static org.bytedeco.openblas.global.openblas.LAPACKE_dgetrf;
 import static org.bytedeco.openblas.global.openblas.LAPACKE_dgetri;
 import static org.bytedeco.openblas.global.openblas.LAPACKE_dpotrf;
@@ -35,6 +38,10 @@ public class KeanuLapack {
      * @return 0 if successful, -i if error at i index, or positive if matrix is not positive-definite
      */
     public static int dpotrf(Triangular upperLower, int N, double[] buffer) {
+        return dpotrf(upperLower, N, DoubleBuffer.wrap(buffer));
+    }
+
+    public static int dpotrf(Triangular upperLower, int N, DoubleBuffer buffer) {
         return LAPACKE_dpotrf(LAPACK_ROW_MAJOR, upperLower.lapackChar, N, buffer, N);
     }
 
@@ -49,6 +56,10 @@ public class KeanuLapack {
      * @return 0 if successful, -i if error at i index, or positive if matrix is not positive-definite
      */
     public static int dpotri(Triangular upperLower, int N, double[] buffer) {
+        return dpotri(upperLower, N, DoubleBuffer.wrap(buffer));
+    }
+
+    public static int dpotri(Triangular upperLower, int N, DoubleBuffer buffer) {
         return LAPACKE_dpotri(LAPACK_ROW_MAJOR, upperLower.lapackChar, N, buffer, N);
     }
 
@@ -64,6 +75,10 @@ public class KeanuLapack {
      * @return 0 if successful, -i if error at i index, or i if matrix is singular and ii index is zero
      */
     public static int dgetrf(int m, int n, double[] buffer, int[] ipiv) {
+        return dgetrf(m, n, DoubleBuffer.wrap(buffer), IntBuffer.wrap(ipiv));
+    }
+
+    public static int dgetrf(int m, int n, DoubleBuffer buffer, IntBuffer ipiv) {
         return LAPACKE_dgetrf(LAPACK_ROW_MAJOR, m, n, buffer, m, ipiv);
     }
 
@@ -78,6 +93,10 @@ public class KeanuLapack {
      * @return 0 if successful, -i if error at i index, or i if matrix is singular and ii index is zero
      */
     public static int dgetri(int N, double[] buffer, int[] ipiv) {
+        return dgetri(N, DoubleBuffer.wrap(buffer), IntBuffer.wrap(ipiv));
+    }
+
+    public static int dgetri(int N, DoubleBuffer buffer, IntBuffer ipiv) {
         return LAPACKE_dgetri(LAPACK_ROW_MAJOR, N, buffer, N, ipiv);
     }
 }

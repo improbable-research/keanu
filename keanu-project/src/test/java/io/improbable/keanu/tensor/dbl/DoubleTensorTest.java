@@ -284,6 +284,29 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canBatchInverseMatrix() {
+        DoubleTensor A = DoubleTensor.create(
+            1, 2,
+            3, 4,
+
+            5, 6,
+            7, 8
+        ).reshape(2, 2, 2);
+
+        DoubleTensor expected = DoubleTensor.create(
+            4, -2,
+            -3, 1,
+
+            8, -6,
+            -7, 5
+        ).reshape(2, 2, 2).div(A.matrixDeterminant());
+
+        DoubleTensor actual = A.matrixInverse();
+
+        assertThat(expected, valuesWithinEpsilonAndShapesMatch(actual, 1e-8));
+    }
+
+    @Test
     public void canMatrixMultiply() {
 
         DoubleTensor left = DoubleTensor.create(new double[]{
@@ -432,6 +455,27 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canFindBatchDeterminantOf3By3Matrix() {
+        DoubleTensor A = DoubleTensor.create(
+            -1, 7, 3,
+            -2, -9, 6,
+            10, -3, 5,
+
+            -1, 7, 3,
+            -2, -9, 6,
+            10, -3, 5
+        ).reshape(2, 3, 3);
+
+        double expected = new LUDecomposition(new BlockRealMatrix(new double[][]{
+            new double[]{-1, 7, 3},
+            new double[]{-2, -9, 6},
+            new double[]{10, -3, 5}
+        })).getDeterminant();
+
+        assertThat(DoubleTensor.create(expected, expected), valuesWithinEpsilonAndShapesMatch(A.matrixDeterminant(), 1e-10));
+    }
+
+    @Test
     public void canFindCholeskyDecomposition() {
         //Example from: https://en.wikipedia.org/wiki/Cholesky_decomposition
         DoubleTensor A = DoubleTensor.create(new double[]{
@@ -452,7 +496,50 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canFindBatchCholeskyDecomposition() {
+        //Example from: https://en.wikipedia.org/wiki/Cholesky_decomposition
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            4, 12, -16,
+            12, 37, -43,
+            -16, -43, 98,
+
+            4, 12, -16,
+            12, 37, -43,
+            -16, -43, 98
+        }, 2, 3, 3);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            2, 0, 0,
+            6, 1, 0,
+            -8, 5, 3,
+
+            2, 0, 0,
+            6, 1, 0,
+            -8, 5, 3
+        }, 2, 3, 3);
+
+        DoubleTensor actual = A.choleskyDecomposition();
+
+        assertThat(actual, valuesWithinEpsilonAndShapesMatch(expected, 1e-10));
+    }
+
+    @Test
     public void canFindInverseFromCholeskyDecomposition() {
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            4, 12, -16,
+            12, 37, -43,
+            -16, -43, 98
+        }, 3, 3);
+
+        DoubleTensor expected = A.matrixInverse().triLower(0);
+
+        DoubleTensor actual = A.choleskyDecomposition().choleskyInverse();
+
+        assertThat(actual, valuesWithinEpsilonAndShapesMatch(expected, 1e-10));
+    }
+
+    @Test
+    public void canFindBatchInverseFromCholeskyDecomposition() {
         DoubleTensor A = DoubleTensor.create(new double[]{
             4, 12, -16,
             12, 37, -43,

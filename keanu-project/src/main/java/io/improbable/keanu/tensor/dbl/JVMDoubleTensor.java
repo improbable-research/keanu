@@ -17,6 +17,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
+import java.nio.IntBuffer;
 import java.util.Arrays;
 
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastedFlatIndex;
@@ -136,103 +137,147 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     @Override
     public DoubleTensor choleskyDecomposition() {
 
-        if (shape.length != 2 || shape[0] != shape[1]) {
-            throw new IllegalArgumentException("Cholesky decomposition must be performed on square matrix.");
-        }
-
-        int N = Ints.checkedCast(shape[0]);
-        double[] newBuffer = buffer.copy().asDoubleArray();
-
-        int factorizationResult = dpotrf(KeanuLapack.Triangular.LOWER, N, newBuffer);
-
-        if (factorizationResult != 0) {
-            throw new IllegalStateException("Cholesky decomposition failed");
-        }
-
-        zeroOutUpperTriangle(N, newBuffer);
-
-        return new JVMDoubleTensor(newBuffer, getShape(), getStride());
-    }
-
-    @Override
-    public DoubleTensor choleskyInverse() {
-
+        Preconditions.checkArgument(shape.length >= 2, "Matrix decomposition must be performed on matrix");
         final int M = Ints.checkedCast(shape[shape.length - 2]);
         final int N = Ints.checkedCast(shape[shape.length - 1]);
-        Preconditions.checkArgument(M == N, "Cholesky inverse input must be square");
+        Preconditions.checkArgument(M == N, "Cholesky decomposition input must be square");
+
+        final long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 2);
+        final int batchLength = TensorShape.getLengthAsInt(batchShape);
+        final int batchSize = M * N;
 
         final double[] newBuffer = buffer.copy().asDoubleArray();
-        int inverseResult = dpotri(KeanuLapack.Triangular.LOWER, N, newBuffer);
+        for (int batch = 0; batch < batchLength; batch++) {
 
-        if (inverseResult != 0) {
-            throw new IllegalStateException("Cholesky inverse failed");
+            final int position = batch * batchSize;
+            final java.nio.DoubleBuffer batchBuffer = java.nio.DoubleBuffer.wrap(newBuffer, position, batchSize);
+
+            final int factorizationResult = dpotrf(KeanuLapack.Triangular.LOWER, N, batchBuffer);
+
+            if (factorizationResult != 0) {
+                throw new IllegalStateException("Cholesky decomposition failed");
+            }
+
+            zeroOutUpperTriangle(N, newBuffer, position);
+
         }
 
         return new JVMDoubleTensor(newBuffer, getShape(), getStride());
     }
 
-    private void zeroOutUpperTriangle(int N, double[] buffer) {
+    private void zeroOutUpperTriangle(int N, double[] buffer, int position) {
         if (N > 1) {
             for (int i = 0; i < N; i++) {
                 for (int j = i + 1; j < N; j++) {
-                    buffer[i * N + j] = 0;
+                    buffer[position + i * N + j] = 0;
                 }
             }
         }
     }
 
     @Override
-    public DoubleTensor matrixDeterminant() {
-        final int m = Ints.checkedCast(shape[0]);
-        final int n = Ints.checkedCast(shape[1]);
+    public DoubleTensor choleskyInverse() {
+        Preconditions.checkArgument(shape.length >= 2, "Matrix decomposition must be performed on matrix");
+        final int M = Ints.checkedCast(shape[shape.length - 2]);
+        final int N = Ints.checkedCast(shape[shape.length - 1]);
+        Preconditions.checkArgument(M == N, "Cholesky inverse input must be square");
+
+        final long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 2);
+        final int batchLength = TensorShape.getLengthAsInt(batchShape);
+        final int batchSize = M * N;
+
         final double[] newBuffer = buffer.copy().asDoubleArray();
-        final int[] ipiv = new int[newBuffer.length];
+        for (int batch = 0; batch < batchLength; batch++) {
 
-        final int factorizationResult = dgetrf(m, n, newBuffer, ipiv);
+            java.nio.DoubleBuffer batchBuffer = java.nio.DoubleBuffer.wrap(newBuffer, batch * batchSize, batchSize);
 
-        if (factorizationResult < 0) {
-            throw new IllegalStateException("Matrix factorization failed");
-        } else if (factorizationResult > 0) {
-            return new JVMDoubleTensor(0.0);
-        }
+            int inverseResult = dpotri(KeanuLapack.Triangular.LOWER, N, batchBuffer);
 
-        //credit: https://stackoverflow.com/questions/47315471/compute-determinant-from-lu-decomposition-in-lapack
-        int j;
-        double detp = 1.;
-        for (j = 0; j < n; j++) {
-            if (j + 1 != ipiv[j]) {
-                detp = -detp;
+            if (inverseResult != 0) {
+                throw new IllegalStateException("Cholesky inverse failed");
             }
+
         }
 
-        double detU = 1.0;
-        for (int i = 0; i < m; i++) {
-            detU *= newBuffer[i * m + i];
+        return new JVMDoubleTensor(newBuffer, getShape(), getStride());
+    }
+
+    @Override
+    public DoubleTensor matrixDeterminant() {
+        Preconditions.checkArgument(shape.length >= 2, "Matrix decomposition must be performed on matrix");
+        final int M = Ints.checkedCast(shape[shape.length - 2]);
+        final int N = Ints.checkedCast(shape[shape.length - 1]);
+
+        final long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 2);
+        final int batchLength = TensorShape.getLengthAsInt(batchShape);
+        final int batchSize = M * N;
+
+        final double[] newBuffer = buffer.copy().asDoubleArray();
+        final double[] results = new double[batchLength];
+        for (int batch = 0; batch < batchLength; batch++) {
+
+            final IntBuffer ipiv = IntBuffer.allocate(batchSize);
+
+            java.nio.DoubleBuffer batchBuffer = java.nio.DoubleBuffer.wrap(newBuffer, batch * batchSize, batchSize);
+
+            final int factorizationResult = dgetrf(M, N, batchBuffer, ipiv);
+
+            if (factorizationResult < 0) {
+                throw new IllegalStateException("Matrix factorization failed");
+            } else if (factorizationResult > 0) {
+                return new JVMDoubleTensor(0.0);
+            }
+
+            //credit: https://stackoverflow.com/questions/47315471/compute-determinant-from-lu-decomposition-in-lapack
+            int j;
+            double detp = 1.;
+            for (j = 0; j < N; j++) {
+                if (j + 1 != ipiv.get(j)) {
+                    detp = -detp;
+                }
+            }
+
+            double detU = 1.0;
+            for (int i = 0; i < M; i++) {
+                detU *= batchBuffer.get(i * M + i);
+            }
+
+            results[batch] = detU * detp;
         }
 
-        return new JVMDoubleTensor(detU * detp);
+        return new JVMDoubleTensor(results, batchShape, TensorShape.getRowFirstStride(batchShape));
     }
 
     @Override
     public DoubleTensor matrixInverse() {
+        final int m = Ints.checkedCast(shape[shape.length - 2]);
+        final int n = Ints.checkedCast(shape[shape.length - 1]);
 
-        final int m = Ints.checkedCast(shape[0]);
-        final int n = Ints.checkedCast(shape[1]);
+        final long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 2);
+        final int batchLength = TensorShape.getLengthAsInt(batchShape);
+        final int batchSize = m * n;
+
         final double[] newBuffer = buffer.copy().asDoubleArray();
-        final int[] ipiv = new int[newBuffer.length];
+        for (int batch = 0; batch < batchLength; batch++) {
 
-        final int factorizationResult = dgetrf(m, n, newBuffer, ipiv);
+            final IntBuffer ipiv = IntBuffer.allocate(batchSize);
 
-        if (factorizationResult < 0) {
-            throw new IllegalStateException("Matrix factorization failed");
-        } else if (factorizationResult > 0) {
-            throw new SingularMatrixException();
-        }
+            java.nio.DoubleBuffer batchBuffer = java.nio.DoubleBuffer.wrap(newBuffer, batch * batchSize, batchSize);
 
-        int inverseResult = dgetri(m, newBuffer, ipiv);
+            final int factorizationResult = dgetrf(m, n, batchBuffer, ipiv);
 
-        if (inverseResult != 0) {
-            throw new IllegalStateException("Matrix inverse failed");
+            if (factorizationResult < 0) {
+                throw new IllegalStateException("Matrix factorization failed");
+            } else if (factorizationResult > 0) {
+                throw new SingularMatrixException();
+            }
+
+            int inverseResult = dgetri(m, batchBuffer, ipiv);
+
+            if (inverseResult != 0) {
+                throw new IllegalStateException("Matrix inverse failed");
+            }
+
         }
 
         return new JVMDoubleTensor(newBuffer, getShape(), getStride());
@@ -287,7 +332,10 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         final long[] leftStride = this.getStride();
 
         final long[] batchShapeLeft = ArrayUtils.subarray(leftShape, 0, leftShape.length - 2);
+        final long[] batchStrideLeft = ArrayUtils.subarray(leftStride, 0, leftStride.length - 2);
         final long[] batchShapeRight = ArrayUtils.subarray(rightShape, 0, rightShape.length - 2);
+        final long[] batchStrideRight = ArrayUtils.subarray(rightStride, 0, rightStride.length - 2);
+
         final long[] batchShape = TensorShape.getBroadcastResultShape(batchShapeLeft, batchShapeRight);
         final long batchLength = TensorShape.getLength(batchShape);
 
@@ -299,30 +347,26 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
         final int resultBatchSize = M * N;
         final int batchSizeA = M * K;
-        final long[] batchLeftShape = ArrayUtils.subarray(leftShape, 0, leftShape.length - 2);
-        final long[] batchLeftStride = ArrayUtils.subarray(leftStride, 0, leftStride.length - 2);
         final int batchSizeB = N * K;
-        final long[] batchRightShape = ArrayUtils.subarray(rightShape, 0, rightShape.length - 2);
-        final long[] batchRightStride = ArrayUtils.subarray(rightStride, 0, rightStride.length - 2);
 
-        final double[] sourceC = new double[Ints.checkedCast(resultBatchSize * batchLength)];
-        final double[] sourceA = buffer.asDoubleArray();
-        final double[] sourceB = getAsJVMTensor(that).getBuffer().asDoubleArray();
+        final double[] outputBuffer = new double[Ints.checkedCast(resultBatchSize * batchLength)];
+        final double[] leftInput = buffer.asDoubleArray();
+        final double[] rightInput = getAsJVMTensor(that).getBuffer().asDoubleArray();
 
         for (int i = 0; i < batchLength; i++) {
 
             final int resultPosition = i * resultBatchSize;
-            final int k = Ints.checkedCast(getBroadcastedFlatIndex(resultPosition, batchResultStride, batchLeftShape, batchLeftStride));
-            final int j = Ints.checkedCast(getBroadcastedFlatIndex(resultPosition, batchResultStride, batchRightShape, batchRightStride));
+            final int k = Ints.checkedCast(getBroadcastedFlatIndex(resultPosition, batchResultStride, batchShapeLeft, batchStrideLeft));
+            final int j = Ints.checkedCast(getBroadcastedFlatIndex(resultPosition, batchResultStride, batchShapeRight, batchStrideRight));
 
-            final java.nio.DoubleBuffer bufferA = java.nio.DoubleBuffer.wrap(sourceA, k, batchSizeA);
-            final java.nio.DoubleBuffer bufferB = java.nio.DoubleBuffer.wrap(sourceB, j, batchSizeB);
-            final java.nio.DoubleBuffer bufferC = java.nio.DoubleBuffer.wrap(sourceC, resultPosition, resultBatchSize);
+            final java.nio.DoubleBuffer batchRightInputBuffer = java.nio.DoubleBuffer.wrap(leftInput, k, batchSizeA);
+            final java.nio.DoubleBuffer batchLeftInputBuffer = java.nio.DoubleBuffer.wrap(rightInput, j, batchSizeB);
+            final java.nio.DoubleBuffer batchOutputBuffer = java.nio.DoubleBuffer.wrap(outputBuffer, resultPosition, resultBatchSize);
 
-            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, 1, bufferA, K, bufferB, N, 0, bufferC, N);
+            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, 1, batchRightInputBuffer, K, batchLeftInputBuffer, N, 0, batchOutputBuffer, N);
         }
 
-        return new JVMDoubleTensor(sourceC, resultShape, resultStride);
+        return new JVMDoubleTensor(outputBuffer, resultShape, resultStride);
     }
 
     @Override

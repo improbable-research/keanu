@@ -184,7 +184,7 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     public DoubleTensor choleskyInverse() {
         INDArray newBuffer = tensor.dup();
 
-        int N = Ints.checkedCast(getShape()[0]);
+        int N = Ints.checkedCast(getShape()[getRank() - 1]);
 
         int inverseResult = LAPACKE_dpotri(
             LAPACK_ROW_MAJOR,
