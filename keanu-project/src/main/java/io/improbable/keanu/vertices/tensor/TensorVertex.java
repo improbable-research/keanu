@@ -42,17 +42,17 @@ public interface TensorVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extend
 
     @Override
     default VERTEX fillTriangular(boolean fillUpper, boolean fillLower) {
-        return null;
+        return wrap(new FillTriangularVertex<>(this, fillLower, fillLower));
     }
 
     @Override
     default VERTEX triUpper(int k) {
-        return null;
+        return wrap(new TriUpperVertex<>(this, k));
     }
 
     @Override
     default VERTEX triLower(int k) {
-        return null;
+        return wrap(new TriLowerVertex<>(this, k));
     }
 
     @Override
