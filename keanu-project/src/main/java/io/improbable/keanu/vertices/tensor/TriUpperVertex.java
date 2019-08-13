@@ -5,10 +5,12 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class TriUpperVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
@@ -43,6 +45,11 @@ public class TriUpperVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
-        return null;
+        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.get().triUpper(k)));
+    }
+
+    @SaveVertexParam(K_NAME)
+    public int getK() {
+        return k;
     }
 }

@@ -12,12 +12,15 @@ import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.tensor.BroadcastVertex;
 import io.improbable.keanu.vertices.tensor.DiagPartVertex;
 import io.improbable.keanu.vertices.tensor.DiagVertex;
+import io.improbable.keanu.vertices.tensor.FillTriangularVertex;
 import io.improbable.keanu.vertices.tensor.GetBooleanIndexVertex;
 import io.improbable.keanu.vertices.tensor.PermuteVertex;
 import io.improbable.keanu.vertices.tensor.ReshapeVertex;
 import io.improbable.keanu.vertices.tensor.SliceVertex;
 import io.improbable.keanu.vertices.tensor.StridedSliceVertex;
 import io.improbable.keanu.vertices.tensor.TakeVertex;
+import io.improbable.keanu.vertices.tensor.TriLowerVertex;
+import io.improbable.keanu.vertices.tensor.TriUpperVertex;
 import io.improbable.keanu.vertices.tensor.WhereVertex;
 import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
 import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.BooleanProxyVertex;
@@ -163,6 +166,9 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(SliceVertex.class, KeanuVertexToTensorOpMapper::sliceOp);
         opMappers.put(StridedSliceVertex.class, KeanuVertexToTensorOpMapper::stridedSliceOp);
         opMappers.put(DiagVertex.class, fluentUnaryOp("diag"));
+        opMappers.put(TriUpperVertex.class, KeanuVertexToTensorOpMapper::triUpperOp);
+        opMappers.put(TriLowerVertex.class, KeanuVertexToTensorOpMapper::triLowerOp);
+        opMappers.put(FillTriangularVertex.class, KeanuVertexToTensorOpMapper::fillTriangular);
         opMappers.put(DiagPartVertex.class, fluentUnaryOp("diagPart"));
         opMappers.put(GetBooleanIndexVertex.class, fluentBinaryOp("get"));
         opMappers.put(WhereVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
@@ -627,6 +633,28 @@ public class KeanuVertexToTensorOpMapper {
         } else {
             return declaration + ".product()";
         }
+    }
+
+    private static String triLowerOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        TriLowerVertex triLower = (TriLowerVertex) vertex;
+        int k = triLower.getK();
+        String triName = lookup.get(triLower.getInputVertex().getId()).getName();
+        return triName + ".triLower(" + k + ")";
+    }
+
+    private static String triUpperOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        TriUpperVertex triUpper = (TriUpperVertex) vertex;
+        int k = triUpper.getK();
+        String triName = lookup.get(triUpper.getInputVertex().getId()).getName();
+        return triName + ".triUpper(" + k + ")";
+    }
+
+    private static String fillTriangular(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        FillTriangularVertex fillTriangularVertex = (FillTriangularVertex) vertex;
+        boolean fillUpper = fillTriangularVertex.isFillUpper();
+        boolean fillLower = fillTriangularVertex.isFillLower();
+        String inputName = lookup.get(fillTriangularVertex.getInputVertex().getId()).getName();
+        return inputName + ".fillTriangular(" + fillUpper + "," + fillLower + ")";
     }
 
     private static String genericIfOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {

@@ -211,9 +211,9 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
             "Length " + endDim + " is not the correct number of elements for a triangular matrix"
         );
 
-        final long n = ((long) a - 1) / 2;
-        final long n2 = n * n;
-        long[] resultShape = TensorShape.concat(ArrayUtils.subarray(shape, 0, shape.length - 1), new long[]{n, n});
+        final long N = ((long) a - 1) / 2;
+        final long NN = N * N;
+        long[] resultShape = TensorShape.concat(ArrayUtils.subarray(shape, 0, shape.length - 1), new long[]{N, N});
         final B newBuffer = getFactory().createNew(TensorShape.getLength(resultShape));
 
         long row = 0;
@@ -222,25 +222,25 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         for (long i = 0; i < bufferLength; i++) {
 
             final long batchNum = i / endDim;
-            final long batchOffset = batchNum * n2;
+            final long batchOffset = batchNum * NN;
 
             if (i % endDim == 0) {
                 row = 0;
                 col = 0;
             }
 
-            final long upperPos = batchOffset + row * n + col;
+            final long upperPos = batchOffset + row * N + col;
             if (fillUpper) {
                 newBuffer.set(buffer.get(i), upperPos);
             }
 
             if (fillLower) {
-                final long lowerPos = upperPos + (col - row) * (n - 1);
+                final long lowerPos = upperPos + (col - row) * (N - 1);
                 newBuffer.set(buffer.get(i), lowerPos);
             }
 
             col++;
-            if (col == n) {
+            if (col == N) {
                 row++;
                 col = row;
             }

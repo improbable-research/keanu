@@ -9,8 +9,8 @@ import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.Uni
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
-import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardModeGradient;
+import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesReverseModeGradient;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TriLowerVertexTest {
@@ -82,6 +82,6 @@ public class TriLowerVertexTest {
         final double INCREMENT = 10;
         final double DELTA = 1e-10;
 
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
+        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
     }
 }
