@@ -97,6 +97,46 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
     }
 
     @Override
+    default VERTEX sinh() {
+        return wrap(new SinhVertex<>(this));
+    }
+
+    @Override
+    default VERTEX cosh() {
+        return wrap(new CoshVertex<>(this));
+    }
+
+    @Override
+    default VERTEX tanh() {
+        return wrap(new TanhVertex<>(this));
+    }
+
+    @Override
+    default VERTEX asinh() {
+        return wrap(new ArcSinhVertex<>(this));
+    }
+
+    @Override
+    default VERTEX acosh() {
+        return wrap(new ArcCoshVertex<>(this));
+    }
+
+    @Override
+    default VERTEX atanh() {
+        return wrap(new ArcTanhVertex<>(this));
+    }
+
+    @Override
+    default VERTEX atan() {
+        return wrap(new ArcTanVertex<>(this));
+    }
+
+    @Override
+    default VERTEX atan2(VERTEX that) {
+        return wrap(new ArcTan2Vertex<>(this, that));
+    }
+
+    @Override
     default VERTEX mean(int... overDimensions) {
         return wrap(new MeanVertex<>(this, overDimensions));
     }
@@ -229,46 +269,6 @@ public interface FloatingPointTensorVertex<T extends Number, TENSOR extends Floa
     @Override
     default VERTEX choleskyInverse() {
         return wrap(new CholeskyInverseVertex<>(this));
-    }
-
-    @Override
-    default VERTEX sinh() {
-        return wrap(new SinhVertex<>(this));
-    }
-
-    @Override
-    default VERTEX cosh() {
-        return wrap(new CoshVertex<>(this));
-    }
-
-    @Override
-    default VERTEX tanh() {
-        return wrap(new TanhVertex<>(this));
-    }
-
-    @Override
-    default VERTEX asinh() {
-        return wrap(new ArcSinhVertex<>(this));
-    }
-
-    @Override
-    default VERTEX acosh() {
-        return wrap(new ArcCoshVertex<>(this));
-    }
-
-    @Override
-    default VERTEX atanh() {
-        return wrap(new ArcTanhVertex<>(this));
-    }
-
-    @Override
-    default VERTEX atan() {
-        return wrap(new ArcTanVertex<>(this));
-    }
-
-    @Override
-    default VERTEX atan2(VERTEX that) {
-        return wrap(new ArcTan2Vertex<>(this, that));
     }
 
     @Override
