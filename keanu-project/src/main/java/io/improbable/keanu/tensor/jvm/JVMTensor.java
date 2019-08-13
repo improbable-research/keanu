@@ -145,20 +145,27 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
     @Override
     public TENSOR triUpper(int k) {
-        Preconditions.checkArgument(shape.length >= 2, "Tri Lower input must be rank >= 2");
+        Preconditions.checkArgument(shape.length >= 2, "Tri Upper input must be rank >= 2");
 
         long N = shape[shape.length - 2];
         long M = shape[shape.length - 1];
-        B toBuffer = getFactory().createNew(N * M);
-        copyUpperTriangle(N, M, toBuffer, buffer, k);
+        long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 2);
+        long batchLength = TensorShape.getLength(batchShape);
+        long batchSize = N * M;
+
+        B toBuffer = getFactory().createNew(batchLength * batchSize);
+
+        for (int i = 0; i < batchLength; i++) {
+            copyUpperTriangle(N, M, toBuffer, i * batchSize, buffer, k);
+        }
 
         return create(toBuffer, getShape(), getStride());
     }
 
-    private void copyUpperTriangle(long N, long M, B to, B from, int k) {
+    private void copyUpperTriangle(long N, long M, B to, long toOffset, B from, int k) {
         for (long i = 0; i < N; i++) {
             for (long j = Math.max(0, i + k); j < M; j++) {
-                final long index = i * M + j;
+                final long index = toOffset + i * M + j;
                 to.set(from.get(index), index);
             }
         }
@@ -170,17 +177,23 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
         long N = shape[shape.length - 2];
         long M = shape[shape.length - 1];
-        B toBuffer = getFactory().createNew(N * M);
+        long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 2);
+        long batchLength = TensorShape.getLength(batchShape);
+        long batchSize = N * M;
 
-        copyLowerTriangle(N, M, toBuffer, buffer, k);
+        B toBuffer = getFactory().createNew(batchLength * batchSize);
+
+        for (int i = 0; i < batchLength; i++) {
+            copyLowerTriangle(N, M, toBuffer, i * batchSize, buffer, k);
+        }
 
         return create(toBuffer, getShape(), getStride());
     }
 
-    private void copyLowerTriangle(long N, long M, B to, B from, int k) {
+    private void copyLowerTriangle(long N, long M, B to, long toOffset, B from, int k) {
         for (long i = 0; i < N; i++) {
             for (long j = 0; j < Math.min(M, i - k + 1); j++) {
-                final long index = i * M + j;
+                final long index = toOffset + i * M + j;
                 to.set(from.get(index), index);
             }
         }
@@ -188,7 +201,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
     @Override
     public TENSOR fillTriangular(boolean fillUpper, boolean fillLower) {
-        Preconditions.checkArgument(shape.length >= 1, "fill symmetric works on rank >= 1");
+        Preconditions.checkArgument(shape.length >= 1, "Fill symmetric works on rank >= 1");
 
         final long endDim = shape[shape.length - 1];
         double a = Math.sqrt(1 + 8 * endDim);

@@ -37,7 +37,8 @@ public class TriLowerVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        return null;
+        final PartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        return PartialDerivative.createFromWrtOf(partial.getWrtOf(inputVertex.getRank()).triLower(k), this.getRank());
     }
 
     @Override

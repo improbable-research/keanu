@@ -11,6 +11,10 @@ public class PartialDerivative {
 
     private final DoubleTensor partial;
 
+    public static PartialDerivative createFromWrtOf(DoubleTensor partial, int ofRank) {
+        return new PartialDerivative(partial.permute(swapDims(partial.getRank(), partial.getRank() - ofRank)));
+    }
+
     public PartialDerivative(DoubleTensor partial) {
         this.partial = partial;
     }
@@ -21,6 +25,20 @@ public class PartialDerivative {
 
     public DoubleTensor get() {
         return partial;
+    }
+
+    public DoubleTensor getWrtOf(int ofRank) {
+        return partial.permute(swapDims(partial.getRank(), ofRank));
+    }
+
+    private static int[] swapDims(int rank, int pivotPoint) {
+        int[] rearrange = new int[rank];
+
+        for (int i = 0; i < rank; i++) {
+            rearrange[i] = (pivotPoint + i) % rank;
+        }
+
+        return rearrange;
     }
 
     public long[] getOfShape(long[] wrtShape) {

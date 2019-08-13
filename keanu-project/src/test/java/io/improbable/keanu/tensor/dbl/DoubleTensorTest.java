@@ -2513,6 +2513,30 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canBatchTriUpperAtK0() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(2, 3, 3).triUpper(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 5, 6,
+            0, 0, 9,
+
+            1, 2, 3,
+            0, 5, 6,
+            0, 0, 9
+        ).reshape(2, 3, 3)));
+    }
+
+    @Test
     public void canTriUpperAtK1of3() {
 
         DoubleTensor result = DoubleTensor.create(
@@ -2626,6 +2650,30 @@ public class DoubleTensorTest {
             4, 5, 0,
             7, 8, 9
         ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canBatchTriLowerAtK0() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(2, 3, 3).triLower(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            4, 5, 0,
+            7, 8, 9,
+
+            1, 0, 0,
+            4, 5, 0,
+            7, 8, 9
+        ).reshape(2, 3, 3)));
     }
 
     @Test
