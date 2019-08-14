@@ -70,14 +70,97 @@ public interface BaseTensor<
     T diagPart();
 
     /**
+     * Fills a square matrix upper or lower triangle given a vector of values. The vector length must be sufficient to
+     * fill a triangle of a square matrix. For a square matrix with rows and columns counts of N, the vector length
+     * will need to be N*(N-1)/2.
+     * <p>
+     * E.g. Given [1,2,3,4,5,6]
+     * <p>
+     * Fill upper triangle will return
+     * <p>
+     * [1,2,3]
+     * [0,4,5]
+     * [0,0,6]
+     * <p>
+     * Fill lower triangle will return the transpose of fill upper.
+     * <p>
+     * [1,0,0]
+     * [2,4,0]
+     * [3,5,6]
+     *
      * @param fillUpper fill the upper triangle if true
      * @param fillLower fill the lower triangle if false
      * @return a matrix with the upper and/or lower triangular filled with these values
      */
     T fillTriangular(boolean fillUpper, boolean fillLower);
 
+    /**
+     * The upper triangle or lower triangle of a square matrix vectorized. The upper triangle is vectorized by row
+     * and the lower triangle is vectorized by column. This can be used to reverse a fillTriangular.
+     * E.g Given
+     * <p>
+     * [1,2,3]
+     * [4,5,6]
+     * [7,8,9]
+     * <p>
+     * Upper part would return
+     * <p>
+     * [1,2,3,5,6,9]
+     * <p>
+     * Lower part would return
+     * <p>
+     * [1,4,7,5,8,9]
+     *
+     * @param upperPart true if the upper triangle should be taken of false for the lower triangle
+     * @return the upper or lower triangle vectorized
+     */
+    T trianglePart(boolean upperPart);
+
+    /**
+     * Copies the upper triangle of a matrix to a new matrix of the same shape. This does not need to be a
+     * square matrix.
+     * <p>
+     * E.g. Given
+     * <p>
+     * [1,2,3]
+     * [4,5,6]
+     * [7,8,9]
+     * <p>
+     * tri upper with a k=0 returns
+     * <p>
+     * [1,2,3]
+     * [0,5,6]
+     * [0,0,9]
+     *
+     * @param k An offset that controls how far from the matrix diagonal to copy the upper triangle. 0 is take the
+     *          upper triangle starting at the diagonal. 1 is the upper triangle excluding the matrix diagonal. -1
+     *          is the upper triangle and the first values of the lower triangle nearest to the diagonal.
+     * @return a new matrix of the same shape with the lower triangle values missing.
+     */
     T triUpper(int k);
 
+
+    /**
+     * Copies the lower triangle of a matrix to a new matrix of the same shape. This does not need to be a
+     * square matrix.
+     * <p>
+     * E.g. Given
+     * <p>
+     * [1,2,3]
+     * [4,5,6]
+     * [7,8,9]
+     * <p>
+     * tri lower with a k=0 returns
+     * <p>
+     * [1,0,0]
+     * [4,5,0]
+     * [7,8,9]
+     *
+     * @param k An offset that controls how far from the matrix diagonal to copy the lower triangle. 0 is take the
+     *          lower triangle starting at the diagonal. 1 is the lower triangle excluding the matrix diagonal. -1
+     *          is the lower triangle and the first values of the upper triangle nearest to the diagonal.
+     * @return a new matrix of the same shape with the upper triangle values missing.
+     */
     T triLower(int k);
 
     default T transpose() {

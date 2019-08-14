@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -12,6 +13,7 @@ import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class FillTriangularVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends TensorVertex<T, TENSOR, VERTEX>>
@@ -61,7 +63,21 @@ public class FillTriangularVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX ex
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
 
-        return null;
+        final DoubleTensor p = partial.get();
+        if (fillUpper && fillLower) {
+            final PartialDerivative result = new PartialDerivative(p.trianglePart(true).plus(p.triLower(1).trianglePart(false)));
+            return Collections.singletonMap(inputVertex, result);
+        } else if (fillLower) {
+            final PartialDerivative result = new PartialDerivative(p.trianglePart(false));
+            return Collections.singletonMap(inputVertex, result);
+        } else if (fillUpper) {
+            final PartialDerivative result = new PartialDerivative(p.trianglePart(true));
+            return Collections.singletonMap(inputVertex, result);
+        } else {
+            final long[] ofShape = partial.getOfShape(this.getShape());
+            final PartialDerivative result = new PartialDerivative(DoubleTensor.zeros(TensorShape.concat(ofShape, inputVertex.getShape())));
+            return Collections.singletonMap(inputVertex, result);
+        }
     }
 
     @SaveVertexParam(FILL_UPPER_NAME)

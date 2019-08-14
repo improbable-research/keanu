@@ -250,6 +250,47 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
     }
 
     @Override
+    public TENSOR trianglePart(boolean upperPart) {
+        final long N = shape[shape.length - 2];
+        final long M = shape[shape.length - 1];
+        Preconditions.checkArgument(N == M, "Triangle part only supports square matrices");
+
+        final long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 2);
+        final long batchLength = TensorShape.getLength(batchShape);
+        final long batchSize = N * M;
+
+        final long vectorLength = N * (N + 1) / 2;
+        final long[] resultShape = TensorShape.concat(batchShape, new long[]{vectorLength});
+        final long resultLength = TensorShape.getLength(resultShape);
+        B resultBuffer = getFactory().createNew(resultLength);
+
+        int pos = 0;
+        if(upperPart) {
+            for (int i = 0; i < batchLength; i++) {
+                long batchOffset = i * batchSize;
+                for (int r = 0; r < N; r++) {
+                    for (int c = r; c < N; c++) {
+                        resultBuffer.set(buffer.get(batchOffset + r * N + c), pos);
+                        pos++;
+                    }
+                }
+            }
+        }else{
+            for (int i = 0; i < batchLength; i++) {
+                long batchOffset = i * batchSize;
+                for (int c = 0; c < N; c++) {
+                    for (int r = c; r < N; r++) {
+                        resultBuffer.set(buffer.get(batchOffset + r * N + c), pos);
+                        pos++;
+                    }
+                }
+            }
+        }
+
+        return create(resultBuffer, resultShape, TensorShape.getRowFirstStride(resultShape));
+    }
+
+    @Override
     public TENSOR permute(int... rearrange) {
         return createFromResultWrapper(permute(getFactory(), buffer, shape, stride, rearrange));
     }

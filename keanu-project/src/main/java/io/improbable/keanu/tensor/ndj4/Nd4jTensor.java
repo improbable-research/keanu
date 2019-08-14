@@ -104,6 +104,11 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     }
 
     @Override
+    public TENSOR trianglePart(boolean upperPart) {
+        return fromJVM(toJVM().trianglePart(upperPart));
+    }
+
+    @Override
     public TENSOR triUpper(int k) {
         return fromJVM(toJVM().triUpper(k));
     }

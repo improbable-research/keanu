@@ -2760,4 +2760,94 @@ public class DoubleTensorTest {
         ).reshape(3, 4)));
     }
 
+    @Test
+    public void canUpperTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).trianglePart(true);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3, 5, 6, 9
+        )));
+    }
+
+    @Test
+    public void canReverseFillTriangularWithUpperTrianglePart() {
+
+        DoubleTensor input = DoubleTensor.create(
+            1, 4, 7, 5, 8, 9
+        );
+
+        DoubleTensor result = input.fillTriangular(true, false).trianglePart(true);
+
+        assertThat(result, valuesAndShapesMatch(input));
+    }
+
+    @Test
+    public void canBatchUpperTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            11, 12, 13,
+            14, 15, 16,
+            17, 18, 19
+        ).reshape(2, 3, 3).trianglePart(true);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3, 5, 6, 9,
+            11, 12, 13, 15, 16, 19
+        ).reshape(2, 6)));
+    }
+
+    @Test
+    public void canLowerTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).trianglePart(false);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 4, 7, 5, 8, 9
+        )));
+    }
+
+    @Test
+    public void canReverseFillTriangularWithLowerTrianglePart() {
+
+        DoubleTensor input = DoubleTensor.create(
+            1, 4, 7, 5, 8, 9
+        );
+
+        DoubleTensor result = input.fillTriangular(false, true).trianglePart(false);
+
+        assertThat(result, valuesAndShapesMatch(input));
+    }
+
+    @Test
+    public void canBatchLowerTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(2, 3, 3).trianglePart(false);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 4, 7, 5, 8, 9,
+            1, 4, 7, 5, 8, 9
+        ).reshape(2, 6)));
+    }
+
 }
