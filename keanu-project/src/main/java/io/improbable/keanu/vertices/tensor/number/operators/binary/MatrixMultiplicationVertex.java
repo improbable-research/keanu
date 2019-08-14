@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.tensor.BinaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -54,9 +55,12 @@ public class MatrixMultiplicationVertex<T extends Number, TENSOR extends NumberT
                 false
             );
 
+        int[] sumRight = AutoDiffBroadcast.dimensionsWithShapeChange(dOutputsWrtRight.get().getShape(), this.getRank(), right.getShape());
+        int[] sumLeft = AutoDiffBroadcast.dimensionsWithShapeChange(dOutputsWrtLeft.get().getShape(), this.getRank(), left.getShape());
+
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(left, dOutputsWrtLeft);
-        partials.put(right, dOutputsWrtRight);
+        partials.put(left, new PartialDerivative(dOutputsWrtLeft.get().sum(sumLeft)));
+        partials.put(right, new PartialDerivative(dOutputsWrtRight.get().sum(sumRight)));
 
         return partials;
     }

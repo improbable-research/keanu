@@ -296,7 +296,7 @@ public class TensorShapeValidation {
             final long[] leftBatchShape = ArrayUtils.subarray(left, 0, left.length - 2);
             final long[] rightBatchShape = ArrayUtils.subarray(right, 0, right.length - 2);
             final long[] batchShape = TensorShape.getBroadcastResultShape(leftBatchShape, rightBatchShape);
-            return TensorShape.concat(batchShape, new long[]{left[left.length - 1], right[right.length - 2]});
+            return TensorShape.concat(batchShape, new long[]{left[left.length - 2], right[right.length - 1]});
         }
     }
 }
