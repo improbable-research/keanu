@@ -461,18 +461,24 @@ public class DoubleTensorTest {
             -2, -9, 6,
             10, -3, 5,
 
-            -1, 7, 3,
-            -2, -9, 6,
-            10, -3, 5
+            -1, 7, 2,
+            -3, -9, 5,
+            11, -3, 5
         ).reshape(2, 3, 3);
 
-        double expected = new LUDecomposition(new BlockRealMatrix(new double[][]{
+        double expected1 = new LUDecomposition(new BlockRealMatrix(new double[][]{
             new double[]{-1, 7, 3},
             new double[]{-2, -9, 6},
             new double[]{10, -3, 5}
         })).getDeterminant();
 
-        assertThat(DoubleTensor.create(expected, expected), valuesWithinEpsilonAndShapesMatch(A.matrixDeterminant(), 1e-10));
+        double expected2 = new LUDecomposition(new BlockRealMatrix(new double[][]{
+            new double[]{-1, 7, 2},
+            new double[]{-3, -9, 5},
+            new double[]{11, -3, 5}
+        })).getDeterminant();
+
+        assertThat(A.matrixDeterminant(), valuesWithinEpsilonAndShapesMatch(DoubleTensor.create(expected1, expected2), 1e-10));
     }
 
     @Test

@@ -173,22 +173,12 @@ public class PartialDerivative {
         }
 
         final DoubleTensor partialValue = partial.get();
-        final int partialRank = partialValue.getRank();
-        final int wrtRightDimension = partialRank - 1;
 
         final DoubleTensor result;
         if (partialIsLeft) {
-            result = partialValue
-                .tensorMultiply(multiplier, new int[]{wrtRightDimension}, new int[]{1});
+            result = partialValue.matrixMultiply(multiplier.transpose());
         } else {
-            int wrtLeftDimension = partialRank - 2;
-            int[] transposeWrt = TensorShape.dimensionRange(0, partialRank);
-            transposeWrt[wrtRightDimension] = wrtLeftDimension;
-            transposeWrt[wrtLeftDimension] = wrtRightDimension;
-
-            result = partialValue
-                .tensorMultiply(multiplier, new int[]{wrtLeftDimension}, new int[]{0})
-                .permute(transposeWrt);
+            result = multiplier.transpose().matrixMultiply(partialValue);
         }
 
         return new PartialDerivative(result);

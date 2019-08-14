@@ -34,9 +34,10 @@ public class MatrixInverseVertex<T extends Number, TENSOR extends FloatingPointT
 
         //dc = -A^-1 * da * A^-1
         DoubleTensor negatedValue = this.getValue().toDouble().unaryMinus();
-        PartialDerivative partial = PartialDerivative.matrixMultiplyAlongOfDimensions(derivativeOfParentWithRespectToInputs, negatedValue, false);
-        partial = PartialDerivative.matrixMultiplyAlongOfDimensions(partial, this.getValue().toDouble(), true);
-        return partial;
+        DoubleTensor wrtOf = derivativeOfParentWithRespectToInputs.getWrtOf(inputVertex.getRank());
+        DoubleTensor result = negatedValue.matrixMultiply(wrtOf).matrixMultiply(this.getValue().toDouble());
+
+        return PartialDerivative.createFromWrtOf(result, this.getRank());
     }
 
     @Override
@@ -45,22 +46,21 @@ public class MatrixInverseVertex<T extends Number, TENSOR extends FloatingPointT
         DoubleTensor parentValue = getValue().toDouble();
         DoubleTensor negativeValue = getValue().toDouble().unaryMinus();
 
-        PartialDerivative newPartials =
-            PartialDerivative.matrixMultiplyAlongWrtDimensions(derivativeOfOutputWithRespectToSelf, negativeValue, false);
-        newPartials = PartialDerivative.matrixMultiplyAlongWrtDimensions(newPartials, parentValue, true);
+        DoubleTensor p = negativeValue.transpose()
+            .matrixMultiply(derivativeOfOutputWithRespectToSelf.get())
+            .matrixMultiply(parentValue.transpose());
 
-        partials.put(inputVertex, newPartials);
-
+        partials.put(inputVertex, new PartialDerivative(p));
         return partials;
     }
 
     private static long[] checkInputIsSquareMatrix(long[] shape) {
-        if (shape.length != 2) {
-            throw new IllegalArgumentException("Can only invert a Matrix (received rank: " + shape.length + ")");
+        if (shape.length < 2) {
+            throw new IllegalArgumentException("Can only invert a matrix or batch of matrices (received rank: " + shape.length + ")");
         }
 
-        if (shape[0] != shape[1]) {
-            throw new IllegalArgumentException("Can only invert a square Matrix (received: "
+        if (shape[shape.length - 1] != shape[shape.length - 2]) {
+            throw new IllegalArgumentException("Can only invert a square matrix (received: "
                 + shape[0] + ", " + shape[1] + ")");
         }
 

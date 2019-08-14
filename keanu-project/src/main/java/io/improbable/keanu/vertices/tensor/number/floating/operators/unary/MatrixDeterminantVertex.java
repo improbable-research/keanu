@@ -14,6 +14,7 @@ import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.Collections;
 import java.util.Map;
@@ -43,37 +44,26 @@ public class MatrixDeterminantVertex<T extends Number, TENSOR extends FloatingPo
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        throw new UnsupportedOperationException();
+
+        final DoubleTensor dA = derivativeOfParentsWithRespectToInput.get(inputVertex).getWrtOf(inputVertex.getRank());
+        final DoubleTensor AInverseTranspose = inputVertex.getValue().toDouble().matrixInverse();
+        final DoubleTensor C = this.getValue().toDouble();
+        final DoubleTensor result = C.times(AInverseTranspose.matrixMultiply(dA).diagPart().sum(-1));
+
+        return PartialDerivative.createFromWrtOf(result, this.getRank());
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
 
-        PartialDerivative dOutputTimesDeterminant = derivativeOfOutputWithRespectToSelf
-            .multiplyBy(inputVertex.getValue().toDouble().matrixDeterminant().scalar());
+        DoubleTensor dC = derivativeOfOutputWithRespectToSelf.get();
+        DoubleTensor C = this.getValue().toDouble();
+        DoubleTensor dCC = dC.times(C);
 
-        long[] resultShape = TensorShape.concat(
-            derivativeOfOutputWithRespectToSelf.get().getShape(),
-            inputVertex.getShape()
-        );
-
-        DoubleTensor reshapedPartial = increaseRankByAppendingOnesToShape(
-            dOutputTimesDeterminant.get(),
-            resultShape.length
-        );
-
-        DoubleTensor broadcastedPartial = reshapedPartial.broadcast(resultShape);
-
-        DoubleTensor inverseTranspose = inputVertex.getValue().toDouble().transpose().matrixInverse();
-
-        PartialDerivative toInput = new PartialDerivative(broadcastedPartial.times(inverseTranspose));
+        long[] dCCExpandedShape = TensorShape.concat(dCC.getShape(), new long[]{1, 1});
+        DoubleTensor AInverseTranspose = inputVertex.getValue().toDouble().matrixInverse().transpose();
+        PartialDerivative toInput = new PartialDerivative(dCC.reshape(dCCExpandedShape).times(AInverseTranspose));
 
         return Collections.singletonMap(inputVertex, toInput);
-    }
-
-    private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
-        return lowRankTensor.reshape(
-            TensorShape.shapeDesiredToRankByAppendingOnes(lowRankTensor.getShape(), desiredRank)
-        );
     }
 }

@@ -164,11 +164,12 @@ public interface BaseTensor<
     T triLower(int k);
 
     default T transpose() {
+        int rank = getRank();
         Preconditions.checkArgument(
-            getRank() == 2,
+            getRank() >= 2,
             "Can only transpose rank 2. Use permute(...) for higher rank transpose."
         );
-        return permute(1, 0);
+        return swapAxis(rank - 1, rank - 2);
     }
 
     T reshape(long... newShape);

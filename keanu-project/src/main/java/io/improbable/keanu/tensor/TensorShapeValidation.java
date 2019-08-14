@@ -128,11 +128,11 @@ public class TensorShapeValidation {
     }
 
     public static void checkShapeIsSquareMatrix(long[] shape) {
-        if (shape.length != 2) {
+        if (shape.length < 2) {
             throw new IllegalArgumentException("Input tensor must be a matrix");
         }
 
-        if (shape[0] != shape[1]) {
+        if (shape[shape.length - 1] != shape[shape.length - 2]) {
             throw new IllegalArgumentException("Input matrix must be square");
         }
     }

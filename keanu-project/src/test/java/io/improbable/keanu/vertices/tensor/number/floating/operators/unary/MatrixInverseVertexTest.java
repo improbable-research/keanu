@@ -30,8 +30,8 @@ public class MatrixInverseVertexTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void rejectsNonMatrix() {
-        DoubleTensor tensor = DoubleTensor.arange(1, 9).reshape(2, 2, 2);
+    public void rejectsVector() {
+        DoubleTensor tensor = DoubleTensor.arange(1, 9);
 
         shouldReject(tensor);
     }
@@ -85,7 +85,7 @@ public class MatrixInverseVertexTest {
     public void inverseMultipliedEqualsIdentity() {
         UniformVertex inputVertex = new UniformVertex(new long[]{4, 4}, -20.0, 20.0);
         DoubleVertex inverseVertex = inputVertex.matrixInverse();
-        DoubleVertex multiplied =  inverseVertex.matrixMultiply(inputVertex);
+        DoubleVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
 
         for (int i = 0; i < NUM_ITERATIONS; i++) {
             inputVertex.setValue(inputVertex.sample());
@@ -113,7 +113,18 @@ public class MatrixInverseVertexTest {
 
     @Test
     public void inverseDifferenceMatchesGradient() {
-        UniformVertex inputVertex = new UniformVertex(new long[]{3, 3}, 1.0, 25.0);
+        assertInverseDifferenceMatchesGradient(new long[]{3, 3});
+        assertInverseDifferenceMatchesGradient(new long[]{4, 4});
+    }
+
+    @Test
+    public void batchInverseDifferenceMatchesGradient() {
+        assertInverseDifferenceMatchesGradient(new long[]{2, 3, 3});
+        assertInverseDifferenceMatchesGradient(new long[]{3, 4, 4});
+    }
+
+    private void assertInverseDifferenceMatchesGradient(long[] shape) {
+        UniformVertex inputVertex = new UniformVertex(shape, 1.0, 25.0);
         DoubleVertex invertVertex = inputVertex.matrixInverse();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(
