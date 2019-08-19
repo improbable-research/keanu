@@ -155,7 +155,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
             final int factorizationResult = dpotrf(KeanuLapack.Triangular.LOWER, N, batchBuffer);
 
             if (factorizationResult != 0) {
-                throw new IllegalStateException("Cholesky decomposition failed");
+                throw new IllegalStateException("Cholesky decomposition failed for input\n" + this);
             }
 
             zeroOutUpperTriangle(N, newBuffer, position);
