@@ -46,11 +46,15 @@ def cast_to_vertex(input: vertex_constructor_param_types) -> Vertex:
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.BroadcastVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.DiagPartVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.DiagVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.FillTriangularVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.PermuteVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.ReshapeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.SliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.StridedSliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.TakeVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.TriLowerVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.TriUpperVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.TrianglePartVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.WhereVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.BooleanProxyVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.CastNumberToBooleanVertex")
@@ -195,6 +199,10 @@ def Diag(input_vertex: vertex_constructor_param_types, label: Optional[str]=None
     return Vertex(context.jvm_view().DiagVertex, label, cast_to_vertex(input_vertex))
 
 
+def FillTriangular(input_vertex: vertex_constructor_param_types, fill_upper: bool, fill_lower: bool, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().FillTriangularVertex, label, cast_to_vertex(input_vertex), cast_to_boolean(fill_upper), cast_to_boolean(fill_lower))
+
+
 def Permute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], label: Optional[str]=None) -> Vertex:
     return Vertex(context.jvm_view().PermuteVertex, label, cast_to_vertex(input_vertex), cast_to_int_array(rearrange))
 
@@ -220,6 +228,18 @@ def StridedSlice(input_vertex: vertex_constructor_param_types, start: Collection
 
 def Take(input_vertex: vertex_constructor_param_types, index: Collection[int], label: Optional[str]=None) -> Vertex:
     return Vertex(context.jvm_view().TakeVertex, label, cast_to_vertex(input_vertex), cast_to_long_array(index))
+
+
+def TriLower(input_vertex: vertex_constructor_param_types, k: int, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().TriLowerVertex, label, cast_to_vertex(input_vertex), cast_to_integer(k))
+
+
+def TriUpper(input_vertex: vertex_constructor_param_types, k: int, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().TriUpperVertex, label, cast_to_vertex(input_vertex), cast_to_integer(k))
+
+
+def TrianglePart(input_vertex: vertex_constructor_param_types, upper_part: bool, label: Optional[str]=None) -> Vertex:
+    return Vertex(context.jvm_view().TrianglePartVertex, label, cast_to_vertex(input_vertex), cast_to_boolean(upper_part))
 
 
 def Where(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
