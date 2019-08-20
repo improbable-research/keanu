@@ -42,14 +42,14 @@ public class MatrixMultiplicationVertex<T extends Number, TENSOR extends NumberT
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
 
         PartialDerivative dOutputsWrtLeft = PartialDerivative
-            .matrixMultiplyAlongWrtDimensions(
+            .matrixMultiply(
                 derivativeOfOutputWithRespectToSelf,
                 right.getValue().toDouble(),
                 true
             );
 
         PartialDerivative dOutputsWrtRight = PartialDerivative
-            .matrixMultiplyAlongWrtDimensions(
+            .matrixMultiply(
                 derivativeOfOutputWithRespectToSelf,
                 left.getValue().toDouble(),
                 false
@@ -74,13 +74,17 @@ public class MatrixMultiplicationVertex<T extends Number, TENSOR extends NumberT
         PartialDerivative partialsFromLeft = PartialDerivative.matrixMultiplyAlongOfDimensions(
             dLeftWrtInput,
             right.getValue().toDouble(),
-            true
+            true,
+            left.getShape(),
+            this.getShape().length
         );
 
         PartialDerivative partialsFromRight = PartialDerivative.matrixMultiplyAlongOfDimensions(
             dRightWrtInput,
             left.getValue().toDouble(),
-            false
+            false,
+            right.getShape(),
+            this.getShape().length
         );
 
         return partialsFromLeft.add(partialsFromRight);

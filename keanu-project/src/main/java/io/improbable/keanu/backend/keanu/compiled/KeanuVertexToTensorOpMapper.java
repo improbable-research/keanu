@@ -21,6 +21,7 @@ import io.improbable.keanu.vertices.tensor.StridedSliceVertex;
 import io.improbable.keanu.vertices.tensor.TakeVertex;
 import io.improbable.keanu.vertices.tensor.TriLowerVertex;
 import io.improbable.keanu.vertices.tensor.TriUpperVertex;
+import io.improbable.keanu.vertices.tensor.TrianglePartVertex;
 import io.improbable.keanu.vertices.tensor.WhereVertex;
 import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
 import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.BooleanProxyVertex;
@@ -170,6 +171,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(TriLowerVertex.class, KeanuVertexToTensorOpMapper::triLowerOp);
         opMappers.put(FillTriangularVertex.class, KeanuVertexToTensorOpMapper::fillTriangular);
         opMappers.put(DiagPartVertex.class, fluentUnaryOp("diagPart"));
+        opMappers.put(TrianglePartVertex.class, KeanuVertexToTensorOpMapper::trianglePartOp);
         opMappers.put(GetBooleanIndexVertex.class, fluentBinaryOp("get"));
         opMappers.put(WhereVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
 
@@ -655,6 +657,13 @@ public class KeanuVertexToTensorOpMapper {
         boolean fillLower = fillTriangularVertex.isFillLower();
         String inputName = lookup.get(fillTriangularVertex.getInputVertex().getId()).getName();
         return inputName + ".fillTriangular(" + fillUpper + "," + fillLower + ")";
+    }
+
+    private static String trianglePartOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        TrianglePartVertex trianglePartVertex = (TrianglePartVertex) vertex;
+        boolean isUpper = trianglePartVertex.isUpperPart();
+        String name = lookup.get(trianglePartVertex.getInputVertex().getId()).getName();
+        return name + ".trianglePart(" + isUpper + ")";
     }
 
     private static String genericIfOp(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {

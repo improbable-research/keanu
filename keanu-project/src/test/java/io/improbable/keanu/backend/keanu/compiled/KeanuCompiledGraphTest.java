@@ -358,7 +358,12 @@ public class KeanuCompiledGraphTest {
         assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(true, false));
         assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(false, true));
         assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(true, true));
+    }
 
+    @Test
+    public void canTrianglePart() {
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.trianglePart(true));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.trianglePart(false));
     }
 
     @Test

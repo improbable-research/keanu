@@ -140,33 +140,36 @@ public class PartialDerivative {
         return new PartialDerivative(result);
     }
 
-    public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial,
+                                                                    DoubleTensor multiplier,
+                                                                    boolean partialIsLeft,
+                                                                    long[] partialOfShape,
+                                                                    int resultOfRank) {
 
         if (!partial.isPresent()) {
             return partial;
         }
 
-        final DoubleTensor partialValue = partial.get();
-        final int partialRank = partialValue.getRank();
+        DoubleTensor partialWrtOf = partial.getWrtOf(partialOfShape.length);
+
+        if (partialOfShape.length != resultOfRank) {
+            long[] wrtShape = partial.getWrtShape(partialOfShape);
+            long[] ofShape = partial.getOfShape(wrtShape);
+            long[] partialWrtOfNewShape = TensorShape.concat(wrtShape, TensorShape.shapeToDesiredRankByPrependingOnes(ofShape, resultOfRank));
+            partialWrtOf = partialWrtOf.reshape(partialWrtOfNewShape);
+        }
 
         final DoubleTensor result;
         if (partialIsLeft) {
-            final int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
-            rearrange[0] = 0;
-            rearrange[1] = partialRank - 1;
-            result = partialValue
-                .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
-                .permute(rearrange);
-
+            result = partialWrtOf.matrixMultiply(multiplier);
         } else {
-            result = multiplier
-                .tensorMultiply(partialValue, new int[]{1}, new int[]{0});
+            result = multiplier.matrixMultiply(partialWrtOf);
         }
 
-        return new PartialDerivative(result);
+        return PartialDerivative.createFromWrtOf(result, resultOfRank);
     }
 
-    public static PartialDerivative matrixMultiplyAlongWrtDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivative matrixMultiply(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
         if (!partial.isPresent()) {
             return partial;
