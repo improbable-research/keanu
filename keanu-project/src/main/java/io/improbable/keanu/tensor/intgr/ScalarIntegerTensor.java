@@ -144,6 +144,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor trianglePart(boolean upperPart) {
+        return this.reshape(1);
+    }
+
+    @Override
     public IntegerTensor triUpper(int k) {
         return duplicate();
     }

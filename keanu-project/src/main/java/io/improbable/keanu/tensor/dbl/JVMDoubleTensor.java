@@ -218,7 +218,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
             final IntBuffer ipiv = IntBuffer.allocate(batchSize);
 
-            java.nio.DoubleBuffer batchBuffer = java.nio.DoubleBuffer.wrap(newBuffer, batch * batchSize, batchSize);
+            final java.nio.DoubleBuffer batchBuffer = java.nio.DoubleBuffer.wrap(newBuffer, batch * batchSize, batchSize);
 
             final int factorizationResult = dgetrf(M, N, batchBuffer, ipiv);
 
@@ -237,9 +237,10 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
                 }
             }
 
+            int bufferPosition = batchBuffer.position();
             double detU = 1.0;
             for (int i = 0; i < M; i++) {
-                detU *= batchBuffer.get(i * M + i);
+                detU *= batchBuffer.get(bufferPosition + i * M + i);
             }
 
             results[batch] = detU * detp;

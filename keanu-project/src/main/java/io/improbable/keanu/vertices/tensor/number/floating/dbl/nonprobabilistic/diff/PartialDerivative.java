@@ -11,6 +11,10 @@ public class PartialDerivative {
 
     private final DoubleTensor partial;
 
+    public static PartialDerivative createFromWrtOf(DoubleTensor partial, int ofRank) {
+        return new PartialDerivative(partial.permute(swapDims(partial.getRank(), partial.getRank() - ofRank)));
+    }
+
     public PartialDerivative(DoubleTensor partial) {
         this.partial = partial;
     }
@@ -21,6 +25,20 @@ public class PartialDerivative {
 
     public DoubleTensor get() {
         return partial;
+    }
+
+    public DoubleTensor getWrtOf(int ofRank) {
+        return partial.permute(swapDims(partial.getRank(), ofRank));
+    }
+
+    private static int[] swapDims(int rank, int pivotPoint) {
+        int[] rearrange = new int[rank];
+
+        for (int i = 0; i < rank; i++) {
+            rearrange[i] = (pivotPoint + i) % rank;
+        }
+
+        return rearrange;
     }
 
     public long[] getOfShape(long[] wrtShape) {
@@ -122,55 +140,48 @@ public class PartialDerivative {
         return new PartialDerivative(result);
     }
 
-    public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial,
+                                                                    DoubleTensor multiplier,
+                                                                    boolean partialIsLeft,
+                                                                    long[] partialOfShape,
+                                                                    int resultOfRank) {
 
         if (!partial.isPresent()) {
             return partial;
         }
 
-        final DoubleTensor partialValue = partial.get();
-        final int partialRank = partialValue.getRank();
+        DoubleTensor partialWrtOf = partial.getWrtOf(partialOfShape.length);
+
+        if (partialOfShape.length != resultOfRank) {
+            long[] wrtShape = partial.getWrtShape(partialOfShape);
+            long[] ofShape = partial.getOfShape(wrtShape);
+            long[] partialWrtOfNewShape = TensorShape.concat(wrtShape, TensorShape.shapeToDesiredRankByPrependingOnes(ofShape, resultOfRank));
+            partialWrtOf = partialWrtOf.reshape(partialWrtOfNewShape);
+        }
 
         final DoubleTensor result;
         if (partialIsLeft) {
-            final int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
-            rearrange[0] = 0;
-            rearrange[1] = partialRank - 1;
-            result = partialValue
-                .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
-                .permute(rearrange);
-
+            result = partialWrtOf.matrixMultiply(multiplier);
         } else {
-            result = multiplier
-                .tensorMultiply(partialValue, new int[]{1}, new int[]{0});
+            result = multiplier.matrixMultiply(partialWrtOf);
         }
 
-        return new PartialDerivative(result);
+        return PartialDerivative.createFromWrtOf(result, resultOfRank);
     }
 
-    public static PartialDerivative matrixMultiplyAlongWrtDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivative matrixMultiply(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
         if (!partial.isPresent()) {
             return partial;
         }
 
         final DoubleTensor partialValue = partial.get();
-        final int partialRank = partialValue.getRank();
-        final int wrtRightDimension = partialRank - 1;
 
         final DoubleTensor result;
         if (partialIsLeft) {
-            result = partialValue
-                .tensorMultiply(multiplier, new int[]{wrtRightDimension}, new int[]{1});
+            result = partialValue.matrixMultiply(multiplier.transpose());
         } else {
-            int wrtLeftDimension = partialRank - 2;
-            int[] transposeWrt = TensorShape.dimensionRange(0, partialRank);
-            transposeWrt[wrtRightDimension] = wrtLeftDimension;
-            transposeWrt[wrtLeftDimension] = wrtRightDimension;
-
-            result = partialValue
-                .tensorMultiply(multiplier, new int[]{wrtLeftDimension}, new int[]{0})
-                .permute(transposeWrt);
+            result = multiplier.transpose().matrixMultiply(partialValue);
         }
 
         return new PartialDerivative(result);

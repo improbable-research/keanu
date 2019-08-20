@@ -20,6 +20,14 @@ to accommodate autodiff for the new vertex operations.
 - sign
 - strided slice
 - trigamma
+- triLower
+- triUpper
+- fillTriangular
+- batch matrix multiply
+- batch matrix inverse
+- batch matrix determinant
+- batch cholesky decomposition
+- cholesky inverse (with batch)
 
 
 ## Version 0.0.26

@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardModeGradient;
+import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesReverseModeGradient;
 import static org.junit.Assert.assertEquals;
 
 public class MatrixMultiplicationVertexTest {
@@ -271,18 +273,141 @@ public class MatrixMultiplicationVertexTest {
     }
 
     @Test
-    public void changesMatchGradient() {
-        UniformVertex inputA = new UniformVertex(new long[]{2, 5}, -10.0, 10.0);
-        UniformVertex inputB = new UniformVertex(new long[]{5, 2}, -10.0, 10.0);
+    public void canAutoDiffReverse() {
+        assertChangesMatchGradientReverse(
+            new long[]{2, 2},
+            new long[]{2, 2},
+            DoubleTensor.arange(2 * 2 * 2).reshape(2, 2, 2)
+        );
+
+        assertChangesMatchGradientReverse(
+            new long[]{4, 5},
+            new long[]{5, 3},
+            DoubleTensor.arange(2 * 4 * 3).reshape(2, 4, 3)
+        );
+
+        assertChangesMatchGradientReverse(
+            new long[]{1, 5},
+            new long[]{5, 4},
+            DoubleTensor.arange(2 * 4).reshape(2, 1, 4)
+        );
+    }
+
+    @Test
+    public void canBatchAutoDiffReverse() {
+
+        assertChangesMatchGradientReverse(
+            new long[]{2, 1, 5},
+            new long[]{5, 4},
+            DoubleTensor.arange(2 * 4).reshape(2, 1, 4)
+        );
+
+        assertChangesMatchGradientReverse(
+            new long[]{2, 2, 2},
+            new long[]{3, 2, 2, 2},
+            DoubleTensor.arange(3 * 2 * 2 * 2).reshape(3, 2, 2, 2)
+        );
+
+        assertChangesMatchGradientReverse(
+            new long[]{4, 5},
+            new long[]{2, 5, 3},
+            DoubleTensor.arange(2 * 4 * 3).reshape(2, 4, 3)
+        );
+
+        assertChangesMatchGradientReverse(
+            new long[]{4, 5},
+            new long[]{3, 2, 5, 3},
+            DoubleTensor.arange(2 * 4 * 3).reshape(2, 4, 3)
+        );
+
+        assertChangesMatchGradientReverse(
+            new long[]{2, 3, 4, 5},
+            new long[]{5, 3},
+            DoubleTensor.arange(3 * 4 * 3).reshape(3, 4, 3)
+        );
+    }
+
+    @Test
+    public void canAutoDiffForward() {
+        assertChangesMatchGradientForward(
+            new long[]{2, 2},
+            new long[]{2, 2},
+            DoubleTensor.arange(2 * 2 * 2).reshape(2, 2, 2)
+        );
+
+        assertChangesMatchGradientForward(
+            new long[]{4, 5},
+            new long[]{5, 3},
+            DoubleTensor.arange(2 * 4 * 3).reshape(2, 4, 3)
+        );
+
+        assertChangesMatchGradientForward(
+            new long[]{1, 5},
+            new long[]{5, 4},
+            DoubleTensor.arange(2 * 4).reshape(2, 1, 4)
+        );
+    }
+
+    @Test
+    public void canBatchAutoDiffForward() {
+
+        assertChangesMatchGradientForward(
+            new long[]{2, 1, 5},
+            new long[]{5, 4},
+            DoubleTensor.arange(2 * 4).reshape(2, 1, 4)
+        );
+
+        assertChangesMatchGradientForward(
+            new long[]{2, 2, 2},
+            new long[]{3, 2, 2, 2},
+            DoubleTensor.arange(3 * 2 * 2 * 2).reshape(3, 2, 2, 2)
+        );
+
+        assertChangesMatchGradientForward(
+            new long[]{4, 5},
+            new long[]{2, 5, 3},
+            DoubleTensor.arange(2 * 4 * 3).reshape(2, 4, 3)
+        );
+
+        assertChangesMatchGradientForward(
+            new long[]{4, 5},
+            new long[]{3, 2, 5, 3},
+            DoubleTensor.arange(2 * 4 * 3).reshape(2, 4, 3)
+        );
+
+        assertChangesMatchGradientForward(
+            new long[]{2, 3, 4, 5},
+            new long[]{5, 3},
+            DoubleTensor.arange(3 * 4 * 3).reshape(3, 4, 3)
+        );
+    }
+
+    private void assertChangesMatchGradientForward(long[] leftShape, long[] rightShape, DoubleTensor postOpFactor) {
+        UniformVertex inputA = new UniformVertex(leftShape, -10.0, 10.0);
+        UniformVertex inputB = new UniformVertex(rightShape, -10.0, 10.0);
         DoubleVertex mmultVertex = inputA.matrixMultiply(inputB);
         DoubleVertex outputVertex = mmultVertex.times(
-            new ConstantDoubleVertex(new double[]{1., 2., 3., 4., 5., 6., 7., 8.}, new long[]{2, 2, 2})
+            new ConstantDoubleVertex(postOpFactor)
         );
 
         final double INCREMENT = 10;
         final double DELTA = 1e-10;
 
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
+        finiteDifferenceMatchesForwardModeGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
+    }
+
+    private void assertChangesMatchGradientReverse(long[] leftShape, long[] rightShape, DoubleTensor postOpFactor) {
+        UniformVertex inputA = new UniformVertex(leftShape, -10.0, 10.0);
+        UniformVertex inputB = new UniformVertex(rightShape, -10.0, 10.0);
+        DoubleVertex mmultVertex = inputA.matrixMultiply(inputB);
+        DoubleVertex outputVertex = mmultVertex.times(
+            new ConstantDoubleVertex(postOpFactor)
+        );
+
+        final double INCREMENT = 10;
+        final double DELTA = 1e-10;
+
+        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
     }
 
     @Test

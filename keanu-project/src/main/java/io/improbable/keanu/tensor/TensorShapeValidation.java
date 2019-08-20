@@ -128,11 +128,11 @@ public class TensorShapeValidation {
     }
 
     public static void checkShapeIsSquareMatrix(long[] shape) {
-        if (shape.length != 2) {
+        if (shape.length < 2) {
             throw new IllegalArgumentException("Input tensor must be a matrix");
         }
 
-        if (shape[0] != shape[1]) {
+        if (shape[shape.length - 1] != shape[shape.length - 2]) {
             throw new IllegalArgumentException("Input matrix must be square");
         }
     }
@@ -296,7 +296,7 @@ public class TensorShapeValidation {
             final long[] leftBatchShape = ArrayUtils.subarray(left, 0, left.length - 2);
             final long[] rightBatchShape = ArrayUtils.subarray(right, 0, right.length - 2);
             final long[] batchShape = TensorShape.getBroadcastResultShape(leftBatchShape, rightBatchShape);
-            return TensorShape.concat(batchShape, new long[]{left[left.length - 1], right[right.length - 2]});
+            return TensorShape.concat(batchShape, new long[]{left[left.length - 2], right[right.length - 1]});
         }
     }
 }

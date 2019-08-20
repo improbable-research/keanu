@@ -69,13 +69,13 @@ public class TensorShapeValidationTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void checkSquareMatrixFailsOnNonMatrices() {
-        TensorShapeValidation.checkShapeIsSquareMatrix(new long[]{3, 3, 3});
+    public void checkSquareMatrixFailsOnNonSquareMatrices() {
+        TensorShapeValidation.checkShapeIsSquareMatrix(new long[]{3, 2});
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void checkSquareMatrixFailsOnNonSquareMatrices() {
-        TensorShapeValidation.checkShapeIsSquareMatrix(new long[]{3, 2});
+    public void checkSquareMatrixFailsOnNonSquareBatchMatrices() {
+        TensorShapeValidation.checkShapeIsSquareMatrix(new long[]{3, 3, 2});
     }
 
     @Test

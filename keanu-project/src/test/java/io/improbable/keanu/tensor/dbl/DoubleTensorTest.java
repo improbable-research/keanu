@@ -461,18 +461,24 @@ public class DoubleTensorTest {
             -2, -9, 6,
             10, -3, 5,
 
-            -1, 7, 3,
-            -2, -9, 6,
-            10, -3, 5
+            -1, 7, 2,
+            -3, -9, 5,
+            11, -3, 5
         ).reshape(2, 3, 3);
 
-        double expected = new LUDecomposition(new BlockRealMatrix(new double[][]{
+        double expected1 = new LUDecomposition(new BlockRealMatrix(new double[][]{
             new double[]{-1, 7, 3},
             new double[]{-2, -9, 6},
             new double[]{10, -3, 5}
         })).getDeterminant();
 
-        assertThat(DoubleTensor.create(expected, expected), valuesWithinEpsilonAndShapesMatch(A.matrixDeterminant(), 1e-10));
+        double expected2 = new LUDecomposition(new BlockRealMatrix(new double[][]{
+            new double[]{-1, 7, 2},
+            new double[]{-3, -9, 5},
+            new double[]{11, -3, 5}
+        })).getDeterminant();
+
+        assertThat(A.matrixDeterminant(), valuesWithinEpsilonAndShapesMatch(DoubleTensor.create(expected1, expected2), 1e-10));
     }
 
     @Test
@@ -2513,6 +2519,30 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canBatchTriUpperAtK0() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(2, 3, 3).triUpper(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 5, 6,
+            0, 0, 9,
+
+            1, 2, 3,
+            0, 5, 6,
+            0, 0, 9
+        ).reshape(2, 3, 3)));
+    }
+
+    @Test
     public void canTriUpperAtK1of3() {
 
         DoubleTensor result = DoubleTensor.create(
@@ -2629,6 +2659,30 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canBatchTriLowerAtK0() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(2, 3, 3).triLower(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            4, 5, 0,
+            7, 8, 9,
+
+            1, 0, 0,
+            4, 5, 0,
+            7, 8, 9
+        ).reshape(2, 3, 3)));
+    }
+
+    @Test
     public void canTriLowerAtK1() {
 
         DoubleTensor result = DoubleTensor.create(
@@ -2710,6 +2764,96 @@ public class DoubleTensorTest {
             5, 6, 0, 0,
             9, 10, 11, 0
         ).reshape(3, 4)));
+    }
+
+    @Test
+    public void canUpperTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).trianglePart(true);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3, 5, 6, 9
+        )));
+    }
+
+    @Test
+    public void canReverseFillTriangularWithUpperTrianglePart() {
+
+        DoubleTensor input = DoubleTensor.create(
+            1, 4, 7, 5, 8, 9
+        );
+
+        DoubleTensor result = input.fillTriangular(true, false).trianglePart(true);
+
+        assertThat(result, valuesAndShapesMatch(input));
+    }
+
+    @Test
+    public void canBatchUpperTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            11, 12, 13,
+            14, 15, 16,
+            17, 18, 19
+        ).reshape(2, 3, 3).trianglePart(true);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3, 5, 6, 9,
+            11, 12, 13, 15, 16, 19
+        ).reshape(2, 6)));
+    }
+
+    @Test
+    public void canLowerTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).trianglePart(false);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 4, 7, 5, 8, 9
+        )));
+    }
+
+    @Test
+    public void canReverseFillTriangularWithLowerTrianglePart() {
+
+        DoubleTensor input = DoubleTensor.create(
+            1, 4, 7, 5, 8, 9
+        );
+
+        DoubleTensor result = input.fillTriangular(false, true).trianglePart(false);
+
+        assertThat(result, valuesAndShapesMatch(input));
+    }
+
+    @Test
+    public void canBatchLowerTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(2, 3, 3).trianglePart(false);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 4, 7, 5, 8, 9,
+            1, 4, 7, 5, 8, 9
+        ).reshape(2, 6)));
     }
 
 }

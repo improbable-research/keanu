@@ -145,20 +145,27 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
     @Override
     public TENSOR triUpper(int k) {
-        Preconditions.checkArgument(shape.length >= 2, "Tri Lower input must be rank >= 2");
+        Preconditions.checkArgument(shape.length >= 2, "Tri Upper input must be rank >= 2");
 
         long N = shape[shape.length - 2];
         long M = shape[shape.length - 1];
-        B toBuffer = getFactory().createNew(N * M);
-        copyUpperTriangle(N, M, toBuffer, buffer, k);
+        long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 2);
+        long batchLength = TensorShape.getLength(batchShape);
+        long batchSize = N * M;
+
+        B toBuffer = getFactory().createNew(batchLength * batchSize);
+
+        for (int i = 0; i < batchLength; i++) {
+            copyUpperTriangle(N, M, toBuffer, i * batchSize, buffer, k);
+        }
 
         return create(toBuffer, getShape(), getStride());
     }
 
-    private void copyUpperTriangle(long N, long M, B to, B from, int k) {
+    private void copyUpperTriangle(long N, long M, B to, long toOffset, B from, int k) {
         for (long i = 0; i < N; i++) {
             for (long j = Math.max(0, i + k); j < M; j++) {
-                final long index = i * M + j;
+                final long index = toOffset + i * M + j;
                 to.set(from.get(index), index);
             }
         }
@@ -170,17 +177,23 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
         long N = shape[shape.length - 2];
         long M = shape[shape.length - 1];
-        B toBuffer = getFactory().createNew(N * M);
+        long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 2);
+        long batchLength = TensorShape.getLength(batchShape);
+        long batchSize = N * M;
 
-        copyLowerTriangle(N, M, toBuffer, buffer, k);
+        B toBuffer = getFactory().createNew(batchLength * batchSize);
+
+        for (int i = 0; i < batchLength; i++) {
+            copyLowerTriangle(N, M, toBuffer, i * batchSize, buffer, k);
+        }
 
         return create(toBuffer, getShape(), getStride());
     }
 
-    private void copyLowerTriangle(long N, long M, B to, B from, int k) {
+    private void copyLowerTriangle(long N, long M, B to, long toOffset, B from, int k) {
         for (long i = 0; i < N; i++) {
             for (long j = 0; j < Math.min(M, i - k + 1); j++) {
-                final long index = i * M + j;
+                final long index = toOffset + i * M + j;
                 to.set(from.get(index), index);
             }
         }
@@ -188,7 +201,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
     @Override
     public TENSOR fillTriangular(boolean fillUpper, boolean fillLower) {
-        Preconditions.checkArgument(shape.length >= 1, "fill symmetric works on rank >= 1");
+        Preconditions.checkArgument(shape.length >= 1, "Fill symmetric works on rank >= 1");
 
         final long endDim = shape[shape.length - 1];
         double a = Math.sqrt(1 + 8 * endDim);
@@ -198,9 +211,9 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
             "Length " + endDim + " is not the correct number of elements for a triangular matrix"
         );
 
-        final long n = ((long) a - 1) / 2;
-        final long n2 = n * n;
-        long[] resultShape = TensorShape.concat(ArrayUtils.subarray(shape, 0, shape.length - 1), new long[]{n, n});
+        final long N = ((long) a - 1) / 2;
+        final long NN = N * N;
+        long[] resultShape = TensorShape.concat(ArrayUtils.subarray(shape, 0, shape.length - 1), new long[]{N, N});
         final B newBuffer = getFactory().createNew(TensorShape.getLength(resultShape));
 
         long row = 0;
@@ -209,31 +222,72 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         for (long i = 0; i < bufferLength; i++) {
 
             final long batchNum = i / endDim;
-            final long batchOffset = batchNum * n2;
+            final long batchOffset = batchNum * NN;
 
             if (i % endDim == 0) {
                 row = 0;
                 col = 0;
             }
 
-            final long upperPos = batchOffset + row * n + col;
+            final long upperPos = batchOffset + row * N + col;
             if (fillUpper) {
                 newBuffer.set(buffer.get(i), upperPos);
             }
 
             if (fillLower) {
-                final long lowerPos = upperPos + (col - row) * (n - 1);
+                final long lowerPos = upperPos + (col - row) * (N - 1);
                 newBuffer.set(buffer.get(i), lowerPos);
             }
 
             col++;
-            if (col == n) {
+            if (col == N) {
                 row++;
                 col = row;
             }
         }
 
         return create(newBuffer, resultShape, TensorShape.getRowFirstStride(resultShape));
+    }
+
+    @Override
+    public TENSOR trianglePart(boolean upperPart) {
+        final long N = shape[shape.length - 2];
+        final long M = shape[shape.length - 1];
+        Preconditions.checkArgument(N == M, "Triangle part only supports square matrices");
+
+        final long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 2);
+        final long batchLength = TensorShape.getLength(batchShape);
+        final long batchSize = N * M;
+
+        final long vectorLength = N * (N + 1) / 2;
+        final long[] resultShape = TensorShape.concat(batchShape, new long[]{vectorLength});
+        final long resultLength = TensorShape.getLength(resultShape);
+        B resultBuffer = getFactory().createNew(resultLength);
+
+        int pos = 0;
+        if(upperPart) {
+            for (int i = 0; i < batchLength; i++) {
+                long batchOffset = i * batchSize;
+                for (int r = 0; r < N; r++) {
+                    for (int c = r; c < N; c++) {
+                        resultBuffer.set(buffer.get(batchOffset + r * N + c), pos);
+                        pos++;
+                    }
+                }
+            }
+        }else{
+            for (int i = 0; i < batchLength; i++) {
+                long batchOffset = i * batchSize;
+                for (int c = 0; c < N; c++) {
+                    for (int r = c; r < N; r++) {
+                        resultBuffer.set(buffer.get(batchOffset + r * N + c), pos);
+                        pos++;
+                    }
+                }
+            }
+        }
+
+        return create(resultBuffer, resultShape, TensorShape.getRowFirstStride(resultShape));
     }
 
     @Override

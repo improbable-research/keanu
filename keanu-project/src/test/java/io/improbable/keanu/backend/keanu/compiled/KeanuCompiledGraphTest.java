@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.If;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
 import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
@@ -203,9 +204,13 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
-    public void compilesSquareMatrices() {
-        assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::matrixDeterminant);
+    public void compilesInverseMatrices() {
         assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::matrixInverse);
+    }
+
+    @Test
+    public void compilesDeterminant() {
+        assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::matrixDeterminant);
     }
 
     private void assertUnaryDoubleMatches(Function<DoubleVertex, DoubleVertex> op) {
@@ -325,6 +330,50 @@ public class KeanuCompiledGraphTest {
     @Test
     public void canTakeBoolean() {
         assertUnaryBooleanMatches(new long[]{3, 4}, (a) -> a.take(1, 2));
+    }
+
+    @Test
+    public void canTriUpper() {
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(-2));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(-1));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(0));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(1));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(2));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(3));
+    }
+
+    @Test
+    public void canTriLower() {
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(-2));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(-1));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(0));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(1));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(2));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(3));
+    }
+
+    @Test
+    public void canFillTriangular() {
+        assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(false, false));
+        assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(true, false));
+        assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(false, true));
+        assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(true, true));
+    }
+
+    @Test
+    public void canTrianglePart() {
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.trianglePart(true));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.trianglePart(false));
+    }
+
+    @Test
+    public void canDiag() {
+        assertUnaryBooleanMatches(new long[]{4}, TensorVertex::diag);
+    }
+
+    @Test
+    public void canDiagParT() {
+        assertUnaryBooleanMatches(new long[]{4, 4}, TensorVertex::diagPart);
     }
 
     @Test

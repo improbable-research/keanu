@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
 import static io.improbable.keanu.vertices.VertexMatchers.hasValue;
+import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardModeGradient;
 import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesReverseModeGradient;
 import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.assertEquals;
@@ -66,8 +67,8 @@ public class MatrixDeterminantVertexTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void failsForNonMatrixInputs() {
-        final long[] shape = new long[]{2, 2, 2};
+    public void failsForVectorInputs() {
+        final long[] shape = new long[]{2};
         final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.create(1, shape));
         input.matrixDeterminant();
     }
@@ -108,6 +109,46 @@ public class MatrixDeterminantVertexTest {
 
         Keanu.Optimizer.of(net).maxLikelihood();
         assertEquals(input.getValue().matrixDeterminant().scalar(), 2.2, 0.1);
+    }
+
+    @Test
+    public void determinantDifferenceMatchesGradientForward() {
+        assertInverseDifferenceMatchesGradientForward(new long[]{3, 3});
+        assertInverseDifferenceMatchesGradientForward(new long[]{4, 4});
+    }
+
+    @Test
+    public void batchDeterminantDifferenceMatchesGradientForward() {
+        assertInverseDifferenceMatchesGradientForward(new long[]{2, 3, 3});
+        assertInverseDifferenceMatchesGradientForward(new long[]{3, 4, 4});
+    }
+
+    @Test
+    public void determinantDifferenceMatchesGradientReverse() {
+        assertInverseDifferenceMatchesGradientReverse(new long[]{3, 3});
+        assertInverseDifferenceMatchesGradientReverse(new long[]{4, 4});
+    }
+
+    @Test
+    public void batchDeterminantDifferenceMatchesGradientReverse() {
+        assertInverseDifferenceMatchesGradientReverse(new long[]{2, 3, 3});
+        assertInverseDifferenceMatchesGradientReverse(new long[]{3, 4, 4});
+    }
+
+    private void assertInverseDifferenceMatchesGradientForward(long[] shape) {
+        UniformVertex inputVertex = new UniformVertex(shape, 1.0, 25.0);
+        DoubleVertex invertVertex = inputVertex.matrixDeterminant();
+
+        finiteDifferenceMatchesForwardModeGradient(
+            ImmutableList.of(inputVertex), invertVertex, 0.001, 1e-5);
+    }
+
+    private void assertInverseDifferenceMatchesGradientReverse(long[] shape) {
+        UniformVertex inputVertex = new UniformVertex(shape, 1.0, 25.0);
+        DoubleVertex invertVertex = inputVertex.matrixDeterminant();
+
+        finiteDifferenceMatchesReverseModeGradient(
+            ImmutableList.of(inputVertex), invertVertex, 0.001, 1e-5);
     }
 
 }

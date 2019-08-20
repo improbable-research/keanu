@@ -28,18 +28,6 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
     }
 
     @Override
-    public TENSOR matrixInverse() {
-        return create(InvertMatrix.invert(tensor, false));
-    }
-
-    @Override
-    public TENSOR choleskyDecomposition() {
-        INDArray dup = tensor.dup();
-        Nd4j.getBlasWrapper().lapack().potrf(dup, true);
-        return create(dup);
-    }
-
-    @Override
     public TENSOR tensorMultiply(TENSOR value, int[] dimsLeft, int[] dimsRight) {
         return TensorMulByMatrixMul.tensorMmul(getThis(), value, dimsLeft, dimsRight);
     }
@@ -247,10 +235,31 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
 
     @Override
     public TENSOR matrixDeterminant() {
+        if (tensor.rank() > 2) {
+            return fromJVM(toJVM().matrixDeterminant());
+        }
         INDArray dup = tensor.dup();
         double[][] asMatrix = dup.toDoubleMatrix();
         RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
         return create(Nd4j.scalar(new LUDecomposition(matrix).getDeterminant()));
+    }
+
+    @Override
+    public TENSOR matrixInverse() {
+        if (tensor.rank() > 2) {
+            return fromJVM(toJVM().matrixInverse());
+        }
+        return create(InvertMatrix.invert(tensor, false));
+    }
+
+    @Override
+    public TENSOR choleskyDecomposition() {
+        if (tensor.rank() > 2) {
+            return fromJVM(toJVM().choleskyDecomposition());
+        }
+        INDArray dup = tensor.dup();
+        Nd4j.getBlasWrapper().lapack().potrf(dup, true);
+        return create(dup);
     }
 
     @Override
