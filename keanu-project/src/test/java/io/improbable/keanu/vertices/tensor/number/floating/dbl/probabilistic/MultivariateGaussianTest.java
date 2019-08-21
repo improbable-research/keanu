@@ -37,6 +37,7 @@ import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilis
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 
@@ -68,12 +69,12 @@ public class MultivariateGaussianTest {
     }
 
     @Test
-    public void throwsIfMuIsNotRank1() {
-        DoubleVertex mu = new ConstantDoubleVertex(new double[]{0.}, new long[]{1, 1});
+    public void throwsIfMuIsScalar() {
+        DoubleVertex mu = new ConstantDoubleVertex(new double[]{0.}, new long[0]);
         DoubleVertex covariance = new ConstantDoubleVertex(new double[]{1.}, new long[]{1, 1});
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Mu must be vector but was rank 2");
+        thrown.expectMessage("Mu must be at least a vector but was a scalar.");
 
         new MultivariateGaussianVertex(mu, covariance);
     }
@@ -114,7 +115,7 @@ public class MultivariateGaussianTest {
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(5, sigma * sigma);
 
         double expectedDensity = new NormalDistribution(5.0, sigma).logDensity(0.5);
-        double density = mvg.logPdf(DoubleTensor.scalar(0.5));
+        double density = mvg.logPdf(DoubleTensor.create(0.5));
 
         assertEquals(expectedDensity, density, 1e-2);
     }
@@ -279,11 +280,118 @@ public class MultivariateGaussianTest {
         mvg.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsMessageIfMuAndCovarianceBatchesAreNotBroadcastable() {
+        DoubleTensor mu = DoubleTensor.create(-1, 2, 2, 3, 4, 5).reshape(3, 2);
+        DoubleTensor covariance = DoubleTensor.create(0.5, 1.0, 0.25, 2).reshape(2, 2).diag();
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covariance);
+    }
+
+    @Test
+    public void canLogProbWithBatchCovariance() {
+        DoubleTensor mu = DoubleTensor.create(-1, 2);
+        DoubleTensor covariance = DoubleTensor.create(0.5, 1.0, 0.25, 2).pow(2).reshape(2, 2).diag();
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covariance);
+        DoubleTensor sample = mvg.sample();
+
+        assertArrayEquals(new long[]{2, 2}, sample.getShape());
+
+        double expected =
+            new NormalDistribution(-1, 0.5).logDensity(sample.getValue(0, 0))
+                + new NormalDistribution(2, 1).logDensity(sample.getValue(0, 1))
+                + new NormalDistribution(-1, 0.25).logDensity(sample.getValue(1, 0))
+                + new NormalDistribution(2, 2).logDensity(sample.getValue(1, 1));
+
+        double actual = mvg.logProb(sample);
+
+        assertEquals(expected, actual, 1e-6);
+    }
+
+    @Test
+    public void canLogProbWithBatchCovarianceSplit() {
+        DoubleTensor mu = DoubleTensor.create(-1, 2);
+        DoubleTensor covariance1 = DoubleTensor.create(0.5, 1.0).pow(2).diag();
+        DoubleTensor covariance2 = DoubleTensor.create(0.25, 2).pow(2).diag();
+        MultivariateGaussianVertex mvg1 = new MultivariateGaussianVertex(mu, covariance1);
+        MultivariateGaussianVertex mvg2 = new MultivariateGaussianVertex(mu, covariance2);
+        DoubleTensor sample1 = mvg1.sample();
+        DoubleTensor sample2 = mvg2.sample();
+
+        assertArrayEquals(new long[]{2}, sample1.getShape());
+        assertArrayEquals(new long[]{2}, sample2.getShape());
+
+        double expected =
+            new NormalDistribution(-1, 0.5).logDensity(sample1.getValue(0))
+                + new NormalDistribution(2, 1).logDensity(sample1.getValue(1))
+                + new NormalDistribution(-1, 0.25).logDensity(sample2.getValue(0))
+                + new NormalDistribution(2, 2).logDensity(sample2.getValue(1));
+
+        double actual1 = mvg1.logProb(sample1);
+        double actual2 = mvg2.logProb(sample2);
+
+        assertEquals(expected, actual1 + actual2, 1e-6);
+    }
+
+    @Test
+    public void canLogProbWithBatchMu() {
+        DoubleTensor mu = DoubleTensor.create(-1, 2, 0.5, 1.5).reshape(2, 2);
+        DoubleTensor covariance = DoubleTensor.create(0.5, 1.0).pow(2).diag();
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covariance);
+        DoubleTensor sample = mvg.sample();
+
+        assertArrayEquals(new long[]{2, 2}, sample.getShape());
+
+        double expectedLogDensity =
+            new NormalDistribution(-1, 0.5).logDensity(sample.getValue(0, 0))
+                + new NormalDistribution(2, 1).logDensity(sample.getValue(0, 1))
+                + new NormalDistribution(0.5, 0.5).logDensity(sample.getValue(1, 0))
+                + new NormalDistribution(1.5, 1).logDensity(sample.getValue(1, 1));
+
+        assertEquals(mvg.logProb(sample), expectedLogDensity, 1e-6);
+    }
+
+    @Test
+    public void canLogProbWithBatchMuAndCovariance() {
+        DoubleTensor mu = DoubleTensor.create(-1, 2, 0.5, 1.5).reshape(2, 2);
+        DoubleTensor covariance = DoubleTensor.create(0.5, 1.0, 0.25, 2).pow(2).reshape(2, 2).diag();
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covariance);
+        DoubleTensor sample = mvg.sample();
+
+        assertArrayEquals(new long[]{2, 2}, sample.getShape());
+
+        double expectedLogDensity =
+            new NormalDistribution(-1, 0.5).logDensity(sample.getValue(0, 0))
+                + new NormalDistribution(2, 1).logDensity(sample.getValue(0, 1))
+                + new NormalDistribution(0.5, 0.25).logDensity(sample.getValue(1, 0))
+                + new NormalDistribution(1.5, 2).logDensity(sample.getValue(1, 1));
+
+        assertEquals(mvg.logProb(sample), expectedLogDensity, 1e-6);
+
+        DoubleTensor batchSample = mvg.sampleWithShape(new long[]{2, 2, 2});
+        assertArrayEquals(new long[]{2, 2, 2}, batchSample.getShape());
+
+        double expected =
+            new NormalDistribution(-1, 0.5).logDensity(batchSample.getValue(0, 0, 0))
+                + new NormalDistribution(2, 1).logDensity(batchSample.getValue(0, 0, 1))
+                + new NormalDistribution(0.5, 0.25).logDensity(batchSample.getValue(0, 1, 0))
+                + new NormalDistribution(1.5, 2).logDensity(batchSample.getValue(0, 1, 1))
+
+                + new NormalDistribution(-1, 0.5).logDensity(batchSample.getValue(1, 0, 0))
+                + new NormalDistribution(2, 1).logDensity(batchSample.getValue(1, 0, 1))
+                + new NormalDistribution(0.5, 0.25).logDensity(batchSample.getValue(1, 1, 0))
+                + new NormalDistribution(1.5, 2).logDensity(batchSample.getValue(1, 1, 1));
+
+        double actual = mvg.logProb(batchSample);
+
+        assertEquals(expected, actual, 1e-6);
+    }
+
     @Test
     public void dlogProbMatchesBivariateDiagonalGaussian() {
         UniformVertex mu = new UniformVertex(new long[]{2}, 0, 1);
         mu.setValue(DoubleTensor.create(-1, 2));
-        UniformVertex sigma = new UniformVertex(new long[]{2}, 0, 1);
+        UniformVertex sigma = new UniformVertex(
+            new long[]{2}, 0, 1);
         sigma.setValue(DoubleTensor.create(0.5, 1.0));
         DoubleVertex covariance = sigma.pow(2).diag();
 

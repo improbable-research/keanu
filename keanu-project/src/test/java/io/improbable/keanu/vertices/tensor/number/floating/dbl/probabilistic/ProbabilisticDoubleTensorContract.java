@@ -106,7 +106,7 @@ public class ProbabilisticDoubleTensorContract {
             double percentage = (double) sampleBucket.getValue() / samples.length;
             double bucketCenter = sampleBucket.getKey();
 
-            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(DoubleTensor.scalar(bucketCenter)));
+            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(DoubleTensor.create(bucketCenter).reshape(vertexUnderTest.getShape())));
             double actual = percentage / bucketSize;
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
         }

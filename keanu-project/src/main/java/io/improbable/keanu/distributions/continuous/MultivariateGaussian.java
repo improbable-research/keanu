@@ -10,6 +10,8 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
+
 public class MultivariateGaussian implements ContinuousDistribution {
 
     private static final double LOG_2_PI = Math.log(2 * Math.PI);
@@ -26,27 +28,84 @@ public class MultivariateGaussian implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        validateXShape(shape, mu.getShape());
-        long[] batchShape = ArrayUtils.subarray(shape, 0, shape.length - 1);
+    public DoubleTensor sample(long[] xShape, KeanuRandom random) {
+        validateShapes(xShape, mu.getShape(), covariance.getShape());
+
+        final long N = xShape[xShape.length - 1];
+        final long[] xBatchShape = getBatch(xShape, 1);
+
         final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
-        final DoubleTensor variateSamples = random.nextGaussian(TensorShape.concat(batchShape, new long[]{mu.getShape()[0], 1}));
+        final DoubleTensor variateSamples = random.nextGaussian(TensorShape.concat(xBatchShape, new long[]{N, 1}));
         final DoubleTensor covTimesVariates = choleskyCov.matrixMultiply(variateSamples);
-        return covTimesVariates.reshape(shape).plus(mu);
+        return covTimesVariates.reshape(xShape).plus(mu);
     }
 
-    private void validateXShape(long[] xShape, long[] muShape) {
-        if (xShape[xShape.length - 1] != muShape[muShape.length - 1]) {
+    private void validateShapes(long[] xShape, long[] muShape, long[] covarianceShape) {
+        if (xShape.length == 0) {
+            throw new IllegalArgumentException(
+                "X shape cannot be scalar. It must at least be a vector of length 1. Use a Gaussian distribution for scalar x."
+            );
+        }
+
+        if (muShape.length == 0) {
+            throw new IllegalArgumentException(
+                "Mu shape cannot be scalar. It must at least be a vector of length 1."
+            );
+        }
+
+        if (covarianceShape.length < 2) {
+            throw new IllegalArgumentException(
+                "Covariance matrix shape must be a matrix or a batch of matrices."
+            );
+        }
+
+        final long xN = xShape[xShape.length - 1];
+        final long muN = muShape[muShape.length - 1];
+        final long covN = covarianceShape[covarianceShape.length - 1];
+        final long covM = covarianceShape[covarianceShape.length - 2];
+
+        if (xN != muN) {
             throw new IllegalArgumentException("Illegal x shape " + Arrays.toString(xShape) + " for mu shape " + Arrays.toString(muShape));
         }
+
+        if (covN != xN) {
+            throw new IllegalArgumentException("Illegal covariance shape " + Arrays.toString(covarianceShape) + " for x shape " + Arrays.toString(xShape));
+        }
+
+        if (covN != covM) {
+            throw new IllegalArgumentException("Illegal covariance shape " + Arrays.toString(covarianceShape) + ". Shape must be square.");
+        }
+
+        if (xShape.length > 1 || muShape.length > 1 || covarianceShape.length > 2) {
+            final long[] xBatchShape = getBatch(xShape, 1);
+            final long[] muBatchShape = getBatch(muShape, 1);
+            final long[] covBatchShape = getBatch(covarianceShape, 2);
+
+            if (!isBroadcastable(xBatchShape, muBatchShape, covBatchShape)) {
+                throw new IllegalArgumentException(
+                    "x batch shape " + Arrays.toString(xBatchShape) +
+                        " is not broadcastable with mu batch shape " + Arrays.toString(muBatchShape) +
+                        " and covariance shape " + Arrays.toString(covBatchShape)
+                );
+            }
+        }
+    }
+
+    private long[] getBatch(long[] shape, int eventRank) {
+        return ArrayUtils.subarray(shape, 0, shape.length - eventRank);
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
+        validateShapes(x.getShape(), mu.getShape(), covariance.getShape());
+
         try {
+            final long[] xShape = x.getShape();
+            final long N = xShape[xShape.length - 1];
+
             final DoubleTensor choleskyOfCovariance = covariance.choleskyDecomposition();
-            final double kLog2Pi = mu.getShape()[0] * LOG_2_PI;
-            final double logCovDet = choleskyOfCovariance.diagPart().log().sum().scalar() * 2;
+            final double kLog2Pi = N * LOG_2_PI;
+            final DoubleTensor logCovDet = choleskyOfCovariance.diagPart().log().sum(-1).times(2);
             final DoubleTensor xMinusMu = x.minus(mu);
 
             DoubleTensor covInv = choleskyOfCovariance.choleskyInverse();
@@ -56,12 +115,14 @@ public class MultivariateGaussian implements ContinuousDistribution {
             long[] fromLeftShape = ArrayUtils.insert(xMinusMuShape.length - 1, xMinusMuShape, 1);
             long[] fromRightShape = ArrayUtils.add(xMinusMuShape, 1);
 
-            final DoubleTensor xmuCovXmu = xMinusMu.reshape(fromLeftShape)
+            DoubleTensor xmuCovXmu = xMinusMu.reshape(fromLeftShape)
                 .matrixMultiply(
                     covInv.matrixMultiply(xMinusMu.reshape(fromRightShape))
                 );
 
-            return xmuCovXmu.plus(kLog2Pi + logCovDet).sum().times(-0.5);
+            xmuCovXmu = xmuCovXmu.reshape(getBatch(xmuCovXmu.getShape(), 2));
+
+            return xmuCovXmu.plus(logCovDet.plus(kLog2Pi)).sum().times(-0.5);
 
         } catch (IllegalStateException ise) {
             return DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
@@ -74,7 +135,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
         if (!wrtX && !wrtMu && !wrtCovariance) {
             return diff;
         }
-        
+
         DoubleTensor covInv = covariance.choleskyDecomposition().choleskyInverse();
         covInv = covInv.plus(covInv.triLower(1).transpose());
 

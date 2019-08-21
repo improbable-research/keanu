@@ -110,6 +110,10 @@ public class TensorShape {
      * @return the flat index from a N dimensional index
      */
     public static long getFlatIndex(long[] shape, long[] stride, long... index) {
+        if (index.length != shape.length) {
+            throw new IllegalArgumentException("Cannot get index " + Arrays.toString(index) + " for shape " + Arrays.toString(shape));
+        }
+
         long flatIndex = 0;
         for (int i = 0; i < shape.length; i++) {
 
@@ -213,6 +217,14 @@ public class TensorShape {
 
     public static long[] calculateShapeForLengthOneBroadcast(long[] shape1, long[] shape2) {
         return (shape1.length >= shape2.length) ? shape1 : shape2;
+    }
+
+    public static long[] getBroadcastResultShape(long[] a, long[]... b) {
+        long[] result = a;
+        for (long[] right : b) {
+            result = TensorShape.getBroadcastResultShape(result, right);
+        }
+        return result;
     }
 
     public static long[] getBroadcastResultShape(long[] left, long[] right) {

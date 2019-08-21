@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
@@ -17,6 +18,7 @@ import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,7 +73,11 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
      * @param covariance the scale of the identity matrix
      */
     public MultivariateGaussianVertex(Vertex<DoubleTensor, ?> mu, double covariance) {
-        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0]).times(covariance)));
+        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[mu.getShape().length - 1]).times(covariance)));
+    }
+
+    public MultivariateGaussianVertex(DoubleTensor mu, DoubleTensor covariance) {
+        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(covariance));
     }
 
     public MultivariateGaussianVertex(double mu, double covariance) {
@@ -157,20 +163,39 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
 
     private static long[] checkValidMultivariateShape(long[] muShape, long[] covarianceShape) {
 
-        if (covarianceShape.length != 2) {
-            throw new IllegalArgumentException("Covariance must be matrix but was rank " + covarianceShape.length);
+        if (covarianceShape.length < 2) {
+            throw new IllegalArgumentException("Covariance must be at least matrix but was rank " + covarianceShape.length);
         }
 
-        if (muShape.length != 1) {
-            throw new IllegalArgumentException("Mu must be vector but was rank " + muShape.length);
+        if (muShape.length < 1) {
+            throw new IllegalArgumentException("Mu must be at least a vector but was a scalar.");
         }
 
-        if (covarianceShape[0] != covarianceShape[1]) {
+        long covN = covarianceShape[covarianceShape.length - 1];
+        long covM = covarianceShape[covarianceShape.length - 2];
+
+        if (covN != covM) {
             throw new IllegalArgumentException("Covariance matrix must be square. Given shape: " + Arrays.toString(covarianceShape));
         }
 
-        if (muShape[0] != covarianceShape[0]) {
-            throw new IllegalArgumentException("Dimension 0 of mu must equal dimension 0 of covariance. Given: mu " + muShape[0] + ", covariance " + covarianceShape[0]);
+        long muN = muShape[muShape.length - 1];
+        if (muN != covN) {
+            throw new IllegalArgumentException("Dimension 0 of mu must equal dimension 0 of covariance. Given: mu " + muN + ", covariance " + covN);
+        }
+
+        if (covarianceShape.length > 2 || muShape.length > 1) {
+            long[] muBatchShape = ArrayUtils.subarray(muShape, 0, muShape.length - 1);
+            long[] covBatchShape = ArrayUtils.subarray(covarianceShape, 0, covarianceShape.length - 2);
+
+            try {
+                long[] broadcastResultShape = TensorShape.getBroadcastResultShape(muBatchShape, covBatchShape);
+                return TensorShape.concat(broadcastResultShape, new long[]{muN});
+            } catch (IllegalArgumentException iae) {
+                throw new IllegalArgumentException(
+                    "Mu batch shape " + Arrays.toString(muBatchShape) +
+                        " is not broadcastable with covariance batch shape " + Arrays.toString(covBatchShape)
+                );
+            }
         }
 
         return muShape;
