@@ -21,8 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
@@ -45,7 +44,7 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
                           @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu,
                           @LoadVertexParam(SIGMA_NAME) Vertex<DoubleTensor, ?> sigma) {
         super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), sigma.getShape());
+        getBroadcastResultShape(tensorShape, mu.getShape(), sigma.getShape());
 
         this.mu = wrapIfNeeded(mu);
         this.sigma = wrapIfNeeded(sigma);
@@ -54,7 +53,7 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
 
     @ExportVertexToPythonBindings
     public GaussianVertex(Vertex<DoubleTensor, ?> mu, Vertex<DoubleTensor, ?> sigma) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), sigma.getShape()), mu, sigma);
+        this(getBroadcastResultShape(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
     public GaussianVertex(Vertex<DoubleTensor, ?> mu, double sigma) {
@@ -79,6 +78,14 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
 
     public GaussianVertex(long[] tensorShape, double mu, double sigma) {
         this(tensorShape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
+    }
+
+    public GaussianVertex(long[] tensorShape, DoubleTensor mu, DoubleTensor sigma) {
+        this(tensorShape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
+    }
+
+    public GaussianVertex(DoubleTensor mu, DoubleTensor sigma) {
+        this(getBroadcastResultShape(mu.getShape(), sigma.getShape()), new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
 
     @SaveVertexParam(MU_NAME)

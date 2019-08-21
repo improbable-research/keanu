@@ -308,31 +308,6 @@ public class MultivariateGaussianTest {
     }
 
     @Test
-    public void canLogProbWithBatchCovarianceSplit() {
-        DoubleTensor mu = DoubleTensor.create(-1, 2);
-        DoubleTensor covariance1 = DoubleTensor.create(0.5, 1.0).pow(2).diag();
-        DoubleTensor covariance2 = DoubleTensor.create(0.25, 2).pow(2).diag();
-        MultivariateGaussianVertex mvg1 = new MultivariateGaussianVertex(mu, covariance1);
-        MultivariateGaussianVertex mvg2 = new MultivariateGaussianVertex(mu, covariance2);
-        DoubleTensor sample1 = mvg1.sample();
-        DoubleTensor sample2 = mvg2.sample();
-
-        assertArrayEquals(new long[]{2}, sample1.getShape());
-        assertArrayEquals(new long[]{2}, sample2.getShape());
-
-        double expected =
-            new NormalDistribution(-1, 0.5).logDensity(sample1.getValue(0))
-                + new NormalDistribution(2, 1).logDensity(sample1.getValue(1))
-                + new NormalDistribution(-1, 0.25).logDensity(sample2.getValue(0))
-                + new NormalDistribution(2, 2).logDensity(sample2.getValue(1));
-
-        double actual1 = mvg1.logProb(sample1);
-        double actual2 = mvg2.logProb(sample2);
-
-        assertEquals(expected, actual1 + actual2, 1e-6);
-    }
-
-    @Test
     public void canLogProbWithBatchMu() {
         DoubleTensor mu = DoubleTensor.create(-1, 2, 0.5, 1.5).reshape(2, 2);
         DoubleTensor covariance = DoubleTensor.create(0.5, 1.0).pow(2).diag();
