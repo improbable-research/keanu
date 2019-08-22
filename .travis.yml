@@ -1,7 +1,7 @@
-dist: trusty
 matrix:
   include:
     - language: java
+      dist: trusty
       jdk: openjdk8
       addons:
         sonarcloud:
@@ -12,6 +12,7 @@ matrix:
       - openssl aes-256-cbc -K $encrypted_eec04b57ffc0_key -iv $encrypted_eec04b57ffc0_iv
         -in ci/secret-keys-keanu.gpg.enc -out ci/secret-keys-keanu.gpg -d
     - language: python
+      dist: trusty
       python: 3.6
       env:
         - PIPENV_IGNORE_VIRTUALENVS=1
