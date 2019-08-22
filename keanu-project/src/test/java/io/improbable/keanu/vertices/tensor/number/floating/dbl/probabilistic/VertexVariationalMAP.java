@@ -21,6 +21,15 @@ public class VertexVariationalMAP {
         List<DoubleVertex> hyperParamsForSampling,
         List<DoubleVertex> latentsToInfer,
         KeanuRandom random) {
+        inferHyperParamsFromSamples(vertexUnderTestCreator, hyperParamsForSampling, latentsToInfer, 0.1, random);
+    }
+
+    public static void inferHyperParamsFromSamples(
+        Function<List<DoubleVertex>, DoubleVertex> vertexUnderTestCreator,
+        List<DoubleVertex> hyperParamsForSampling,
+        List<DoubleVertex> latentsToInfer,
+        Double epsilon,
+        KeanuRandom random) {
 
         // SOURCE OF TRUTH
         DoubleVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
@@ -35,7 +44,7 @@ public class VertexVariationalMAP {
         doInferenceOn(latentsToInfer.get(0), random);
 
         for (int i = 0; i < latentsToInfer.size(); i++) {
-            assertThat(latentsToInfer.get(i).getValue(), valuesWithinEpsilonAndShapesMatch(hyperParamsForSampling.get(i).getValue(), 0.1));
+            assertThat(latentsToInfer.get(i).getValue(), valuesWithinEpsilonAndShapesMatch(hyperParamsForSampling.get(i).getValue(), epsilon));
         }
     }
 

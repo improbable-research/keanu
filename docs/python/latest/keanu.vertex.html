@@ -168,6 +168,19 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="keanu.vertex.FillTriangular">
+<code class="descclassname">keanu.vertex.</code><code class="descname">FillTriangular</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>fill_upper</em>, <em>fill_lower</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#FillTriangular"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.FillTriangular" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="keanu.vertex.Permute">
 <code class="descclassname">keanu.vertex.</code><code class="descname">Permute</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>rearrange</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Permute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Permute" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -231,6 +244,45 @@
 <dl class="function">
 <dt id="keanu.vertex.Take">
 <code class="descclassname">keanu.vertex.</code><code class="descname">Take</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>index</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#Take"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Take" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.TriLower">
+<code class="descclassname">keanu.vertex.</code><code class="descname">TriLower</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>k</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#TriLower"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.TriLower" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.TriUpper">
+<code class="descclassname">keanu.vertex.</code><code class="descname">TriUpper</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>k</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#TriUpper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.TriUpper" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.TrianglePart">
+<code class="descclassname">keanu.vertex.</code><code class="descname">TrianglePart</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>upper_part</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#TrianglePart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.TrianglePart" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1125,7 +1177,11 @@ a matching shaped Laplace.</p>
 <dl class="function">
 <dt id="keanu.vertex.MultivariateGaussian">
 <code class="descclassname">keanu.vertex.</code><code class="descname">MultivariateGaussian</code><span class="sig-paren">(</span><em>mu</em>, <em>covariance</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#MultivariateGaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.MultivariateGaussian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Matches a mu and covariance of some shape to a Multivariate Gaussian</p>
+<dd><p>Matches a mu and full covariance matrix of some shape to a Multivariate Gaussian distribution. Mu should
+be shape (batchShape, N) where N is the number of dimensions and batchShape can be any shape that is broadcastable
+with the covariance batchShape if it is also batched. The covariance matrix should be shape (batchShape, N, N) where
+the batchShape must be broadcastable with the batchShape of mu. Only the lower triangle of the covariance matrix
+is used due to it being assumed to be a symmetric matrix. The upper triangle will be ignored.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

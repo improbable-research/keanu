@@ -112,6 +112,15 @@ public class TensorShapeValidation {
         }
     }
 
+    public static boolean isBroadcastable(long[] a, long[]... b) {
+        try {
+            TensorShape.getBroadcastResultShape(a, b);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
     /**
      * @param predicate shape of predicate
      * @param thn       shape of then

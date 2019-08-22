@@ -18,14 +18,37 @@ import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholder
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+/**
+ * A full covariance matrix multivariate gaussian distribution. This vertex supports batching of all parameters.
+ * <p>
+ * If the covariance matrix is simply a diagonal matrix then it will be more efficient to use the GaussianVertex with
+ * batched mu and sigma. E.g.
+ * <p>
+ * a MultivariateGaussianVertex with covariance
+ * <p>
+ * [1, 0]
+ * [0, 2]
+ * <p>
+ * and mu
+ * <p>
+ * [-1, 2]
+ * <p>
+ * is the same as a GaussianVertex with sigma
+ * <p>
+ * [1, 2]
+ * <p>
+ * and mu
+ * <p>
+ * [-1, 2]
+ */
+public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex>
+    implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;
@@ -33,18 +56,40 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
     private static final String COVARIANCE_NAME = "covariance";
 
     /**
-     * Multivariate gaussian distribution. The shape is driven from mu, which must be a vector.
-     * The shape of the covariance (matrix) must be a square that is the same height as mu.
+     * Multivariate gaussian distribution. Each parameter must have shapes that agree on the number of dimensions N.
+     * E.g.
+     * mu shape of (2) and therefore N = 2
+     * covariance shape of (2, 2) and therefore N = 2
+     * <p>
+     * would have a result shape of (2)
+     * <p>
+     * This is the most common and most simple use case. More complex use cases can take advantage of batching.
+     * <p>
+     * Each parameter can be batched but if multiple parameters are batched then the batchShape must be broadcastable.
+     * E.g.
+     * <p>
+     * mu shape of (2, 2) and therefore batchShape = (2) N = 2
+     * covariance shape of (3, 1, 2, 2) and therefore batchShape = (3, 1), N = 2
+     * <p>
+     * would have a result shape of (3, 2, 2) and therefore batchShape = (3, 2) by broadcasting (2) with (3, 1)
+     * <p>
+     * If the result shape is (3, 2, 2) then the shape parameter here can further be used to batch. E.g. if the
+     * shape parameter could be (4, 3, 2, 2) to further batch (4)
      *
-     * @param shape      the desired shape of the vertex
-     * @param mu         the mu of the Multivariate Gaussian
-     * @param covariance the covariance matrix of the Multivariate Gaussian
+     * @param shape      the desired shape of the vertex including any batching. Must be shape (batchShape, N),where N is the
+     *                   number of dimensions and the batchShape can be any shape as long as it is broadcastable with
+     *                   any other batched parameter.
+     * @param mu         the mu of the Multivariate Gaussian. Must have shape (batchShape, N), where N is the
+     *                   number of dimensions and the batchShape can be any shape as long as it is broadcastable with
+     *                   any other batched parameter.
+     * @param covariance the covariance matrix of the Multivariate Gaussian. Must have shape (batchShape, N, N) where
+     *                   N is the number of dimensions. The batchShape can be any shape as long as it is broadcastable with
+     *                   any other batched parameter.
      */
     public MultivariateGaussianVertex(@LoadShape long[] shape,
                                       @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu,
                                       @LoadVertexParam(COVARIANCE_NAME) Vertex<DoubleTensor, ?> covariance) {
-        super(shape);
-        checkValidMultivariateShape(mu.getShape(), covariance.getShape());
+        super(MultivariateGaussian.validateShapes(shape, mu.getShape(), covariance.getShape()));
 
         this.mu = wrapIfNeeded(mu);
         this.covariance = wrapIfNeeded(covariance);
@@ -52,34 +97,45 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
     }
 
     /**
-     * Matches a mu and covariance of some shape to a Multivariate Gaussian
+     * Matches a mu and full covariance matrix of some shape to a Multivariate Gaussian distribution. Mu should
+     * be shape (batchShape, N) where N is the number of dimensions and batchShape can be any shape that is broadcastable
+     * with the covariance batchShape if it is also batched. The covariance matrix should be shape (batchShape, N, N) where
+     * the batchShape must be broadcastable with the batchShape of mu. Only the lower triangle of the covariance matrix
+     * is used due to it being assumed to be a symmetric matrix. The upper triangle will be ignored.
      *
      * @param mu         the mu of the Multivariate Gaussian
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     @ExportVertexToPythonBindings
     public MultivariateGaussianVertex(Vertex<DoubleTensor, ?> mu, Vertex<DoubleTensor, ?> covariance) {
-        this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
+        this(MultivariateGaussian.validateShapes(mu.getShape(), mu.getShape(), covariance.getShape()), mu, covariance);
     }
 
     /**
      * Matches a mu to a Multivariate Gaussian. The covariance value provided here
-     * is used to create a covariance tensor by multiplying the scalar value against
+     * is used to create a covariance matrix by multiplying the scalar value against
      * an identity matrix of the appropriate size.
      *
      * @param mu         the mu of the Multivariate Gaussian
      * @param covariance the scale of the identity matrix
      */
     public MultivariateGaussianVertex(Vertex<DoubleTensor, ?> mu, double covariance) {
-        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0]).times(covariance)));
+        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[mu.getShape().length - 1]).times(covariance)));
     }
 
+    public MultivariateGaussianVertex(DoubleTensor mu, DoubleTensor covariance) {
+        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(covariance));
+    }
+
+    /**
+     * This treats the MultivariateGaussianVertex as effectively a GaussianVertex. Using the GaussianVertex will be
+     * more efficient.
+     *
+     * @param mu         the mu for the distribution
+     * @param covariance the value used to create a 1x1 covariance matrix
+     */
     public MultivariateGaussianVertex(double mu, double covariance) {
-        this(new ConstantDoubleVertex(DoubleTensor.vector(mu)), oneByOneMatrix(covariance));
-    }
-
-    private static DoubleVertex oneByOneMatrix(double value) {
-        return new ConstantDoubleVertex(DoubleTensor.create(value, new long[]{1, 1}));
+        this(new ConstantDoubleVertex(DoubleTensor.vector(mu)), new ConstantDoubleVertex(DoubleTensor.create(covariance, new long[]{1, 1})));
     }
 
     @SaveVertexParam(MU_NAME)
@@ -114,15 +170,6 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
             .build();
     }
 
-
-    /**
-     * Math credit to:
-     * https://math.stackexchange.com/questions/1599966/derivative-of-multivariate-normal-distribution-wrt-mean-and-covariance
-     *
-     * @param x             at value
-     * @param withRespectTo list of parents to differentiate with respect to
-     * @return the derivative of the logProb wrt given vertices
-     */
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor x, Set<? extends Vertex> withRespectTo) {
 
@@ -153,26 +200,5 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
     @Override
     public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return MultivariateGaussian.withParameters(mu.getValue(), covariance.getValue()).sample(shape, random);
-    }
-
-    private static long[] checkValidMultivariateShape(long[] muShape, long[] covarianceShape) {
-
-        if (covarianceShape.length != 2) {
-            throw new IllegalArgumentException("Covariance must be matrix but was rank " + covarianceShape.length);
-        }
-
-        if (muShape.length != 1) {
-            throw new IllegalArgumentException("Mu must be vector but was rank " + muShape.length);
-        }
-
-        if (covarianceShape[0] != covarianceShape[1]) {
-            throw new IllegalArgumentException("Covariance matrix must be square. Given shape: " + Arrays.toString(covarianceShape));
-        }
-
-        if (muShape[0] != covarianceShape[0]) {
-            throw new IllegalArgumentException("Dimension 0 of mu must equal dimension 0 of covariance. Given: mu " + muShape[0] + ", covariance " + covarianceShape[0]);
-        }
-
-        return muShape;
     }
 }

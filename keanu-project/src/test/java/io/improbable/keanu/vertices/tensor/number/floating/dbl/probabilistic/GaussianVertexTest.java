@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class GaussianVertexTest {
@@ -128,6 +129,80 @@ public class GaussianVertexTest {
         Supplier<GaussianVertex> vertexSupplier = () -> new GaussianVertex(muTensor, sigmaTensor);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+    }
+
+    @Test
+    public void canLogProbWithBatchSigma() {
+        DoubleTensor mu = DoubleTensor.create(-1, 2);
+        DoubleTensor sigma = DoubleTensor.create(0.5, 1.0, 0.25, 2).reshape(2, 2);
+        GaussianVertex g = new GaussianVertex(mu, sigma);
+        DoubleTensor sample = g.sample();
+
+        assertArrayEquals(new long[]{2, 2}, sample.getShape());
+
+        double expected =
+            new NormalDistribution(-1, 0.5).logDensity(sample.getValue(0, 0))
+                + new NormalDistribution(2, 1).logDensity(sample.getValue(0, 1))
+                + new NormalDistribution(-1, 0.25).logDensity(sample.getValue(1, 0))
+                + new NormalDistribution(2, 2).logDensity(sample.getValue(1, 1));
+
+        double actual = g.logProb(sample);
+
+        assertEquals(expected, actual, 1e-6);
+    }
+
+    @Test
+    public void canLogProbWithBatchMu() {
+        DoubleTensor mu = DoubleTensor.create(-1, 2, 0.5, 1.5).reshape(2, 2);
+        DoubleTensor sigma = DoubleTensor.create(0.5, 1.0);
+        GaussianVertex g = new GaussianVertex(mu, sigma);
+        DoubleTensor sample = g.sample();
+
+        assertArrayEquals(new long[]{2, 2}, sample.getShape());
+
+        double expectedLogDensity =
+            new NormalDistribution(-1, 0.5).logDensity(sample.getValue(0, 0))
+                + new NormalDistribution(2, 1).logDensity(sample.getValue(0, 1))
+                + new NormalDistribution(0.5, 0.5).logDensity(sample.getValue(1, 0))
+                + new NormalDistribution(1.5, 1).logDensity(sample.getValue(1, 1));
+
+        assertEquals(g.logProb(sample), expectedLogDensity, 1e-6);
+    }
+
+    @Test
+    public void canLogProbWithBatchMuAndSigma() {
+        DoubleTensor mu = DoubleTensor.create(-1, 2, 0.5, 1.5).reshape(2, 2);
+        DoubleTensor sigma = DoubleTensor.create(0.5, 1.0, 0.25, 2).reshape(2, 2);
+        GaussianVertex g = new GaussianVertex(mu, sigma);
+        DoubleTensor sample = g.sample();
+
+        assertArrayEquals(new long[]{2, 2}, sample.getShape());
+
+        double expectedLogDensity =
+            new NormalDistribution(-1, 0.5).logDensity(sample.getValue(0, 0))
+                + new NormalDistribution(2, 1).logDensity(sample.getValue(0, 1))
+                + new NormalDistribution(0.5, 0.25).logDensity(sample.getValue(1, 0))
+                + new NormalDistribution(1.5, 2).logDensity(sample.getValue(1, 1));
+
+        assertEquals(g.logProb(sample), expectedLogDensity, 1e-6);
+
+        DoubleTensor batchSample = g.sampleWithShape(new long[]{2, 2, 2});
+        assertArrayEquals(new long[]{2, 2, 2}, batchSample.getShape());
+
+        double expected =
+            new NormalDistribution(-1, 0.5).logDensity(batchSample.getValue(0, 0, 0))
+                + new NormalDistribution(2, 1).logDensity(batchSample.getValue(0, 0, 1))
+                + new NormalDistribution(0.5, 0.25).logDensity(batchSample.getValue(0, 1, 0))
+                + new NormalDistribution(1.5, 2).logDensity(batchSample.getValue(0, 1, 1))
+
+                + new NormalDistribution(-1, 0.5).logDensity(batchSample.getValue(1, 0, 0))
+                + new NormalDistribution(2, 1).logDensity(batchSample.getValue(1, 0, 1))
+                + new NormalDistribution(0.5, 0.25).logDensity(batchSample.getValue(1, 1, 0))
+                + new NormalDistribution(1.5, 2).logDensity(batchSample.getValue(1, 1, 1));
+
+        double actual = g.logProb(batchSample);
+
+        assertEquals(expected, actual, 1e-6);
     }
 
     @Test
