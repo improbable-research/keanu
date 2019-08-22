@@ -162,4 +162,26 @@ public class PoissonVertexTest {
             random
         );
     }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(4.5, 8);
+
+        List<DoubleVertex> mu = new ArrayList<>();
+        mu.add(ConstantVertex.of(trueMu));
+
+        List<DoubleVertex> latents = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(0.01, 10.0);
+        latentMu.setAndCascade(DoubleTensor.create(9.9, 2));
+        latents.add(latentMu);
+
+        int numSamples = 2000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new PoissonVertex(new long[]{numSamples, 2}, hyperParams.get(0)),
+            mu,
+            latents,
+            random
+        );
+    }
 }

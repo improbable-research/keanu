@@ -4,6 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
@@ -24,7 +25,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
@@ -42,8 +42,7 @@ public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex> impl
      */
     public PoissonVertex(@LoadShape long[] shape,
                          @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu) {
-        super(shape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, mu.getShape());
+        super(TensorShape.getBroadcastResultShape(shape, mu.getShape()));
 
         this.mu = wrapIfNeeded(mu);
         setParents(mu);
