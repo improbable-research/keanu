@@ -429,8 +429,8 @@ public class MultivariateGaussianTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdMu() {
-        UniformVertex uniformA = new UniformVertex(new long[]{2}, -100, 100);
-        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(uniformA, ConstantVertex.of(0.5, 2).diag());
+        UniformVertex mu = new UniformVertex(new long[]{2}, -100, 100);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, ConstantVertex.of(0.5, 2).diag());
 
         DoubleTensor vertexStartValue = DoubleTensor.create(-10, 3);
         DoubleTensor vertexEndValue = DoubleTensor.create(-9.5, 3.5);
@@ -440,7 +440,49 @@ public class MultivariateGaussianTest {
             DoubleTensor.create(-3, -3),
             DoubleTensor.create(3.0, 3.0),
             0.1,
-            uniformA,
+            mu,
+            mvg,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            0.0001);
+    }
+
+    @Test
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdMuWithBatchMu() {
+        UniformVertex mu = new UniformVertex(new long[]{2, 2}, -100, 100);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, ConstantVertex.of(0.5, 2).diag());
+
+        DoubleTensor vertexStartValue = DoubleTensor.create(-10, 3);
+        DoubleTensor vertexEndValue = DoubleTensor.create(-9.5, 3.5);
+        double vertexIncrement = 0.1;
+
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
+            DoubleTensor.create(-3, -3),
+            DoubleTensor.create(3.0, 3.0),
+            0.1,
+            mu,
+            mvg,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            0.0001);
+    }
+
+    @Test
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdMuWithBatchCovariance() {
+        DoubleVertex covariance = new UniformVertex(new long[]{2, 2}, 1, 20);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(ConstantVertex.of(-1.0, 1.0), covariance.diag());
+
+        DoubleTensor vertexStartValue = DoubleTensor.create(-10, 3);
+        DoubleTensor vertexEndValue = DoubleTensor.create(-9.5, 3.5);
+        double vertexIncrement = 0.1;
+
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
+            DoubleTensor.create(3, 2, 1, 0.5).reshape(2, 2),
+            DoubleTensor.create(4, 3, 2, 1).reshape(2, 2),
+            0.1,
+            covariance,
             mvg,
             vertexStartValue,
             vertexEndValue,
@@ -488,7 +530,7 @@ public class MultivariateGaussianTest {
         muCov.add(ConstantVertex.of(trueCovarianceDiag));
 
         List<DoubleVertex> latentMuCov = new ArrayList<>();
-        UniformVertex latentCovDiag = new UniformVertex(new long[]{2}, 0.01, 10.0);
+        UniformVertex latentCovDiag = new UniformVertex(new long[]{1}, 0.01, 10.0);
         latentCovDiag.setAndCascade(DoubleTensor.create(0.5));
         latentMuCov.add(latentCovDiag);
 
@@ -499,36 +541,6 @@ public class MultivariateGaussianTest {
             latentMuCov,
             random
         );
-    }
-
-    @Test
-    public void infer2DCovarianceParamsFromSamples() {
-
-        DoubleTensor trueCovarianceDiag = DoubleTensor.create(1, 0.6, 0.6, 2).reshape(2, 2);
-
-        UniformVertex latentCovDiag = new UniformVertex(new long[]{2, 2}, 0.01, 100.0);
-        latentCovDiag.setAndCascade(DoubleTensor.create(3, 2.5, 1.5, 7).reshape(2, 2));
-
-        long sampleCount = 500;
-        MultivariateGaussianVertex testDataGenerator = new MultivariateGaussianVertex(
-            new long[]{sampleCount, 2},
-            ConstantVertex.of(DoubleTensor.create(-1, 2)),
-            ConstantVertex.of(trueCovarianceDiag)
-        );
-
-        DoubleTensor data = testDataGenerator.sample();
-
-        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(
-            ConstantVertex.of(DoubleTensor.create(-1, 2)),
-            latentCovDiag
-        );
-
-        mvg.observe(data);
-
-        BayesianNetwork inferNet = new BayesianNetwork(mvg.getConnectedGraph());
-        Keanu.Optimizer.Gradient.of(inferNet).maxAPosteriori();
-
-        assertThat(latentCovDiag.getValue().triLower(0), valuesWithinEpsilonAndShapesMatch(trueCovarianceDiag.triLower(0), 0.1));
     }
 
     @Test
@@ -596,6 +608,75 @@ public class MultivariateGaussianTest {
         int numSamples = 200;
         VertexVariationalMAP.inferHyperParamsFromSamples(
             hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2}, hyperParams.get(0), hyperParams.get(1).diag()),
+            muCov,
+            latentMuCov,
+            random
+        );
+    }
+
+    @Test
+    public void infer2DMuAndFullCovarianceParamFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(-1, 2);
+        DoubleTensor trueCovarianceTril = DoubleTensor.create(1, 0.5, 2);
+
+        List<DoubleVertex> muCov = new ArrayList<>();
+        muCov.add(ConstantVertex.of(trueMu));
+        muCov.add(ConstantVertex.of(trueCovarianceTril));
+
+        List<DoubleVertex> latentMuCov = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(new long[]{2}, -100, 100.0);
+        latentMu.setAndCascade(DoubleTensor.create(3, 3));
+        latentMuCov.add(latentMu);
+
+        UniformVertex latentCovTril = new UniformVertex(new long[]{3}, 0.01, 100.0);
+        latentCovTril.setAndCascade(DoubleTensor.create(0.5, 0.2, 1));
+        latentMuCov.add(latentCovTril);
+
+        int numSamples = 500;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2}, hyperParams.get(0), hyperParams.get(1).fillTriangular(false, true)),
+            muCov,
+            latentMuCov,
+            random
+        );
+    }
+
+    @Test
+    public void infer2DBatchMuAndBatchFullCovarianceParamFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(
+            -1, 2,
+            1, 0.5
+        ).reshape(2, 2);
+
+        DoubleTensor trueCovarianceTril = DoubleTensor.create(
+            1.0, 0.5, 2.0,
+            2.0, 0.2, 3.0
+        ).reshape(2, 3);
+
+        List<DoubleVertex> muCov = new ArrayList<>();
+        muCov.add(ConstantVertex.of(trueMu));
+        muCov.add(ConstantVertex.of(trueCovarianceTril));
+
+        List<DoubleVertex> latentMuCov = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(new long[]{2, 2}, -100, 100.0);
+        latentMu.setAndCascade(DoubleTensor.create(
+            3, 3,
+            2, 1
+        ).reshape(2, 2));
+        latentMuCov.add(latentMu);
+
+        UniformVertex latentCovarianceTril = new UniformVertex(new long[]{2, 3}, 0.01, 100.0);
+        latentCovarianceTril.setAndCascade(DoubleTensor.create(
+            0.2, 1.0, 0.5,
+            2.5, 0.5, 2.0
+        ).reshape(2, 3));
+        latentMuCov.add(latentCovarianceTril);
+
+        int numSamples = 500;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0), hyperParams.get(1).fillTriangular(false, true)),
             muCov,
             latentMuCov,
             random

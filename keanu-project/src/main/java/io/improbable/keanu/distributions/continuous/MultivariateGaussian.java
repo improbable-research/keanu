@@ -141,14 +141,18 @@ public class MultivariateGaussian implements ContinuousDistribution {
 
         final DoubleTensor xMinusMu = x.minus(mu);
 
-        final long[] batchShape = ArrayUtils.subarray(x.getShape(), 0, x.getShape().length - 1);
+        final long[] xBatchShape = getBatch(x.getShape(), 1);
+        final long[] muBatchShape = getBatch(mu.getShape(), 1);
+        final long[] covBatchShape = getBatch(covariance.getShape(), 2);
+        final long[] resultBatchShape = TensorShape.getBroadcastResultShape(xBatchShape, muBatchShape, covBatchShape);
+
         final long dims = x.getShape()[x.getShape().length - 1];
 
         if (wrtMu || wrtX) {
 
             final DoubleTensor dLogProbWrtMuForBatch = covInv.matrixMultiply(
-                xMinusMu.reshape(TensorShape.concat(batchShape, new long[]{dims, 1}))
-            ).reshape(TensorShape.concat(batchShape, new long[]{dims}));
+                xMinusMu.reshape(TensorShape.concat(xBatchShape, new long[]{dims, 1}))
+            ).reshape(TensorShape.concat(resultBatchShape, new long[]{dims}));
 
             if (wrtX) {
                 diff[0] = sumOverBatch(dLogProbWrtMuForBatch, x.getShape()).unaryMinus();
