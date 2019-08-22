@@ -136,7 +136,12 @@ public class MultivariateGaussian implements ContinuousDistribution {
             return diff;
         }
 
-        DoubleTensor covInv = covariance.choleskyDecomposition().choleskyInverse();
+        DoubleTensor covInv;
+        try {
+            covInv = covariance.choleskyDecomposition().choleskyInverse();
+        } catch (IllegalStateException ise) {
+            return diff;
+        }
         covInv = covInv.plus(covInv.triLower(1).transpose());
 
         final DoubleTensor xMinusMu = x.minus(mu);
@@ -178,6 +183,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
         }
 
         return diff;
+
     }
 
     private static DoubleTensor sumOverBatch(DoubleTensor batched, long[] targetShape) {

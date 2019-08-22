@@ -2,11 +2,9 @@ package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -587,6 +585,71 @@ public class MultivariateGaussianTest {
     }
 
     @Test
+    public void infer2DBatchMuParamFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(-1, 2, 0, 0.5).reshape(2, 2);
+        List<DoubleVertex> muCov = new ArrayList<>();
+        muCov.add(ConstantVertex.of(trueMu));
+
+        List<DoubleVertex> latentMuCov = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(new long[]{2}, -10, 10.0);
+        latentMu.setAndCascade(DoubleTensor.create(9, -9, 5, 2).reshape(2, 2));
+        latentMuCov.add(latentMu);
+
+        int numSamples = 500;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0), ConstantVertex.of(DoubleTensor.create(1, 2).diag())),
+            muCov,
+            latentMuCov,
+            random
+        );
+    }
+
+    @Test
+    public void infer2DBatchDiagonalCovarianceParamFromSamples() {
+
+        DoubleTensor trueCov = DoubleTensor.create(0.5, 2, 3, 1).reshape(2, 2);
+        List<DoubleVertex> muCov = new ArrayList<>();
+        muCov.add(ConstantVertex.of(trueCov));
+
+        List<DoubleVertex> latentMuCov = new ArrayList<>();
+        UniformVertex latentCovDiag = new UniformVertex(new long[]{2}, 0.1, 10.0);
+        latentCovDiag.setAndCascade(DoubleTensor.create(9, 9, 5, 2).reshape(2, 2));
+        latentMuCov.add(latentCovDiag);
+
+        int numSamples = 200;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2, 2}, ConstantVertex.of(DoubleTensor.create(1, 2)), hyperParams.get(0).diag()),
+            muCov,
+            latentMuCov,
+            0.5,
+            random
+        );
+    }
+
+    @Test
+    public void infer2DBatchFullCovarianceParamFromSamples() {
+
+        DoubleTensor trueCovTril = DoubleTensor.create(0.5, 0.1, 2, 3, 0.5, 1).reshape(2, 3);
+        List<DoubleVertex> muCov = new ArrayList<>();
+        muCov.add(ConstantVertex.of(trueCovTril));
+
+        List<DoubleVertex> latentMuCov = new ArrayList<>();
+        UniformVertex latentCovDiag = new UniformVertex(new long[]{2, 3}, 0.01, 10.0);
+        latentCovDiag.setAndCascade(DoubleTensor.create(9, 0.8, 9, 5, 0.1, 2).reshape(2, 3));
+        latentMuCov.add(latentCovDiag);
+
+        int numSamples = 200;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2, 2}, ConstantVertex.of(DoubleTensor.create(1, 2)), hyperParams.get(0).fillTriangular(false, true)),
+            muCov,
+            latentMuCov,
+            0.5,
+            random
+        );
+    }
+
+    @Test
     public void infer2DMuAndDiagonalCovarianceParamFromSamples() {
 
         DoubleTensor trueMu = DoubleTensor.create(-1, 2);
@@ -652,7 +715,7 @@ public class MultivariateGaussianTest {
 
         DoubleTensor trueCovarianceTril = DoubleTensor.create(
             1.0, 0.5, 2.0,
-            2.0, 0.2, 3.0
+            2.0, 0.4, 1.5
         ).reshape(2, 3);
 
         List<DoubleVertex> muCov = new ArrayList<>();
@@ -669,16 +732,17 @@ public class MultivariateGaussianTest {
 
         UniformVertex latentCovarianceTril = new UniformVertex(new long[]{2, 3}, 0.01, 100.0);
         latentCovarianceTril.setAndCascade(DoubleTensor.create(
-            0.2, 1.0, 0.5,
-            2.5, 0.5, 2.0
+            4, 0.2, 2,
+            2, 0.3, 3
         ).reshape(2, 3));
         latentMuCov.add(latentCovarianceTril);
 
-        int numSamples = 500;
+        int numSamples = 200;
         VertexVariationalMAP.inferHyperParamsFromSamples(
             hyperParams -> new MultivariateGaussianVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0), hyperParams.get(1).fillTriangular(false, true)),
             muCov,
             latentMuCov,
+            0.2,
             random
         );
     }
