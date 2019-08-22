@@ -10,8 +10,6 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
-
 public class MultivariateGaussian implements ContinuousDistribution {
 
     private static final double LOG_2_PI = Math.log(2 * Math.PI);
@@ -40,7 +38,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
         return covTimesVariates.reshape(xShape).plus(mu);
     }
 
-    private void validateShapes(long[] xShape, long[] muShape, long[] covarianceShape) {
+    public static long[] validateShapes(long[] xShape, long[] muShape, long[] covarianceShape) {
         if (xShape.length == 0) {
             throw new IllegalArgumentException(
                 "X shape cannot be scalar. It must at least be a vector of length 1. Use a Gaussian distribution for scalar x."
@@ -81,7 +79,11 @@ public class MultivariateGaussian implements ContinuousDistribution {
             final long[] muBatchShape = getBatch(muShape, 1);
             final long[] covBatchShape = getBatch(covarianceShape, 2);
 
-            if (!isBroadcastable(xBatchShape, muBatchShape, covBatchShape)) {
+            try {
+                long[] broadcastBatchShape = TensorShape.getBroadcastResultShape(xBatchShape, muBatchShape, covBatchShape);
+                return TensorShape.concat(broadcastBatchShape, new long[]{muN});
+            } catch (IllegalArgumentException ise) {
+
                 throw new IllegalArgumentException(
                     "x batch shape " + Arrays.toString(xBatchShape) +
                         " is not broadcastable with mu batch shape " + Arrays.toString(muBatchShape) +
@@ -89,9 +91,11 @@ public class MultivariateGaussian implements ContinuousDistribution {
                 );
             }
         }
+
+        return muShape;
     }
 
-    private long[] getBatch(long[] shape, int eventRank) {
+    private static long[] getBatch(long[] shape, int eventRank) {
         return ArrayUtils.subarray(shape, 0, shape.length - eventRank);
     }
 
@@ -129,6 +133,16 @@ public class MultivariateGaussian implements ContinuousDistribution {
         }
     }
 
+    /**
+     * Math credit to:
+     * https://math.stackexchange.com/questions/1599966/derivative-of-multivariate-normal-distribution-wrt-mean-and-covariance
+     *
+     * @param x             at value
+     * @param wrtX          if true, the derivative of the logProb with respect to X will be calculated and returned as element 0
+     * @param wrtMu         if true, the derivative of the logProb with respect to Mu will be calculated and returned as element 1
+     * @param wrtCovariance if true, the derivative of the logProb with respect to the covariance matrix will be calculated and returned as element 2
+     * @return the derivative of the logProb wrt given vertices
+     */
     public DoubleTensor[] dLogProb(DoubleTensor x, boolean wrtX, boolean wrtMu, boolean wrtCovariance) {
         DoubleTensor[] diff = new DoubleTensor[3];
 

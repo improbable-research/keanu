@@ -24,7 +24,8 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex>
+    implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -32,19 +33,21 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
     protected static final String SIGMA_NAME = "sigma";
 
     /**
-     * One mu or sigma or both that match a proposed tensor shape of Gaussian
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     * A single variate gaussian distribution with mu and sigma. Alternatively, providing multiple mu and sigmas can
+     * be used to create a diagonal covariance multivariate gaussian distribution. If a full covariance matrix is
+     * needed then use the MultivariateGaussianVertex.
      *
-     * @param tensorShape the desired shape of the tensor in this vertex
-     * @param mu          the mu of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
-     * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
+     * @param shape a shape that is broadcastable with the shape of mu and sigma. This shape can be used for batching
+     *              but most commonly will match the broadcasted shape of mu with sigma.
+     * @param mu    the mu of the Gaussian with a shape that is broadcastable with the shape parameter and the shape
+     *              of sigma.
+     * @param sigma the sigma of the Gaussian with a shape that is broadcastable with the shape parameter and the shape
+     *              of mu.
      */
-    public GaussianVertex(@LoadShape long[] tensorShape,
+    public GaussianVertex(@LoadShape long[] shape,
                           @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu,
                           @LoadVertexParam(SIGMA_NAME) Vertex<DoubleTensor, ?> sigma) {
-        super(tensorShape);
-        getBroadcastResultShape(tensorShape, mu.getShape(), sigma.getShape());
+        super(getBroadcastResultShape(shape, mu.getShape(), sigma.getShape()));
 
         this.mu = wrapIfNeeded(mu);
         this.sigma = wrapIfNeeded(sigma);
