@@ -92,7 +92,14 @@ public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex> impl
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
-        return Collections.emptyMap();
+        boolean wrtMu = withRespectTo.contains(mu);
+
+        DoubleTensor[] result = Poisson.withParameters(mu.getValue()).dLogProb(value, wrtMu);
+        if (wrtMu) {
+            return Collections.singletonMap(mu, result[0]);
+        } else {
+            return Collections.emptyMap();
+        }
     }
 
     @Override

@@ -20,7 +20,7 @@ public class Poisson implements DiscreteDistribution {
 
     private final DoubleTensor mu;
 
-    public static DiscreteDistribution withParameters(DoubleTensor mu) {
+    public static Poisson withParameters(DoubleTensor mu) {
         return new Poisson(mu);
     }
 
@@ -91,5 +91,15 @@ public class Poisson implements DiscreteDistribution {
         DoubleVertex logFactorialK = kDouble.plus(1).logGamma();
 
         return kDouble.times(mu.log()).minus(mu).minus(logFactorialK);
+    }
+
+    public DoubleTensor[] dLogProb(IntegerTensor k, boolean wrtMu) {
+        DoubleTensor[] result = new DoubleTensor[1];
+
+        if (wrtMu) {
+            result[0] = k.toDouble().div(mu.getValue()).minus(1);
+        }
+
+        return result;
     }
 }
