@@ -72,7 +72,7 @@ public class MultivariateGaussianTest {
         DoubleVertex covariance = new ConstantDoubleVertex(new double[]{1.}, new long[]{1, 1});
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Mu must be at least a vector but was a scalar.");
+        thrown.expectMessage("X shape cannot be scalar. It must at least be a vector of length 1. Use a Gaussian distribution for scalar x.");
 
         new MultivariateGaussianVertex(mu, covariance);
     }

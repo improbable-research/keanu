@@ -1177,7 +1177,11 @@ a matching shaped Laplace.</p>
 <dl class="function">
 <dt id="keanu.vertex.MultivariateGaussian">
 <code class="descclassname">keanu.vertex.</code><code class="descname">MultivariateGaussian</code><span class="sig-paren">(</span><em>mu</em>, <em>covariance</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#MultivariateGaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.MultivariateGaussian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Matches a mu and covariance of some shape to a Multivariate Gaussian</p>
+<dd><p>Matches a mu and full covariance matrix of some shape to a Multivariate Gaussian distribution. Mu should
+be shape (batchShape, N) where N is the number of dimensions and batchShape can be any shape that is broadcastable
+with the covariance batchShape if it is also batched. The covariance matrix should be shape (batchShape, N, N) where
+the batchShape must be broadcastable with the batchShape of mu. Only the lower triangle of the covariance matrix
+is used due to it being assumed to be a symmetric matrix. The upper triangle will be ignored.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

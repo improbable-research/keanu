@@ -558,7 +558,11 @@ def Logistic(mu: vertex_constructor_param_types, s: vertex_constructor_param_typ
 
 def MultivariateGaussian(mu: vertex_constructor_param_types, covariance: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     """
-    Matches a mu and covariance of some shape to a Multivariate Gaussian
+    Matches a mu and full covariance matrix of some shape to a Multivariate Gaussian distribution. Mu should
+    be shape (batchShape, N) where N is the number of dimensions and batchShape can be any shape that is broadcastable
+    with the covariance batchShape if it is also batched. The covariance matrix should be shape (batchShape, N, N) where
+    the batchShape must be broadcastable with the batchShape of mu. Only the lower triangle of the covariance matrix
+    is used due to it being assumed to be a symmetric matrix. The upper triangle will be ignored.
     
     :param mu: the mu of the Multivariate Gaussian
     :param covariance: the covariance matrix of the Multivariate Gaussian

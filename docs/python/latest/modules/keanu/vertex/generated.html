@@ -640,7 +640,11 @@
 
 <div class="viewcode-block" id="MultivariateGaussian"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.MultivariateGaussian">[docs]</a><span class="k">def</span> <span class="nf">MultivariateGaussian</span><span class="p">(</span><span class="n">mu</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">,</span> <span class="n">covariance</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Matches a mu and covariance of some shape to a Multivariate Gaussian</span>
+<span class="sd">    Matches a mu and full covariance matrix of some shape to a Multivariate Gaussian distribution. Mu should</span>
+<span class="sd">    be shape (batchShape, N) where N is the number of dimensions and batchShape can be any shape that is broadcastable</span>
+<span class="sd">    with the covariance batchShape if it is also batched. The covariance matrix should be shape (batchShape, N, N) where</span>
+<span class="sd">    the batchShape must be broadcastable with the batchShape of mu. Only the lower triangle of the covariance matrix</span>
+<span class="sd">    is used due to it being assumed to be a symmetric matrix. The upper triangle will be ignored.</span>
 <span class="sd">    </span>
 <span class="sd">    :param mu: the mu of the Multivariate Gaussian</span>
 <span class="sd">    :param covariance: the covariance matrix of the Multivariate Gaussian</span>
