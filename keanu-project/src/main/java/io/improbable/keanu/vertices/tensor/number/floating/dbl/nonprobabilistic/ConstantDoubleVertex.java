@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class ConstantDoubleVertex extends VertexImpl<DoubleTensor, DoubleVertex>
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
         return Collections.emptyMap();
     }
 

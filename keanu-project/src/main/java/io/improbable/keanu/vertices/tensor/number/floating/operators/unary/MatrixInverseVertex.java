@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +42,8 @@ public class MatrixInverseVertex<T extends Number, TENSOR extends FloatingPointT
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
         DoubleTensor parentValue = getValue().toDouble();
         DoubleTensor negativeValue = getValue().toDouble().unaryMinus();
 
@@ -51,7 +51,7 @@ public class MatrixInverseVertex<T extends Number, TENSOR extends FloatingPointT
             .matrixMultiply(derivativeOfOutputWithRespectToSelf.get())
             .matrixMultiply(parentValue.transpose());
 
-        partials.put(inputVertex, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), p));
+        partials.put(inputVertex, new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), p));
         return partials;
     }
 

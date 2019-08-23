@@ -33,7 +33,7 @@ public class LogProbGradients {
 
     public LogProbGradients add(PartialsOf addition) {
 
-        for (Map.Entry<VertexId, PartialDerivative> entry : addition.asMap().entrySet()) {
+        for (Map.Entry<VertexId, ReverseModePartialDerivative> entry : addition.asMap().entrySet()) {
             putPartial(entry.getKey(), entry.getValue().get());
         }
 

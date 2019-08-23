@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
@@ -19,8 +19,8 @@ public interface Differentiable {
         }
     }
 
-    static PartialDerivative ofSelfWrtSelf(long[] shape) {
-        return new PartialDerivative(
+    static ReverseModePartialDerivative ofSelfWrtSelf(long[] shape) {
+        return new ReverseModePartialDerivative(
             shape,
             DoubleTensor.eye(TensorShape.getLength(shape)).reshape(TensorShape.concat(shape, shape))
         );
@@ -33,7 +33,7 @@ public interface Differentiable {
         );
     }
 
-    default Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    default Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
         return Collections.emptyMap();
     }
 }

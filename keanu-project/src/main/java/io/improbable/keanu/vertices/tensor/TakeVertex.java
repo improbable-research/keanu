@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,8 +56,8 @@ public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> reshapedDerivatives = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, ReverseModePartialDerivative> reshapedDerivatives = new HashMap<>();
 
         DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
         long[] newPartialShape = TensorShape.concat(
@@ -69,7 +69,7 @@ public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
         DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape());
         takeMask.setValue(1., index);
         DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
-        reshapedDerivatives.put(inputVertex, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), highRankMask));
+        reshapedDerivatives.put(inputVertex, new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), highRankMask));
 
         return reshapedDerivatives;
     }

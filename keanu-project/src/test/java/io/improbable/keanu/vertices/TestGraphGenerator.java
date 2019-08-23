@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +59,7 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
             autoDiffCount.incrementAndGet();
             return Collections.singletonMap(inputVertex, derivativeOfOutputWithRespectToSelf);
         }
@@ -107,9 +107,9 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
             autoDiffCount.incrementAndGet();
-            Map<Vertex, PartialDerivative> partials = new HashMap<>();
+            Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
             partials.put(left, derivativeOfOutputWithRespectToSelf);
             partials.put(right, derivativeOfOutputWithRespectToSelf);
             return partials;

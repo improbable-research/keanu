@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,8 +87,8 @@ public class StridedSliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
 
         final DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
 
@@ -99,7 +99,7 @@ public class StridedSliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
 
         final DoubleTensor result = partial.reverseSlice(zeroes, align(slicer, inputVertex.getRank()));
 
-        partials.put(inputVertex, new PartialDerivative(ofShape, result));
+        partials.put(inputVertex, new ReverseModePartialDerivative(ofShape, result));
 
         return partials;
     }

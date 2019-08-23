@@ -4,14 +4,14 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Arrays;
 
-public class PartialDerivative {
+public class ReverseModePartialDerivative {
 
-    public static final PartialDerivative EMPTY = new PartialDerivative(null, null);
+    public static final ReverseModePartialDerivative EMPTY = new ReverseModePartialDerivative(null, null);
 
     private final DoubleTensor partial;
     private final long[] ofShape;
 
-    public PartialDerivative(long[] ofShape, DoubleTensor partial) {
+    public ReverseModePartialDerivative(long[] ofShape, DoubleTensor partial) {
         if (partial != null && ofShape == null) {
             throw new IllegalArgumentException("Must provide of shape");
         }
@@ -35,42 +35,42 @@ public class PartialDerivative {
         return Arrays.copyOfRange(partial.getShape(), ofShape.length, partial.getRank());
     }
 
-    public PartialDerivative add(PartialDerivative addition) {
+    public ReverseModePartialDerivative add(ReverseModePartialDerivative addition) {
 
         if (this.isPresent() && addition.isPresent()) {
-            return new PartialDerivative(ofShape, partial.plus(addition.partial));
+            return new ReverseModePartialDerivative(ofShape, partial.plus(addition.partial));
         } else if (this.isPresent() && !addition.isPresent()) {
-            return new PartialDerivative(ofShape, partial);
+            return new ReverseModePartialDerivative(ofShape, partial);
         } else if (!this.isPresent() && addition.isPresent()) {
-            return new PartialDerivative(addition.ofShape, addition.partial);
+            return new ReverseModePartialDerivative(addition.ofShape, addition.partial);
         } else {
-            return PartialDerivative.EMPTY;
+            return ReverseModePartialDerivative.EMPTY;
         }
     }
 
-    public PartialDerivative subtract(PartialDerivative subtraction) {
+    public ReverseModePartialDerivative subtract(ReverseModePartialDerivative subtraction) {
 
         if (this.isPresent() && subtraction.isPresent()) {
-            return new PartialDerivative(ofShape, partial.minus(subtraction.partial));
+            return new ReverseModePartialDerivative(ofShape, partial.minus(subtraction.partial));
         } else if (this.isPresent() && !subtraction.isPresent()) {
-            return new PartialDerivative(ofShape, partial);
+            return new ReverseModePartialDerivative(ofShape, partial);
         } else if (!this.isPresent() && subtraction.isPresent()) {
-            return new PartialDerivative(subtraction.ofShape, subtraction.partial.unaryMinus());
+            return new ReverseModePartialDerivative(subtraction.ofShape, subtraction.partial.unaryMinus());
         } else {
-            return PartialDerivative.EMPTY;
+            return ReverseModePartialDerivative.EMPTY;
         }
     }
 
-    public PartialDerivative multiply(double multiplier) {
+    public ReverseModePartialDerivative multiply(double multiplier) {
 
         if (!isPresent()) {
             return this;
         }
 
-        return new PartialDerivative(ofShape, partial.times(multiplier));
+        return new ReverseModePartialDerivative(ofShape, partial.times(multiplier));
     }
 
-    public PartialDerivative multiply(DoubleTensor multiplier) {
+    public ReverseModePartialDerivative multiply(DoubleTensor multiplier) {
 
         if (!isPresent()) {
             return this;
@@ -78,10 +78,10 @@ public class PartialDerivative {
 
         DoubleTensor result = partial.times(multiplier);
 
-        return new PartialDerivative(ofShape, result);
+        return new ReverseModePartialDerivative(ofShape, result);
     }
 
-    public static PartialDerivative matrixMultiply(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static ReverseModePartialDerivative matrixMultiply(ReverseModePartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
         if (!partial.isPresent()) {
             return partial;
@@ -96,6 +96,6 @@ public class PartialDerivative {
             result = multiplier.transpose().matrixMultiply(partialValue);
         }
 
-        return new PartialDerivative(partial.ofShape, result);
+        return new ReverseModePartialDerivative(partial.ofShape, result);
     }
 }

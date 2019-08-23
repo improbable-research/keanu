@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,12 +45,12 @@ public class SigmoidVertex<T extends Number, TENSOR extends FloatingPointTensor<
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
         DoubleTensor sigmoidOfInput = getValue().toDouble();
         //dSigmoid = sigmoid(x)*(1-sigmoid(x))
         DoubleTensor derivativeOfSigmoidWrtInput = sigmoidOfInput.minus(sigmoidOfInput.pow(2));
 
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+        Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
         partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(derivativeOfSigmoidWrtInput));
         return partials;
     }

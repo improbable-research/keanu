@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,10 +49,10 @@ public class ArcSinVertex<T extends Number, TENSOR extends FloatingPointTensor<T
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
         DoubleTensor inputValue = inputVertex.getValue().toDouble();
 
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+        Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
         partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(dArcSin(inputValue)));
 
         return partials;

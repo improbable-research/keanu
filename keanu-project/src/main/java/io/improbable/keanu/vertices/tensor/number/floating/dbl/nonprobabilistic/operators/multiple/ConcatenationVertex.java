@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -115,8 +115,8 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> splitPartials = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, ReverseModePartialDerivative> splitPartials = new HashMap<>();
 
         long currentSplitIndex = 0;
         long[] splitIndices = new long[operands.length];
@@ -124,7 +124,7 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
         for (int i = 0; i < operands.length; i++) {
             splitIndices[i] = currentSplitIndex + operands[i].getShape()[dimension];
             currentSplitIndex = splitIndices[i];
-            splitPartials.put(operands[i], PartialDerivative.EMPTY);
+            splitPartials.put(operands[i], ReverseModePartialDerivative.EMPTY);
         }
 
         int operandsRank = operands[0].getRank();
@@ -136,7 +136,7 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
         List<DoubleTensor> splitPartial = partial.split(wrtSplitOn, splitIndices);
 
         for (int i = 0; i < splitPartial.size(); i++) {
-            splitPartials.put(operands[i], new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), splitPartial.get(i)));
+            splitPartials.put(operands[i], new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), splitPartial.get(i)));
         }
 
         return splitPartials;

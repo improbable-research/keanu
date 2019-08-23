@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Collections;
@@ -57,7 +57,7 @@ public class TrianglePartVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative partial) {
         final DoubleTensor result;
         if (upperPart) {
             result = partial.get().fillTriangular(true, false);
@@ -65,7 +65,7 @@ public class TrianglePartVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
             result = partial.get().fillTriangular(false, true);
         }
 
-        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.getOfShape(), result));
+        return Collections.singletonMap(inputVertex, new ReverseModePartialDerivative(partial.getOfShape(), result));
     }
 
     @SaveVertexParam(UPPER_PART_NAME)

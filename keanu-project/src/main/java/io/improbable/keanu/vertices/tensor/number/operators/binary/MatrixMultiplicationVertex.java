@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,16 +40,16 @@ public class MatrixMultiplicationVertex<T extends Number, TENSOR extends NumberT
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
 
-        PartialDerivative dOutputsWrtLeft = PartialDerivative
+        ReverseModePartialDerivative dOutputsWrtLeft = ReverseModePartialDerivative
             .matrixMultiply(
                 derivativeOfOutputWithRespectToSelf,
                 right.getValue().toDouble(),
                 true
             );
 
-        PartialDerivative dOutputsWrtRight = PartialDerivative
+        ReverseModePartialDerivative dOutputsWrtRight = ReverseModePartialDerivative
             .matrixMultiply(
                 derivativeOfOutputWithRespectToSelf,
                 left.getValue().toDouble(),
@@ -59,9 +59,9 @@ public class MatrixMultiplicationVertex<T extends Number, TENSOR extends NumberT
         int[] sumRight = AutoDiffBroadcast.dimensionsWithShapeChange(dOutputsWrtRight.get().getShape(), this.getRank(), right.getShape());
         int[] sumLeft = AutoDiffBroadcast.dimensionsWithShapeChange(dOutputsWrtLeft.get().getShape(), this.getRank(), left.getShape());
 
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(left, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), dOutputsWrtLeft.get().sum(sumLeft)));
-        partials.put(right, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), dOutputsWrtRight.get().sum(sumRight)));
+        Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
+        partials.put(left, new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), dOutputsWrtLeft.get().sum(sumLeft)));
+        partials.put(right, new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), dOutputsWrtRight.get().sum(sumRight)));
 
         return partials;
     }

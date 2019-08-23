@@ -14,7 +14,7 @@ import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.Map;
 
@@ -79,7 +79,7 @@ public class SumVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>,
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative partial) {
 
         final long[] wrtShapeWithoutRankLoss = TensorShape.getReductionResultShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
         final long[] ofShape = partial.getOfShape();
@@ -98,7 +98,7 @@ public class SumVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>,
 
         final DoubleTensor broadcastedPartial = partialDueToSummationShapeChange.broadcast(resultShape);
 
-        return singletonMap(inputVertex, new PartialDerivative(ofShape, broadcastedPartial));
+        return singletonMap(inputVertex, new ReverseModePartialDerivative(ofShape, broadcastedPartial));
     }
 
     @SaveVertexParam(DIMENSIONS_NAME)

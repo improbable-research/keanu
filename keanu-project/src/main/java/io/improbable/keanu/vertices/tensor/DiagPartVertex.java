@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
@@ -39,7 +39,7 @@ public class DiagPartVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
-        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.getOfShape(), partial.get().diag()));
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative partial) {
+        return Collections.singletonMap(inputVertex, new ReverseModePartialDerivative(partial.getOfShape(), partial.get().diag()));
     }
 }

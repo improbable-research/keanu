@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,12 +48,12 @@ public class SliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Ten
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
 
         DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
         DoubleTensor padded = padSliceWithZerosToMatchInputShape(partial);
-        partials.put(inputVertex, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), padded));
+        partials.put(inputVertex, new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), padded));
 
         return partials;
     }

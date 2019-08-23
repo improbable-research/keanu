@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Collections;
@@ -62,21 +62,21 @@ public class FillTriangularVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX ex
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative partial) {
 
         final DoubleTensor p = partial.get();
         if (fillUpper && fillLower) {
-            final PartialDerivative result = new PartialDerivative(partial.getOfShape(), p.trianglePart(true).plus(p.triLower(1).trianglePart(false)));
+            final ReverseModePartialDerivative result = new ReverseModePartialDerivative(partial.getOfShape(), p.trianglePart(true).plus(p.triLower(1).trianglePart(false)));
             return Collections.singletonMap(inputVertex, result);
         } else if (fillLower) {
-            final PartialDerivative result = new PartialDerivative(partial.getOfShape(), p.trianglePart(false));
+            final ReverseModePartialDerivative result = new ReverseModePartialDerivative(partial.getOfShape(), p.trianglePart(false));
             return Collections.singletonMap(inputVertex, result);
         } else if (fillUpper) {
-            final PartialDerivative result = new PartialDerivative(partial.getOfShape(), p.trianglePart(true));
+            final ReverseModePartialDerivative result = new ReverseModePartialDerivative(partial.getOfShape(), p.trianglePart(true));
             return Collections.singletonMap(inputVertex, result);
         } else {
             final long[] ofShape = partial.getOfShape();
-            final PartialDerivative result = new PartialDerivative(partial.getOfShape(), DoubleTensor.zeros(TensorShape.concat(ofShape, inputVertex.getShape())));
+            final ReverseModePartialDerivative result = new ReverseModePartialDerivative(partial.getOfShape(), DoubleTensor.zeros(TensorShape.concat(ofShape, inputVertex.getShape())));
             return Collections.singletonMap(inputVertex, result);
         }
     }

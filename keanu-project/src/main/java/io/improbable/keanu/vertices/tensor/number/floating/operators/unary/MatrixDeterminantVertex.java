@@ -14,7 +14,7 @@ import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class MatrixDeterminantVertex<T extends Number, TENSOR extends FloatingPo
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
 
         DoubleTensor dC = derivativeOfOutputWithRespectToSelf.get();
         DoubleTensor C = this.getValue().toDouble();
@@ -63,7 +63,7 @@ public class MatrixDeterminantVertex<T extends Number, TENSOR extends FloatingPo
 
         long[] dCCExpandedShape = TensorShape.concat(dCC.getShape(), new long[]{1, 1});
         DoubleTensor AInverseTranspose = inputVertex.getValue().toDouble().matrixInverse().transpose();
-        PartialDerivative toInput = new PartialDerivative(
+        ReverseModePartialDerivative toInput = new ReverseModePartialDerivative(
             derivativeOfOutputWithRespectToSelf.getOfShape(),
             dCC.reshape(dCCExpandedShape).times(AInverseTranspose)
         );

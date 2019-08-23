@@ -13,7 +13,7 @@ import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
@@ -75,7 +75,7 @@ public class ProductVertex<T extends Number, TENSOR extends NumberTensor<T, TENS
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative partial) {
 
         final long[] wrtShapeWithoutRankLoss = TensorShape.getReductionResultShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
         final long[] ofShape = partial.getOfShape();
@@ -91,7 +91,7 @@ public class ProductVertex<T extends Number, TENSOR extends NumberTensor<T, TENS
             .times(getValue().toDouble().reshape(wrtShapeWithoutRankLoss))
             .div(inputVertex.getValue().toDouble());
 
-        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.getOfShape(), result));
+        return Collections.singletonMap(inputVertex, new ReverseModePartialDerivative(partial.getOfShape(), result));
     }
 
     @SaveVertexParam(OVER_DIMENSIONS)

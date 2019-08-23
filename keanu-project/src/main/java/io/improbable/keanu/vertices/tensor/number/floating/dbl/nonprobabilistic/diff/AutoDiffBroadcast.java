@@ -35,7 +35,7 @@ public class AutoDiffBroadcast {
         return new ForwardModePartialDerivative(wrtShape, correctedPartial);
     }
 
-    public static PartialDerivative correctForBroadcastPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
+    public static ReverseModePartialDerivative correctForBroadcastPartialReverse(ReverseModePartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
 
         if (shouldCorrectPartialForBroadcast(partial, partialWrtShape, targetWrtShape)) {
             return broadcastPartialReverse(partial, partialWrtShape, targetWrtShape);
@@ -44,7 +44,7 @@ public class AutoDiffBroadcast {
         }
     }
 
-    public static PartialDerivative broadcastPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
+    public static ReverseModePartialDerivative broadcastPartialReverse(ReverseModePartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
         long[] partialShape = partial.get().getShape();
 
         int[] broadcastDimensions = dimensionsWithShapeChange(partialShape, partialWrtShape.length, targetWrtShape);
@@ -56,10 +56,10 @@ public class AutoDiffBroadcast {
             targetWrtShape
         );
 
-        return new PartialDerivative(partial.getOfShape(), partialSummed.reshape(resultShape));
+        return new ReverseModePartialDerivative(partial.getOfShape(), partialSummed.reshape(resultShape));
     }
 
-    private static boolean shouldCorrectPartialForBroadcast(PartialDerivative partial, long[] actualShape, long[] expectedShape) {
+    private static boolean shouldCorrectPartialForBroadcast(ReverseModePartialDerivative partial, long[] actualShape, long[] expectedShape) {
         return partial.isPresent() && !Arrays.equals(actualShape, expectedShape);
     }
 

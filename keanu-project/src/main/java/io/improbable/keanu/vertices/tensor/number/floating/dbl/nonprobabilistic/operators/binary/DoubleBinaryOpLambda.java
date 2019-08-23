@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -24,14 +24,14 @@ public class DoubleBinaryOpLambda<A, B>
     protected final Vertex<B, ?> right;
     protected final BiFunction<A, B, DoubleTensor> op;
     protected final Function<Map<Vertex, ForwardModePartialDerivative>, ForwardModePartialDerivative> forwardModeAutoDiffLambda;
-    protected final Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda;
+    protected final Function<ReverseModePartialDerivative, Map<Vertex, ReverseModePartialDerivative>> reverseModeAutoDiffLambda;
 
     public DoubleBinaryOpLambda(long[] shape,
                                 Vertex<A, ?> left,
                                 Vertex<B, ?> right,
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, ForwardModePartialDerivative>, ForwardModePartialDerivative> forwardModeAutoDiffLambda,
-                                Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
+                                Function<ReverseModePartialDerivative, Map<Vertex, ReverseModePartialDerivative>> reverseModeAutoDiffLambda) {
         super(shape);
         this.left = left;
         this.right = right;
@@ -49,7 +49,7 @@ public class DoubleBinaryOpLambda<A, B>
                                 Vertex<B, ?> right,
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, ForwardModePartialDerivative>, ForwardModePartialDerivative> forwardModeAutoDiffLambda,
-                                Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
+                                Function<ReverseModePartialDerivative, Map<Vertex, ReverseModePartialDerivative>> reverseModeAutoDiffLambda) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
@@ -72,7 +72,7 @@ public class DoubleBinaryOpLambda<A, B>
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
         return reverseModeAutoDiffLambda.apply(derivativeOfOutputWithRespectToSelf);
     }
 }
