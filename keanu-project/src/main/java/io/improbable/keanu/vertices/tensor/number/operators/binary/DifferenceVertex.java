@@ -48,7 +48,7 @@ public class DifferenceVertex<T extends Number, TENSOR extends NumberTensor<T, T
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
         PartialDerivative toLeft = AutoDiffBroadcast.correctForBroadcastPartialReverse(derivativeOfOutputWithRespectToSelf, this.getShape(), left.getShape());
-        PartialDerivative toRight = AutoDiffBroadcast.correctForBroadcastPartialReverse(derivativeOfOutputWithRespectToSelf.multiplyBy(-1), this.getShape(), right.getShape());
+        PartialDerivative toRight = AutoDiffBroadcast.correctForBroadcastPartialReverse(derivativeOfOutputWithRespectToSelf.multiply(-1), this.getShape(), right.getShape());
 
         partials.put(left, toLeft);
         partials.put(right, toRight);

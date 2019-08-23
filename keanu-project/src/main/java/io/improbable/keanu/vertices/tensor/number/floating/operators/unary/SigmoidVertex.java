@@ -51,7 +51,7 @@ public class SigmoidVertex<T extends Number, TENSOR extends FloatingPointTensor<
         DoubleTensor derivativeOfSigmoidWrtInput = sigmoidOfInput.minus(sigmoidOfInput.pow(2));
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(derivativeOfSigmoidWrtInput));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(derivativeOfSigmoidWrtInput));
         return partials;
     }
 

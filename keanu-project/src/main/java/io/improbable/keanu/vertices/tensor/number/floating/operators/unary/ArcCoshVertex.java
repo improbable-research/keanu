@@ -48,7 +48,7 @@ public class ArcCoshVertex<T extends Number, TENSOR extends FloatingPointTensor<
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor inputValue = inputVertex.getValue().toDouble();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dArcCosh(inputValue)));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(dArcCosh(inputValue)));
         return partials;
     }
 }

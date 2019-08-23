@@ -48,7 +48,7 @@ public class CoshVertex<T extends Number, TENSOR extends FloatingPointTensor<T, 
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor inputValue = inputVertex.getValue().toDouble();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dCosh(inputValue)));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(dCosh(inputValue)));
         return partials;
     }
 }

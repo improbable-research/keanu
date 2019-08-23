@@ -48,7 +48,7 @@ public class ArcSinhVertex<T extends Number, TENSOR extends FloatingPointTensor<
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor inputValue = inputVertex.getValue().toDouble();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dArcSinh(inputValue)));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(dArcSinh(inputValue)));
         return partials;
     }
 }

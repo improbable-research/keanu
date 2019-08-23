@@ -48,7 +48,7 @@ public class TanhVertex<T extends Number, TENSOR extends FloatingPointTensor<T, 
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         final DoubleTensor tanh = getValue().toDouble();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dTanh(tanh)));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(dTanh(tanh)));
         return partials;
     }
 }

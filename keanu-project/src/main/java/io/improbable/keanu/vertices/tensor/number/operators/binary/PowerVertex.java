@@ -91,8 +91,8 @@ public class PowerVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR
         DoubleTensor dSelfWrtBase = exponentValue.times(baseValue.pow(exponentValue.minus(1)));
         DoubleTensor dSelfWrtExponent = basePowExponent.times(baseValue.log());
 
-        PartialDerivative dOutputsWrtBase = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase);
-        PartialDerivative dOutputsWrtExponent = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent);
+        PartialDerivative dOutputsWrtBase = derivativeOfOutputWithRespectToSelf.multiply(dSelfWrtBase);
+        PartialDerivative dOutputsWrtExponent = derivativeOfOutputWithRespectToSelf.multiply(dSelfWrtExponent);
 
         PartialDerivative toBase = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtBase, this.getShape(), getBase().getShape());
         PartialDerivative toExponent = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtExponent, this.getShape(), getExponent().getShape());

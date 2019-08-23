@@ -48,7 +48,7 @@ public class AbsVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>,
         final DoubleTensor signOfInput = inputVertex.getValue().toDouble().sign();
 
         final Map<Vertex, PartialDerivative> result = new HashMap<>();
-        result.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(signOfInput));
+        result.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(signOfInput));
         return result;
     }
 }

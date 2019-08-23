@@ -58,11 +58,11 @@ public class SafeLogTimesVertex<T extends Number, TENSOR extends FloatingPointTe
         final DoubleTensor y = right.getValue().toDouble();
         final BooleanTensor yZeroMask = y.elementwiseEquals(0.0);
 
-        final PartialDerivative dOutputsWrtX = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(
+        final PartialDerivative dOutputsWrtX = derivativeOfOutputWithRespectToSelf.multiply(
             y.div(x)
         );
 
-        final PartialDerivative dOutputsWrtY = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(
+        final PartialDerivative dOutputsWrtY = derivativeOfOutputWithRespectToSelf.multiply(
             DoubleTensor.scalar(Double.NaN).where(yZeroMask, x.log())
         );
 

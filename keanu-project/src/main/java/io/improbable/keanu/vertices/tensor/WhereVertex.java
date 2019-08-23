@@ -83,9 +83,9 @@ public class WhereVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Ten
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
         partials.put(thn, derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(predicateValue.toDoubleMask()));
+            .multiply(predicateValue.toDoubleMask()));
         partials.put(els, derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask()));
+            .multiply(predicateValue.not().toDoubleMask()));
         return partials;
     }
 

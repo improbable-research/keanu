@@ -50,7 +50,7 @@ public class ArcTanVertex<T extends Number, TENSOR extends FloatingPointTensor<T
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor inputValue = inputVertex.getValue().toDouble();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dArcTanh(inputValue)));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(dArcTanh(inputValue)));
         return partials;
     }
 }

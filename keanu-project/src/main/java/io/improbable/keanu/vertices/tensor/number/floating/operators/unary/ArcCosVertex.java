@@ -50,7 +50,7 @@ public class ArcCosVertex<T extends Number, TENSOR extends FloatingPointTensor<T
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor inputValue = inputVertex.getValue().toDouble();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dArcCos(inputValue)));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(dArcCos(inputValue)));
         return partials;
     }
 }

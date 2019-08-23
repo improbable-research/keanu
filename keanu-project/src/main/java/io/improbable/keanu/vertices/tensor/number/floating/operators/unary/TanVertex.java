@@ -47,7 +47,7 @@ public class TanVertex<T extends Number, TENSOR extends FloatingPointTensor<T, T
         DoubleTensor dTandInput = inputVertex.getValue().toDouble().cos().powInPlace(2.0).reciprocalInPlace();
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dTandInput));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(dTandInput));
         return partials;
     }
 }

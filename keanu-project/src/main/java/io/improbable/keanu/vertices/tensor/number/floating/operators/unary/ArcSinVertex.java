@@ -53,7 +53,7 @@ public class ArcSinVertex<T extends Number, TENSOR extends FloatingPointTensor<T
         DoubleTensor inputValue = inputVertex.getValue().toDouble();
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dArcSin(inputValue)));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(dArcSin(inputValue)));
 
         return partials;
     }

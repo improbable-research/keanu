@@ -41,7 +41,7 @@ public class DigammaVertex<T extends Number, TENSOR extends FloatingPointTensor<
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         PartialDerivative dOutputsWrtInputVertex =
-            derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(inputVertex.getValue().toDouble().trigamma());
+            derivativeOfOutputWithRespectToSelf.multiply(inputVertex.getValue().toDouble().trigamma());
         partials.put(inputVertex, dOutputsWrtInputVertex);
         return partials;
     }

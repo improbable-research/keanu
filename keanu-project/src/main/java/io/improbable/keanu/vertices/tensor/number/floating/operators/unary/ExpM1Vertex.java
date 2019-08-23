@@ -40,7 +40,7 @@ public class ExpM1Vertex<T extends Number, TENSOR extends FloatingPointTensor<T,
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(getValue().plus(1.0).toDouble()));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(getValue().plus(1.0).toDouble()));
         return partials;
     }
 }

@@ -68,8 +68,8 @@ public class ArcTan2Vertex<T extends Number, TENSOR extends FloatingPointTensor<
         DoubleTensor dOutWrtX = yValue.div(denominator).unaryMinusInPlace();
         DoubleTensor dOutWrtY = xValue.div(denominator);
 
-        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX);
-        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY);
+        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiply(dOutWrtX);
+        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiply(dOutWrtY);
 
         PartialDerivative toLeft = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
         PartialDerivative toRight = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());

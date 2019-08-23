@@ -44,7 +44,7 @@ public class Log2Vertex<T extends Number, TENSOR extends FloatingPointTensor<T, 
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         partials.put(inputVertex, derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(inputVertex.getValue().toDouble().times(LN2).reciprocal()));
+            .multiply(inputVertex.getValue().toDouble().times(LN2).reciprocal()));
         return partials;
     }
 }

@@ -62,10 +62,10 @@ public class DivisionVertex<T extends Number, TENSOR extends NumberTensor<T, TEN
         DoubleTensor dOutWrtRight = leftValue.div(rightValue.pow(2.0)).unaryMinusInPlace();
 
         PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(dOutWrtLeft);
+            .multiply(dOutWrtLeft);
 
         PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(dOutWrtRight);
+            .multiply(dOutWrtRight);
 
         PartialDerivative toLeft = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
         PartialDerivative toRight = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());

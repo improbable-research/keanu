@@ -57,11 +57,11 @@ public class MultiplicationVertex<T extends Number, TENSOR extends NumberTensor<
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
-        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(
+        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiply(
             right.getValue().toDouble()
         );
 
-        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(
+        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiply(
             left.getValue().toDouble()
         );
 

@@ -45,7 +45,7 @@ public class SinVertex<T extends Number, TENSOR extends FloatingPointTensor<T, T
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         partials.put(inputVertex, derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(inputVertex.getValue().toDouble().cos()));
+            .multiply(inputVertex.getValue().toDouble().cos()));
         return partials;
     }
 }
