@@ -201,7 +201,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor matrixMultiply(IntegerTensor that) {
+    public IntegerTensor matrixMultiply(IntegerTensor that, boolean transposeLeft, boolean transposeRight) {
         if (that.isLengthOne()) {
             return that.times(value);
         }

@@ -15,6 +15,7 @@ import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.special.Gamma;
 import org.bytedeco.javacpp.DoublePointer;
+import org.nd4j.linalg.api.blas.params.MMulTranspose;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.scalar.ReplaceNans;
@@ -171,12 +172,19 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     }
 
     @Override
-    public DoubleTensor matrixMultiply(DoubleTensor value) {
-        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
+    public DoubleTensor matrixMultiply(DoubleTensor value, boolean transposeLeft, boolean transposeRight) {
+        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape(), transposeLeft, transposeRight);
         if (tensor.shape().length > 2 || value.getShape().length > 2) {
-            return fromJVM(toJVM().matrixMultiply(value));
+            return fromJVM(toJVM().matrixMultiply(value, transposeLeft, transposeRight));
         }
-        INDArray mmulResult = tensor.mmul(getTensor(value));
+
+        INDArray mmulResult = tensor.mmul(getTensor(value), MMulTranspose.builder()
+            .transposeA(transposeLeft)
+            .transposeB(transposeRight)
+            .transposeResult(false)
+            .build()
+        );
+
         return create(mmulResult);
     }
 

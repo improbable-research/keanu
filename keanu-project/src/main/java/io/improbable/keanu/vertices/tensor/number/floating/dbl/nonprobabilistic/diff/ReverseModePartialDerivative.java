@@ -81,7 +81,11 @@ public class ReverseModePartialDerivative {
         return new ReverseModePartialDerivative(ofShape, result);
     }
 
-    public static ReverseModePartialDerivative matrixMultiply(ReverseModePartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static ReverseModePartialDerivative matrixMultiply(ReverseModePartialDerivative partial,
+                                                              DoubleTensor multiplier,
+                                                              boolean partialIsLeft,
+                                                              boolean transposePartial,
+                                                              boolean transposeMultiplier) {
 
         if (!partial.isPresent()) {
             return partial;
@@ -91,9 +95,9 @@ public class ReverseModePartialDerivative {
 
         final DoubleTensor result;
         if (partialIsLeft) {
-            result = partialValue.matrixMultiply(multiplier.transpose());
+            result = partialValue.matrixMultiply(multiplier, transposePartial, transposeMultiplier);
         } else {
-            result = multiplier.transpose().matrixMultiply(partialValue);
+            result = multiplier.matrixMultiply(partialValue, transposeMultiplier, transposePartial);
         }
 
         return new ReverseModePartialDerivative(partial.ofShape, result);

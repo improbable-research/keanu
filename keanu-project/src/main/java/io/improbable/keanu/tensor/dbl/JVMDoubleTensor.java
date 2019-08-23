@@ -28,6 +28,7 @@ import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotrf;
 import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotri;
 import static org.bytedeco.openblas.global.openblas.CblasNoTrans;
 import static org.bytedeco.openblas.global.openblas.CblasRowMajor;
+import static org.bytedeco.openblas.global.openblas.CblasTrans;
 import static org.bytedeco.openblas.global.openblas.cblas_dgemm;
 
 public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor, DoubleBuffer.PrimitiveDoubleWrapper> implements DoubleTensor {
@@ -294,7 +295,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
     }
 
     @Override
-    public DoubleTensor matrixMultiply(DoubleTensor that) {
+    public DoubleTensor matrixMultiply(DoubleTensor that, boolean transposeLeft, boolean transposeRight) {
 
         final long[] rightShape = that.getShape();
         final long[] leftShape = this.getShape();
@@ -305,16 +306,19 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
         //C = alpha*A*B + beta*C
         //(M,N) = (M,k)(k,N) + (M,N)
-        final int K = Ints.checkedCast(leftShape[leftShape.length - 1]);
-        final int N = Ints.checkedCast(rightShape[rightShape.length - 1]);
-        final int M = Ints.checkedCast(leftShape[leftShape.length - 2]);
+        final int K = Ints.checkedCast(transposeLeft ? leftShape[leftShape.length - 2] : leftShape[leftShape.length - 1]);
+        final int N = Ints.checkedCast(transposeRight ? rightShape[rightShape.length - 2] : rightShape[rightShape.length - 1]);
+        final int M = Ints.checkedCast(transposeLeft ? leftShape[leftShape.length - 1] : leftShape[leftShape.length - 2]);
+        final int lda = transposeLeft ? M : K;
+        final int ldb = transposeRight ? K : N;
 
-        if (K != Ints.checkedCast(rightShape[rightShape.length - 2])) {
+        final int KFromRight = Ints.checkedCast(transposeRight ? rightShape[rightShape.length - 1] : rightShape[rightShape.length - 2]);
+        if (K != KFromRight) {
             throwMatrixMultiplyException(leftShape, rightShape);
         }
 
         if (leftShape.length > 2 || rightShape.length > 2) {
-            return batchMatrixMultiply(that, K, M, N);
+            return batchMatrixMultiply(that, K, M, N, lda, ldb, transposeLeft, transposeRight);
         }
 
         final long[] resultShape = new long[]{M, N};
@@ -323,12 +327,13 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
         final double[] A = buffer.asDoubleArray();
         final double[] B = getAsJVMTensor(that).getBuffer().asDoubleArray();
 
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, 1, A, K, B, N, 0, C, N);
+        cblas_dgemm(CblasRowMajor, transposeLeft ? CblasTrans : CblasNoTrans, transposeRight ? CblasTrans : CblasNoTrans,
+            M, N, K, 1, A, lda, B, ldb, 0, C, N);
 
         return new JVMDoubleTensor(C, resultShape);
     }
 
-    private DoubleTensor batchMatrixMultiply(DoubleTensor that, int K, int M, int N) {
+    private DoubleTensor batchMatrixMultiply(DoubleTensor that, int K, int M, int N, int lda, int ldb, boolean transposeLeft, boolean transposeRight) {
 
         final long[] rightShape = that.getShape();
         final long[] rightStride = that.getStride();
@@ -367,7 +372,8 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
             final java.nio.DoubleBuffer batchLeftInputBuffer = java.nio.DoubleBuffer.wrap(rightInput, j, batchSizeB);
             final java.nio.DoubleBuffer batchOutputBuffer = java.nio.DoubleBuffer.wrap(outputBuffer, resultPosition, resultBatchSize);
 
-            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, 1, batchRightInputBuffer, K, batchLeftInputBuffer, N, 0, batchOutputBuffer, N);
+            cblas_dgemm(CblasRowMajor, transposeLeft ? CblasTrans : CblasNoTrans, transposeRight ? CblasTrans : CblasNoTrans,
+                M, N, K, 1, batchRightInputBuffer, lda, batchLeftInputBuffer, ldb, 0, batchOutputBuffer, N);
         }
 
         return new JVMDoubleTensor(outputBuffer, resultShape, resultStride);

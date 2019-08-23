@@ -49,7 +49,11 @@ public interface BaseNumberTensor<
 
     T clamp(T min, T max);
 
-    T matrixMultiply(T that);
+    default T matrixMultiply(T that) {
+        return matrixMultiply(that, false, false);
+    }
+
+    T matrixMultiply(T that, boolean transposeLeft, boolean transposeRight);
 
     T tensorMultiply(T value, int[] dimLeft, int[] dimsRight);
 
