@@ -52,11 +52,11 @@ public class AutoDiffBroadcast {
         DoubleTensor partialSummed = partial.get().sum(broadcastDimensions);
 
         long[] resultShape = TensorShape.concat(
-            partial.getOfShape(partialWrtShape),
+            partial.getOfShape(),
             targetWrtShape
         );
 
-        return new PartialDerivative(partialSummed.reshape(resultShape));
+        return new PartialDerivative(partial.getOfShape(), partialSummed.reshape(resultShape));
     }
 
     private static boolean shouldCorrectPartialForBroadcast(PartialDerivative partial, long[] actualShape, long[] expectedShape) {

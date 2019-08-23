@@ -82,7 +82,7 @@ public class SumVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>,
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
 
         final long[] wrtShapeWithoutRankLoss = TensorShape.getReductionResultShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
-        final long[] ofShape = partial.getOfShape(this.getShape());
+        final long[] ofShape = partial.getOfShape();
 
         final long[] newPartialShape = TensorShape.concat(
             ofShape,
@@ -98,7 +98,7 @@ public class SumVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>,
 
         final DoubleTensor broadcastedPartial = partialDueToSummationShapeChange.broadcast(resultShape);
 
-        return singletonMap(inputVertex, new PartialDerivative(broadcastedPartial));
+        return singletonMap(inputVertex, new PartialDerivative(ofShape, broadcastedPartial));
     }
 
     @SaveVertexParam(DIMENSIONS_NAME)

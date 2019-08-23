@@ -53,7 +53,7 @@ public class SliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Ten
 
         DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
         DoubleTensor padded = padSliceWithZerosToMatchInputShape(partial);
-        partials.put(inputVertex, new PartialDerivative(padded));
+        partials.put(inputVertex, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), padded));
 
         return partials;
     }

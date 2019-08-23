@@ -44,28 +44,15 @@ public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
     }
 
     private DoubleTensor takeFromPartial(DoubleTensor from, long... indices) {
-//        long[] fromShape = from.getShape();
-//        long[] subFromShape = Arrays.copyOf(fromShape, indices.length);
-//        long indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
-//        long[] takeShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
-//        long subShapeLength = TensorShape.getLength(subFromShape);
-//
-
         Slicer.SlicerBuilder builder = Slicer.builder().ellipsis();
 
-        for(long i: indices){
+        for (long i : indices) {
             builder.slice(i);
         }
 
-        DoubleTensor result = from.slice(
+        return from.slice(
             builder.build()
         );
-
-        return result;
-
-//        return from.reshape(subShapeLength, -1)
-//            .slice(0, indexToTakeFrom)
-//            .reshape(takeShape);
     }
 
     @Override
@@ -82,7 +69,7 @@ public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
         DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape());
         takeMask.setValue(1., index);
         DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
-        reshapedDerivatives.put(inputVertex, new PartialDerivative(highRankMask));
+        reshapedDerivatives.put(inputVertex, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), highRankMask));
 
         return reshapedDerivatives;
     }

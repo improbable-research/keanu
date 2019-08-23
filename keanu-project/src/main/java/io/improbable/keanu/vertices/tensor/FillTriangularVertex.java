@@ -66,17 +66,17 @@ public class FillTriangularVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX ex
 
         final DoubleTensor p = partial.get();
         if (fillUpper && fillLower) {
-            final PartialDerivative result = new PartialDerivative(p.trianglePart(true).plus(p.triLower(1).trianglePart(false)));
+            final PartialDerivative result = new PartialDerivative(partial.getOfShape(), p.trianglePart(true).plus(p.triLower(1).trianglePart(false)));
             return Collections.singletonMap(inputVertex, result);
         } else if (fillLower) {
-            final PartialDerivative result = new PartialDerivative(p.trianglePart(false));
+            final PartialDerivative result = new PartialDerivative(partial.getOfShape(), p.trianglePart(false));
             return Collections.singletonMap(inputVertex, result);
         } else if (fillUpper) {
-            final PartialDerivative result = new PartialDerivative(p.trianglePart(true));
+            final PartialDerivative result = new PartialDerivative(partial.getOfShape(), p.trianglePart(true));
             return Collections.singletonMap(inputVertex, result);
         } else {
-            final long[] ofShape = partial.getOfShape(this.getShape());
-            final PartialDerivative result = new PartialDerivative(DoubleTensor.zeros(TensorShape.concat(ofShape, inputVertex.getShape())));
+            final long[] ofShape = partial.getOfShape();
+            final PartialDerivative result = new PartialDerivative(partial.getOfShape(), DoubleTensor.zeros(TensorShape.concat(ofShape, inputVertex.getShape())));
             return Collections.singletonMap(inputVertex, result);
         }
     }

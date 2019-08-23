@@ -63,7 +63,10 @@ public class MatrixDeterminantVertex<T extends Number, TENSOR extends FloatingPo
 
         long[] dCCExpandedShape = TensorShape.concat(dCC.getShape(), new long[]{1, 1});
         DoubleTensor AInverseTranspose = inputVertex.getValue().toDouble().matrixInverse().transpose();
-        PartialDerivative toInput = new PartialDerivative(dCC.reshape(dCCExpandedShape).times(AInverseTranspose));
+        PartialDerivative toInput = new PartialDerivative(
+            derivativeOfOutputWithRespectToSelf.getOfShape(),
+            dCC.reshape(dCCExpandedShape).times(AInverseTranspose)
+        );
 
         return Collections.singletonMap(inputVertex, toInput);
     }

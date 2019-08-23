@@ -60,8 +60,8 @@ public class MatrixMultiplicationVertex<T extends Number, TENSOR extends NumberT
         int[] sumLeft = AutoDiffBroadcast.dimensionsWithShapeChange(dOutputsWrtLeft.get().getShape(), this.getRank(), left.getShape());
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(left, new PartialDerivative(dOutputsWrtLeft.get().sum(sumLeft)));
-        partials.put(right, new PartialDerivative(dOutputsWrtRight.get().sum(sumRight)));
+        partials.put(left, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), dOutputsWrtLeft.get().sum(sumLeft)));
+        partials.put(right, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), dOutputsWrtRight.get().sum(sumRight)));
 
         return partials;
     }

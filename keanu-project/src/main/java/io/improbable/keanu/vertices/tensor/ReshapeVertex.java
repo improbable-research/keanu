@@ -46,12 +46,14 @@ public class ReshapeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> reshapedDerivatives = new HashMap<>();
 
+        long[] ofShape = derivativeOfOutputWithRespectToSelf.getOfShape();
         long[] newPartialShape = TensorShape.concat(
-            derivativeOfOutputWithRespectToSelf.getOfShape(getShape()),
+            ofShape,
             inputVertex.getShape()
         );
 
         PartialDerivative dXWrtInputVertex = new PartialDerivative(
+            ofShape,
             derivativeOfOutputWithRespectToSelf.get().reshape(newPartialShape)
         );
 

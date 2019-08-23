@@ -51,7 +51,7 @@ public class PermuteVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         int[] permuteToApply = reversePermute(derivativeOfOutputWithRespectToSelf);
         DoubleTensor result = derivativeOfOutputWithRespectToSelf.get().permute(permuteToApply);
-        partials.put(inputVertex, new PartialDerivative(result));
+        partials.put(inputVertex, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), result));
         return partials;
     }
 

@@ -135,7 +135,7 @@ public class LogProbGradientCalculator {
                 dOfWrtLatentsAccumulated.putWithRespectTo(vertexWithDiff.getId(), dLogProbOfWrtVertexWithDiff);
             } else {
 
-                PartialDerivative partialWrtVertexWithDiff = new PartialDerivative(dLogProbOfWrtVertexWithDiff);
+                PartialDerivative partialWrtVertexWithDiff = new PartialDerivative(new long[0], dLogProbOfWrtVertexWithDiff);
 
                 PartialDerivative correctForScalarReverse = AutoDiffBroadcast.correctForBroadcastPartialReverse(
                     partialWrtVertexWithDiff, dLogProbOfWrtVertexWithDiff.getShape(), vertexWithDiff.getShape()

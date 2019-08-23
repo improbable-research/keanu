@@ -21,6 +21,7 @@ public interface Differentiable {
 
     static PartialDerivative ofSelfWrtSelf(long[] shape) {
         return new PartialDerivative(
+            shape,
             DoubleTensor.eye(TensorShape.getLength(shape)).reshape(TensorShape.concat(shape, shape))
         );
     }

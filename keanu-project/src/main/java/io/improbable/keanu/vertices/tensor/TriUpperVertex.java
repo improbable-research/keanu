@@ -46,7 +46,7 @@ public class TriUpperVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
-        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.get().triUpper(k)));
+        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.getOfShape(), partial.get().triUpper(k)));
     }
 
     @SaveVertexParam(K_NAME)

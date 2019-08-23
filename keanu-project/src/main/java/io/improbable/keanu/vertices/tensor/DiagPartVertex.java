@@ -40,6 +40,6 @@ public class DiagPartVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
-        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.get().diag()));
+        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.getOfShape(), partial.get().diag()));
     }
 }

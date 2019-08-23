@@ -6,11 +6,16 @@ import java.util.Arrays;
 
 public class PartialDerivative {
 
-    public static final PartialDerivative EMPTY = new PartialDerivative(null);
+    public static final PartialDerivative EMPTY = new PartialDerivative(null, null);
 
     private final DoubleTensor partial;
+    private final long[] ofShape;
 
-    public PartialDerivative(DoubleTensor partial) {
+    public PartialDerivative(long[] ofShape, DoubleTensor partial) {
+        if (partial != null && ofShape == null) {
+            throw new IllegalArgumentException("Must provide of shape");
+        }
+        this.ofShape = ofShape;
         this.partial = partial;
     }
 
@@ -22,22 +27,22 @@ public class PartialDerivative {
         return partial;
     }
 
-    public long[] getOfShape(long[] wrtShape) {
-        return Arrays.copyOfRange(partial.getShape(), 0, partial.getRank() - wrtShape.length);
+    public long[] getOfShape() {
+        return ofShape;
     }
 
-    public long[] getWrtShape(long[] ofShape) {
+    public long[] getWrtShape() {
         return Arrays.copyOfRange(partial.getShape(), ofShape.length, partial.getRank());
     }
 
     public PartialDerivative add(PartialDerivative addition) {
 
         if (this.isPresent() && addition.isPresent()) {
-            return new PartialDerivative(partial.plus(addition.partial));
+            return new PartialDerivative(ofShape, partial.plus(addition.partial));
         } else if (this.isPresent() && !addition.isPresent()) {
-            return new PartialDerivative(get());
+            return new PartialDerivative(ofShape, partial);
         } else if (!this.isPresent() && addition.isPresent()) {
-            return new PartialDerivative(addition.partial);
+            return new PartialDerivative(addition.ofShape, addition.partial);
         } else {
             return PartialDerivative.EMPTY;
         }
@@ -46,11 +51,11 @@ public class PartialDerivative {
     public PartialDerivative subtract(PartialDerivative subtraction) {
 
         if (this.isPresent() && subtraction.isPresent()) {
-            return new PartialDerivative(partial.minus(subtraction.partial));
+            return new PartialDerivative(ofShape, partial.minus(subtraction.partial));
         } else if (this.isPresent() && !subtraction.isPresent()) {
-            return new PartialDerivative(get());
+            return new PartialDerivative(ofShape, partial);
         } else if (!this.isPresent() && subtraction.isPresent()) {
-            return new PartialDerivative(subtraction.partial.unaryMinus());
+            return new PartialDerivative(subtraction.ofShape, subtraction.partial.unaryMinus());
         } else {
             return PartialDerivative.EMPTY;
         }
@@ -62,7 +67,7 @@ public class PartialDerivative {
             return this;
         }
 
-        return new PartialDerivative(partial.times(multiplier));
+        return new PartialDerivative(ofShape, partial.times(multiplier));
     }
 
     public PartialDerivative multiply(DoubleTensor multiplier) {
@@ -73,7 +78,7 @@ public class PartialDerivative {
 
         DoubleTensor result = partial.times(multiplier);
 
-        return new PartialDerivative(result);
+        return new PartialDerivative(ofShape, result);
     }
 
     public static PartialDerivative matrixMultiply(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
@@ -91,6 +96,6 @@ public class PartialDerivative {
             result = multiplier.transpose().matrixMultiply(partialValue);
         }
 
-        return new PartialDerivative(result);
+        return new PartialDerivative(partial.ofShape, result);
     }
 }

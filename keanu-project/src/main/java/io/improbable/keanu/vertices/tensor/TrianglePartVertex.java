@@ -65,7 +65,7 @@ public class TrianglePartVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
             result = partial.get().fillTriangular(false, true);
         }
 
-        return Collections.singletonMap(inputVertex, new PartialDerivative(result));
+        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.getOfShape(), result));
     }
 
     @SaveVertexParam(UPPER_PART_NAME)

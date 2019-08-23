@@ -78,7 +78,7 @@ public class ProductVertex<T extends Number, TENSOR extends NumberTensor<T, TENS
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
 
         final long[] wrtShapeWithoutRankLoss = TensorShape.getReductionResultShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
-        final long[] ofShape = partial.getOfShape(this.getShape());
+        final long[] ofShape = partial.getOfShape();
 
         final long[] newPartialShape = TensorShape.concat(
             ofShape,
@@ -91,7 +91,7 @@ public class ProductVertex<T extends Number, TENSOR extends NumberTensor<T, TENS
             .times(getValue().toDouble().reshape(wrtShapeWithoutRankLoss))
             .div(inputVertex.getValue().toDouble());
 
-        return Collections.singletonMap(inputVertex, new PartialDerivative(result));
+        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.getOfShape(), result));
     }
 
     @SaveVertexParam(OVER_DIMENSIONS)

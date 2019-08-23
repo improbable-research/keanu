@@ -45,7 +45,7 @@ public class TriLowerVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends 
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative partial) {
-        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.get().triLower(k)));
+        return Collections.singletonMap(inputVertex, new PartialDerivative(partial.getOfShape(), partial.get().triLower(k)));
     }
 
     @SaveVertexParam(K_NAME)

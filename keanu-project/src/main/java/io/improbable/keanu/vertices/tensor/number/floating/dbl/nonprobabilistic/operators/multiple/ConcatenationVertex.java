@@ -136,7 +136,7 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
         List<DoubleTensor> splitPartial = partial.split(wrtSplitOn, splitIndices);
 
         for (int i = 0; i < splitPartial.size(); i++) {
-            splitPartials.put(operands[i], new PartialDerivative(splitPartial.get(i)));
+            splitPartials.put(operands[i], new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), splitPartial.get(i)));
         }
 
         return splitPartials;

@@ -92,15 +92,14 @@ public class StridedSliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
 
         final DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
 
-        final long[] wrtShape = getShape();
-        final long[] ofShape = derivativeOfOutputWithRespectToSelf.getOfShape(wrtShape);
+        final long[] ofShape = derivativeOfOutputWithRespectToSelf.getOfShape();
         final long[] resultShape = TensorShape.concat(ofShape, inputVertex.getShape());
 
         final DoubleTensor zeroes = DoubleTensor.zeros(resultShape);
 
         final DoubleTensor result = partial.reverseSlice(zeroes, align(slicer, inputVertex.getRank()));
 
-        partials.put(inputVertex, new PartialDerivative(result));
+        partials.put(inputVertex, new PartialDerivative(ofShape, result));
 
         return partials;
     }

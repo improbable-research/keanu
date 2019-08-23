@@ -51,7 +51,7 @@ public class MatrixInverseVertex<T extends Number, TENSOR extends FloatingPointT
             .matrixMultiply(derivativeOfOutputWithRespectToSelf.get())
             .matrixMultiply(parentValue.transpose());
 
-        partials.put(inputVertex, new PartialDerivative(p));
+        partials.put(inputVertex, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), p));
         return partials;
     }
 
