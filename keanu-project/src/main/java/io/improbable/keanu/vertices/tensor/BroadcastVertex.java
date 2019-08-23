@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -34,9 +35,9 @@ public class BroadcastVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
 
-        PartialDerivative dInput = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        ForwardModePartialDerivative dInput = derivativeOfParentsWithRespectToInput.get(inputVertex);
         return broadcastPartialForward(dInput, inputVertex.getShape(), toShape);
     }
 

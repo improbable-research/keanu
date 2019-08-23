@@ -16,7 +16,7 @@ import java.util.List;
 @UtilityClass
 public class AutoDiffBroadcast {
 
-    public static PartialDerivative correctForBroadcastPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
+    public static ForwardModePartialDerivative correctForBroadcastPartialForward(ForwardModePartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
 
         if (shouldCorrectPartialForBroadcast(partial, partialOfShape, targetOfShape)) {
             return broadcastPartialForward(partial, partialOfShape, targetOfShape);
@@ -25,13 +25,14 @@ public class AutoDiffBroadcast {
         }
     }
 
-    public static PartialDerivative broadcastPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
-        long[] wrtShape = partial.getWrtShape(partialOfShape);
-        long[] resultShape = TensorShape.concat(targetOfShape, wrtShape);
+    public static ForwardModePartialDerivative broadcastPartialForward(ForwardModePartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
+        long[] wrtShape = partial.getWrtShape();
+        long[] partialReshape = TensorShape.concat(wrtShape, TensorShape.shapeToDesiredRankByPrependingOnes(partialOfShape, targetOfShape.length));
+        long[] resultShape = TensorShape.concat(wrtShape, targetOfShape);
 
-        DoubleTensor correctedPartial = partial.get().broadcast(resultShape);
+        DoubleTensor correctedPartial = partial.get().reshape(partialReshape).broadcast(resultShape);
 
-        return new PartialDerivative(correctedPartial);
+        return new ForwardModePartialDerivative(wrtShape, correctedPartial);
     }
 
     public static PartialDerivative correctForBroadcastPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
@@ -58,6 +59,10 @@ public class AutoDiffBroadcast {
         return new PartialDerivative(partialSummed.reshape(resultShape));
     }
 
+    private static boolean shouldCorrectPartialForBroadcast(PartialDerivative partial, long[] actualShape, long[] expectedShape) {
+        return partial.isPresent() && !Arrays.equals(actualShape, expectedShape);
+    }
+
     /**
      * @param partial       The partial derivative that may or may not come from a broadcasted operation.
      * @param actualShape   The part of the partial shape that should match the expected shape in the case no broadcast was
@@ -66,7 +71,7 @@ public class AutoDiffBroadcast {
      *                      This should match the actual shape if no broadcast was performed.
      * @return true if a broadcast should be taken into account and corrected for in the auto diff calculation, false otherwise.
      */
-    private static boolean shouldCorrectPartialForBroadcast(PartialDerivative partial, long[] actualShape, long[] expectedShape) {
+    private static boolean shouldCorrectPartialForBroadcast(ForwardModePartialDerivative partial, long[] actualShape, long[] expectedShape) {
         return partial.isPresent() && !Arrays.equals(actualShape, expectedShape);
     }
 

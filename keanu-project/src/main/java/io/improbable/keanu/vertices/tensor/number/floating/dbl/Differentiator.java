@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.tensor.number.floating.dbl;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialsWithRespectTo;
@@ -33,13 +34,13 @@ public class Differentiator {
         HashSet<Vertex> alreadyQueued = new HashSet<>();
         alreadyQueued.add(wrt);
 
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        Map<VertexId, PartialDerivative> ofWrt = new HashMap<>();
+        Map<Vertex, ForwardModePartialDerivative> partials = new HashMap<>();
+        Map<VertexId, ForwardModePartialDerivative> ofWrt = new HashMap<>();
 
         while (!priorityQueue.isEmpty()) {
             V visiting = priorityQueue.poll();
 
-            PartialDerivative partialOfVisiting = ((Differentiable) visiting).forwardModeAutoDifferentiation(partials);
+            ForwardModePartialDerivative partialOfVisiting = ((Differentiable) visiting).forwardModeAutoDifferentiation(partials);
             partials.put(visiting, partialOfVisiting);
 
             if (of.contains(visiting)) {
@@ -62,7 +63,7 @@ public class Differentiator {
         if (ofVertex.isObserved()) {
             return new PartialsOf(ofVertex, Collections.emptyMap());
         } else {
-            return reverseModeAutoDiff(ofVertex, Differentiable.withRespectToSelf(ofVertex.getShape()), wrt);
+            return reverseModeAutoDiff(ofVertex, Differentiable.ofSelfWrtSelf(ofVertex.getShape()), wrt);
         }
     }
 

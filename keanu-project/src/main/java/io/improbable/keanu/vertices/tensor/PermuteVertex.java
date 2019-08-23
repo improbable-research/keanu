@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -38,11 +39,11 @@ public class PermuteVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        int[] permuteToApply = forwardPermute(derivativeOfParentWithRespectToInputs);
-        DoubleTensor result = derivativeOfParentWithRespectToInputs.get().permute(permuteToApply);
-        return new PartialDerivative(result);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        int[] permuteToApply = forwardPermute(partial, partial.getWrtShape().length);
+        DoubleTensor result = partial.get().permute(permuteToApply);
+        return new ForwardModePartialDerivative(partial.getWrtShape(), result);
     }
 
     @Override
@@ -54,12 +55,13 @@ public class PermuteVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
         return partials;
     }
 
-    private int[] forwardPermute(PartialDerivative partial) {
-        int[] permuteToApply = new int[partial.get().getRank()];
+    private int[] forwardPermute(ForwardModePartialDerivative partial, int wrtRank) {
+        int partialRank = partial.get().getRank();
+        int[] permuteToApply = new int[partialRank];
 
-        for (int i = 0; i < partial.get().getRank(); i++) {
-            if (i < rearrange.length) {
-                permuteToApply[i] = rearrange[i];
+        for (int i = 0; i < partialRank; i++) {
+            if (i >= wrtRank) {
+                permuteToApply[i] = rearrange[i - wrtRank] + wrtRank;
             } else {
                 permuteToApply[i] = i;
             }

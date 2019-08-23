@@ -11,6 +11,7 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -48,34 +49,34 @@ public class PowerVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative dBaseWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
-        PartialDerivative dExponentWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative dBaseWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, ForwardModePartialDerivative.EMPTY);
+        ForwardModePartialDerivative dExponentWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, ForwardModePartialDerivative.EMPTY);
 
-        PartialDerivative fromBase = AutoDiffBroadcast.correctForBroadcastPartialForward(dBaseWrtInput, left.getShape(), this.getShape());
-        PartialDerivative fromExponent = AutoDiffBroadcast.correctForBroadcastPartialForward(dExponentWrtInput, right.getShape(), this.getShape());
+        ForwardModePartialDerivative fromBase = AutoDiffBroadcast.correctForBroadcastPartialForward(dBaseWrtInput, left.getShape(), this.getShape());
+        ForwardModePartialDerivative fromExponent = AutoDiffBroadcast.correctForBroadcastPartialForward(dExponentWrtInput, right.getShape(), this.getShape());
 
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
-        PartialDerivative partialsFromBase;
-        PartialDerivative partialsFromExponent;
+        ForwardModePartialDerivative partialsFromBase;
+        ForwardModePartialDerivative partialsFromExponent;
 
         final DoubleTensor baseValue = left.getValue().toDouble();
         final DoubleTensor exponentValue = right.getValue().toDouble();
 
         if (fromBase.isPresent()) {
-            partialsFromBase = fromBase.multiplyAlongOfDimensions(
+            partialsFromBase = fromBase.multiply(
                 exponentValue.times(baseValue.toDouble().pow(exponentValue.toDouble().minus(1)))
             );
         } else {
-            partialsFromBase = PartialDerivative.EMPTY;
+            partialsFromBase = ForwardModePartialDerivative.EMPTY;
         }
 
         if (fromExponent.isPresent()) {
-            partialsFromExponent = fromExponent.multiplyAlongOfDimensions(
+            partialsFromExponent = fromExponent.multiply(
                 baseValue.log().timesInPlace(this.getValue().toDouble())
             );
         } else {
-            partialsFromExponent = PartialDerivative.EMPTY;
+            partialsFromExponent = ForwardModePartialDerivative.EMPTY;
         }
 
         return partialsFromBase.add(partialsFromExponent);

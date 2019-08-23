@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.ArrayList;
@@ -26,12 +27,12 @@ public class ReduceVertex extends VertexImpl<DoubleTensor, DoubleVertex> impleme
 
     private final List<Vertex<DoubleTensor, ?>> inputs;
     private final BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction;
-    private final Supplier<PartialDerivative> forwardModeAutoDiffLambda;
+    private final Supplier<ForwardModePartialDerivative> forwardModeAutoDiffLambda;
     private final Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda;
 
     public ReduceVertex(long[] shape, Collection<? extends Vertex<DoubleTensor, ?>> inputs,
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
-                        Supplier<PartialDerivative> forwardModeAutoDiffLambda,
+                        Supplier<ForwardModePartialDerivative> forwardModeAutoDiffLambda,
                         Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         super(shape);
         if (inputs.size() < 2) {
@@ -46,7 +47,7 @@ public class ReduceVertex extends VertexImpl<DoubleTensor, DoubleVertex> impleme
     }
 
     public ReduceVertex(long[] shape, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
-                        Supplier<PartialDerivative> forwardModeAutoDiffLambda,
+                        Supplier<ForwardModePartialDerivative> forwardModeAutoDiffLambda,
                         Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda,
                         Vertex<DoubleTensor, ?>... input) {
         this(shape, Arrays.asList(input), reduceFunction, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
@@ -66,7 +67,7 @@ public class ReduceVertex extends VertexImpl<DoubleTensor, DoubleVertex> impleme
      * @param input                     input vertices to reduce
      */
     public ReduceVertex(BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
-                        Supplier<PartialDerivative> forwardModeAutoDiffLambda,
+                        Supplier<ForwardModePartialDerivative> forwardModeAutoDiffLambda,
                         Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda,
                         Vertex<DoubleTensor, ?>... input) {
         this(checkAllShapesMatch(Arrays.stream(input).map(Vertex::getShape).collect(Collectors.toList())),
@@ -103,7 +104,7 @@ public class ReduceVertex extends VertexImpl<DoubleTensor, DoubleVertex> impleme
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
         if (forwardModeAutoDiffLambda != null) {
             return forwardModeAutoDiffLambda.get();
         }

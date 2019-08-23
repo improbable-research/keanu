@@ -4,11 +4,13 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Arrays;
@@ -29,8 +31,8 @@ public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
         TENSOR newValue = this.getValue();
 
@@ -39,19 +41,32 @@ public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
         long[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
         atIndexTensor = atIndexTensor.reshape(paddedShape);
 
-        return new PartialDerivative(atIndexTensor);
+        return new ForwardModePartialDerivative(derivativeOfParentWithRespectToInputs.getWrtShape(), atIndexTensor);
     }
 
     private DoubleTensor takeFromPartial(DoubleTensor from, long... indices) {
-        long[] fromShape = from.getShape();
-        long[] subFromShape = Arrays.copyOf(fromShape, indices.length);
-        long indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
-        long[] takeShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
-        long subShapeLength = TensorShape.getLength(subFromShape);
+//        long[] fromShape = from.getShape();
+//        long[] subFromShape = Arrays.copyOf(fromShape, indices.length);
+//        long indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
+//        long[] takeShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
+//        long subShapeLength = TensorShape.getLength(subFromShape);
+//
 
-        return from.reshape(subShapeLength, -1)
-            .slice(0, indexToTakeFrom)
-            .reshape(takeShape);
+        Slicer.SlicerBuilder builder = Slicer.builder().ellipsis();
+
+        for(long i: indices){
+            builder.slice(i);
+        }
+
+        DoubleTensor result = from.slice(
+            builder.build()
+        );
+
+        return result;
+
+//        return from.reshape(subShapeLength, -1)
+//            .slice(0, indexToTakeFrom)
+//            .reshape(takeShape);
     }
 
     @Override

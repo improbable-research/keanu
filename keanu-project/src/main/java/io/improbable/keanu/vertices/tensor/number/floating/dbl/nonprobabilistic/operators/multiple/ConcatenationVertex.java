@@ -10,11 +10,11 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,12 +47,12 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        List<PartialDerivative> partialsOfOperands = new ArrayList<>();
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        List<ForwardModePartialDerivative> partialsOfOperands = new ArrayList<>();
         List<DoubleTensor> operandValues = new ArrayList<>();
 
         for (Vertex<DoubleTensor, ?> operand : operands) {
-            PartialDerivative operandPartial = derivativeOfParentsWithRespectToInput.getOrDefault(operand, PartialDerivative.EMPTY);
+            ForwardModePartialDerivative operandPartial = derivativeOfParentsWithRespectToInput.getOrDefault(operand, ForwardModePartialDerivative.EMPTY);
             partialsOfOperands.add(operandPartial);
             operandValues.add(operand.getValue());
         }
@@ -60,18 +60,16 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
         return concat(partialsOfOperands, operandValues, dimension);
     }
 
-    public static PartialDerivative concat(List<PartialDerivative> partialsOfOperands,
-                                           List<DoubleTensor> operandValues,
-                                           int dimension) {
+    public static ForwardModePartialDerivative concat(List<ForwardModePartialDerivative> partialsOfOperands,
+                                                      List<DoubleTensor> operandValues,
+                                                      int dimension) {
 
         long[] wrtShape = null;
         for (int i = 0; i < partialsOfOperands.size(); i++) {
-            PartialDerivative partial = partialsOfOperands.get(i);
-            DoubleTensor operandValue = operandValues.get(i);
+            ForwardModePartialDerivative partial = partialsOfOperands.get(i);
 
             if (partial.isPresent()) {
-                long[] partialWrtShape = partial.get().getShape();
-                wrtShape = Arrays.copyOfRange(partialWrtShape, operandValue.getRank(), partialWrtShape.length);
+                wrtShape = partial.getWrtShape();
                 break;
             }
         }
@@ -82,23 +80,23 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
             wrtShape
         );
 
-        return new PartialDerivative(concatPartialDerivatives(dimension, partialsToConcat));
+        return new ForwardModePartialDerivative(wrtShape, concatPartialDerivatives(dimension + wrtShape.length, partialsToConcat));
     }
 
-    private static List<DoubleTensor> getPartialsToConcatForInput(List<PartialDerivative> partialsOfOperands,
+    private static List<DoubleTensor> getPartialsToConcatForInput(List<ForwardModePartialDerivative> partialsOfOperands,
                                                                   List<DoubleTensor> operandValues,
                                                                   long[] wrtShape) {
 
         List<DoubleTensor> partialsToConcat = new ArrayList<>();
 
         for (int i = 0; i < operandValues.size(); i++) {
-            PartialDerivative partialOfOperand = partialsOfOperands.get(i);
+            ForwardModePartialDerivative partialOfOperand = partialsOfOperands.get(i);
             DoubleTensor operandValue = operandValues.get(i);
 
             if (partialOfOperand.isPresent()) {
                 partialsToConcat.add(partialOfOperand.get());
             } else {
-                long[] resultShape = TensorShape.concat(operandValue.getShape(), wrtShape);
+                long[] resultShape = TensorShape.concat(wrtShape, operandValue.getShape());
                 partialsToConcat.add(DoubleTensor.zeros(resultShape));
             }
 

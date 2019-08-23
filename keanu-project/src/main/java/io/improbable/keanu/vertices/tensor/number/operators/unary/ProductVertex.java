@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Collections;
@@ -47,19 +48,30 @@ public class ProductVertex<T extends Number, TENSOR extends NumberTensor<T, TENS
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
 
-        final PartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        final ForwardModePartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        final int operandRank = inputVertex.getRank();
+        final int partialRank = partial.get().getRank();
+
+        final int[] dimensionsToSum;
+        if (overDimensions == null) {
+            dimensionsToSum = TensorShape.dimensionRange(operandRank, partialRank);
+        } else {
+            dimensionsToSum = new int[overDimensions.length];
+            for (int i = 0; i < dimensionsToSum.length; i++) {
+                dimensionsToSum[i] = overDimensions[i] + (partialRank - operandRank);
+            }
+        }
 
         final long[] ofShapeWithoutRankLoss = TensorShape.getReductionResultShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
-        int[] sumOver = overDimensions == null ? TensorShape.dimensionRange(0, inputVertex.getRank()) : overDimensions;
 
         final DoubleTensor result = partial
-            .multiplyAlongOfDimensions(getValue().toDouble().reshape(ofShapeWithoutRankLoss))
-            .divideByAlongOfDimensions(inputVertex.getValue().toDouble())
-            .get().sum(sumOver);
+            .multiply(getValue().toDouble().reshape(ofShapeWithoutRankLoss))
+            .divideBy(inputVertex.getValue().toDouble())
+            .get().sum(dimensionsToSum);
 
-        return new PartialDerivative(result);
+        return new ForwardModePartialDerivative(partial.getWrtShape(), result);
     }
 
     @Override

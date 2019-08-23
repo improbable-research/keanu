@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -30,15 +31,15 @@ public class ReshapeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
         long[] newPartialShape = TensorShape.concat(
-            getShape(),
-            dInputVertex.getWrtShape(inputVertex.getShape())
+            dInputVertex.getWrtShape(),
+            getShape()
         );
 
-        return new PartialDerivative(dInputVertex.get().reshape(newPartialShape));
+        return new ForwardModePartialDerivative(dInputVertex.getWrtShape(), dInputVertex.get().reshape(newPartialShape));
     }
 
     @Override

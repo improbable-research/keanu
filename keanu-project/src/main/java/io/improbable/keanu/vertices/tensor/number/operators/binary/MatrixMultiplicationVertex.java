@@ -10,6 +10,7 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -66,25 +67,21 @@ public class MatrixMultiplicationVertex<T extends Number, TENSOR extends NumberT
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
-        PartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, ForwardModePartialDerivative.EMPTY);
+        ForwardModePartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, ForwardModePartialDerivative.EMPTY);
 
         // dc = A * db + da * B;
-        PartialDerivative partialsFromLeft = PartialDerivative.matrixMultiplyAlongOfDimensions(
+        ForwardModePartialDerivative partialsFromLeft = ForwardModePartialDerivative.matrixMultiply(
             dLeftWrtInput,
             right.getValue().toDouble(),
-            true,
-            left.getShape(),
-            this.getShape().length
+            true
         );
 
-        PartialDerivative partialsFromRight = PartialDerivative.matrixMultiplyAlongOfDimensions(
+        ForwardModePartialDerivative partialsFromRight = ForwardModePartialDerivative.matrixMultiply(
             dRightWrtInput,
             left.getValue().toDouble(),
-            false,
-            right.getShape(),
-            this.getShape().length
+            false
         );
 
         return partialsFromLeft.add(partialsFromRight);

@@ -10,6 +10,7 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.ArrayList;
@@ -79,21 +80,10 @@ public class StridedSliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
-        return new PartialDerivative(dInputVertex.get().slice(alignOf(slicer, inputVertex.getRank())));
-    }
-
-    private Slicer alignOf(Slicer from, int ofRank) {
-
-        final List<Slicer.Slice> slices = new ArrayList<>();
-
-        for (int i = 0; i < ofRank; i++) {
-            slices.add(from.getSlice(i, ofRank));
-        }
-
-        return new Slicer(slices, ofRank);
+        return new ForwardModePartialDerivative(dInputVertex.getWrtShape(), dInputVertex.get().slice(align(slicer, inputVertex.getRank())));
     }
 
     @Override
@@ -108,14 +98,14 @@ public class StridedSliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX exte
 
         final DoubleTensor zeroes = DoubleTensor.zeros(resultShape);
 
-        final DoubleTensor result = partial.reverseSlice(zeroes, alignWrt(slicer, inputVertex.getRank()));
+        final DoubleTensor result = partial.reverseSlice(zeroes, align(slicer, inputVertex.getRank()));
 
         partials.put(inputVertex, new PartialDerivative(result));
 
         return partials;
     }
 
-    private Slicer alignWrt(Slicer from, int wrtRank) {
+    private Slicer align(Slicer from, int wrtRank) {
 
         List<Slicer.Slice> slices = new ArrayList<>();
 

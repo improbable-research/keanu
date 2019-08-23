@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Collections;
@@ -32,9 +33,9 @@ public class DiagVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        final PartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return PartialDerivative.createFromWrtOf(partial.getWrtOf(inputVertex.getRank()).diag(), this.getRank());
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        final ForwardModePartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        return new ForwardModePartialDerivative(partial.getWrtShape(), partial.get().diag());
     }
 
     @Override

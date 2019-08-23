@@ -537,6 +537,8 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         long[] outputStride = TensorShape.getRowFirstStride(toShape);
         B outputBuffer = getFactory().createNew(outputLength);
 
+        TensorShape.getBroadcastResultShape(shape, toShape);
+
         JVMTensorBroadcast.broadcast(buffer, shape, stride, outputBuffer, outputStride);
 
         return create(outputBuffer, toShape, outputStride);

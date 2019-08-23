@@ -10,6 +10,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -61,10 +62,10 @@ public class WhereVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Ten
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
 
-        PartialDerivative thnPartial = derivativeOfParentsWithRespectToInput.getOrDefault(thn, PartialDerivative.EMPTY);
-        PartialDerivative elsPartial = derivativeOfParentsWithRespectToInput.getOrDefault(els, PartialDerivative.EMPTY);
+        ForwardModePartialDerivative thnPartial = derivativeOfParentsWithRespectToInput.getOrDefault(thn, ForwardModePartialDerivative.EMPTY);
+        ForwardModePartialDerivative elsPartial = derivativeOfParentsWithRespectToInput.getOrDefault(els, ForwardModePartialDerivative.EMPTY);
         BooleanTensor predicateValue = predicate.getValue();
 
         if (predicateValue.allTrue().scalar()) {
@@ -72,8 +73,8 @@ public class WhereVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Ten
         } else if (predicateValue.allFalse().scalar()) {
             return elsPartial;
         } else {
-            return thnPartial.multiplyAlongOfDimensions(predicateValue.toDoubleMask())
-                .add(elsPartial.multiplyAlongOfDimensions(predicateValue.not().toDoubleMask()));
+            return thnPartial.multiply(predicateValue.toDoubleMask())
+                .add(elsPartial.multiply(predicateValue.not().toDoubleMask()));
         }
     }
 

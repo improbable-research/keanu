@@ -10,6 +10,7 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -35,12 +36,11 @@ public class AbsVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>,
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
 
         final DoubleTensor signOfInput = inputVertex.getValue().toDouble().sign();
 
-        return derivativeOfParentsWithRespectToInput.get(inputVertex)
-            .multiplyAlongOfDimensions(signOfInput);
+        return derivativeOfParentsWithRespectToInput.get(inputVertex).multiply(signOfInput);
     }
 
     @Override

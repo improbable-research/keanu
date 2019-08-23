@@ -13,6 +13,7 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Map;
@@ -59,14 +60,26 @@ public class MeanVertex<T extends Number, TENSOR extends FloatingPointTensor<T, 
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        final PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        final ForwardModePartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
         final int operandRank = inputVertex.getValue().getRank();
-        final int[] dimensionsToSum = overDimensions == null ? TensorShape.dimensionRange(0, operandRank) : overDimensions;
+        final int partialRank = dInputVertex.get().getRank();
 
-        final long length = TensorShape.getLength(inputVertex.getShape(), dimensionsToSum);
+        final int[] dimensionsToSum;
+        final long length;
+        if (overDimensions == null) {
+            dimensionsToSum = TensorShape.dimensionRange(operandRank, partialRank);
+            length = inputVertex.getValue().getLength();
+        } else {
+            dimensionsToSum = new int[overDimensions.length];
+            for (int i = 0; i < dimensionsToSum.length; i++) {
+                dimensionsToSum[i] = overDimensions[i] + (partialRank - operandRank);
+            }
+            length = TensorShape.getLength(inputVertex.getShape(), overDimensions);
+        }
 
-        return new PartialDerivative(dInputVertex.get().sum(dimensionsToSum).div(length));
+
+        return new ForwardModePartialDerivative(dInputVertex.getWrtShape(), dInputVertex.get().sum(dimensionsToSum).div(length));
     }
 
     @Override
