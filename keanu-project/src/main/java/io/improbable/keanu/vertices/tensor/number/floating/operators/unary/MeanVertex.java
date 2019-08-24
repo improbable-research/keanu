@@ -72,10 +72,11 @@ public class MeanVertex<T extends Number, TENSOR extends FloatingPointTensor<T, 
             length = inputVertex.getValue().getLength();
         } else {
             dimensionsToSum = new int[overDimensions.length];
+            int[] absoluteDims = TensorShape.getAbsoluteDimensions(inputVertex.getRank(), overDimensions);
             for (int i = 0; i < dimensionsToSum.length; i++) {
-                dimensionsToSum[i] = overDimensions[i] + (partialRank - operandRank);
+                dimensionsToSum[i] = absoluteDims[i] + (partialRank - operandRank);
             }
-            length = TensorShape.getLength(inputVertex.getShape(), overDimensions);
+            length = TensorShape.getLength(inputVertex.getShape(), absoluteDims);
         }
 
 

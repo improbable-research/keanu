@@ -391,6 +391,7 @@ public class JVMDoubleTensor extends JVMFloatingPointTensor<Double, DoubleTensor
 
     @Override
     public DoubleTensor mean(int... overDimensions) {
+        overDimensions = TensorShape.getAbsoluteDimensions(shape.length, overDimensions);
         final long length = TensorShape.getLength(shape, overDimensions);
         return sum(overDimensions).divInPlace((double) length);
     }

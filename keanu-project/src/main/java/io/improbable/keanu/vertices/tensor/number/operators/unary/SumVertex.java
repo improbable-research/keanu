@@ -70,8 +70,9 @@ public class SumVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>,
             dimensionsToSum = TensorShape.dimensionRange(operandRank, partialRank);
         } else {
             dimensionsToSum = new int[overDimensions.length];
+            int[] absoluteDims = TensorShape.getAbsoluteDimensions(inputVertex.getRank(), overDimensions);
             for (int i = 0; i < dimensionsToSum.length; i++) {
-                dimensionsToSum[i] = overDimensions[i] + (partialRank - operandRank);
+                dimensionsToSum[i] = absoluteDims[i] + (partialRank - operandRank);
             }
         }
 

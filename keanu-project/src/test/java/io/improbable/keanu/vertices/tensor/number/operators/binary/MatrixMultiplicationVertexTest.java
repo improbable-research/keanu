@@ -382,6 +382,20 @@ public class MatrixMultiplicationVertexTest {
         );
     }
 
+    @Test
+    public void canBatchForwardFromWrtSingleVariable() {
+        UniformVertex input = new UniformVertex(new long[]{3, 3, 2}, -10.0, 10.0);
+        DoubleVertex mmultVertex = input.transpose().matrixMultiply(input.reshape(3, 1, 3, 2));
+        DoubleVertex outputVertex = mmultVertex.times(
+            new ConstantDoubleVertex(DoubleTensor.arange(4).reshape(2, 2))
+        ).sum(-1);
+
+        final double INCREMENT = 10;
+        final double DELTA = 1e-10;
+
+        finiteDifferenceMatchesForwardModeGradient(ImmutableList.of(input), outputVertex, INCREMENT, DELTA);
+    }
+
     private void assertChangesMatchGradientForward(long[] leftShape, long[] rightShape, DoubleTensor postOpFactor) {
         UniformVertex inputA = new UniformVertex(leftShape, -10.0, 10.0);
         UniformVertex inputB = new UniformVertex(rightShape, -10.0, 10.0);

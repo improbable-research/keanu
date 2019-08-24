@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
@@ -37,6 +38,24 @@ public class ProductVertexTest {
         final double DELTA = 1e-10;
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA), outputVertex, INCREMENT, DELTA);
+    }
+
+    @Test
+    @Ignore
+    public void changesMatchGradientWhenProductDimensionsFromRight() {
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+
+        DoubleVertex outputVertex = inputVertex.product(-1)
+            .times(
+                inputVertex.product(-2)
+            ).times(
+                inputVertex.product(-3)
+            ).times(
+                inputVertex.product()
+            );
+
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-6);
     }
 
     @Test

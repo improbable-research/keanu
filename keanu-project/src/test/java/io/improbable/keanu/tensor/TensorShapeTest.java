@@ -33,19 +33,19 @@ public class TensorShapeTest {
 
     @Test
     public void canGetAbsoluteDimensionsFromRelative() {
-        int[] actual = TensorShape.setToAbsoluteDimensions(3, new int[]{-2, 1, 2});
+        int[] actual = TensorShape.getAbsoluteDimensions(3, new int[]{-2, 1, 2});
         int[] expected = new int[]{1, 1, 2};
         assertArrayEquals(actual, expected);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void doesThrowOnInvalidNegativeAbsoluteDimensionsFromRelative() {
-        TensorShape.setToAbsoluteDimensions(3, new int[]{-4, 1, 2});
+        TensorShape.getAbsoluteDimensions(3, new int[]{-4, 1, 2});
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void doesThrowOnInvalidPositiveAbsoluteDimensionsFromRelative() {
-        TensorShape.setToAbsoluteDimensions(3, new int[]{3, 1, 2});
+        TensorShape.getAbsoluteDimensions(3, new int[]{3, 1, 2});
     }
 
     @Test

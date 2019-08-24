@@ -68,6 +68,23 @@ public class MeanVertexTest {
     }
 
     @Test
+    public void changesMatchGradientWhenMeanDimensionsFromRight() {
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+
+        DoubleVertex outputVertex = inputVertex.mean(-1)
+            .times(
+                inputVertex.mean(-2)
+            ).times(
+                inputVertex.mean(-3)
+            ).times(
+                inputVertex.mean()
+            );
+
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-6);
+    }
+
+    @Test
     public void changesMatchGradientWhenMeanSpecificDimensions() {
         UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
