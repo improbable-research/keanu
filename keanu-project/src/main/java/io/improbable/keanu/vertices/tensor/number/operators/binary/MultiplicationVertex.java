@@ -43,14 +43,11 @@ public class MultiplicationVertex<T extends Number, TENSOR extends NumberTensor<
         ForwardModePartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, ForwardModePartialDerivative.EMPTY);
         ForwardModePartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, ForwardModePartialDerivative.EMPTY);
 
-        ForwardModePartialDerivative fromLeft = AutoDiffBroadcast.correctForBroadcastPartialForward(dLeftWrtInput, left.getShape(), this.getShape());
-        ForwardModePartialDerivative fromRight = AutoDiffBroadcast.correctForBroadcastPartialForward(dRightWrtInput, right.getShape(), this.getShape());
-
         // dc = A * db + da * B;
-        ForwardModePartialDerivative partialsFromLeft = fromLeft.multiply(right.getValue().toDouble());
-        ForwardModePartialDerivative partialsFromRight = fromRight.multiply(left.getValue().toDouble());
+        ForwardModePartialDerivative partialsFromLeft = dLeftWrtInput.multiply(right.getValue().toDouble());
+        ForwardModePartialDerivative partialsFromRight = dRightWrtInput.multiply(left.getValue().toDouble());
 
-        return partialsFromLeft.add(partialsFromRight);
+        return partialsFromLeft.add(partialsFromRight, this.getShape());
     }
 
     @Override

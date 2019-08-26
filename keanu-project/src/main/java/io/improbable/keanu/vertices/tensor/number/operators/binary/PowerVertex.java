@@ -53,9 +53,6 @@ public class PowerVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR
         ForwardModePartialDerivative dBaseWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, ForwardModePartialDerivative.EMPTY);
         ForwardModePartialDerivative dExponentWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, ForwardModePartialDerivative.EMPTY);
 
-        ForwardModePartialDerivative fromBase = AutoDiffBroadcast.correctForBroadcastPartialForward(dBaseWrtInput, left.getShape(), this.getShape());
-        ForwardModePartialDerivative fromExponent = AutoDiffBroadcast.correctForBroadcastPartialForward(dExponentWrtInput, right.getShape(), this.getShape());
-
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
         ForwardModePartialDerivative partialsFromBase;
         ForwardModePartialDerivative partialsFromExponent;
@@ -63,23 +60,23 @@ public class PowerVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR
         final DoubleTensor baseValue = left.getValue().toDouble();
         final DoubleTensor exponentValue = right.getValue().toDouble();
 
-        if (fromBase.isPresent()) {
-            partialsFromBase = fromBase.multiply(
+        if (dBaseWrtInput.isPresent()) {
+            partialsFromBase = dBaseWrtInput.multiply(
                 exponentValue.times(baseValue.toDouble().pow(exponentValue.toDouble().minus(1)))
             );
         } else {
             partialsFromBase = ForwardModePartialDerivative.EMPTY;
         }
 
-        if (fromExponent.isPresent()) {
-            partialsFromExponent = fromExponent.multiply(
+        if (dExponentWrtInput.isPresent()) {
+            partialsFromExponent = dExponentWrtInput.multiply(
                 baseValue.log().timesInPlace(this.getValue().toDouble())
             );
         } else {
             partialsFromExponent = ForwardModePartialDerivative.EMPTY;
         }
 
-        return partialsFromBase.add(partialsFromExponent);
+        return partialsFromBase.add(partialsFromExponent, this.getShape());
     }
 
     @Override

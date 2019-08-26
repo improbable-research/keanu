@@ -103,7 +103,7 @@ public class TestGraphGenerator {
             ForwardModePartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, ForwardModePartialDerivative.EMPTY);
             ForwardModePartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, ForwardModePartialDerivative.EMPTY);
             autoDiffCount.incrementAndGet();
-            return dLeftWrtInput.add(dRightWrtInput);
+            return dLeftWrtInput.add(dRightWrtInput, this.getShape());
         }
 
         @Override

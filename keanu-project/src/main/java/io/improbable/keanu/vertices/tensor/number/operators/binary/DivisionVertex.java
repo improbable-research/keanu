@@ -43,14 +43,11 @@ public class DivisionVertex<T extends Number, TENSOR extends NumberTensor<T, TEN
         ForwardModePartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, ForwardModePartialDerivative.EMPTY);
         ForwardModePartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, ForwardModePartialDerivative.EMPTY);
 
-        ForwardModePartialDerivative fromLeft = AutoDiffBroadcast.correctForBroadcastPartialForward(dLeftWrtInput, left.getShape(), this.getShape());
-        ForwardModePartialDerivative fromRight = AutoDiffBroadcast.correctForBroadcastPartialForward(dRightWrtInput, right.getShape(), this.getShape());
-
         // dc = (B * da - A * db) / B^2;
-        ForwardModePartialDerivative partialsFromLeft = fromLeft.multiply(right.getValue().toDouble());
-        ForwardModePartialDerivative partialsFromRight = fromRight.multiply(left.getValue().toDouble());
+        ForwardModePartialDerivative partialsFromLeft = dLeftWrtInput.multiply(right.getValue().toDouble());
+        ForwardModePartialDerivative partialsFromRight = dRightWrtInput.multiply(left.getValue().toDouble());
 
-        return partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().toDouble().pow(2.));
+        return partialsFromLeft.subtract(partialsFromRight, this.getShape()).divideBy(right.getValue().toDouble().pow(2.));
     }
 
     @Override

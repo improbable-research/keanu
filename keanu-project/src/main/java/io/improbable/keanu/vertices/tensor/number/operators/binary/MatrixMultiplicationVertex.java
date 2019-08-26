@@ -101,7 +101,7 @@ public class MatrixMultiplicationVertex<T extends Number, TENSOR extends NumberT
             false
         );
 
-        return partialsFromLeft.add(partialsFromRight);
+        return partialsFromLeft.add(partialsFromRight, this.getShape());
     }
 
     @SaveVertexParam(TRANSPOSE_LEFT)

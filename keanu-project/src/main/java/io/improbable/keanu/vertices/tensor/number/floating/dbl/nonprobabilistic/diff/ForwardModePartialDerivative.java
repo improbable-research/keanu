@@ -56,39 +56,74 @@ public class ForwardModePartialDerivative {
         return wrtShape;
     }
 
-    public ForwardModePartialDerivative add(ForwardModePartialDerivative addition) {
+    public ForwardModePartialDerivative add(ForwardModePartialDerivative right, long[] desiredOfShape) {
 
-        if (this.isPresent() && addition.isPresent()) {
-            return new ForwardModePartialDerivative(wrtShape, partial.plus(addition.partial));
-        } else if (this.isPresent() && !addition.isPresent()) {
-            return new ForwardModePartialDerivative(wrtShape, get());
-        } else if (!this.isPresent() && addition.isPresent()) {
-            return new ForwardModePartialDerivative(addition.getWrtShape(), addition.partial);
+        if (this.isPresent() && right.isPresent()) {
+
+            if (partial.getRank() == right.partial.getRank()) {
+                return new ForwardModePartialDerivative(wrtShape, partial.plus(right.partial));
+            } else if (partial.getRank() < right.partial.getRank()) {
+                final DoubleTensor leftPartial = upRankForBroadcast(this, desiredOfShape.length);
+                return new ForwardModePartialDerivative(wrtShape, leftPartial.plus(right.partial));
+            } else {
+                final DoubleTensor rightPartial = upRankForBroadcast(right, desiredOfShape.length);
+                return new ForwardModePartialDerivative(wrtShape, partial.plus(rightPartial));
+            }
+        } else if (this.isPresent() && !right.isPresent()) {
+            final DoubleTensor resultValue = broadcastToDesiredShape(this, desiredOfShape);
+            return new ForwardModePartialDerivative(wrtShape, resultValue);
+        } else if (!this.isPresent() && right.isPresent()) {
+            final DoubleTensor resultValue = broadcastToDesiredShape(right, desiredOfShape);
+            return new ForwardModePartialDerivative(right.wrtShape, resultValue);
         } else {
             return ForwardModePartialDerivative.EMPTY;
         }
     }
 
-    public ForwardModePartialDerivative subtract(ForwardModePartialDerivative subtraction) {
+    public ForwardModePartialDerivative subtract(ForwardModePartialDerivative right, long[] desiredOfShape) {
 
-        if (this.isPresent() && subtraction.isPresent()) {
-            return new ForwardModePartialDerivative(wrtShape, partial.minus(subtraction.partial));
-        } else if (this.isPresent() && !subtraction.isPresent()) {
-            return new ForwardModePartialDerivative(wrtShape, get());
-        } else if (!this.isPresent() && subtraction.isPresent()) {
-            return new ForwardModePartialDerivative(subtraction.getWrtShape(), subtraction.partial.unaryMinus());
+        if (this.isPresent() && right.isPresent()) {
+
+            if (partial.getRank() == right.partial.getRank()) {
+                return new ForwardModePartialDerivative(wrtShape, partial.minus(right.partial));
+            } else if (partial.getRank() < right.partial.getRank()) {
+                final DoubleTensor leftPartial = upRankForBroadcast(this, desiredOfShape.length);
+                return new ForwardModePartialDerivative(wrtShape, leftPartial.minus(right.partial));
+            } else {
+                final DoubleTensor rightPartial = upRankForBroadcast(right, desiredOfShape.length);
+                return new ForwardModePartialDerivative(wrtShape, partial.minus(rightPartial));
+            }
+        } else if (this.isPresent() && !right.isPresent()) {
+            final DoubleTensor resultValue =  broadcastToDesiredShape(this, desiredOfShape);
+            return new ForwardModePartialDerivative(wrtShape, resultValue);
+        } else if (!this.isPresent() && right.isPresent()) {
+            final DoubleTensor resultValue =  broadcastToDesiredShape(right.unaryMinus(), desiredOfShape);
+            return new ForwardModePartialDerivative(right.wrtShape, resultValue);
         } else {
             return ForwardModePartialDerivative.EMPTY;
         }
     }
 
-    public ForwardModePartialDerivative multiplyBy(double multiplier) {
+    private DoubleTensor broadcastToDesiredShape(ForwardModePartialDerivative fromPartial, long[] desiredOfShape) {
+        final long[] resultShape = TensorShape.concat(fromPartial.wrtShape, desiredOfShape);
+        DoubleTensor partialValue = upRankForBroadcast(fromPartial, desiredOfShape.length);
 
-        if (!isPresent()) {
-            return this;
+        if (Arrays.equals(partialValue.getShape(), resultShape)) {
+            return partialValue;
+        } else {
+            return partialValue.broadcast(resultShape);
         }
+    }
 
-        return new ForwardModePartialDerivative(wrtShape, partial.times(multiplier));
+    private static DoubleTensor upRankForBroadcast(ForwardModePartialDerivative partial, int desiredOfRank) {
+        int partialOfRank = partial.get().getRank() - partial.wrtShape.length;
+
+        if (partialOfRank < desiredOfRank) {
+            long[] newShape = TensorShape.concat(partial.wrtShape, TensorShape.shapeToDesiredRankByPrependingOnes(partial.getOfShape(), desiredOfRank));
+            return partial.get().reshape(newShape);
+        } else {
+            return partial.get();
+        }
     }
 
     public ForwardModePartialDerivative divideBy(DoubleTensor divisor) {
@@ -97,9 +132,19 @@ public class ForwardModePartialDerivative {
             return this;
         }
 
-        DoubleTensor result = partial.div(divisor);
+        final DoubleTensor partialValue = upRankForBroadcast(this, divisor.getRank());
+        DoubleTensor result = partialValue.div(divisor);
 
         return new ForwardModePartialDerivative(wrtShape, result);
+    }
+
+    public ForwardModePartialDerivative unaryMinus() {
+
+        if (!isPresent()) {
+            return this;
+        }
+
+        return new ForwardModePartialDerivative(wrtShape, partial.unaryMinus());
     }
 
     public ForwardModePartialDerivative multiply(DoubleTensor multiplier) {
@@ -108,7 +153,8 @@ public class ForwardModePartialDerivative {
             return this;
         }
 
-        DoubleTensor result = partial.times(multiplier);
+        final DoubleTensor partialValue = upRankForBroadcast(this, multiplier.getRank());
+        DoubleTensor result = partialValue.times(multiplier);
 
         return new ForwardModePartialDerivative(wrtShape, result);
     }
@@ -119,16 +165,7 @@ public class ForwardModePartialDerivative {
             return partial;
         }
 
-        final DoubleTensor partialValue;
-        int ofRank = partial.get().getRank() - partial.getWrtShape().length;
-
-        //Check for batch broadcasting
-        if (ofRank < multiplier.getRank()) {
-            long[] newShape = TensorShape.concat(partial.wrtShape, TensorShape.shapeToDesiredRankByPrependingOnes(partial.getOfShape(), multiplier.getRank()));
-            partialValue = partial.get().reshape(newShape);
-        } else {
-            partialValue = partial.get();
-        }
+        final DoubleTensor partialValue = upRankForBroadcast(partial, multiplier.getRank());
 
         final DoubleTensor result;
         if (partialIsLeft) {
@@ -139,4 +176,5 @@ public class ForwardModePartialDerivative {
 
         return new ForwardModePartialDerivative(partial.wrtShape, result);
     }
+
 }

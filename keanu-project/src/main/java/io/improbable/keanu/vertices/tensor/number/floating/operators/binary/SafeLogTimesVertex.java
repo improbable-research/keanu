@@ -37,17 +37,14 @@ public class SafeLogTimesVertex<T extends Number, TENSOR extends FloatingPointTe
         final ForwardModePartialDerivative dXWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, ForwardModePartialDerivative.EMPTY);
         final ForwardModePartialDerivative dYWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, ForwardModePartialDerivative.EMPTY);
 
-        final ForwardModePartialDerivative fromLeft = AutoDiffBroadcast.correctForBroadcastPartialForward(dXWrtInput, left.getShape(), this.getShape());
-        final ForwardModePartialDerivative fromRight = AutoDiffBroadcast.correctForBroadcastPartialForward(dYWrtInput, right.getShape(), this.getShape());
-
         final DoubleTensor x = left.getValue().toDouble();
         final DoubleTensor y = right.getValue().toDouble();
         final BooleanTensor yZeroMask = y.elementwiseEquals(0.0);
 
-        final ForwardModePartialDerivative partialsFromX = fromLeft.multiply(y.div(x));
-        final ForwardModePartialDerivative partialsFromY = fromRight.multiply(DoubleTensor.scalar(Double.NaN).where(yZeroMask, x.log()));
+        final ForwardModePartialDerivative partialsFromX = dXWrtInput.multiply(y.div(x));
+        final ForwardModePartialDerivative partialsFromY = dYWrtInput.multiply(DoubleTensor.scalar(Double.NaN).where(yZeroMask, x.log()));
 
-        return partialsFromX.add(partialsFromY);
+        return partialsFromX.add(partialsFromY, this.getShape());
     }
 
     @Override

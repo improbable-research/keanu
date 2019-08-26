@@ -16,15 +16,6 @@ import java.util.List;
 @UtilityClass
 public class AutoDiffBroadcast {
 
-    public static ForwardModePartialDerivative correctForBroadcastPartialForward(ForwardModePartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
-
-        if (shouldCorrectPartialForBroadcast(partial, partialOfShape, targetOfShape)) {
-            return broadcastPartialForward(partial, partialOfShape, targetOfShape);
-        } else {
-            return partial;
-        }
-    }
-
     public static ForwardModePartialDerivative broadcastPartialForward(ForwardModePartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
         long[] wrtShape = partial.getWrtShape();
         long[] partialReshape = TensorShape.concat(wrtShape, TensorShape.shapeToDesiredRankByPrependingOnes(partialOfShape, targetOfShape.length));

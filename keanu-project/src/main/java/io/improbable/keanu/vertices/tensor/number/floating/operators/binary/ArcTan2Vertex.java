@@ -49,13 +49,10 @@ public class ArcTan2Vertex<T extends Number, TENSOR extends FloatingPointTensor<
         DoubleTensor xValue = left.getValue().toDouble();
         DoubleTensor denominator = yValue.pow(2).plusInPlace(xValue.pow(2));
 
-        ForwardModePartialDerivative fromX = AutoDiffBroadcast.correctForBroadcastPartialForward(dxWrtInput, left.getShape(), this.getShape());
-        ForwardModePartialDerivative fromY = AutoDiffBroadcast.correctForBroadcastPartialForward(dyWrtInput, right.getShape(), this.getShape());
+        ForwardModePartialDerivative diffFromX = dxWrtInput.multiply(yValue.div(denominator).unaryMinusInPlace());
+        ForwardModePartialDerivative diffFromY = dyWrtInput.multiply(xValue.div(denominator));
 
-        ForwardModePartialDerivative diffFromX = fromX.multiply(yValue.div(denominator).unaryMinusInPlace());
-        ForwardModePartialDerivative diffFromY = fromY.multiply(xValue.div(denominator));
-
-        return diffFromX.add(diffFromY);
+        return diffFromX.add(diffFromY, this.getShape());
     }
 
     @Override

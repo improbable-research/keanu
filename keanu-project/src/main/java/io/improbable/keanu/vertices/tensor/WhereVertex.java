@@ -74,7 +74,7 @@ public class WhereVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Ten
             return elsPartial;
         } else {
             return thnPartial.multiply(predicateValue.toDoubleMask())
-                .add(elsPartial.multiply(predicateValue.not().toDoubleMask()));
+                .add(elsPartial.multiply(predicateValue.not().toDoubleMask()), this.getShape());
         }
     }
 
