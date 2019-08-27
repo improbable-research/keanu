@@ -6,8 +6,6 @@ import java.util.Arrays;
 
 public class ReverseModePartialDerivative {
 
-    public static final ReverseModePartialDerivative EMPTY = new ReverseModePartialDerivative(null, null);
-
     private final DoubleTensor partial;
     private final long[] ofShape;
 
@@ -36,45 +34,14 @@ public class ReverseModePartialDerivative {
     }
 
     public ReverseModePartialDerivative add(ReverseModePartialDerivative addition) {
-
-        if (this.isPresent() && addition.isPresent()) {
-            return new ReverseModePartialDerivative(ofShape, partial.plus(addition.partial));
-        } else if (this.isPresent() && !addition.isPresent()) {
-            return new ReverseModePartialDerivative(ofShape, partial);
-        } else if (!this.isPresent() && addition.isPresent()) {
-            return new ReverseModePartialDerivative(addition.ofShape, addition.partial);
-        } else {
-            return ReverseModePartialDerivative.EMPTY;
-        }
-    }
-
-    public ReverseModePartialDerivative subtract(ReverseModePartialDerivative subtraction) {
-
-        if (this.isPresent() && subtraction.isPresent()) {
-            return new ReverseModePartialDerivative(ofShape, partial.minus(subtraction.partial));
-        } else if (this.isPresent() && !subtraction.isPresent()) {
-            return new ReverseModePartialDerivative(ofShape, partial);
-        } else if (!this.isPresent() && subtraction.isPresent()) {
-            return new ReverseModePartialDerivative(subtraction.ofShape, subtraction.partial.unaryMinus());
-        } else {
-            return ReverseModePartialDerivative.EMPTY;
-        }
+        return new ReverseModePartialDerivative(ofShape, partial.plus(addition.partial));
     }
 
     public ReverseModePartialDerivative multiply(double multiplier) {
-
-        if (!isPresent()) {
-            return this;
-        }
-
         return new ReverseModePartialDerivative(ofShape, partial.times(multiplier));
     }
 
     public ReverseModePartialDerivative multiply(DoubleTensor multiplier) {
-
-        if (!isPresent()) {
-            return this;
-        }
 
         DoubleTensor result = partial.times(multiplier);
 
@@ -86,10 +53,6 @@ public class ReverseModePartialDerivative {
                                                               boolean partialIsLeft,
                                                               boolean transposePartial,
                                                               boolean transposeMultiplier) {
-
-        if (!partial.isPresent()) {
-            return partial;
-        }
 
         final DoubleTensor partialValue = partial.get();
 

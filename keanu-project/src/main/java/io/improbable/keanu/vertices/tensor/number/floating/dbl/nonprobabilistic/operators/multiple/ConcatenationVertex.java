@@ -124,7 +124,6 @@ public class ConcatenationVertex extends VertexImpl<DoubleTensor, DoubleVertex> 
         for (int i = 0; i < operands.length; i++) {
             splitIndices[i] = currentSplitIndex + operands[i].getShape()[dimension];
             currentSplitIndex = splitIndices[i];
-            splitPartials.put(operands[i], ReverseModePartialDerivative.EMPTY);
         }
 
         int operandsRank = operands[0].getRank();
