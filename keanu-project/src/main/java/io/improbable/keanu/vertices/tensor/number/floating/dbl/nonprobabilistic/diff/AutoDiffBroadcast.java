@@ -16,16 +16,6 @@ import java.util.List;
 @UtilityClass
 public class AutoDiffBroadcast {
 
-    public static ForwardModePartialDerivative broadcastPartialForward(ForwardModePartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
-        long[] wrtShape = partial.getWrtShape();
-        long[] partialReshape = TensorShape.concat(wrtShape, TensorShape.shapeToDesiredRankByPrependingOnes(partialOfShape, targetOfShape.length));
-        long[] resultShape = TensorShape.concat(wrtShape, targetOfShape);
-
-        DoubleTensor correctedPartial = partial.get().reshape(partialReshape).broadcast(resultShape);
-
-        return new ForwardModePartialDerivative(wrtShape, correctedPartial);
-    }
-
     public static ReverseModePartialDerivative correctForBroadcastPartialReverse(ReverseModePartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
 
         if (shouldCorrectPartialForBroadcast(partial, partialWrtShape, targetWrtShape)) {
@@ -51,18 +41,6 @@ public class AutoDiffBroadcast {
     }
 
     private static boolean shouldCorrectPartialForBroadcast(ReverseModePartialDerivative partial, long[] actualShape, long[] expectedShape) {
-        return partial.isPresent() && !Arrays.equals(actualShape, expectedShape);
-    }
-
-    /**
-     * @param partial       The partial derivative that may or may not come from a broadcasted operation.
-     * @param actualShape   The part of the partial shape that should match the expected shape in the case no broadcast was
-     *                      performed. This would be the of shape for forward mode and the with respect to shape for reverse.
-     * @param expectedShape The shape of the operation result in forward mode or the shape of the operand in reverse mode.
-     *                      This should match the actual shape if no broadcast was performed.
-     * @return true if a broadcast should be taken into account and corrected for in the auto diff calculation, false otherwise.
-     */
-    private static boolean shouldCorrectPartialForBroadcast(ForwardModePartialDerivative partial, long[] actualShape, long[] expectedShape) {
         return partial.isPresent() && !Arrays.equals(actualShape, expectedShape);
     }
 
