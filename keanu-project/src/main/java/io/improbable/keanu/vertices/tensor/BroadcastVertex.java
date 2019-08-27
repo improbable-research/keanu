@@ -38,16 +38,14 @@ public class BroadcastVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends
     @Override
     public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
 
-        ForwardModePartialDerivative dInput = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return broadcastPartialForward(dInput, inputVertex.getShape(), toShape);
-    }
+        final ForwardModePartialDerivative dInput = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
-    public static ForwardModePartialDerivative broadcastPartialForward(ForwardModePartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
-        long[] wrtShape = partial.getWrtShape();
-        long[] partialReshape = TensorShape.concat(wrtShape, TensorShape.shapeToDesiredRankByPrependingOnes(partialOfShape, targetOfShape.length));
-        long[] resultShape = TensorShape.concat(wrtShape, targetOfShape);
+        final long[] partialOfShape = inputVertex.getShape();
+        final long[] wrtShape = dInput.getWrtShape();
+        final long[] partialReshape = TensorShape.concat(wrtShape, TensorShape.shapeToDesiredRankByPrependingOnes(partialOfShape, toShape.length));
+        final long[] resultShape = TensorShape.concat(wrtShape, toShape);
 
-        DoubleTensor correctedPartial = partial.get().reshape(partialReshape).broadcast(resultShape);
+        final DoubleTensor correctedPartial = dInput.get().reshape(partialReshape).broadcast(resultShape);
 
         return new ForwardModePartialDerivative(wrtShape, correctedPartial);
     }
