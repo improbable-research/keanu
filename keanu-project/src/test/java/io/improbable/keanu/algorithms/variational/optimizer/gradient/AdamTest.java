@@ -9,6 +9,7 @@ import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class AdamTest {
@@ -90,6 +91,7 @@ public class AdamTest {
         );
 
         assertEquals(i.getValue(), new Integer(5));
+        assertFalse(adamOptimizer.getStatistics().didConverge());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -120,6 +122,12 @@ public class AdamTest {
     @Test(expected = NotStrictlyPositiveException.class)
     public void throwsOnNegativeEpsilon() {
         validateParameters(10, 0.1, 0.1, 0.1, -0.1);
+    }
+
+    @Test(expected = NotStrictlyPositiveException.class)
+    public void throwsOnNegativeMaxEvaluations() {
+        validateParameters(-10, 0.1, 0.1, 0.1, -0.1);
+
     }
 
     public void validateParameters(int maxEvaluations, double alpha, double beta1, double beta2, double epsilon) {

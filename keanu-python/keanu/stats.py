@@ -1,10 +1,10 @@
-from typing import List, Tuple
+from typing import List
 
-from numpy import ndarray, fromiter, issubdtype, floating, stack
+import numpy as np
+from numpy import ndarray, fromiter
 from py4j.java_gateway import java_import
 
-from keanu.shape_validation import check_index_is_valid, check_all_shapes_match
-from keanu.vartypes import numpy_types
+from keanu.vartypes import primitive_types
 from .context import KeanuContext
 
 k = KeanuContext()
@@ -12,16 +12,15 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.statistics.Autocorrelation")
 
 
-def autocorrelation(arg: List[numpy_types], index: Tuple[int, ...] = ()) -> ndarray:
+def autocorrelation(arg: List[primitive_types]) -> ndarray:
     check_all_floats(arg)
-    check_all_shapes_match([elem.shape for elem in arg])
-    check_index_is_valid(arg[0].shape, index)
-    arg_array = stack(arg, axis=-1)[index]
-    autocorr = k.jvm_view().Autocorrelation.calculate(k.to_java_array(arg_array))
-    return fromiter(autocorr, arg[0].dtype)
+    autocorr = k.jvm_view().Autocorrelation.calculate(k.to_java_array(arg))
+    return fromiter(autocorr, float)
 
 
-def check_all_floats(arg: List[numpy_types]) -> None:
-    all_floats = all(issubdtype(elem.dtype, floating) for elem in arg)
+def check_all_floats(arg: List[primitive_types]) -> None:
+    all_floats = all(
+        (type(elem) == float or type(elem) == np.float16 or type(elem) == np.float32 or type(elem) == np.float64)
+        for elem in arg)
     if not all_floats:
-        raise ValueError("Autocorrelation must be run on a list of numpy floating types.")
+        raise ValueError("Autocorrelation must be run on a list of floating types.")

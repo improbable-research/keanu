@@ -1,12 +1,12 @@
 package io.improbable.snippet
 
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer
+import io.improbable.keanu.Keanu.Optimizer
 import io.improbable.keanu.kotlin.times
 import io.improbable.keanu.network.BayesianNetwork
 import io.improbable.keanu.randomfactory.DoubleVertexFactory
-import io.improbable.keanu.vertices.dbl.DoubleVertex
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex
 
 //%%SNIPPET_START%% LorenzFull
 private val windowSize = 10
@@ -45,7 +45,7 @@ fun main(args: Array<String>) {
 
         //%%SNIPPET_START%% LorenzOptimise
         val net = BayesianNetwork(graphTimeSteps.first().first().connectedGraph)
-        val optimiser = KeanuOptimizer.of(net)
+        val optimiser = Optimizer.of(net)
         optimiser.maxAPosteriori()
         //%%SNIPPET_END%% LorenzOptimise
 

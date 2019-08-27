@@ -4,13 +4,13 @@ import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.If;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.BinomialVertex;
 
 import static java.util.Collections.singletonList;
 
@@ -41,7 +41,7 @@ public class CheatingStudents {
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(answerTotal.getConnectedGraph());
 
-        NetworkSamplesGenerator samplesGenerator = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+        NetworkSamplesGenerator samplesGenerator = Keanu.Sampling.MetropolisHastings.withDefaultConfig()
             .generatePosteriorSamples(model, singletonList(probabilityOfCheating));
 
         NetworkSamples networkSamples = samplesGenerator
@@ -67,7 +67,7 @@ public class CheatingStudents {
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(answerTotal.getConnectedGraph());
 
-        NetworkSamplesGenerator samplesGenerator = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+        NetworkSamplesGenerator samplesGenerator = Keanu.Sampling.MetropolisHastings.withDefaultConfig()
             .generatePosteriorSamples(model, singletonList(probabilityOfCheating));
 
         NetworkSamples networkSamples = samplesGenerator.dropCount(numberOfSamples / 10)

@@ -1,9 +1,10 @@
 ## This is a generated file. DO NOT EDIT.
 
-from typing import Collection
+from typing import Collection, Optional
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex, Double, Integer, Boolean, vertex_constructor_param_types
+from keanu.vertex.label import _VertexLabel
 from keanu.vartypes import (
     tensor_arg_types,
     shape_types
@@ -16,9 +17,9 @@ from .vertex_casting import (
     cast_to_boolean_tensor,
     cast_to_double,
     cast_to_integer,
-    cast_to_string,
     cast_to_boolean,
     cast_to_long_array,
+    cast_to_boolean_array,
     cast_to_int_array,
     cast_to_vertex_array,
 )

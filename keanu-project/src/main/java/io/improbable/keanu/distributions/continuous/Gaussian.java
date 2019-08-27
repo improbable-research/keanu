@@ -2,14 +2,9 @@ package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-
-import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 public class Gaussian implements ContinuousDistribution {
 
@@ -18,7 +13,7 @@ public class Gaussian implements ContinuousDistribution {
     private final DoubleTensor mu;
     private final DoubleTensor sigma;
 
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
+    public static Gaussian withParameters(DoubleTensor mu, DoubleTensor sigma) {
         return new Gaussian(mu, sigma);
     }
 
@@ -48,21 +43,34 @@ public class Gaussian implements ContinuousDistribution {
         return xMinusMuSquaredOver2Variance.plus(lnSigma).plus(LN_SQRT_2PI).unaryMinus();
     }
 
-    @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public DoubleTensor[] dLogProb(DoubleTensor x, boolean wrtX, boolean wrtMu, boolean wrtSigma) {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor xMinusMu = x.minus(mu);
 
-        final DoubleTensor dLogPdmu = xMinusMu.div(variance);
-        final DoubleTensor dLogPdx = dLogPdmu.unaryMinus();
-        final DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2)
-            .divInPlace(variance.timesInPlace(sigma))
-            .minusInPlace(sigma.reciprocal());
+        DoubleTensor[] diff = new DoubleTensor[3];
 
-        return new Diffs()
-            .put(MU, dLogPdmu)
-            .put(SIGMA, dLogPdsigma)
-            .put(X, dLogPdx);
+        if (wrtX || wrtMu) {
+            final DoubleTensor dLogPdMu = xMinusMu.div(variance);
+
+            if (wrtX) {
+                final DoubleTensor dLogPdx = dLogPdMu.unaryMinus();
+                diff[0] = dLogPdx;
+            }
+
+            if (wrtMu) {
+                diff[1] = dLogPdMu;
+            }
+        }
+
+        if (wrtSigma) {
+            final DoubleTensor dLogPdSigma = xMinusMu.powInPlace(2.0)
+                .divInPlace(variance.timesInPlace(sigma))
+                .minusInPlace(sigma.reciprocal());
+
+            diff[2] = dLogPdSigma;
+        }
+
+        return diff;
     }
 
 }

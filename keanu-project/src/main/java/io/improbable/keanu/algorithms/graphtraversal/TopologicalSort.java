@@ -24,8 +24,9 @@ public class TopologicalSort {
      * @return a linear ordering of vertices by order of execution
      */
     public static List<Vertex> sort(Collection<? extends Vertex> vertices) {
-        return vertices.stream().
-            sorted(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()))
+        return vertices
+            .stream()
+            .sorted(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()))
             .collect(Collectors.toList());
     }
 
@@ -34,7 +35,7 @@ public class TopologicalSort {
         Map<Vertex, Set<Vertex>> deps = new HashMap<>();
         Set<Vertex> verticesBeingSorted = new HashSet<>(vertices);
 
-        for (Vertex<?> v : vertices) {
+        for (Vertex<?, ?> v : vertices) {
             if (!deps.containsKey(v)) {
                 insertParentDependencies(v, deps, verticesBeingSorted);
             }
@@ -43,7 +44,7 @@ public class TopologicalSort {
         return deps;
     }
 
-    private static void insertParentDependencies(Vertex<?> aVertex, Map<Vertex, Set<Vertex>> dependencies, Set<Vertex> verticesToCount) {
+    private static void insertParentDependencies(Vertex<?, ?> aVertex, Map<Vertex, Set<Vertex>> dependencies, Set<Vertex> verticesToCount) {
 
         dependencies.computeIfAbsent(aVertex, v -> new HashSet<>());
 

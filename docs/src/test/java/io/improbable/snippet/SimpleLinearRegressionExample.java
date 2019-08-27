@@ -3,9 +3,9 @@ package io.improbable.snippet;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 
 public class SimpleLinearRegressionExample {
     public static void main(String[] args) {
@@ -16,13 +16,13 @@ public class SimpleLinearRegressionExample {
         int numberOfSamples = 100;
 
         //Define random input data vertex by sampling from uniform probability distribution between 0 and 10
-        DoubleVertex xGenerator = new UniformVertex(new long[]{1, numberOfSamples}, 0, 10);
+        UniformVertex xGenerator = new UniformVertex(new long[]{1, numberOfSamples}, 0, 10);
 
         //Define the desired output vertices
         DoubleVertex yMu = xGenerator.multiply(weight).plus(offset);
 
         //Define a vertex for taking noisy readings of output data
-        DoubleVertex yGenerator = new GaussianVertex(yMu, 1.0);
+        GaussianVertex yGenerator = new GaussianVertex(yMu, 1.0);
 
         //Sample input data and then sample the corresponding noisy output data
         DoubleTensor xData = xGenerator.sample();

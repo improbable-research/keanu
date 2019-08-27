@@ -1,15 +1,17 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,10 +26,12 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 
 public class BayesianNetworkTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     BayesianNetwork network;
     Set<Vertex> connectedGraph;
@@ -89,8 +93,6 @@ public class BayesianNetworkTest {
         assertThat(retrieved, is(b));
         retrieved = net.getVertexByLabel(labelOr);
         assertThat(retrieved, is(ored));
-        retrieved = net.getVertexByLabel(null);
-        assertThat(retrieved, nullValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -105,17 +107,7 @@ public class BayesianNetworkTest {
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
     }
 
-    private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {
-        @Override
-        public DoubleTensor sample(KeanuRandom random) {
-            return null;
-        }
-
-        @Override
-        public DoubleTensor sample() {
-            return null;
-        }
-
+    private class TestNonSaveableVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonSaveableVertex {
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});
         }
@@ -146,14 +138,10 @@ public class BayesianNetworkTest {
 
     @Test
     public void networkReturnsVerticesInNamespace() {
-        BooleanVertex a0 = new BernoulliVertex(0.5);
-        BooleanVertex a1 = new BernoulliVertex(0.5);
-        BooleanVertex b0 = new BernoulliVertex(0.5);
+        BooleanVertex a0 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "a", "0"));
+        BooleanVertex a1 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "a", "1"));
+        BooleanVertex b0 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "b", "0"));
         BooleanVertex c = new BernoulliVertex(0.5);
-
-        a0.setLabel(new VertexLabel("root", "a", "0"));
-        a1.setLabel(new VertexLabel("root", "a", "1"));
-        b0.setLabel(new VertexLabel("root", "b", "0"));
 
         BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
         List<Vertex> verticesInNamespace = net.getVerticesInNamespace("root");
@@ -162,4 +150,30 @@ public class BayesianNetworkTest {
         assertTrue(verticesInNamespace.containsAll(Arrays.asList(a0, a1, b0)));
     }
 
+    @Test
+    public void networkReturnsAllWithSameInnerLabel() {
+        BooleanVertex a0 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "a", "0"));
+        BooleanVertex a1 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "a", "1"));
+        BooleanVertex b0 = new BernoulliVertex(0.5).setLabel(new VertexLabel("root", "b", "0"));
+        BooleanVertex c = new BernoulliVertex(0.5);
+
+        BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
+        List<Vertex> verticesInNamespace = net.getVerticesIgnoringNamespace("0");
+
+        assertThat(verticesInNamespace.size(), equalTo(2));
+        assertTrue(verticesInNamespace.containsAll(Arrays.asList(a0, b0)));
+    }
+
+    @Test
+    public void throwsIfVertexWithLabelIsNotInBayesianNetwork() {
+        BooleanVertex vertexInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_A);
+        BayesianNetwork network = new BayesianNetwork(vertexInNetwork.getConnectedGraph());
+
+        BooleanVertex vertexNotInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_B);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(String.format("Vertex with label %s was not found in BayesianNetwork", LABEL_B));
+
+        network.getVertexByLabel(new VertexLabel(LABEL_B));
+    }
 }

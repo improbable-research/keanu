@@ -2,16 +2,19 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
-import io.improbable.keanu.algorithms.SaveStatistics;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
 
 import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
 
 
 /**
@@ -20,334 +23,392 @@ import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
  * <p>
  * The tree is reset for each sample.
  */
-class Tree implements SaveStatistics {
+class Tree {
 
-    private static final double DELTA_MAX = 1000.0;
-    private static final int STARTING_ACCEPTED_LEAPFROG = 1;
-    private static final boolean STARTING_SHOULD_CONTINUE = true;
-    private static final double STARTING_DELTA_LIKELIHOOD = 0.;
-    private static final int STARTING_TREE_SIZE = 1;
+    private final ProbabilisticModelWithGradient logProbGradientCalculator;
 
-    private Leapfrog leapfrogForward;
-    private Leapfrog leapfrogBackward;
-    private Map<VariableReference, DoubleTensor> acceptedPosition;
-    private Map<? extends VariableReference, DoubleTensor> gradientAtAcceptedPosition;
-    private double logOfMasterPAtAcceptedPosition;
-    private Map<VariableReference, ?> sampleAtAcceptedPosition;
-    private int acceptedLeapfrogCount;
-    private boolean shouldContinueFlag;
-    private double deltaLikelihoodOfLeapfrog;
-    private double treeSize;
+    private final LeapfrogIntegrator leapfrogIntegrator;
+
+    private final List<? extends Variable> sampleFromVariables;
+
+    private final KeanuRandom random;
 
     /**
-     * @param leapfrog                  The result of the forward leapfrog
-     * @param logProbAtAcceptedPosition The log prob of the network at the accepted position
-     * @param sampleAtAcceptedPosition  The sample value at the accepted position
-     * @param acceptedLeapfrogCount     The number of accepted leapfrogs
-     * @param shouldContinueFlag        False if we are U-Turning
-     * @param deltaLikelihoodOfLeapfrog The change in log prob as a result of the latest leapfrog
-     * @param treeSize                  The size of the tree
+     * The forward most state in the tree
      */
-    Tree(Leapfrog leapfrog,
-         double logProbAtAcceptedPosition,
-         Map<VariableReference, ?> sampleAtAcceptedPosition,
-         int acceptedLeapfrogCount,
-         boolean shouldContinueFlag,
-         double deltaLikelihoodOfLeapfrog,
-         double treeSize) {
-
-        this.leapfrogForward = leapfrog;
-        this.leapfrogBackward = leapfrog;
-        this.acceptedPosition = leapfrog.getPosition();
-        this.gradientAtAcceptedPosition = leapfrog.getGradient();
-        this.logOfMasterPAtAcceptedPosition = logProbAtAcceptedPosition;
-        this.sampleAtAcceptedPosition = sampleAtAcceptedPosition;
-        this.acceptedLeapfrogCount = acceptedLeapfrogCount;
-        this.shouldContinueFlag = shouldContinueFlag;
-        this.deltaLikelihoodOfLeapfrog = deltaLikelihoodOfLeapfrog;
-        this.treeSize = treeSize;
-    }
+    @Getter
+    private LeapfrogState forward;
 
     /**
-     * A helper method to create a basic tree
-     *
-     * @param position                 the starting position
-     * @param momentum                 the starting momentum
-     * @param gradient                 the starting gradient
-     * @param initialLogOfMasterP      the initial log prob
-     * @param sampleAtAcceptedPosition the initial sample
-     * @return a basic tree
+     * The backward most state in the tree
      */
-    public static Tree createInitialTree(Map<VariableReference, DoubleTensor> position,
-                                         Map<VariableReference, DoubleTensor> momentum,
-                                         Map<? extends
-                                             VariableReference, DoubleTensor> gradient,
-                                         double initialLogOfMasterP,
-                                         Map<VariableReference, ?> sampleAtAcceptedPosition) {
+    @Getter
+    private LeapfrogState backward;
 
-        return new Tree(
-            new Leapfrog(position, momentum, gradient),
-            initialLogOfMasterP,
-            sampleAtAcceptedPosition,
-            STARTING_ACCEPTED_LEAPFROG,
-            STARTING_SHOULD_CONTINUE,
-            STARTING_DELTA_LIKELIHOOD,
-            STARTING_TREE_SIZE
-        );
+    /**
+     * The accepted position in the tree
+     */
+    @Getter
+    private Proposal proposal;
+
+    /**
+     * Sum of momentum over all steps in tree
+     */
+    @Getter
+    private Map<VariableReference, DoubleTensor> sumMomentum;
+
+    /**
+     * The energy at the start state
+     */
+    @Getter
+    private final double startEnergy;
+
+    /**
+     * Maximum energy change on a step before the step is considered divergent
+     */
+    @Getter
+    private final double maxEnergyChange;
+
+    /**
+     * log sum of negative energy change
+     */
+    @Getter
+    private double logSumWeight;
+
+    /**
+     * A summation of the metropolis acceptance probability over each step in tree.
+     */
+    @Getter
+    private double sumMetropolisAcceptanceProbability;
+
+    /**
+     * Total number of steps in tree
+     */
+    @Getter
+    private int treeSize;
+
+    /**
+     * Height of binary tree as of last growth
+     */
+    @Getter
+    private int treeHeight;
+
+    /**
+     * True if the tree stopped growth if the max energy change was exceeded on one of the steps
+     */
+    @Getter
+    private boolean diverged;
+
+    /**
+     * True if the tree stopped growth due to u-turn
+     */
+    @Getter
+    private boolean uTurned;
+
+    /**
+     * @param startState                The leap frog for is initial step in the tree.
+     * @param proposal                  The current accepted position.
+     * @param logProbGradientCalculator logProb gradient and logProb function
+     * @param sampleFromVariables       Variables to sample from at proposals
+     * @param random                    Source of randomness
+     */
+    public Tree(LeapfrogState startState,
+                Proposal proposal,
+                double maxEnergyChange,
+                ProbabilisticModelWithGradient logProbGradientCalculator,
+                LeapfrogIntegrator leapfrogIntegrator,
+                List<? extends Variable> sampleFromVariables,
+                KeanuRandom random) {
+
+        this.forward = startState;
+        this.backward = startState;
+        this.proposal = proposal;
+        this.maxEnergyChange = maxEnergyChange;
+        this.logProbGradientCalculator = logProbGradientCalculator;
+        this.leapfrogIntegrator = leapfrogIntegrator;
+        this.sampleFromVariables = sampleFromVariables;
+        this.random = random;
+        this.sumMomentum = startState.getMomentum();
+        this.startEnergy = startState.getEnergy();
+        this.logSumWeight = 0.0;
+        this.sumMetropolisAcceptanceProbability = 0.0;
+        this.treeSize = 0;
+        this.treeHeight = 0;
+        this.diverged = false;
+        this.uTurned = false;
     }
 
-    public static Tree buildOtherHalfOfTree(Tree currentTree,
-                                            List<? extends Variable<DoubleTensor, ?>> latentVariables,
-                                            ProbabilisticModelWithGradient logProbGradientCalculator,
-                                            final List<? extends Variable> sampleFromVariables,
-                                            double logU,
-                                            int buildDirection,
-                                            int treeHeight,
-                                            double epsilon,
-                                            double logOfMasterPMinusMomentumBeforeLeapfrog,
-                                            KeanuRandom random) {
+    public void grow(int buildDirection,
+                     double timeStep) {
 
-        Tree otherHalfTree = buildTree(
-            latentVariables,
-            logProbGradientCalculator,
-            sampleFromVariables,
-            buildDirection == -1 ? currentTree.leapfrogBackward : currentTree.leapfrogForward,
-            logU,
+        SubTree otherHalfTree = buildTree(
+            buildDirection == -1 ? backward : forward,
             buildDirection,
             treeHeight,
-            epsilon,
-            logOfMasterPMinusMomentumBeforeLeapfrog,
-            random
+            timeStep
         );
 
         if (buildDirection == -1) {
-            currentTree.leapfrogBackward = otherHalfTree.leapfrogBackward;
+            backward = otherHalfTree.backward;
         } else {
-            currentTree.leapfrogForward = otherHalfTree.leapfrogForward;
+            forward = otherHalfTree.forward;
         }
 
-        return otherHalfTree;
+        sumMetropolisAcceptanceProbability += otherHalfTree.sumMetropolisAcceptanceProbability;
+        treeSize += otherHalfTree.treeSize;
+
+        if (otherHalfTree.shouldContinue()) {
+
+            if (Tree.acceptOtherProposalWithProbability(otherHalfTree.getLogSumWeight() - logSumWeight, random)) {
+                proposal = otherHalfTree.proposal;
+            }
+
+            logSumWeight = logSumExp(logSumWeight, otherHalfTree.logSumWeight);
+
+            sumMomentum = add(sumMomentum, otherHalfTree.sumMomentum);
+        }
+
+        diverged = otherHalfTree.diverged;
+
+        if (!diverged) {
+
+            uTurned = otherHalfTree.uTurned || Tree.isUTurning(
+                forward.getVelocity(),
+                backward.getVelocity(),
+                sumMomentum
+            );
+        }
+
+        treeHeight++;
     }
 
-    private static Tree buildTree(List<? extends Variable<DoubleTensor, ?>> latentVariables,
-                                  ProbabilisticModelWithGradient logProbGradientCalculator,
-                                  final List<? extends Variable> sampleFromVariables,
-                                  Leapfrog leapfrog,
-                                  double logU,
-                                  int buildDirection,
-                                  int treeHeight,
-                                  double epsilon,
-                                  double logOfMasterPMinusMomentumBeforeLeapfrog,
-                                  KeanuRandom random) {
+    /**
+     * @param buildFrom      The leap frog to start building the tree from
+     * @param buildDirection either 1 for forward or -1 for backwards in time
+     * @param treeHeight     The height to build the tree to
+     * @param timeStep       The time step delta for each new step
+     * @return A subtree with treeHeight height
+     */
+    private SubTree buildTree(LeapfrogState buildFrom,
+                              int buildDirection,
+                              int treeHeight,
+                              double timeStep) {
         if (treeHeight == 0) {
 
             //Base case-take one leapfrog step in the build direction
 
             return treeBuilderBaseCase(
-                latentVariables,
-                logProbGradientCalculator,
-                sampleFromVariables,
-                leapfrog,
-                logU,
+                buildFrom,
                 buildDirection,
-                epsilon,
-                logOfMasterPMinusMomentumBeforeLeapfrog
+                timeStep
             );
 
         } else {
             //Recursion-implicitly build the left and right subtrees.
 
-            Tree tree = buildTree(
-                latentVariables,
-                logProbGradientCalculator,
-                sampleFromVariables,
-                leapfrog,
-                logU,
+            SubTree subTree = buildTree(
+                buildFrom,
                 buildDirection,
                 treeHeight - 1,
-                epsilon,
-                logOfMasterPMinusMomentumBeforeLeapfrog,
-                random
+                timeStep
             );
 
-            //Should continue building other half if first half's shouldContinueFlag is true
-            if (tree.shouldContinueFlag) {
+            //Should continue building other half if first half's shouldContinue is true
+            if (subTree.shouldContinue()) {
 
-                Tree otherHalfTree = buildOtherHalfOfTree(
-                    tree,
-                    latentVariables,
-                    logProbGradientCalculator,
-                    sampleFromVariables,
-                    logU,
+                SubTree extendedSubTree = buildTree(
+                    buildDirection == -1 ? subTree.backward : subTree.forward,
                     buildDirection,
                     treeHeight - 1,
-                    epsilon,
-                    logOfMasterPMinusMomentumBeforeLeapfrog,
-                    random
+                    timeStep
                 );
 
-                double acceptOtherTreePositionProbability = (double) otherHalfTree.acceptedLeapfrogCount / (tree.acceptedLeapfrogCount + otherHalfTree.acceptedLeapfrogCount);
+                if (buildDirection == -1) {
+                    subTree.backward = extendedSubTree.backward;
+                } else {
+                    subTree.forward = extendedSubTree.forward;
+                }
 
-                Tree.acceptOtherPositionWithProbability(
-                    acceptOtherTreePositionProbability,
-                    tree,
-                    otherHalfTree,
-                    random
-                );
+                subTree.diverged = extendedSubTree.diverged;
+                subTree.uTurned = extendedSubTree.uTurned;
 
-                tree.continueIfNotUTurning(otherHalfTree);
+                if (extendedSubTree.shouldContinue()) {
 
-                tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
-                tree.deltaLikelihoodOfLeapfrog += otherHalfTree.deltaLikelihoodOfLeapfrog;
-                tree.treeSize += otherHalfTree.treeSize;
+                    subTree.sumMomentum = add(subTree.sumMomentum, extendedSubTree.sumMomentum);
+
+                    subTree.uTurned = isUTurning(
+                        subTree.forward.getVelocity(),
+                        subTree.backward.getVelocity(),
+                        subTree.sumMomentum
+                    );
+
+                    final double totalLogSumWeight = logSumExp(subTree.logSumWeight, extendedSubTree.logSumWeight);
+
+                    subTree.logSumWeight = totalLogSumWeight;
+
+                    if (acceptOtherProposalWithProbability(extendedSubTree.logSumWeight - totalLogSumWeight, random)) {
+                        subTree.proposal = extendedSubTree.proposal;
+                    }
+
+                }
+
+                subTree.sumMetropolisAcceptanceProbability += extendedSubTree.sumMetropolisAcceptanceProbability;
+                subTree.treeSize += extendedSubTree.treeSize;
             }
 
-            return tree;
+            return subTree;
         }
 
     }
 
-    private static Tree treeBuilderBaseCase(List<? extends Variable<DoubleTensor, ?>> latentVariables,
-                                            ProbabilisticModelWithGradient logProbGradientCalculator,
-                                            final List<? extends Variable> sampleFromVariables,
-                                            Leapfrog leapfrog,
-                                            double logU,
-                                            int buildDirection,
-                                            double epsilon,
-                                            double logOfMasterPMinusMomentumBeforeLeapfrog) {
-
-        leapfrog = leapfrog.step(latentVariables, logProbGradientCalculator, epsilon * buildDirection);
-
-        final double logOfMasterPAfterLeapfrog = logProbGradientCalculator.logProb();
-
-        final double logOfMasterPMinusMomentum = logOfMasterPAfterLeapfrog - leapfrog.halfDotProductMomentum();
-        final int acceptedLeapfrogCount = logU <= logOfMasterPMinusMomentum ? 1 : 0;
-        final boolean shouldContinueFlag = logU < DELTA_MAX + logOfMasterPMinusMomentum;
-
-        final Map<VariableReference, ?> sampleAtAcceptedPosition = takeSample((List<? extends Variable<Object, ?>>)sampleFromVariables);
-
-        final double deltaLikelihoodOfLeapfrog = Math.min(
-            1.0,
-            Math.exp(logOfMasterPMinusMomentum - logOfMasterPMinusMomentumBeforeLeapfrog)
-        );
-
-        return new Tree(
-            leapfrog,
-            logOfMasterPAfterLeapfrog,
-            sampleAtAcceptedPosition,
-            acceptedLeapfrogCount,
-            shouldContinueFlag,
-            deltaLikelihoodOfLeapfrog,
-            STARTING_TREE_SIZE
-        );
+    public static double logSumExp(double a, double b) {
+        double max = Math.max(a, b);
+        return max + Math.log(Math.exp(a - max) + Math.exp(b - max));
     }
 
-    public static void acceptOtherPositionWithProbability(double probability,
-                                                          Tree tree,
-                                                          Tree otherTree,
-                                                          KeanuRandom random) {
-        if (random.nextDouble() < probability) {
-            tree.acceptedPosition = otherTree.acceptedPosition;
-            tree.gradientAtAcceptedPosition = otherTree.gradientAtAcceptedPosition;
-            tree.logOfMasterPAtAcceptedPosition = otherTree.logOfMasterPAtAcceptedPosition;
-            tree.sampleAtAcceptedPosition = otherTree.sampleAtAcceptedPosition;
+    private SubTree treeBuilderBaseCase(final LeapfrogState leapfrogState,
+                                        final int buildDirection,
+                                        final double timeStep) {
+
+        LeapfrogState leapfrogStateAfterStep = leapfrogIntegrator.step(leapfrogState, logProbGradientCalculator, timeStep * buildDirection);
+
+        final double energyAfterStep = leapfrogStateAfterStep.getEnergy();
+
+        final double energyChange = energyAfterStep - startEnergy;
+
+        final boolean isDivergent = Math.abs(energyChange) >= maxEnergyChange || Double.isNaN(energyChange);
+
+        if (isDivergent) {
+
+            return new SubTree(
+                leapfrogStateAfterStep,
+                leapfrogStateAfterStep,
+                leapfrogStateAfterStep.getMomentum(),
+                null,
+                Double.NEGATIVE_INFINITY,
+                true,
+                false,
+                0,
+                1
+            );
+
+        } else {
+
+            final double logSumWeight = -energyChange;
+
+            final double metropolisAcceptanceProbability = Math.min(
+                1.0,
+                Math.exp(logSumWeight)
+            );
+
+            final Map<VariableReference, ?> sample = takeSample(sampleFromVariables);
+
+            Proposal proposal = new Proposal(
+                leapfrogStateAfterStep.getPosition(),
+                leapfrogStateAfterStep.getGradient(),
+                sample,
+                leapfrogStateAfterStep.getLogProb()
+            );
+
+            return new SubTree(
+                leapfrogStateAfterStep,
+                leapfrogStateAfterStep,
+                leapfrogStateAfterStep.getMomentum(),
+                proposal,
+                logSumWeight,
+                false,
+                false,
+                metropolisAcceptanceProbability,
+                1
+            );
         }
     }
 
-    private static boolean isNotUTurning(Map<VariableReference, DoubleTensor> positionForward,
-                                         Map<VariableReference, DoubleTensor> positionBackward,
-                                         Map<VariableReference, DoubleTensor> momentumForward,
-                                         Map<VariableReference, DoubleTensor> momentumBackward) {
+    private static boolean acceptOtherProposalWithProbability(double probability,
+                                                              KeanuRandom random) {
+
+        return Math.log(random.nextDouble()) < probability;
+    }
+
+    private static boolean isUTurning(Map<VariableReference, DoubleTensor> velocityForward,
+                                      Map<VariableReference, DoubleTensor> velocityBackward,
+                                      Map<VariableReference, DoubleTensor> rho) {
         double forward = 0.0;
         double backward = 0.0;
 
-        for (Map.Entry<VariableReference, DoubleTensor> forwardPositionForLatent : positionForward.entrySet()) {
+        for (VariableReference latentId : velocityForward.keySet()) {
 
-            final VariableReference latentId = forwardPositionForLatent.getKey();
-            final DoubleTensor forwardMinusBackward = forwardPositionForLatent.getValue().minus(
-                positionBackward.get(latentId)
-            );
+            final DoubleTensor vForward = velocityForward.get(latentId);
+            final DoubleTensor vBackward = velocityBackward.get(latentId);
+            final DoubleTensor rhoForLatent = rho.get(latentId);
 
-            forward += forwardMinusBackward.times(momentumForward.get(latentId)).sum();
-            backward += forwardMinusBackward.timesInPlace(momentumBackward.get(latentId)).sum();
+            forward += vForward.times(rhoForLatent).sumNumber();
+            backward += vBackward.times(rhoForLatent).sumNumber();
         }
 
-        return (forward >= 0.0) && (backward >= 0.0);
-    }
-
-    public void continueIfNotUTurning(Tree otherHalfTree) {
-        shouldContinueFlag = (otherHalfTree.shouldContinue() && Tree.isNotUTurning(
-            getForwardPosition(),
-            getBackwardPosition(),
-            getForwardMomentum(),
-            getBackwardMomentum()
-        ));
+        return (forward < 0.0) || (backward < 0.0);
     }
 
     public boolean shouldContinue() {
-        return shouldContinueFlag;
-    }
-
-    public int getAcceptedLeapfrogCount() {
-        return acceptedLeapfrogCount;
-    }
-
-    public void resetTreeBeforeSample() {
-        this.shouldContinueFlag = true;
-        this.acceptedLeapfrogCount = 1;
-    }
-
-    public double getDeltaLikelihoodOfLeapfrog() {
-        return deltaLikelihoodOfLeapfrog;
-    }
-
-    public void setDeltaLikelihoodOfLeapfrog(double deltaLikelihoodOfLeapfrog) {
-        this.deltaLikelihoodOfLeapfrog = deltaLikelihoodOfLeapfrog;
-    }
-
-    public double getTreeSize() {
-        return treeSize;
-    }
-
-    public void setTreeSize(double treeSize) {
-        this.treeSize = treeSize;
-    }
-
-    public void incrementLeapfrogCount(int otherTreeAcceptedCount) {
-        this.acceptedLeapfrogCount += otherTreeAcceptedCount;
-    }
-
-    public Map<VariableReference, ?> getSampleAtAcceptedPosition() {
-        return sampleAtAcceptedPosition;
-    }
-
-    public double getLogOfMasterPAtAcceptedPosition() {
-        return logOfMasterPAtAcceptedPosition;
-    }
-
-    public Map<VariableReference, DoubleTensor> getForwardPosition() {
-        return leapfrogForward.getPosition();
-    }
-
-    public Map<VariableReference, DoubleTensor> getBackwardPosition() {
-        return leapfrogBackward.getPosition();
-    }
-
-    public Map<VariableReference, DoubleTensor> getForwardMomentum() {
-        return leapfrogForward.getMomentum();
-    }
-
-    public Map<VariableReference, DoubleTensor> getBackwardMomentum() {
-        return leapfrogBackward.getMomentum();
-    }
-
-    public void acceptPositionAndGradient() {
-        leapfrogForward = leapfrogForward.makeJumpTo(acceptedPosition, gradientAtAcceptedPosition);
-        leapfrogBackward = leapfrogBackward.makeJumpTo(acceptedPosition, gradientAtAcceptedPosition);
+        return !diverged && !uTurned;
     }
 
     public void save(Statistics statistics) {
-        statistics.store(NUTS.Metrics.LOG_PROB, logOfMasterPAtAcceptedPosition);
-        statistics.store(NUTS.Metrics.TREE_SIZE, treeSize);
+        statistics.store(NUTS.Metrics.LOG_PROB, proposal.getLogProb());
+        statistics.store(NUTS.Metrics.TREE_SIZE, (double) treeSize);
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class SubTree {
+
+        /**
+         * The leap frog at the forward most step in the tree.
+         */
+        private LeapfrogState forward;
+
+        /**
+         * The leap frog at the backward most step in the tree
+         */
+        private LeapfrogState backward;
+
+        /**
+         * The sum of all of the momentum from each step
+         */
+        private Map<VariableReference, DoubleTensor> sumMomentum;
+
+        /**
+         * The current accepted proposal.
+         */
+        private Proposal proposal;
+
+        /**
+         * log sum of negative energy change
+         */
+        private double logSumWeight;
+
+        /**
+         * A flag indicating the a step diverged due to significant energy change.
+         */
+        private boolean diverged;
+
+        /**
+         * A flag indicating the steps are turning
+         */
+        private boolean uTurned;
+
+        /**
+         * A summation of the metropolis acceptance probability from each step
+         */
+        private double sumMetropolisAcceptanceProbability;
+
+        /**
+         * The size of the sub tree, which is the number of steps taken to build the tree.
+         */
+        private int treeSize;
+
+        public boolean shouldContinue() {
+            return !diverged && !uTurned;
+        }
     }
 }

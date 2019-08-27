@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.Statistics;
@@ -10,10 +10,11 @@ import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.HalfGaussianVertex;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -21,18 +22,19 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class NUTSTest {
 
-    private KeanuRandom random;
-
-    @Before
-    public void setup() {
-        random = new KeanuRandom(1);
-    }
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
 
     @Category(Slow.class)
     @Test
@@ -41,13 +43,12 @@ public class NUTSTest {
         double sigma = 1.0;
         double initStepSize = 1;
         int maxTreeHeight = 4;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3);
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()
-            .adaptEnabled(false)
+            .adaptStepSizeEnabled(false)
             .initialStepSize(initStepSize)
-            .random(random)
             .maxTreeHeight(maxTreeHeight)
             .saveStatistics(true)
             .build();
@@ -76,24 +77,24 @@ public class NUTSTest {
     public void samplesGaussian() {
         double mu = 0.0;
         double sigma = 1.0;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3);
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
+        int sampleCount = 300;
         NUTS nuts = NUTS.builder()
-            .adaptCount(2000)
-            .random(random)
-            .targetAcceptanceProb(0.65)
+            .adaptCount(sampleCount / 4)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             model,
             model.getLatentVariables(),
-            2000
+            sampleCount
         );
 
-        Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
+        DoubleVertex vertex = simpleGaussian.getContinuousLatentVertices().get(0);
+        List<DoubleTensor> nutsSamples = posteriorSamples.get(vertex).asList();
 
-        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
+        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, nutsSamples);
     }
 
     @Test
@@ -102,11 +103,9 @@ public class NUTSTest {
         BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 15.0);
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(bayesNet);
 
-        int sampleCount = 6000;
+        int sampleCount = 500;
         NUTS nuts = NUTS.builder()
             .adaptCount(sampleCount)
-            .maxTreeHeight(4)
-            .random(random)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
@@ -115,8 +114,8 @@ public class NUTSTest {
             sampleCount
         ).drop(sampleCount / 4);
 
-        Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
-        Vertex<DoubleTensor> B = bayesNet.getContinuousLatentVertices().get(1);
+        DoubleVertex A = bayesNet.getContinuousLatentVertices().get(0);
+        DoubleVertex B = bayesNet.getContinuousLatentVertices().get(1);
 
         MCMCTestDistributions.samplesMatchesSumOfGaussians(44.0, posteriorSamples.get(A).asList(), posteriorSamples.get(B).asList());
     }
@@ -127,19 +126,19 @@ public class NUTSTest {
         BayesianNetwork donutBayesNet = MCMCTestDistributions.create2DDonutDistribution();
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(donutBayesNet);
 
+        int sampleCount = 1000;
         NUTS nuts = NUTS.builder()
-            .adaptCount(1000)
-            .random(random)
+            .adaptCount(sampleCount)
             .build();
 
         NetworkSamples samples = nuts.getPosteriorSamples(
             model,
             model.getLatentVariables(),
-            1000
+            sampleCount
         );
 
-        Vertex<DoubleTensor> A = donutBayesNet.getContinuousLatentVertices().get(0);
-        Vertex<DoubleTensor> B = donutBayesNet.getContinuousLatentVertices().get(1);
+        DoubleVertex A = donutBayesNet.getContinuousLatentVertices().get(0);
+        DoubleVertex B = donutBayesNet.getContinuousLatentVertices().get(1);
 
         MCMCTestDistributions.samplesMatch2DDonut(samples.get(A).asList(), samples.get(B).asList());
     }
@@ -149,7 +148,6 @@ public class NUTSTest {
 
         GaussianVertex A = new GaussianVertex(0.0, 1.0);
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
-        net.probeForNonZeroProbability(100, random);
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(net);
 
         NUTS nuts = NUTS.builder()
@@ -168,22 +166,41 @@ public class NUTSTest {
         assertFalse(posteriorSamples.get(A).asList().isEmpty());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfStartingPositionIsZeroProbability() {
+
+        GaussianVertex A = new HalfGaussianVertex(1.0);
+        A.setValue(-1.0);
+
+        BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
+
+        ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(net);
+
+        NUTS nuts = NUTS.builder()
+            .build();
+
+        nuts.getPosteriorSamples(model, 2);
+    }
+
     @Category(Slow.class)
     @Test
-    /**
+    /*
      * This test assumes the functional logic of NUTS has not been changed.
      * It simply checks that the samples produced are identical to a previous build.
+     * If this test fails, it may still be functionally correct. Please make sure
+     * you understand why the samples have changed before accepting them by updating these
+     * magic numbers.
      */
     public void checksSamplesAgainstMagicNumbers() {
         double mu = 0.0;
         double sigma = 1.0;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3);
         KeanuProbabilisticModel model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()
             .adaptCount(5)
-            .random(random)
             .targetAcceptanceProb(0.65)
+            .maxTreeHeight(10)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
@@ -192,16 +209,68 @@ public class NUTSTest {
             20
         );
 
-        Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
+        DoubleVertex vertex = simpleGaussian.getContinuousLatentVertices().get(0);
 
         List<DoubleTensor> samples = posteriorSamples.get(vertex).asList();
 
-        Assert.assertEquals(3.0, samples.get(0).scalar(), 1e-9);
-        Assert.assertEquals(3.0, samples.get(1).scalar(), 1e-9);
-        Assert.assertEquals(0.9374092571432446, samples.get(2).scalar(), 1e-9);
-        Assert.assertEquals(0.05720950629236243, samples.get(3).scalar(), 1e-9);
-        Assert.assertEquals(0.33119352888492626, samples.get(4).scalar(), 1e-9);
-        Assert.assertEquals(0.9124861769925321, samples.get(19).scalar(), 1e-9);
+        double epsilon = 1e-9;
+
+        //Use this if you're sure you want to accept a change in the nuts walk given the above setup
+        //for (int i = 0; i < samples.size(); i++) {
+        //    System.out.println("Assert.assertEquals(" + samples.get(i).scalar() + ", samples.get(" + i + ").scalar(), epsilon);");
+        //}
+
+        Assert.assertEquals(2.655769904078054, samples.get(0).scalar(), epsilon);
+        Assert.assertEquals(2.655769904078054, samples.get(1).scalar(), epsilon);
+        Assert.assertEquals(-1.0165440910526553, samples.get(2).scalar(), epsilon);
+        Assert.assertEquals(-1.0165440910526553, samples.get(3).scalar(), epsilon);
+        Assert.assertEquals(-1.1033732018241589, samples.get(4).scalar(), epsilon);
+        Assert.assertEquals(-1.5926775601489656, samples.get(5).scalar(), epsilon);
+        Assert.assertEquals(-1.5926775601489656, samples.get(6).scalar(), epsilon);
+        Assert.assertEquals(0.06269495259568081, samples.get(7).scalar(), epsilon);
+        Assert.assertEquals(0.06269495259568081, samples.get(8).scalar(), epsilon);
+        Assert.assertEquals(0.06269495259568081, samples.get(9).scalar(), epsilon);
+        Assert.assertEquals(-1.9067350000491319, samples.get(10).scalar(), epsilon);
+        Assert.assertEquals(-0.16217717982790925, samples.get(11).scalar(), epsilon);
+        Assert.assertEquals(-0.16217717982790925, samples.get(12).scalar(), epsilon);
+        Assert.assertEquals(-1.7749397804101408, samples.get(13).scalar(), epsilon);
+        Assert.assertEquals(-1.95774120776884, samples.get(14).scalar(), epsilon);
+        Assert.assertEquals(1.1167543688694772, samples.get(15).scalar(), epsilon);
+        Assert.assertEquals(-2.3326358434845753, samples.get(16).scalar(), epsilon);
+        Assert.assertEquals(-2.425061791760318, samples.get(17).scalar(), epsilon);
+        Assert.assertEquals(1.3182493371930095, samples.get(18).scalar(), epsilon);
+        Assert.assertEquals(-1.3168733581639154, samples.get(19).scalar(), epsilon);
 
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateAdapStepSizeCount() {
+        NUTS.builder().adaptCount(-1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateInitialStepSize() {
+        NUTS.builder().initialStepSize(-0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateTargetAcceptanceUpper() {
+        NUTS.builder().targetAcceptanceProb(1.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateTargetAcceptanceLower() {
+        NUTS.builder().targetAcceptanceProb(-0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateMaxEnergyChange() {
+        NUTS.builder().maxEnergyChange(-0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateMaxTreeHeight() {
+        NUTS.builder().maxTreeHeight(0);
+    }
+
 }

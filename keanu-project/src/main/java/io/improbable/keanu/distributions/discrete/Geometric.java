@@ -4,6 +4,11 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerPlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 /**
  * Implements a Geometric Random Distribution.  More details can be found at:
@@ -38,6 +43,16 @@ public class Geometric implements DiscreteDistribution {
         }
     }
 
+    public static DoubleVertex logProbOutput(IntegerPlaceholderVertex k, DoublePlaceholderVertex p) {
+        DoubleVertex zeroes = ConstantVertex.of(DoubleTensor.zeros(k.getShape()));
+        DoubleVertex ones = ConstantVertex.of(DoubleTensor.ones(k.getShape()));
+        DoubleVertex parameterIsInvalidMask = p.greaterThanMask(zeroes)
+            .times(p.lessThanMask(ones))
+            .unaryMinus()
+            .plus(ones);
+        return calculateLogProb(k, p).setWithMask(parameterIsInvalidMask, Double.NEGATIVE_INFINITY);
+    }
+
     private DoubleTensor calculateLogProb(IntegerTensor k) {
         DoubleTensor kAsDouble = k.toDouble();
         DoubleTensor oneMinusP = p.unaryMinus().plusInPlace(1.0);
@@ -46,13 +61,28 @@ public class Geometric implements DiscreteDistribution {
         return setProbToZeroForInvalidK(k, results);
     }
 
+    private static DoubleVertex calculateLogProb(IntegerVertex k, DoubleVertex p) {
+        DoubleVertex kAsDouble = k.toDouble();
+        DoubleVertex oneMinusP = p.unaryMinus().plus(1.0);
+        DoubleVertex results = kAsDouble.minus(1.0).times(oneMinusP.log()).plus(p.log());
+
+        return setProbToZeroForInvalidK(k, results);
+    }
+
     private DoubleTensor setProbToZeroForInvalidK(IntegerTensor k, DoubleTensor results) {
-        IntegerTensor invalidK = k.getLessThanMask(IntegerTensor.create(1, k.getShape()));
+        IntegerTensor invalidK = k.lessThanMask(IntegerTensor.create(1, k.getShape()));
 
         return results.setWithMaskInPlace(invalidK.toDouble(), Double.NEGATIVE_INFINITY);
     }
 
-    private boolean checkParameterIsValid() {
-        return p.greaterThan(0.0).allTrue() && p.lessThan(1.0).allTrue();
+    private static DoubleVertex setProbToZeroForInvalidK(IntegerVertex k, DoubleVertex results) {
+        DoubleVertex invalidK = k.toDouble().lessThanMask(1.);
+
+        return results.setWithMask(invalidK, Double.NEGATIVE_INFINITY);
     }
+
+    private boolean checkParameterIsValid() {
+        return p.greaterThan(0.0).allTrue().scalar() && p.lessThan(1.0).allTrue().scalar();
+    }
+
 }

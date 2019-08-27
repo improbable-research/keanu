@@ -1,11 +1,13 @@
 package io.improbable.keanu.tensor.intgr;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 public class ScalarIntegerTensorTest {
@@ -23,7 +25,7 @@ public class ScalarIntegerTensorTest {
     public void canArgFindMaxOfOneByOne() {
         IntegerTensor tensor = IntegerTensor.scalar(1).reshape(1, 1);
 
-        assertEquals(0, tensor.argMax());
+        assertThat(tensor.argMax().scalar(), equalTo(0));
         assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.scalar(0)));
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.scalar(0)));
     }
@@ -42,6 +44,14 @@ public class ScalarIntegerTensorTest {
         assertThat(result, hasValue(true, false, false));
     }
 
+    @Test
+    public void canMod() {
+        IntegerTensor value = IntegerTensor.scalar(4);
+
+        assertThat(value.mod(3).scalar(), equalTo(1));
+        assertThat(value.mod(2).scalar(), equalTo(0));
+        assertThat(value.mod(4).scalar(), equalTo(0));
+    }
 
     @Test
     public void doesKeepRankOnGTEq() {
@@ -65,5 +75,27 @@ public class ScalarIntegerTensorTest {
     public void doesKeepRankOnLTEq() {
         IntegerTensor value = IntegerTensor.scalar(1).reshape(1, 1, 1);
         assertEquals(3, value.lessThanOrEqual(2).getRank());
+    }
+
+    @Test
+    public void canBroadcastScalarToShape() {
+        IntegerTensor a = IntegerTensor.scalar(2);
+
+        IntegerTensor expected = IntegerTensor.create(
+            2, 2, 2,
+            2, 2, 2,
+            2, 2, 2
+        ).reshape(3, 3);
+
+        Assert.assertThat(a.broadcast(3, 3), valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canBooleanIndex() {
+        ScalarIntegerTensor a = new ScalarIntegerTensor(1);
+        IntegerTensor result = a.get(BooleanTensor.scalar(false));
+
+        assertThat(result.getLength(), equalTo(0L));
+        assertThat(result.getShape(), equalTo(new long[0]));
     }
 }

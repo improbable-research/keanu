@@ -1,10 +1,10 @@
 package io.improbable.keanu.kotlin
 
 import io.improbable.keanu.DeterministicRule
-import io.improbable.keanu.vertices.dbl.DoubleVertex
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
-import io.improbable.keanu.vertices.intgr.IntegerVertex
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.ConstantIntegerVertex
 import junit.framework.TestCase
 import org.junit.Rule
 import org.junit.Test

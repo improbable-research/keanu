@@ -10,7 +10,7 @@ def test_can_save_and_load(tmpdir) -> None:
     gamma = Gamma(1.0, 1.0)
     gamma.set_value(2.5)
     # %%SNIPPET_START%% PythonSaveSnippet
-    net = BayesNet(gamma.get_connected_graph())
+    net = BayesNet(gamma.iter_connected_graph())
     metadata = {"Author": "Documentation Team"}
 
     protobuf_saver = ProtobufSaver(net)

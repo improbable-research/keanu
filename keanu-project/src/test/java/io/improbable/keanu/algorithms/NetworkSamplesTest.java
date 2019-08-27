@@ -3,8 +3,23 @@ package io.improbable.keanu.algorithms;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertexSamples;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.generic.GenericVertex;
+import io.improbable.keanu.vertices.tensor.generic.nonprobabilistic.ConstantGenericVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertexSamples;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.UniformIntVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexSamples;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,6 +34,7 @@ import java.util.Map;
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertTrue;
 
 public class NetworkSamplesTest {
@@ -126,5 +142,57 @@ public class NetworkSamplesTest {
         assertEquals(v2Samples, networkSamples.get(v2).asList());
         assertEquals(logOfMasterPBySample.get(0), networkSamples.getLogOfMasterP(0));
         assertEquals(logOfMasterPBySample.get(1), networkSamples.getLogOfMasterP(1));
+    }
+
+    @Test
+    public void getReturnsDoubleVertexSamplesIfVariableIsDoubleVertex() {
+        DoubleVertex vertex = new GaussianVertex(0., 1.);
+        Map<VariableReference, DoubleTensor> vertexValsFirstSample = ImmutableMap.of(
+            vertex.getId(), DoubleTensor.scalar(0.)
+        );
+        NetworkSamples networkSamples = NetworkSamples.from(ImmutableList.of(
+            new NetworkSample(vertexValsFirstSample, 9.4)
+        ));
+        assertThat(vertex, instanceOf(DoubleVertex.class));
+        assertThat(networkSamples.get(vertex), instanceOf(DoubleVertexSamples.class));
+    }
+
+    @Test
+    public void getReturnsIntegerSamplesIfVariableIsIntegerVertex() {
+        IntegerVertex vertex = new UniformIntVertex(0, 1);
+        Map<VariableReference, IntegerTensor> vertexValsFirstSample = ImmutableMap.of(
+            vertex.getId(), IntegerTensor.scalar(0)
+        );
+        NetworkSamples networkSamples = NetworkSamples.from(ImmutableList.of(
+            new NetworkSample(vertexValsFirstSample, 9.4)
+        ));
+        assertThat(vertex, instanceOf(IntegerVertex.class));
+        assertThat(networkSamples.get(vertex), instanceOf(IntegerVertexSamples.class));
+    }
+
+    @Test
+    public void getReturnsBooleanSamplesIfVariableIsBooleanVertex() {
+        BooleanVertex vertex = new BernoulliVertex(0.5);
+        Map<VariableReference, BooleanTensor> vertexValsFirstSample = ImmutableMap.of(
+            vertex.getId(), BooleanTensor.scalar(true)
+        );
+        NetworkSamples networkSamples = NetworkSamples.from(ImmutableList.of(
+            new NetworkSample(vertexValsFirstSample, 9.4)
+        ));
+        assertThat(vertex, instanceOf(BooleanVertex.class));
+        assertThat(networkSamples.get(vertex), instanceOf(BooleanVertexSamples.class));
+    }
+
+    @Test
+    public void getReturnsSamplesIfVariableIsGenericVertex() {
+        GenericVertex<Integer> vertex = new ConstantGenericVertex(0);
+        Map<VariableReference, GenericTensor<Integer>> vertexValsFirstSample = ImmutableMap.of(
+            vertex.getId(), GenericTensor.scalar(0)
+        );
+        NetworkSamples networkSamples = NetworkSamples.from(ImmutableList.of(
+            new NetworkSample(vertexValsFirstSample, 9.4)
+        ));
+        assertThat(vertex, instanceOf(GenericVertex.class));
+        assertThat(networkSamples.get(vertex).getClass(), equalTo(Samples.class));
     }
 }

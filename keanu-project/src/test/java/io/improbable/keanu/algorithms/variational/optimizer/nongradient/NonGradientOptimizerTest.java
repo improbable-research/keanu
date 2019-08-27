@@ -1,11 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.ProbabilisticModel;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.HalfGaussianVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -22,7 +22,7 @@ public class NonGradientOptimizerTest {
     @Test
     public void doesCallOnFitnessHandler() {
         AtomicInteger timesCalled = new AtomicInteger(0);
-        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.ofConnectedGraph(new GaussianVertex(new GaussianVertex(0, 1), 1));
+        NonGradientOptimizer optimizer = Keanu.Optimizer.NonGradient.ofConnectedGraph(new GaussianVertex(new GaussianVertex(0, 1), 1));
         optimizer.addFitnessCalculationHandler((point, fitness) -> timesCalled.incrementAndGet());
         optimizer.maxAPosteriori();
         assertTrue(timesCalled.get() > 0);
@@ -47,7 +47,7 @@ public class NonGradientOptimizerTest {
 
         ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
-        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.builderFor(A.getConnectedGraph())
+        NonGradientOptimizer optimizer = Keanu.Optimizer.NonGradient.builderFor(A.getConnectedGraph())
             .probabilisticModel(model)
             .algorithm((vars, fitness) -> new OptimizedResult(null, 0))
             .checkInitialFitnessConditions(enableCheck)

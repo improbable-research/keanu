@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.TensorValueException;
 import org.junit.Test;
 
 import java.util.function.Function;
@@ -24,9 +25,9 @@ public class TensorValidationTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
 
-        TensorValidator validator = TensorValidator.thatReplaces(0., 1e-8);
-        validator.validate(containsZero);
-        assertThat(containsZero, equalTo(expectedResult));
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatReplaces(0., 1e-8);
+        DoubleTensor actual = validator.validate(containsZero);
+        assertThat(actual, equalTo(expectedResult));
     }
 
     @Test
@@ -35,8 +36,8 @@ public class TensorValidationTest {
         DoubleTensor expectedResult = DoubleTensor.create(1e-8);
 
         TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatReplaces(0., 1e-8);
-        containsZero = validator.validate(containsZero);
-        assertThat(containsZero, equalTo(expectedResult));
+        DoubleTensor actual = validator.validate(containsZero);
+        assertThat(actual, equalTo(expectedResult));
     }
 
     @Test
@@ -45,8 +46,8 @@ public class TensorValidationTest {
         DoubleTensor expectedResult = DoubleTensor.create(1e-8);
 
         TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatReplaces(0., 1e-8);
-        containsZero = validator.validate(containsZero);
-        assertThat(containsZero, equalTo(expectedResult));
+        DoubleTensor actual = validator.validate(containsZero);
+        assertThat(actual, equalTo(expectedResult));
     }
 
     @Test(expected = TensorValueException.class)
@@ -64,7 +65,7 @@ public class TensorValidationTest {
         try {
             validator.validate(input);
             throw new AssertionError("Expected it to throw TensorValueException");
-        } catch(TensorValueException e) {
+        } catch (TensorValueException e) {
             assertThat(e.getResult(), equalTo(expectedResult));
         }
     }

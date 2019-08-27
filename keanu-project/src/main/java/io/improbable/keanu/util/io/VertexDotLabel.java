@@ -5,6 +5,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class VertexDotLabel {
     private final Vertex vertex;
@@ -30,25 +31,28 @@ public class VertexDotLabel {
     }
 
     public String inDotFormat() {
-        // Output value if value is set, but also add some descriptive info for non-constant vertices.
+        // Output value if value is set, but also add some descriptive info.
         if (!value.isEmpty()) {
-            String dotLabel = vertex.getId().hashCode() + DOT_LABEL_OPENING + value;
-            if (!(vertex instanceof ConstantVertex)) {
-                dotLabel += " (" + getDescriptiveInfo() + ")";
-            }
-            return dotLabel + DOT_LABEL_CLOSING;
+            StringBuilder dotLabel = new StringBuilder();
+            dotLabel.append(vertex.getId().hashCode()).append(DOT_LABEL_OPENING).append(value);
+            getDescriptiveInfo().ifPresent(info -> dotLabel.append(" (").append(info).append(")"));
+            return dotLabel.append(DOT_LABEL_CLOSING).toString();
         }
-        return vertex.getId().hashCode() + DOT_LABEL_OPENING + getDescriptiveInfo() + DOT_LABEL_CLOSING;
+        return vertex.getId().hashCode() + DOT_LABEL_OPENING + getDescriptiveInfo().orElse("") + DOT_LABEL_CLOSING;
     }
 
-    private String getDescriptiveInfo() {
+    private Optional<String> getDescriptiveInfo() {
         if (!vertexLabel.isEmpty()) {
-            return vertexLabel;
+            return Optional.of(vertexLabel);
+        } else if (value.isEmpty() || !(vertex instanceof ConstantVertex)) {
+            return Optional.of(getAnnotationIfPresentElseSimpleName());
+        } else {
+            return Optional.empty();
         }
-        if (!annotation.isEmpty()) {
-            return annotation;
-        }
-        return vertex.getClass().getSimpleName();
+    }
+
+    private String getAnnotationIfPresentElseSimpleName() {
+        return annotation.isEmpty() ? vertex.getClass().getSimpleName() : annotation;
     }
 
     @Override

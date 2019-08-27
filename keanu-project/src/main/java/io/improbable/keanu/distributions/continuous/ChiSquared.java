@@ -5,16 +5,16 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerPlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 public class ChiSquared implements ContinuousDistribution {
 
     private static final double LOG_TWO = Math.log(2);
     private final IntegerTensor k;
 
-    public static ContinuousDistribution withParameters(IntegerTensor k) {
+    public static ChiSquared withParameters(IntegerTensor k) {
         return new ChiSquared(k);
     }
 
@@ -24,7 +24,7 @@ public class ChiSquared implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        return random.nextGamma(shape, DoubleTensor.TWO_SCALAR, k.toDouble().div(2));
+        return random.nextGamma(shape, DoubleTensor.scalar(2.0), k.toDouble().div(2));
     }
 
     @Override
@@ -35,14 +35,13 @@ public class ChiSquared implements ContinuousDistribution {
         return numerator.minusInPlace(denominator);
     }
 
-    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, IntegerPlaceHolderVertex k) {
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, IntegerPlaceholderVertex k) {
         final DoubleVertex halfK = k.toDouble().div(2.);
         final DoubleVertex numerator = halfK.minus(1.).times(x.log()).minus(x.div(2.));
         final DoubleVertex denominator = halfK.times(LOG_TWO).plus(halfK.logGamma());
         return numerator.minus(denominator);
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }

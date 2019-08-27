@@ -7,10 +7,10 @@ import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDouble;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -87,7 +87,7 @@ public class KLDivergenceTest {
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
-            .withDefaultConfigFor(model)
+            .withDefaultConfig()
             .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
 
         ProbabilisticDouble q1 = new GaussianVertex(0.1, 1.);
@@ -104,7 +104,7 @@ public class KLDivergenceTest {
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
-            .withDefaultConfigFor(model)
+            .withDefaultConfig()
             .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
 
         QDistribution q1 = new TestGaussianQDistribution(0.1, 1.);
@@ -121,7 +121,7 @@ public class KLDivergenceTest {
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
-            .withDefaultConfigFor(model)
+            .withDefaultConfig()
             .getPosteriorSamples(model, Arrays.asList(v1, v3), 1000);
         ProbabilisticDouble q = new GaussianVertex(0.1, 1.);
 

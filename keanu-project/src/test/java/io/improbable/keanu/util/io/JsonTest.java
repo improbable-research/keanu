@@ -4,13 +4,13 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.mir.KeanuSavedBayesNet;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class JsonTest {
 
     @BeforeClass
     public static void setup() throws IOException {
-        VertexId.ID_GENERATOR.set(0);
+        VertexId.resetIdGenerator();
 
         DoubleVertex mu = new ConstantDoubleVertex(0);
         DoubleVertex sigma = new ConstantDoubleVertex(new double[]{3.0, 4.0});
@@ -60,7 +60,7 @@ public class JsonTest {
         gaussianVertex.setLabel("GaussianVertex");
         net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
 
-        someMetadata = ImmutableMap.of( "Author", "Some Author", "Tag", "MyBayesNet" );
+        someMetadata = ImmutableMap.of("Author", "Some Author", "Tag", "MyBayesNet");
         JsonSaver jsonSaver = new JsonSaver(net);
         jsonSaver.save(outputStream, true, someMetadata);
     }
@@ -77,13 +77,13 @@ public class JsonTest {
 
     @Test
     public void jsonSaverSavesMetadata() throws IOException {
-        KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
+        KeanuSavedBayesNet.ModelMetadata.Builder metadataBuilder = KeanuSavedBayesNet.ModelMetadata.newBuilder();
         for (Map.Entry<String, String> entry : someMetadata.entrySet()) {
             metadataBuilder.putMetadataInfo(entry.getKey(), entry.getValue());
         }
-        KeanuSavedBayesNet.Model.Builder modelBuilder = KeanuSavedBayesNet.Model.newBuilder();
+        KeanuSavedBayesNet.ProtoModel.Builder modelBuilder = KeanuSavedBayesNet.ProtoModel.newBuilder();
         JsonFormat.parser().merge(outputStream.toString(), modelBuilder);
-        KeanuSavedBayesNet.Model parsedModel = modelBuilder.build();
+        KeanuSavedBayesNet.ProtoModel parsedModel = modelBuilder.build();
 
         assertTrue(parsedModel.hasMetadata());
         assertEquals(parsedModel.getMetadata().getMetadataInfoMap().size(), (metadataBuilder.getMetadataInfoMap().size()));
@@ -100,38 +100,39 @@ public class JsonTest {
         assertEquals(net.getLatentVertices().size(), loadedNetwork.getLatentVertices().size());
         assertEquals(net.getObservedVertices().size(), loadedNetwork.getObservedVertices().size());
         assertThat(net.getObservedVertices().get(0), instanceOf(GaussianVertex.class));
-        GaussianVertex gaussianVertex = (GaussianVertex)loadedNetwork.getObservedVertices().get(0);
+        GaussianVertex gaussianVertex = (GaussianVertex) loadedNetwork.getObservedVertices().get(0);
         assertThat(gaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
         assertThat(gaussianVertex.getSigma().getValue(0), closeTo(3.0, 1e-10));
         assertThat(gaussianVertex.getSigma().getValue(1), closeTo(4.0, 1e-10));
-        assertThat(gaussianVertex.getValue().scalar(), closeTo(1.0, 1e-10));
+        assertThat(gaussianVertex.getValue().getValue(0), closeTo(1.0, 1e-10));
+        assertThat(gaussianVertex.getValue().getValue(1), closeTo(1.0, 1e-10));
     }
 
     @Test
     public void loadFailsIfInvalidVertexSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Unknown Vertex Type Specified: io.improbable.keanu.vertices.dbl.nonprobabilistic.NonExistentVertexType");
+        expectedException.expectMessage("Unknown Vertex Type Specified: io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.NonExistentVertexType");
         tryLoadingNetwork(JSON_INVALID_VERTEX_TYPE_FILE);
     }
 
     @Test
     public void loadFailsIfParentVertexInfoIsMissing() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex due to missing parent: mu");
+        expectedException.expectMessage("Failed to create vertex due to missing parameter: mu");
         tryLoadingNetwork(JSON_MISSING_PARENT_VERTEX_FILE);
     }
 
     @Test
     public void loadFailsIfHyperparameterIsMissing() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex due to missing parent: mu");
+        expectedException.expectMessage("Failed to create vertex due to missing parameter: mu");
         tryLoadingNetwork(JSON_MISSING_HYPERPARAMETER_FILE);
     }
 
     @Test
     public void loadFailsIfWrongArgumentTypeSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Incorrect Parameter Type specified.  " +
+        expectedException.expectMessage("For ConstantDoubleVertex got incorrect parameter type specified.  " +
             "Got: class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, " +
             "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
         tryLoadingNetwork(JSON_WRONG_ARGUMENT_TYPE_FILE);

@@ -2,8 +2,6 @@ package io.improbable.keanu.util.io;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
-import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -14,16 +12,19 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.Differentiator;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.If;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiator;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.mir.KeanuSavedBayesNet;
+import io.improbable.mir.SavedBayesNet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -41,6 +42,7 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +56,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 
 public class ProtobufTest {
@@ -89,10 +92,10 @@ public class ProtobufTest {
         assertThat(readNet.getLatentVertices().size(), is(1));
         assertThat(readNet.getLatentVertices().get(0), instanceOf(GaussianVertex.class));
         GaussianVertex latentGaussianVertex = (GaussianVertex) readNet.getLatentVertices().get(0);
-        GaussianVertex labelGaussianVerted = (GaussianVertex) readNet.getVertexByLabel(new VertexLabel(gaussianLabel));
-        assertThat(latentGaussianVertex, equalTo(labelGaussianVerted));
+        GaussianVertex labelGaussianVertex = (GaussianVertex) readNet.getVertexByLabel(new VertexLabel(gaussianLabel));
+        assertThat(latentGaussianVertex, equalTo(labelGaussianVertex));
         assertThat(latentGaussianVertex.getMu().getValue(0), closeTo(3.0, 1e-10));
-        assertThat(labelGaussianVerted.getMu().getValue(2), closeTo(5.0, 1e-10));
+        assertThat(labelGaussianVertex.getMu().getValue(2), closeTo(5.0, 1e-10));
         assertThat(latentGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         latentGaussianVertex.sample();
     }
@@ -131,14 +134,14 @@ public class ProtobufTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ProtobufSaver saver = new ProtobufSaver(complexNet);
         saver.save(outputStream, true);
-        DoubleIfVertex outputVertex = (DoubleIfVertex) complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        GaussianVertex inputVertex = (GaussianVertex) complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        Vertex outputVertex = complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        Vertex inputVertex = complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         ByteArrayInputStream input = new ByteArrayInputStream(outputStream.toByteArray());
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork loadedNet = loader.loadNetwork(input);
-        DoubleIfVertex outputVertex2 = (DoubleIfVertex) loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        GaussianVertex inputVertex2 = (GaussianVertex) loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        Vertex outputVertex2 = loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        Vertex inputVertex2 =  loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(
             inputVertex,
@@ -178,37 +181,37 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfParentsAreMissing() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex due to missing parent: sigma");
+        expectedException.expectMessage("Failed to create vertex due to missing parameter: sigma");
 
-        KeanuSavedBayesNet.Vertex muVertex = KeanuSavedBayesNet.Vertex.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+        SavedBayesNet.Vertex muVertex = SavedBayesNet.Vertex.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
             .setLabel("MU VERTEX")
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
-            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+            .addParameters(SavedBayesNet.NamedParam.newBuilder()
                 .setName("constant")
-                .setDoubleTensorParam(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+                .setDoubleTensorParam(SavedBayesNet.DoubleTensor.newBuilder()
                     .addAllShape(Longs.asList(1, 1))
                     .addValues(0.0).build())
                 .build())
             .build();
 
-        KeanuSavedBayesNet.Vertex gaussianVertex = KeanuSavedBayesNet.Vertex.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("2"))
+        SavedBayesNet.Vertex gaussianVertex = SavedBayesNet.Vertex.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId("2"))
             .setLabel("GAUSSIAN VERTEX")
             .setVertexType(GaussianVertex.class.getCanonicalName())
-            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+            .addParameters(SavedBayesNet.NamedParam.newBuilder()
                 .setName("mu")
-                .setParentVertex(KeanuSavedBayesNet.VertexID.newBuilder().setId("1").build())
+                .setParentVertex(SavedBayesNet.VertexID.newBuilder().setId("1").build())
                 .build()
             )
             .build();
 
-        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+        SavedBayesNet.Graph savedNet = SavedBayesNet.Graph.newBuilder()
             .addVertices(muVertex)
             .addVertices(gaussianVertex).build();
 
-        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
-            .setNetwork(savedNet)
+        KeanuSavedBayesNet.ProtoModel savedModel = KeanuSavedBayesNet.ProtoModel.newBuilder()
+            .setGraph(savedNet)
             .build();
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
@@ -223,16 +226,16 @@ public class ProtobufTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Unknown Vertex Type Specified: made.up.vertex.NonExistentVertex");
 
-        KeanuSavedBayesNet.Vertex constantVertex = KeanuSavedBayesNet.Vertex.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+        SavedBayesNet.Vertex constantVertex = SavedBayesNet.Vertex.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
             .setVertexType("made.up.vertex.NonExistentVertex")
             .build();
 
-        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+        SavedBayesNet.Graph savedNet = SavedBayesNet.Graph.newBuilder()
             .addVertices(constantVertex).build();
 
-        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
-            .setNetwork(savedNet)
+        KeanuSavedBayesNet.ProtoModel savedModel = KeanuSavedBayesNet.ProtoModel.newBuilder()
+            .setGraph(savedNet)
             .build();
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
@@ -244,18 +247,18 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfNoConstantSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex due to missing parent: constant");
+        expectedException.expectMessage("Failed to create vertex due to missing parameter: constant");
 
-        KeanuSavedBayesNet.Vertex constantVertex = KeanuSavedBayesNet.Vertex.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+        SavedBayesNet.Vertex constantVertex = SavedBayesNet.Vertex.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
             .build();
 
-        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+        SavedBayesNet.Graph savedNet = SavedBayesNet.Graph.newBuilder()
             .addVertices(constantVertex).build();
 
-        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
-            .setNetwork(savedNet)
+        KeanuSavedBayesNet.ProtoModel savedModel = KeanuSavedBayesNet.ProtoModel.newBuilder()
+            .setGraph(savedNet)
             .build();
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
@@ -267,25 +270,25 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfWrongArgumentTypeSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Incorrect Parameter Type specified.  " +
+        expectedException.expectMessage("For ConstantDoubleVertex got incorrect parameter type specified.  " +
             "Got: class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, " +
             "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
 
-        KeanuSavedBayesNet.Vertex constantVertex = KeanuSavedBayesNet.Vertex.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+        SavedBayesNet.Vertex constantVertex = SavedBayesNet.Vertex.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
-            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+            .addParameters(SavedBayesNet.NamedParam.newBuilder()
                 .setName("constant")
-                .setIntTensorParam(KeanuSavedBayesNet.IntegerTensor.newBuilder()
+                .setIntTensorParam(SavedBayesNet.IntegerTensor.newBuilder()
                     .addAllShape(Longs.asList()).addValues(1).build()
                 ).build())
             .build();
 
-        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+        SavedBayesNet.Graph savedNet = SavedBayesNet.Graph.newBuilder()
             .addVertices(constantVertex).build();
 
-        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
-            .setNetwork(savedNet)
+        KeanuSavedBayesNet.ProtoModel savedModel = KeanuSavedBayesNet.ProtoModel.newBuilder()
+            .setGraph(savedNet)
             .build();
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
@@ -296,8 +299,8 @@ public class ProtobufTest {
 
     @Test
     public void canLoadWithLabelRatherThanId() throws IOException {
-        KeanuSavedBayesNet.Model savedModel = createBasicNetworkProtobufWithValue(
-            GAUSS_LABEL, GAUSS_ID, GAUSS_VALUE);
+        KeanuSavedBayesNet.ProtoModel savedModel =
+            createBasicNetworkProtobufWithValue(GAUSS_LABEL, GAUSS_ID, GAUSS_VALUE);
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
         savedModel.writeTo(writer);
@@ -317,9 +320,9 @@ public class ProtobufTest {
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
         ProtobufSaver protobufSaver = new ProtobufSaver(net);
         protobufSaver.save(writer, true, metadata);
-        KeanuSavedBayesNet.Model parsedModel = KeanuSavedBayesNet.Model.parseFrom(writer.toByteArray());
+        KeanuSavedBayesNet.ProtoModel parsedModel = KeanuSavedBayesNet.ProtoModel.parseFrom(writer.toByteArray());
 
-        KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
+        KeanuSavedBayesNet.ModelMetadata.Builder metadataBuilder = KeanuSavedBayesNet.ModelMetadata.newBuilder();
         String[] metadataKeys = metadata.keySet().toArray(new String[0]);
         Arrays.sort(metadataKeys);
         for (String metadataKey : metadataKeys) {
@@ -335,7 +338,7 @@ public class ProtobufTest {
         expectedException.expectMessage("Label and VertexID don't refer to same Vertex: (sigmaVertex) " +
             "(id: \"1.1\"\n)");
 
-        KeanuSavedBayesNet.Model savedModel = createBasicNetworkProtobufWithValue(
+        KeanuSavedBayesNet.ProtoModel savedModel = createBasicNetworkProtobufWithValue(
             "sigmaVertex", GAUSS_ID, 2.1
         );
 
@@ -351,37 +354,33 @@ public class ProtobufTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Non Double Value specified for Double Vertex");
 
-        KeanuSavedBayesNet.Vertex constantVertex = KeanuSavedBayesNet.Vertex.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+        SavedBayesNet.Vertex constantVertex = SavedBayesNet.Vertex.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
-            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+            .addParameters(SavedBayesNet.NamedParam.newBuilder()
                 .setName("constant")
-                .setDoubleTensorParam(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+                .setDoubleTensorParam(SavedBayesNet.DoubleTensor.newBuilder()
                     .addAllShape(Longs.asList(1, 1)).addValues(1.0).build()
                 ).build())
             .build();
 
-        KeanuSavedBayesNet.StoredValue constantValue = KeanuSavedBayesNet.StoredValue.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
-            .setValue(KeanuSavedBayesNet.VertexValue.newBuilder()
-                .setIntVal(KeanuSavedBayesNet.IntegerTensor.newBuilder()
+        SavedBayesNet.StoredValue constantValue = SavedBayesNet.StoredValue.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
+            .setValue(SavedBayesNet.VertexValue.newBuilder()
+                .setIntVal(SavedBayesNet.IntegerTensor.newBuilder()
                     .addShape(1).addShape(1)
                     .addValues(2)
                     .build()
                 ).build()
             ).build();
 
-        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+        SavedBayesNet.Graph savedNet = SavedBayesNet.Graph.newBuilder()
             .addVertices(constantVertex)
-            .build();
-
-        KeanuSavedBayesNet.BayesianNetworkState savedNetState = KeanuSavedBayesNet.BayesianNetworkState.newBuilder()
             .addDefaultState(constantValue)
             .build();
 
-        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
-            .setNetwork(savedNet)
-            .setNetworkState(savedNetState)
+        KeanuSavedBayesNet.ProtoModel savedModel = KeanuSavedBayesNet.ProtoModel.newBuilder()
+            .setGraph(savedNet)
             .build();
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
@@ -390,91 +389,78 @@ public class ProtobufTest {
         BayesianNetwork readNet = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
-    private KeanuSavedBayesNet.Model createBasicNetworkProtobufWithValue(String labelForValue,
-                                                                         String idForValue,
-                                                                         Double valueToStore) {
+    private KeanuSavedBayesNet.ProtoModel createBasicNetworkProtobufWithValue(String labelForValue,
+                                                                              String idForValue,
+                                                                              Double valueToStore) {
 
-        KeanuSavedBayesNet.Vertex muVertex = KeanuSavedBayesNet.Vertex.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+        SavedBayesNet.Vertex muVertex = SavedBayesNet.Vertex.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId("1"))
             .setLabel("muVertex")
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
-            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+            .addParameters(SavedBayesNet.NamedParam.newBuilder()
                 .setName("constant")
-                .setDoubleTensorParam(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+                .setDoubleTensorParam(SavedBayesNet.DoubleTensor.newBuilder()
                     .addAllShape(Longs.asList(1, 1)).addValues(1.0).build()
                 ).build())
             .build();
 
-        KeanuSavedBayesNet.Vertex sigmaVertex = KeanuSavedBayesNet.Vertex.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("2"))
+        SavedBayesNet.Vertex sigmaVertex = SavedBayesNet.Vertex.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId("2"))
             .setLabel("sigmaVertex")
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
-            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+            .addParameters(SavedBayesNet.NamedParam.newBuilder()
                 .setName("constant")
-                .setDoubleTensorParam(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+                .setDoubleTensorParam(SavedBayesNet.DoubleTensor.newBuilder()
                     .addAllShape(Longs.asList(1, 1)).addValues(2.0).build()
                 ).build())
             .build();
 
-        KeanuSavedBayesNet.Vertex gaussianVertex = KeanuSavedBayesNet.Vertex.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(GAUSS_ID))
+        SavedBayesNet.Vertex gaussianVertex = SavedBayesNet.Vertex.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId(GAUSS_ID))
             .setLabel(GAUSS_LABEL)
             .setVertexType(GaussianVertex.class.getCanonicalName())
-            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+            .addParameters(SavedBayesNet.NamedParam.newBuilder()
                 .setName("mu")
-                .setParentVertex(KeanuSavedBayesNet.VertexID.newBuilder().setId("1").build())
+                .setParentVertex(SavedBayesNet.VertexID.newBuilder().setId("1").build())
                 .build()
-            ).addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+            ).addParameters(SavedBayesNet.NamedParam.newBuilder()
                 .setName("sigma")
-                .setParentVertex(KeanuSavedBayesNet.VertexID.newBuilder().setId("2").build())
+                .setParentVertex(SavedBayesNet.VertexID.newBuilder().setId("2").build())
                 .build()
             )
             .build();
 
-        KeanuSavedBayesNet.StoredValue gaussianValue = KeanuSavedBayesNet.StoredValue.newBuilder()
+        SavedBayesNet.StoredValue gaussianValue = SavedBayesNet.StoredValue.newBuilder()
             .setVertexLabel(labelForValue)
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(idForValue))
-            .setValue(KeanuSavedBayesNet.VertexValue.newBuilder()
-                .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+            .setId(SavedBayesNet.VertexID.newBuilder().setId(idForValue))
+            .setValue(SavedBayesNet.VertexValue.newBuilder()
+                .setDoubleVal(SavedBayesNet.DoubleTensor.newBuilder()
                     .addShape(1).addShape(1)
                     .addValues(valueToStore)
                     .build()
                 ).build()
             ).build();
 
-        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+        SavedBayesNet.Graph savedNet = SavedBayesNet.Graph.newBuilder()
             .addVertices(muVertex)
             .addVertices(sigmaVertex)
             .addVertices(gaussianVertex)
-            .build();
-
-        KeanuSavedBayesNet.BayesianNetworkState savedNetState = KeanuSavedBayesNet.BayesianNetworkState.newBuilder()
             .addDefaultState(gaussianValue)
             .build();
 
-        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
-            .setNetwork(savedNet)
-            .setNetworkState(savedNetState)
+        KeanuSavedBayesNet.ProtoModel savedModel = KeanuSavedBayesNet.ProtoModel.newBuilder()
+            .setGraph(savedNet)
             .build();
 
         return savedModel;
     }
 
-    private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {
+    private class TestNonSaveableVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonSaveableVertex {
 
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});
         }
 
-        @Override
-        public DoubleTensor sample(KeanuRandom random) {
-            return null;
-        }
-
-        @Override
-        public DoubleTensor sample() {
-            return null;
-        }
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -482,7 +468,7 @@ public class ProtobufTest {
         DoubleVertex testVertex = new TestNonSaveableVertex();
         BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
         ProtobufSaver protobufSaver = new ProtobufSaver(net);
-        testVertex.save(protobufSaver);
+        protobufSaver.save(testVertex);
     }
 
     @Category(Slow.class)
@@ -502,16 +488,31 @@ public class ProtobufTest {
          * For each vertex we need to check that we have a single constructor we can use for loading and that we save
          * all the necessary Params for that constructor
          */
-        Map<String, Class> storedParams = getSavedParams(vertexClass);
+        Map<String, Set<Class>> storedParams = getSavedParams(vertexClass);
         Map<String, Class> requiredParams = checkConstructorParamValidityAndGetRequiredSaves(vertexClass);
 
         for (Map.Entry<String, Class> param : requiredParams.entrySet()) {
+
             assertThat("Class must save all required params: " + vertexClass,
                 storedParams, hasKey(param.getKey()));
-            assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
-                    + storedParams.get(param.getKey()) + ", " + param.getValue(),
-                param.getValue().isAssignableFrom(storedParams.get(param.getKey())));
+            if (param.getKey().equals("label")) {
+                //Labels are stored as strings and are parsed into VertexLabels at load time
+                assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
+                        + storedParams.get(param.getKey()) + ", " + param.getValue(),
+                    String.class.isAssignableFrom(storedParams.get(param.getKey()).iterator().next()));
+            } else {
+                assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
+                        + storedParams.get(param.getKey()) + ", " + param.getValue(),
+                    containsAssignableFrom(storedParams.get(param.getKey()), param.getValue()));
+            }
         }
+    }
+
+    private boolean containsAssignableFrom(Set<Class> paramTypes, Class toAssign) {
+        return paramTypes.stream()
+            .map(toAssign::isAssignableFrom)
+            .collect(Collectors.toSet())
+            .contains(true);
     }
 
     private <A extends AnnotatedElement> List<A> filterAnnotatedObjects(A[] items, Class annotation) {
@@ -524,31 +525,32 @@ public class ProtobufTest {
         return filteredList;
     }
 
-    private List<Constructor> getConstructorsWithAnnotatedParameters(Class parentClass, Class annotation) {
+    private Set<Constructor> getConstructorsWithAnnotatedParameters(Class parentClass, Class annotation) {
         return Arrays.stream(parentClass.getConstructors())
             .filter(constructor -> !filterAnnotatedObjects(constructor.getParameters(), annotation).isEmpty())
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
     }
 
-    private Map<String, Class> getSavedParams(Class<? extends Vertex> vertexClass) {
-        Map<String, Class> savedParams = new HashMap<>();
+    private Map<String, Set<Class>> getSavedParams(Class<? extends Vertex> vertexClass) {
+        Map<String, Set<Class>> savedParams = new HashMap<>();
 
         for (Method method : filterAnnotatedObjects(vertexClass.getMethods(), SaveVertexParam.class)) {
             String paramName = method.getAnnotation(SaveVertexParam.class).value();
             Class paramType = method.getReturnType();
-            savedParams.put(paramName, paramType);
+            savedParams.computeIfAbsent(paramName, (name) -> new HashSet<>()).add(paramType);
         }
 
         return savedParams;
     }
 
     private Map<String, Class> checkConstructorParamValidityAndGetRequiredSaves(Class<? extends Vertex> vertexClass) {
-        List<Constructor> parentConstructor = getConstructorsWithAnnotatedParameters(vertexClass,
-            LoadVertexParam.class);
-        assertThat("Need Constructor for Class: " + vertexClass, parentConstructor.size(), is(1));
+        Set<Constructor> loadConstructors = getConstructorsWithAnnotatedParameters(vertexClass, LoadVertexParam.class);
+        loadConstructors.addAll(getConstructorsWithAnnotatedParameters(vertexClass, LoadShape.class));
+
+        assertThat("Need Constructor for Class: " + vertexClass, loadConstructors.size(), is(1));
         Map<String, Class> requiredParameters = new HashMap<>();
 
-        for (Parameter parameter : parentConstructor.get(0).getParameters()) {
+        for (Parameter parameter : loadConstructors.iterator().next().getParameters()) {
             LoadVertexParam parameterAnnotation = parameter.getAnnotation(LoadVertexParam.class);
             LoadShape shapeAnnotation = parameter.getAnnotation(LoadShape.class);
             assertThat("Annotation has to be present on all Constructor params for class: " + vertexClass,
@@ -565,4 +567,19 @@ public class ProtobufTest {
         return requiredParameters;
     }
 
+    @Test
+    public void canSaveAndLoadBayesNetWithUnparentedProxyVertex() throws IOException {
+        VertexLabel proxyLabel = new VertexLabel("proxy");
+        DoubleVertex proxyVertex = new DoubleProxyVertex(proxyLabel);
+
+        BayesianNetwork network = new BayesianNetwork(proxyVertex.getConnectedGraph());
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        ProtobufSaver saver = new ProtobufSaver(network);
+        saver.save(writer, true);
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork reconstructedNetwork = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        Vertex reconstructedVertex = reconstructedNetwork.getVertexByLabel(proxyLabel);
+        assertThat(reconstructedVertex, notNullValue());
+    }
 }

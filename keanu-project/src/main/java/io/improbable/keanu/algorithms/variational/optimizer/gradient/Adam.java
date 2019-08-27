@@ -10,6 +10,8 @@ import io.improbable.keanu.algorithms.variational.optimizer.RelativeConvergenceC
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 
@@ -20,7 +22,7 @@ import java.util.Map;
 /**
  * Implemented as described in https://arxiv.org/pdf/1412.6980.pdf
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Adam implements GradientOptimizationAlgorithm {
 
     public static AdamBuilder builder() {
@@ -33,6 +35,9 @@ public class Adam implements GradientOptimizationAlgorithm {
     private final double beta1;
     private final double beta2;
     private final double epsilon;
+
+    @Getter
+    private AdamStatistics statistics;
 
     @Override
     public OptimizedResult optimize(List<? extends Variable> latentVariables,
@@ -79,6 +84,8 @@ public class Adam implements GradientOptimizationAlgorithm {
         updatePoint(latentVariables, theta, thetaAsPoint);
 
         double logProb = fitnessFunction.getFitnessAt(thetaAsPoint);
+
+        this.statistics = new AdamStatistics(converged);
 
         return new OptimizedResult(thetaAsPoint, logProb);
     }
@@ -141,6 +148,18 @@ public class Adam implements GradientOptimizationAlgorithm {
 
     }
 
+    @AllArgsConstructor
+    public static class AdamStatistics {
+        private final boolean converged;
+
+        /**
+         * @return true if the optimizer convergence checker signalled convergence, false if the optimizer stopped
+         * due to exceeding max evaluations.
+         */
+        public boolean didConverge() {
+            return converged;
+        }
+    }
 
     @ToString
     public static class AdamBuilder {

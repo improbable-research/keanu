@@ -86,7 +86,7 @@ room temperature.
 
 ```java
 BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-Optimizer optimizer = KeanuOptimizer.of(bayesNet);
+Optimizer optimizer = Keanu.Optimizer.of(bayesNet);
 optimizer.maxAPosteriori();
 
 double calculatedTemperature = temperature.getValue().scalar();
@@ -117,11 +117,12 @@ estimated temperature.
 #### Java
 
 ```java
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 
 public class ThermometerExample {
 
@@ -136,7 +137,7 @@ public class ThermometerExample {
         secondThermometer.observe(30.);
 
         BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        Optimizer optimizer = KeanuOptimizer.of(bayesNet);
+        Optimizer optimizer = Keanu.Optimizer.of(bayesNet);
         optimizer.maxAPosteriori();
 
         double calculatedTemperature = temperature.getValue().scalar();

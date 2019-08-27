@@ -1,13 +1,13 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.HalfGaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -26,7 +26,7 @@ public class GradientOptimizerTest {
     public void doesCallOnFitnessAndOnGradientHandler() {
         AtomicInteger fitnessTimesCalled = new AtomicInteger(0);
         AtomicInteger gradientTimesCalled = new AtomicInteger(0);
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.ofConnectedGraph(
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.ofConnectedGraph(
             new GaussianVertex(0, 1)
         );
         optimizer.addFitnessCalculationHandler((point, fitness) -> fitnessTimesCalled.incrementAndGet());
@@ -40,9 +40,9 @@ public class GradientOptimizerTest {
     @Test(expected = UnsupportedOperationException.class)
     public void errorOnDiscreteLatents() {
         PoissonVertex v1 = new PoissonVertex(15);
-        PoissonVertex v2 = new PoissonVertex(v1);
+        PoissonVertex v2 = new PoissonVertex(v1.toDouble());
 
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.ofConnectedGraph(v1);
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.ofConnectedGraph(v1);
     }
 
     @Test
@@ -52,14 +52,14 @@ public class GradientOptimizerTest {
         GaussianVertex B = new GaussianVertex(A.abs(), 1);
         A.observe(2.0);
 
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.ofConnectedGraph(B);
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.ofConnectedGraph(B);
         optimizer.maxAPosteriori();
 
         assertEquals(2.0, B.getValue().scalar(), 1e-5);
 
         A.observe(3.0);
 
-        GradientOptimizer optimizerAfterObserve = KeanuOptimizer.Gradient.ofConnectedGraph(B);
+        GradientOptimizer optimizerAfterObserve = Keanu.Optimizer.Gradient.ofConnectedGraph(B);
         optimizerAfterObserve.maxAPosteriori();
 
         assertEquals(3.0, B.getValue().scalar(), 1e-5);
@@ -96,7 +96,7 @@ public class GradientOptimizerTest {
         A.observe(-1);
 
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(A.getConnectedGraph());
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(A.getConnectedGraph())
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.builderFor(A.getConnectedGraph())
             .probabilisticModel(model)
             .algorithm((vars, fitness, gradient) -> new OptimizedResult(null, 0))
             .checkInitialFitnessConditions(enableCheck)
@@ -110,7 +110,7 @@ public class GradientOptimizerTest {
         A.setValue(0.5);
 
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(A.getConnectedGraph());
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(A.getConnectedGraph())
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.builderFor(A.getConnectedGraph())
             .probabilisticModel(model)
             .algorithm((vars, fitness, gradient) -> new OptimizedResult(null, 0))
             .checkInitialFitnessConditions(enableCheck)

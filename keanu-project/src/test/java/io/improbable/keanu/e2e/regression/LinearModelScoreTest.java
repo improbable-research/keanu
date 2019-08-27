@@ -3,9 +3,8 @@ package io.improbable.keanu.e2e.regression;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -20,21 +19,21 @@ public class LinearModelScoreTest {
 
     @Test
     public void coefficientOfDeterminationIsVeryLowForRandomData() {
-        DoubleVertex generator = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
+        UniformVertex generator = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
         assertThat(ModelScoring.coefficientOfDetermination(generator.sample(), generator.sample()), lessThan(0.0));
     }
 
     @Test
     public void coefficientOfDeterminationIs1ForSameData() {
-        DoubleVertex generator = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
+        UniformVertex generator = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
         DoubleTensor sample = generator.sample();
-        assertThat( ModelScoring.coefficientOfDetermination(sample, sample), closeTo(1, 1e-8));
+        assertThat(ModelScoring.coefficientOfDetermination(sample, sample), closeTo(1, 1e-8));
     }
 
     @Test
     public void coefficientOfDeterminationIs1HighForSimilarData() {
-        DoubleVertex input = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
-        DoubleVertex noisy = new GaussianVertex(input, 50);
+        UniformVertex input = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
+        GaussianVertex noisy = new GaussianVertex(input, 50);
         DoubleTensor inputSample = input.sample();
         input.setAndCascade(inputSample);
         assertThat(ModelScoring.coefficientOfDetermination(inputSample, noisy.sample()), greaterThan(0.9));

@@ -1,17 +1,18 @@
 import collections
-from typing import List, Tuple, Iterator, Union, SupportsRound, Optional, Callable
-from typing import cast as typing_cast
-
 import numpy as np
 from py4j.java_collections import JavaList, JavaArray
-from py4j.java_gateway import JavaObject, JavaMember
+from py4j.java_gateway import JavaObject, JavaMember, is_instance_of
+from typing import List, Tuple, Iterator, Union, SupportsRound, Optional, Callable
+from typing import cast as typing_cast
 
 import keanu as kn
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_wrapped_java_types,
-                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, runtime_float_types)
+                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, runtime_float_types,
+                            runtime_str_types)
+from keanu.vertex.label import _VertexLabel
 
 k = KeanuContext()
 
@@ -21,7 +22,7 @@ vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_
 
 class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
-    def __init__(self, val_or_ctor: Union[JavaMember, JavaObject],
+    def __init__(self, val_or_ctor: Union[JavaMember, JavaObject], label: Optional[str],
                  *args: Union[vertex_constructor_param_types, shape_types]) -> None:
         val: JavaObject
         if args:
@@ -31,9 +32,16 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             val = typing_cast(JavaObject, val_or_ctor)
 
         super(Vertex, self).__init__(val)
+        if label is not None and self.get_label() is None:
+            self.set_label(label)
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return v
+
+    def __bool__(self) -> bool:
+        raise TypeError(
+            'Keanu vertices cannot be used as a predicate in a Python "if" statement. Please use keanu.vertex.If instead.'
+        )
 
     def __hash__(self) -> int:
         return hash(self.get_id())
@@ -41,11 +49,19 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def observe(self, v: tensor_arg_types) -> None:
         self.unwrap().observe(Tensor(self.cast(v)).unwrap())
 
+    def unobserve(self) -> None:
+        self.unwrap().unobserve()
+
     def set_value(self, v: tensor_arg_types) -> None:
         self.unwrap().setValue(Tensor(self.cast(v)).unwrap())
 
     def set_and_cascade(self, v: tensor_arg_types) -> None:
         self.unwrap().setAndCascade(Tensor(self.cast(v)).unwrap())
+
+    def set_label(self, label: Optional[str]) -> None:
+        if label is None:
+            raise ValueError("label cannot be None.")
+        self.unwrap().setLabel(_VertexLabel(label).unwrap())
 
     def sample(self) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().sample())
@@ -53,14 +69,31 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def get_value(self) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().getValue())
 
-    def get_connected_graph(self) -> Iterator['Vertex']:
+    def iter_connected_graph(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
-    def get_id(self) -> Tuple[JavaObject, ...]:
+    def get_id(self) -> Tuple[int, ...]:
         return Vertex._get_python_id(self.unwrap())
 
-    def get_label(self) -> str:
-        return self.unwrap().getLabel().getQualifiedName()
+    def get_label(self) -> Optional[str]:
+        label = self.unwrap().getLabel()
+        return None if label is None else label.getQualifiedName()
+
+    def get_label_without_outer_namespace(self) -> Optional[str]:
+        label = self.unwrap().getLabel()
+        return None if label is None else label.withoutOuterNamespace().getQualifiedName()
+
+    def iter_parents(self) -> Iterator['Vertex']:
+        return Vertex._to_generator(self.unwrap().getParents())
+
+    def iter_children(self) -> Iterator['Vertex']:
+        return Vertex._to_generator(self.unwrap().getChildren())
+
+    def is_observed(self) -> bool:
+        return self.unwrap().isObserved()
+
+    def has_value(self) -> bool:
+        return self.unwrap().hasValue()
 
     """
     __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.
@@ -95,48 +128,60 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
     def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
         other = cast_to_double_vertex_if_integer_vertex(other)
-        return kn.vertex.generated.Addition(self, other)
+        return Double(k.jvm_view().AdditionVertex, None, kn.vertex.generated.cast_to_double_vertex(self),
+                      kn.vertex.generated.cast_to_double_vertex(other))
 
     def __radd__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.Addition(other, self)
+        return Double(k.jvm_view().AdditionVertex, None, kn.vertex.generated.cast_to_double_vertex(other),
+                      kn.vertex.generated.cast_to_double_vertex(self))
 
     def __sub__(self, other: vertex_operation_param_types) -> 'Vertex':
         other = cast_to_double_vertex_if_integer_vertex(other)
-        return kn.vertex.generated.Difference(self, other)
+        return Double(k.jvm_view().DifferenceVertex, None, kn.vertex.generated.cast_to_double_vertex(self),
+                      kn.vertex.generated.cast_to_double_vertex(other))
 
     def __rsub__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.Difference(other, self)
+        return Double(k.jvm_view().DifferenceVertex, None, kn.vertex.generated.cast_to_double_vertex(other),
+                      kn.vertex.generated.cast_to_double_vertex(self))
 
     def __mul__(self, other: vertex_operation_param_types) -> 'Vertex':
         other = cast_to_double_vertex_if_integer_vertex(other)
-        return kn.vertex.generated.Multiplication(self, other)
+        return Double(k.jvm_view().MultiplicationVertex, None, kn.vertex.generated.cast_to_double_vertex(self),
+                      kn.vertex.generated.cast_to_double_vertex(other))
 
     def __rmul__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.Multiplication(other, self)
+        return Double(k.jvm_view().MultiplicationVertex, None, kn.vertex.generated.cast_to_double_vertex(other),
+                      kn.vertex.generated.cast_to_double_vertex(self))
 
     def __pow__(self, other: vertex_operation_param_types) -> 'Vertex':
         other = cast_to_double_vertex_if_integer_vertex(other)
-        return kn.vertex.generated.Power(self, other)
+        return Double(k.jvm_view().PowerVertex, None, kn.vertex.generated.cast_to_double_vertex(self),
+                      kn.vertex.generated.cast_to_double_vertex(other))
 
     def __rpow__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.Power(other, self)
+        return Double(k.jvm_view().PowerVertex, None, kn.vertex.generated.cast_to_double_vertex(other),
+                      kn.vertex.generated.cast_to_double_vertex(self))
 
     def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
         other = cast_to_double_vertex_if_integer_vertex(other)
-        return kn.vertex.generated.Division(self, other)
+        return Double(k.jvm_view().DivisionVertex, None, kn.vertex.generated.cast_to_double_vertex(self),
+                      kn.vertex.generated.cast_to_double_vertex(other))
 
     def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.Division(other, self)
+        return Double(k.jvm_view().DivisionVertex, None, kn.vertex.generated.cast_to_double_vertex(other),
+                      kn.vertex.generated.cast_to_double_vertex(self))
 
     def __floordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
         other = cast_to_double_vertex_if_integer_vertex(other)
-        intermediate = kn.vertex.generated.Division(self, other)
+        intermediate = Double(k.jvm_view().DivisionVertex, None, kn.vertex.generated.cast_to_double_vertex(self),
+                              kn.vertex.generated.cast_to_double_vertex(other))
 
-        return kn.vertex.generated.Floor(intermediate)
+        return Double(k.jvm_view().FloorVertex, None, intermediate)
 
     def __rfloordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        intermediate = kn.vertex.generated.Division(other, self)
-        return kn.vertex.generated.Floor(intermediate)
+        intermediate = Double(k.jvm_view().DivisionVertex, None, kn.vertex.generated.cast_to_double_vertex(other),
+                              kn.vertex.generated.cast_to_double_vertex(self))
+        return Double(k.jvm_view().FloorVertex, None, intermediate)
 
     def __eq__(  # type: ignore # see https://github.com/python/mypy/issues/2783
             self, other: vertex_operation_param_types) -> 'Vertex':
@@ -159,18 +204,18 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return kn.vertex.generated.LessThanOrEqual(self, other)
 
     def __abs__(self) -> 'Vertex':
-        return kn.vertex.generated.Abs(self)
+        return Double(k.jvm_view().AbsVertex, None, kn.vertex.generated.cast_to_double_vertex(self))
 
     def __round__(self, ndigits: Optional[int] = 0) -> 'Vertex':
         if ndigits != 0:
             raise NotImplementedError("Keanu only supports rounding to 0 digits")
-        return kn.vertex.generated.Round(self)
+        return Double(k.jvm_view().RoundVertex, None, kn.vertex.generated.cast_to_double_vertex(self))
 
     def __floor__(self) -> 'Vertex':
-        return kn.vertex.generated.Floor(self)
+        return Double(k.jvm_view().FloorVertex, None, kn.vertex.generated.cast_to_double_vertex(self))
 
     def __ceil__(self) -> 'Vertex':
-        return kn.vertex.generated.Ceil(self)
+        return Double(k.jvm_view().CeilVertex, None, kn.vertex.generated.cast_to_double_vertex(self))
 
     @staticmethod
     def __parse_args(args: Tuple[Union[vertex_constructor_param_types, shape_types], ...]) -> List[JavaObject]:
@@ -182,22 +227,33 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             return arg.unwrap()
         elif isinstance(arg, collections.Collection) and all(isinstance(x, runtime_primitive_types) for x in arg):
             return k.to_java_long_array(arg)
-        elif isinstance(arg, runtime_primitive_types) or isinstance(arg, JavaObject):
+        elif isinstance(arg, (runtime_primitive_types, JavaObject, runtime_str_types)):
             return arg
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
+    def _from_java_vertex(java_vertex: JavaObject) -> 'Vertex':
+        ctor = Vertex
+
+        if is_instance_of(k._gateway, java_vertex,
+                          "io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex"):
+            ctor = Double
+        elif is_instance_of(k._gateway, java_vertex,
+                            "io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex"):
+            ctor = Integer
+        elif is_instance_of(k._gateway, java_vertex, "io.improbable.keanu.vertices.tensor.bool.BooleanVertex"):
+            ctor = Boolean
+
+        return ctor(java_vertex, None)
+
+    @staticmethod
     def _to_generator(java_vertices: Union[JavaList, JavaArray]) -> Iterator['Vertex']:
-        return (Vertex(java_vertex) for java_vertex in java_vertices)
+        return (Vertex._from_java_vertex(java_vertex) for java_vertex in java_vertices)
 
     @staticmethod
-    def _get_python_id(java_vertex: JavaObject) -> Tuple[JavaObject, ...]:
+    def _get_python_id(java_vertex: JavaObject) -> Tuple[int, ...]:
         return tuple(java_vertex.getId().getValue())
-
-    @staticmethod
-    def _get_python_label(java_vertex: JavaObject) -> str:
-        return java_vertex.getLabel().getQualifiedName()
 
 
 class Double(Vertex):
@@ -233,64 +289,76 @@ class Integer(Vertex):
     def __op_based_on_other_type(self, other: vertex_operation_param_types, op: Callable,
                                  integer_op_ctr: Callable) -> 'Vertex':
         if is_floating_type(other):
-            # Equivalent to kn.vertex.generated.CastToDouble(self).__add__(other) for add
-            return op(kn.vertex.generated.CastToDouble(self))
+            # Equivalent to kn.vertex.generated.CastNumberToDouble(self).__add__(other) for add
+            return op(kn.vertex.generated.CastNumberToDouble(self))
         else:
             return integer_op_ctr(other)
 
     def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
-            other, lambda casted_to_double: casted_to_double.__add__(other),
-            lambda other_holder: kn.vertex.generated.IntegerAddition(self, other_holder))
+            other, lambda casted_to_double: casted_to_double.__add__(other), lambda other_holder: Integer(
+                k.jvm_view().AdditionVertex, None, kn.vertex.generated.cast_to_integer_vertex(self),
+                kn.vertex.generated.cast_to_integer_vertex(other_holder)))
 
     def __radd__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
-            other, lambda casted_to_double: casted_to_double.__radd__(other),
-            lambda other_holder: kn.vertex.generated.IntegerAddition(other_holder, self))
+            other, lambda casted_to_double: casted_to_double.__radd__(other), lambda other_holder: Integer(
+                k.jvm_view().AdditionVertex, None, kn.vertex.generated.cast_to_integer_vertex(other_holder),
+                kn.vertex.generated.cast_to_integer_vertex(self)))
 
     def __sub__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
-            other, lambda casted_to_double: casted_to_double.__sub__(other),
-            lambda other_holder: kn.vertex.generated.IntegerDifference(self, other_holder))
+            other, lambda casted_to_double: casted_to_double.__sub__(other), lambda other_holder: Integer(
+                k.jvm_view().DifferenceVertex, None, kn.vertex.generated.cast_to_integer_vertex(self),
+                kn.vertex.generated.cast_to_integer_vertex(other_holder)))
 
     def __rsub__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
-            other, lambda casted_to_double: casted_to_double.__rsub__(other),
-            lambda other_holder: kn.vertex.generated.IntegerDifference(other_holder, self))
+            other, lambda casted_to_double: casted_to_double.__rsub__(other), lambda other_holder: Integer(
+                k.jvm_view().DifferenceVertex, None, kn.vertex.generated.cast_to_integer_vertex(other_holder),
+                kn.vertex.generated.cast_to_integer_vertex(self)))
 
     def __mul__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
-            other, lambda casted_to_double: casted_to_double.__mul__(other),
-            lambda other_holder: kn.vertex.generated.IntegerMultiplication(self, other_holder))
+            other, lambda casted_to_double: casted_to_double.__mul__(other), lambda other_holder: Integer(
+                k.jvm_view().MultiplicationVertex, None, kn.vertex.generated.cast_to_integer_vertex(self),
+                kn.vertex.generated.cast_to_integer_vertex(other_holder)))
 
     def __rmul__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
-            other, lambda casted_to_double: casted_to_double.__rmul__(other),
-            lambda other_holder: kn.vertex.generated.IntegerMultiplication(other_holder, self))
+            other, lambda casted_to_double: casted_to_double.__rmul__(other), lambda other_holder: Integer(
+                k.jvm_view().MultiplicationVertex, None, kn.vertex.generated.cast_to_integer_vertex(other_holder),
+                kn.vertex.generated.cast_to_integer_vertex(self)))
 
     def __pow__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return self.__op_based_on_other_type(other, lambda casted_to_double: casted_to_double.__pow__(other),
-                                             lambda other_holder: kn.vertex.generated.IntegerPower(self, other_holder))
+        return self.__op_based_on_other_type(
+            other, lambda casted_to_double: casted_to_double.__pow__(other), lambda other_holder: Integer(
+                k.jvm_view().PowerVertex, None, kn.vertex.generated.cast_to_integer_vertex(self),
+                kn.vertex.generated.cast_to_integer_vertex(other_holder)))
 
     def __rpow__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return self.__op_based_on_other_type(other, lambda casted_to_double: casted_to_double.__rpow__(other),
-                                             lambda other_holder: kn.vertex.generated.IntegerPower(other_holder, self))
+        return self.__op_based_on_other_type(
+            other, lambda casted_to_double: casted_to_double.__rpow__(other), lambda other_holder: Integer(
+                k.jvm_view().PowerVertex, None, kn.vertex.generated.cast_to_integer_vertex(other_holder),
+                kn.vertex.generated.cast_to_integer_vertex(self)))
 
     def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.CastToDouble(self).__truediv__(other)
+        return kn.vertex.generated.CastNumberToDouble(self).__truediv__(other)
 
     def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.CastToDouble(self).__rtruediv__(other)
+        return kn.vertex.generated.CastNumberToDouble(self).__rtruediv__(other)
 
     def __floordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
-            other, lambda casted_to_double: casted_to_double.__truediv__(other).__floor__(),
-            lambda other_holder: kn.vertex.generated.IntegerDivision(self, other_holder))
+            other, lambda casted_to_double: casted_to_double.__truediv__(other).__floor__(), lambda other_holder:
+            Integer(k.jvm_view().DivisionVertex, None, kn.vertex.generated.cast_to_integer_vertex(self),
+                    kn.vertex.generated.cast_to_integer_vertex(other_holder)))
 
     def __rfloordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
         return self.__op_based_on_other_type(
-            other, lambda casted_to_double: casted_to_double.__rtruediv__(other).__floor__(),
-            lambda other_holder: kn.vertex.generated.IntegerDivision(other_holder, self))
+            other, lambda casted_to_double: casted_to_double.__rtruediv__(other).__floor__(), lambda other_holder:
+            Integer(k.jvm_view().DivisionVertex, None, kn.vertex.generated.cast_to_integer_vertex(other_holder),
+                    kn.vertex.generated.cast_to_integer_vertex(self)))
 
 
 class Boolean(Vertex):
@@ -331,5 +399,5 @@ def is_floating_type(other: vertex_operation_param_types) -> bool:
 
 def cast_to_double_vertex_if_integer_vertex(vertex: vertex_operation_param_types) -> vertex_operation_param_types:
     if type(vertex) == Integer:
-        return kn.vertex.generated.CastToDouble(vertex)
+        return kn.vertex.generated.CastNumberToDouble(vertex)
     return vertex

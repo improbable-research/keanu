@@ -1,15 +1,13 @@
 package io.improbable.keanu.vertices;
 
-import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface Probabilistic<T> extends Observable<T> {
+public interface Probabilistic<T> extends Observable<T>, Samplable<T> {
 
     /**
      * This is the natural log of the probability at the supplied value. In the
@@ -52,13 +50,4 @@ public interface Probabilistic<T> extends Observable<T> {
         return dLogProb(getValue(), withRespectTo);
     }
 
-    static <V extends Vertex & Probabilistic> List<V> keepOnlyProbabilisticVertices(Iterable<? extends Vertex> vertices) {
-        ImmutableList.Builder<V> probabilisticVertices = ImmutableList.builder();
-        for (Vertex v : vertices) {
-            if (v instanceof Probabilistic) {
-                probabilisticVertices.add((V) v);
-            }
-        }
-        return probabilisticVertices.build();
-    }
 }

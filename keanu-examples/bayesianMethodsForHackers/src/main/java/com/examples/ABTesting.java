@@ -4,11 +4,11 @@ import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexSamples;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 
 import java.util.Arrays;
 
@@ -42,7 +42,7 @@ public class ABTesting {
         //infer the most probable probabilities
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(probabilityA.getConnectedGraph());
         int sampleCount = 100;
-        NetworkSamples networkSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+        NetworkSamples networkSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig()
             .getPosteriorSamples(model, Arrays.asList(probabilityA, probabilityB, delta), sampleCount)
             .drop(sampleCount/2).downSample(model.getLatentVariables().size());
 

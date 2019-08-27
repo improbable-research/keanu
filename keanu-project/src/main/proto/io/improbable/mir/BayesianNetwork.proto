@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package mir;
+
+option java_package = "io.improbable.mir";
+option java_outer_classname = "KeanuSavedBayesNet";
+
+import "io/improbable/mir/BayesNet.proto";
+
+message ProtoModel {
+    Graph graph = 1;
+    ModelMetadata metadata = 2;
+}
+
+message ModelMetadata {
+    map<string, string> metadataInfo = 1;
+}

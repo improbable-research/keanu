@@ -1,11 +1,10 @@
 package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.variational.optimizer.HasShape;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 
-public interface SamplableWithManyScalars<T extends Tensor<?>> extends Samplable<T>, SamplableWithShape<T>, HasShape {
+public interface SamplableWithManyScalars<T extends Tensor<?, T>> extends Samplable<T>, SamplableWithShape<T>, HasShape {
 
     default T sampleManyScalars(long[] shape, KeanuRandom random) {
         TensorShapeValidation.checkTensorsAreScalar("Cannot sample many scalars from a non-scalar vertex", this.getShape());

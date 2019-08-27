@@ -6,7 +6,6 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.RollbackAndCascadeOnRejection;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
-import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
@@ -89,7 +88,7 @@ public class LinearRidgeRegressionTest {
             .withPriorOnWeightsAndIntercept(0, 0.00001)
             .build();
 
-        assertThat(linearRegressionModelNarrow.getWeightVertex().getValue().pow(2).sum(), lessThan(linearRegressionModelWide.getWeightVertex().getValue().pow(2).sum()));
+        assertThat(linearRegressionModelNarrow.getWeightVertex().getValue().pow(2).sumNumber(), lessThan(linearRegressionModelWide.getWeightVertex().getValue().pow(2).sumNumber()));
 
     }
 
@@ -101,12 +100,10 @@ public class LinearRidgeRegressionTest {
 
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData(smallRawDataSize);
 
-        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(0.25));
-
         SamplingModelFitting sampling = new SamplingModelFitting(model -> MetropolisHastings.builder()
-            .proposalDistribution(proposalDistribution)
+            .proposalDistribution(new GaussianProposalDistribution(model.getLatentVariables(), DoubleTensor.scalar(0.25)))
             .variableSelector(MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR)
-            .rejectionStrategy(new RollbackAndCascadeOnRejection(model.getLatentVertices()))
+            .rejectionStrategy(new RollbackAndCascadeOnRejection())
             .build(),
             samplingCount);
 

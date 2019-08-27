@@ -1,178 +1,165 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.ConjugateGradient;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
-import io.improbable.keanu.model.regression.RegressionModel;
-import io.improbable.keanu.model.regression.RegressionRegularization;
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.util.csv.ReadCsv;
-import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
-import org.junit.Assert;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.HalfCauchyVertex;
+import lombok.Value;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.core.AllOf.allOf;
 
+/*
+ * Implementation of https://docs.pymc.io/notebooks/GLM-hierarchical.html
+ */
 public class RadonHierarchicalRegression {
 
     @Rule
     public DeterministicRule rule = new DeterministicRule();
 
-    private List<Data> radonData;
+    private Map<String, List<Data>> radonData;
 
     @Before
     public void readRadonCSV() {
         radonData = ReadCsv.fromResources("data/datasets/radon/radon.csv")
             .asRowsDefinedBy(Data.class)
-            .load(true);
+            .load(true)
+            .stream()
+            .collect(Collectors.groupingBy(d -> d.county));
     }
 
     @Test
-    public void canPerformSimpleLinearRegression() {
-        RegressionModel model = linearRegression(radonData);
-        assertThat(model.getWeightVertex().getValue().scalar(), both(greaterThan(-0.7)).and(lessThan(-0.4)));
-        assertThat(model.getInterceptVertex().getValue().scalar(), both(greaterThan(1.2)).and(lessThan(1.5)));
+    @Category(Slow.class)
+    @Ignore("Ignoring this until we can run a large enough version of this quickly enough to be useful")
+    public void canPerformRegressionWithEightHierarchies() {
+        buildAndRunHierarchicalNetwork(radonData, 8);
     }
 
-    @Test
-    public void canPerformRegressionWithOneHierarchy() {
-        buildAndRunHeirarchicalNetwork(radonData, 1);
-    }
+    public void buildAndRunHierarchicalNetwork(Map<String, List<Data>> radonData, int numberOfModels) {
 
-    @Test
-    public void canPerformRegressionWithTwoHierarchies() {
-        buildAndRunHeirarchicalNetwork(radonData, 2);
-    }
-
-    @Test
-    public void canPerformRegressionWithFourHierarchies() {
-        buildAndRunHeirarchicalNetwork(radonData, 4);
-    }
-
-    @Test
-    public void canPerformRegressionWithTenHierarchies() {
-        buildAndRunHeirarchicalNetwork(radonData, 10);
-    }
-
-    private RegressionModel linearRegression(List<Data> data) {
-        double[] radon = data.stream().mapToDouble(k -> k.log_radon).toArray();
-        double[] floor = data.stream().mapToDouble(k -> k.floor).toArray();
-        DoubleTensor y = DoubleTensor.create(radon, radon.length, 1);
-        DoubleTensor x = DoubleTensor.create(floor, floor.length, 1);
-
-        RegressionModel model = RegressionModel.
-            withTrainingData(x, y).
-            withRegularization(RegressionRegularization.RIDGE).
-            withPriorOnWeights(0., 5.).
-            withPriorOnIntercept(0., 5.).
-            build();
-
-        return model;
-    }
-
-    private void buildAndRunHeirarchicalNetwork(List<Data> radonData, int numberOfModels) {
-        GaussianVertex muAlpha = new GaussianVertex(new long[]{1, 1}, 0, 100).setLabel("MuIntercept");
-        GaussianVertex muBeta = new GaussianVertex(new long[]{1, 1}, 0, 100).setLabel("MuGradient");
-
-        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(new long[]{1, 1}, 10.).setLabel("SigmaIntercept");
-        HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(new long[]{1, 1}, 10.).setLabel("SigmaGradient");
-
-        int numPartitions = radonData.size() / numberOfModels;
-
-        double[] allFloor = radonData.stream().mapToDouble(k -> k.floor).toArray();
-        double[] allRadon = radonData.stream().mapToDouble(k -> k.log_radon).toArray();
-
-        List<RegressionModel> models = new ArrayList<>();
-
-        for (int i = 0; i < numberOfModels; i++) {
-            RegressionModel model = createSubModel(allFloor, allRadon, i, numPartitions, muBeta, muAlpha, sigmaBeta, sigmaAlpha);
-            models.add(model);
+        if (numberOfModels > radonData.size()) {
+            throw new IllegalArgumentException("Not enough data for " + numberOfModels + " models!");
         }
 
-        //Set the starting values of the parent random variables
-        //This is required for the optimiser to find the correct values of the sub models latents
-        muAlpha.setValue(1.);
-        sigmaAlpha.setValue(0.5);
+        DoubleVertex muIntercept = new GaussianVertex(0, 1.0).setLabel("MuIntercept");
+        DoubleVertex muGradient = new GaussianVertex(0, 1.0).setLabel("MuGradient");
 
-        muBeta.setValue(-1.);
-        sigmaBeta.setValue(0.5);
+        DoubleVertex sigmaIntercept = new HalfCauchyVertex(1.0).setLabel("SigmaIntercept");
+        DoubleVertex sigmaGradient = new HalfCauchyVertex(1.0).setLabel("SigmaGradient");
 
-        optimise(new BayesianNetwork(muAlpha.getConnectedGraph()), models);
+        DoubleVertex eps = new HalfCauchyVertex(1.0).setLabel("Eps");
+
+        final List<SubModel> models = radonData.keySet().stream()
+            .sorted()
+            .limit(numberOfModels)
+            .map(county -> createSubModel(radonData.get(county), muGradient, muIntercept, sigmaGradient, sigmaIntercept, eps))
+            .collect(Collectors.toList());
+
+        BayesianNetwork net = new BayesianNetwork(muIntercept.getConnectedGraph());
+
+        final NetworkSamples samples = sampleWithNUTS(net, Arrays.asList(muIntercept, muGradient, sigmaIntercept, sigmaGradient, eps));
+
+        assertSampleAveragesAreCorrect(muIntercept, muGradient, sigmaIntercept, sigmaGradient, eps, models, samples);
     }
 
-    private RegressionModel createSubModel(double[] allFloor,
-                                           double[] allRadon,
-                                           int i,
-                                           int size,
-                                           DoubleVertex muGradient,
-                                           DoubleVertex muIntercept,
-                                           DoubleVertex sigmaGradient,
-                                           DoubleVertex sigmaIntercept) {
+    private SubModel createSubModel(List<Data> data,
+                                    DoubleVertex muGradient,
+                                    DoubleVertex muIntercept,
+                                    DoubleVertex sigmaGradient,
+                                    DoubleVertex sigmaIntercept,
+                                    DoubleVertex eps) {
 
-        int startIndex = size * i;
-        int endIndex = size * (i + 1);
+        double[] floorForSubModel = data.stream().mapToDouble(d -> d.floor).toArray();
+        double[] radonForSubModel = data.stream().mapToDouble(d -> d.log_radon).toArray();
 
-        double[] floorForSubModel = Arrays.copyOfRange(allFloor, startIndex, endIndex);
-        double[] radonForSubModel = Arrays.copyOfRange(allRadon, startIndex, endIndex);
+        DoubleVertex x = ConstantVertex.of(DoubleTensor.create(floorForSubModel, floorForSubModel.length));
 
-        DoubleTensor x = DoubleTensor.create(floorForSubModel, floorForSubModel.length, 1);
-        DoubleTensor y = DoubleTensor.create(radonForSubModel, floorForSubModel.length, 1);
+        DoubleVertex gradient = new GaussianVertex(muGradient, sigmaGradient);
+        DoubleVertex intercept = new GaussianVertex(muIntercept, sigmaIntercept);
 
-        RegressionModel model = RegressionModel.
-            withTrainingData(x, y).
-            withRegularization(RegressionRegularization.RIDGE).
-            withPriorOnWeights(muGradient, sigmaGradient).
-            withPriorOnIntercept(muIntercept, sigmaIntercept).
-            buildWithoutFitting();
+        DoubleVertex y = x.times(gradient).plus(intercept);
 
-        return model;
+        DoubleVertex yObs = new GaussianVertex(y, eps);
+        yObs.observe(DoubleTensor.create(radonForSubModel, floorForSubModel.length));
+
+        return new SubModel(gradient, intercept);
     }
 
-    private void optimise(BayesianNetwork bayesianNetwork, List<RegressionModel> models) {
-        bayesianNetwork.probeForNonZeroProbability(100);
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(bayesianNetwork)
-            .algorithm(ConjugateGradient.builder()
-                .absoluteThreshold(0.25)
-                .maxEvaluations(10000)
-                .build()
-            ).build();
-        optimizer.maxAPosteriori();
+    private NetworkSamples sampleWithNUTS(BayesianNetwork bayesianNetwork, List<Vertex> sampleFrom) {
 
-        assertValuesAreCorrect(bayesianNetwork, models);
+        int sampleCount = 1000;
+        KeanuProbabilisticModelWithGradient probabilisticModel = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
+        return NUTS.builder()
+            .adaptCount(sampleCount)
+            .maxTreeHeight(8)
+            .build()
+            .getPosteriorSamples(probabilisticModel, sampleFrom, sampleCount)
+            .drop(sampleCount / 4);
     }
 
-    private void assertValuesAreCorrect(BayesianNetwork bayesianNetwork, List<RegressionModel> models) {
-        DoubleVertex muIntercept = (DoubleVertex) bayesianNetwork.getVertexByLabel(new VertexLabel("MuIntercept"));
-        DoubleVertex muGradient = (DoubleVertex) bayesianNetwork.getVertexByLabel(new VertexLabel("MuGradient"));
-        DoubleVertex sigmaIntercept = (DoubleVertex) bayesianNetwork.getVertexByLabel(new VertexLabel("SigmaIntercept"));
-        DoubleVertex sigmaGradient = (DoubleVertex) bayesianNetwork.getVertexByLabel(new VertexLabel("SigmaGradient"));
+    private void assertSampleAveragesAreCorrect(final DoubleVertex muIntercept,
+                                                final DoubleVertex muGradient,
+                                                final DoubleVertex sigmaIntercept,
+                                                final DoubleVertex sigmaGradient,
+                                                final DoubleVertex eps,
+                                                final List<SubModel> models,
+                                                final NetworkSamples samples) {
 
-        Assert.assertTrue(-0.4 > muGradient.getValue().scalar() && muGradient.getValue().scalar() > -0.9);
-        Assert.assertTrue(1.8 > muIntercept.getValue().scalar() && muIntercept.getValue().scalar() > 1.2);
+        double averagePosteriorMuIntercept = samples.getDoubleTensorSamples(muIntercept).getAverages().scalar();
+        double averagePosteriorSigmaIntercept = samples.getDoubleTensorSamples(sigmaIntercept).getAverages().scalar();
+        double averagePosteriorMuGradient = samples.getDoubleTensorSamples(muGradient).getAverages().scalar();
+        double averagePosteriorSigmaGradient = samples.getDoubleTensorSamples(sigmaGradient).getAverages().scalar();
+        double averagePosteriorEps = samples.getDoubleTensorSamples(eps).getAverages().scalar();
 
-        Assert.assertTrue(0.5 > sigmaGradient.getValue().scalar() && sigmaGradient.getValue().scalar() > 0.);
-        Assert.assertTrue(0.5 > sigmaIntercept.getValue().scalar() && sigmaIntercept.getValue().scalar() > 0.);
+        //-0.65
+        assertThat(averagePosteriorMuGradient, allOf(greaterThan(-0.9), lessThan(-0.4)));
 
-        for (RegressionModel subModel : models) {
+        //1.49
+        assertThat(averagePosteriorMuIntercept, allOf(greaterThan(1.2), lessThan(1.8)));
+
+        //0.3
+        assertThat(averagePosteriorSigmaGradient, allOf(greaterThan(0.), lessThan(0.5)));
+
+        //0.325
+        assertThat(averagePosteriorSigmaIntercept, allOf(greaterThan(0.), lessThan(0.5)));
+
+        //0.72
+        assertThat(averagePosteriorEps, allOf(greaterThan(0.6), lessThan(0.8)));
+
+        for (SubModel subModel : models) {
             double weight = subModel.getWeightVertex().getValue().scalar();
             double intercept = subModel.getInterceptVertex().getValue().scalar();
-            Assert.assertTrue(-0.0 > weight && weight > -1.5);
-            Assert.assertTrue(2. > intercept && intercept > 1.);
+            assertThat(weight, both(greaterThan(-3.0)).and(lessThan(1.0)));
+            assertThat(intercept, both(greaterThan(0.)).and(lessThan(3.0)));
         }
+    }
+
+    @Value
+    public static class SubModel {
+        DoubleVertex weightVertex;
+        DoubleVertex interceptVertex;
     }
 
     public static class Data {
@@ -180,5 +167,4 @@ public class RadonHierarchicalRegression {
         public double log_radon;
         public double floor;
     }
-
 }

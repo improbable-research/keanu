@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 
 public class SimpleVertexDictionary implements VertexDictionary {
 
-    private final Map<VertexLabel, Vertex<?>> dictionary;
+    private final Map<VertexLabel, Vertex<?, ?>> dictionary;
 
-    private SimpleVertexDictionary(Map<VertexLabel, Vertex<?>> dictionary) {
+    private SimpleVertexDictionary(Map<VertexLabel, Vertex<?, ?>> dictionary) {
         this.dictionary = dictionary;
     }
 
     public static SimpleVertexDictionary combine(SimpleVertexDictionary dictionary, SimpleVertexDictionary dictionary2) {
-        ImmutableMap<VertexLabel, Vertex<?>> combinedDictionary = ImmutableMap.<VertexLabel, Vertex<?>>builder()
+        ImmutableMap<VertexLabel, Vertex<?, ?>> combinedDictionary = ImmutableMap.<VertexLabel, Vertex<?, ?>>builder()
             .putAll(dictionary.dictionary)
             .putAll(dictionary2.dictionary)
             .build();
@@ -24,29 +24,29 @@ public class SimpleVertexDictionary implements VertexDictionary {
     }
 
     @Override
-    public <V extends Vertex<?>> V get(VertexLabel label) {
+    public <V extends Vertex<?, ?>> V get(VertexLabel label) {
         return (V) dictionary.get(label);
     }
 
     @Override
-    public VertexDictionary withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
+    public VertexDictionary withExtraEntries(Map<VertexLabel, Vertex<?, ?>> extraEntries) {
         return SimpleVertexDictionary.backedBy(dictionary, extraEntries);
     }
 
-    public static SimpleVertexDictionary backedBy(Map<VertexLabel, Vertex<?>> dictionary) {
+    public static SimpleVertexDictionary backedBy(Map<VertexLabel, Vertex<?, ?>> dictionary) {
         return new SimpleVertexDictionary(dictionary);
     }
 
-    public static SimpleVertexDictionary backedBy(Map<VertexLabel, Vertex<?>> first, Map<VertexLabel, Vertex<?>> second) {
+    public static SimpleVertexDictionary backedBy(Map<VertexLabel, Vertex<?, ?>> first, Map<VertexLabel, Vertex<?, ?>> second) {
         return SimpleVertexDictionary.backedBy(
-            ImmutableMap.<VertexLabel, Vertex<?>>builder()
+            ImmutableMap.<VertexLabel, Vertex<?, ?>>builder()
                 .putAll(first)
                 .putAll(second)
                 .build());
     }
 
-    public static SimpleVertexDictionary of(Vertex<?>... vertices) {
-        Map<VertexLabel, Vertex<?>> dictionary = Arrays.stream(vertices).collect(Collectors.toMap(Vertex::getLabel, v -> v));
+    public static SimpleVertexDictionary of(Vertex<?, ?>... vertices) {
+        Map<VertexLabel, Vertex<?, ?>> dictionary = Arrays.stream(vertices).collect(Collectors.toMap(Vertex::getLabel, v -> v));
         return backedBy(dictionary);
     }
 }

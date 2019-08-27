@@ -4,7 +4,8 @@ import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,7 @@ public class KeanuProbabilisticModelWithGradient extends KeanuProbabilisticModel
     public KeanuProbabilisticModelWithGradient(BayesianNetwork bayesianNetwork) {
         super(bayesianNetwork);
 
-        List<Vertex<DoubleTensor>> continuousLatentVertices = bayesianNetwork.getContinuousLatentVertices();
+        List<DoubleVertex> continuousLatentVertices = bayesianNetwork.getContinuousLatentVertices();
 
         this.logProbGradientCalculator = new LogProbGradientCalculator(
             bayesianNetwork.getLatentOrObservedVertices(),
@@ -39,26 +40,26 @@ public class KeanuProbabilisticModelWithGradient extends KeanuProbabilisticModel
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
+    public Map<VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
         return gradients(inputs, logProbGradientCalculator);
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logProbGradients() {
+    public Map<VariableReference, DoubleTensor> logProbGradients() {
         return logProbGradients(null);
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
+    public Map<VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
         return gradients(inputs, logLikelihoodGradientCalculator);
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients() {
+    public Map<VariableReference, DoubleTensor> logLikelihoodGradients() {
         return logLikelihoodGradients(null);
     }
 
-    private Map<? extends VariableReference, DoubleTensor> gradients(Map<VariableReference, ?> inputs, LogProbGradientCalculator gradientCalculator) {
+    private Map gradients(Map<VariableReference, ?> inputs, LogProbGradientCalculator gradientCalculator) {
         if (inputs != null && !inputs.isEmpty()) {
             cascadeValues(inputs);
         }

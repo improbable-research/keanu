@@ -2,11 +2,12 @@ package io.improbable.keanu.vertices;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
@@ -51,14 +52,14 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-            PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+            ForwardModePartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
             autoDiffCount.incrementAndGet();
             return derivativeOfParentWithRespectToInputs;
         }
 
         @Override
-        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
             autoDiffCount.incrementAndGet();
             return Collections.singletonMap(inputVertex, derivativeOfOutputWithRespectToSelf);
         }
@@ -68,7 +69,7 @@ public class TestGraphGenerator {
         return new PassThroughVertex(from, opCount, autoDiffCount, onOp);
     }
 
-    public static class SumVertex extends DoubleBinaryOpVertex implements Differentiable {
+    public static class SumVertex extends DoubleBinaryOpVertex implements Differentiable, NonSaveableVertex {
 
         private final AtomicInteger opCount;
         private final AtomicInteger autoDiffCount;
@@ -83,7 +84,7 @@ public class TestGraphGenerator {
             this.onOp = onOp;
         }
 
-        public SumVertex(@LoadVertexParam("left")DoubleVertex left, @LoadVertexParam("right")DoubleVertex right) {
+        public SumVertex(@LoadVertexParam("left") DoubleVertex left, @LoadVertexParam("right") DoubleVertex right) {
             super(left, right);
             this.opCount = new AtomicInteger();
             this.autoDiffCount = new AtomicInteger();
@@ -98,17 +99,17 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-            PartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
-            PartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
+        public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+            ForwardModePartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, ForwardModePartialDerivative.EMPTY);
+            ForwardModePartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, ForwardModePartialDerivative.EMPTY);
             autoDiffCount.incrementAndGet();
-            return dLeftWrtInput.add(dRightWrtInput);
+            return dLeftWrtInput.add(dRightWrtInput, this.getShape());
         }
 
         @Override
-        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
             autoDiffCount.incrementAndGet();
-            Map<Vertex, PartialDerivative> partials = new HashMap<>();
+            Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
             partials.put(left, derivativeOfOutputWithRespectToSelf);
             partials.put(right, derivativeOfOutputWithRespectToSelf);
             return partials;

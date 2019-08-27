@@ -4,4 +4,6 @@ include 'keanu-project',
     'benchmarks',
     'keanu-python',
     'keanu-examples:coalMiningDisasters',
-    'keanu-examples:bayesianMethodsForHackers'
+    'keanu-examples:customDistribution',
+    'keanu-examples:bayesianMethodsForHackers',
+    'keanu-python:nd4j'

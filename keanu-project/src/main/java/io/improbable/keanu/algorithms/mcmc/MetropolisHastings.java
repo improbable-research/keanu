@@ -6,8 +6,10 @@ import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.ProbabilisticModel;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
+import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.util.status.StatusBar;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,33 +21,33 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
 /**
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
  */
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
 
     @Getter
-    private KeanuRandom random;
+    private final KeanuRandom random;
 
     @Getter
     @NonNull
-    private ProposalDistribution proposalDistribution;
+    private final ProposalDistribution proposalDistribution;
 
     @Getter
-    private MHStepVariableSelector variableSelector;
+    private final MHStepVariableSelector variableSelector;
 
     @Getter
     @NonNull
-    private ProposalRejectionStrategy rejectionStrategy;
+    private final ProposalRejectionStrategy rejectionStrategy;
 
     public static MetropolisHastingsBuilder builder() {
         return new MetropolisHastingsBuilder();
     }
 
     /**
-     * @param model      a probabilistic model containing latent variables
+     * @param model                 a probabilistic model containing latent variables
      * @param variablesToSampleFrom the variables to include in the returned samples
-     * @param sampleCount          number of samples to take using the algorithm
+     * @param sampleCount           number of samples to take using the algorithm
      * @return Samples for each variable ordered by MCMC iteration
      */
     @Override
@@ -78,12 +80,9 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     public static class MetropolisHastingsBuilder {
         private KeanuRandom random = KeanuRandom.getDefaultRandom();
-        private ProposalDistribution proposalDistribution;
+        private ProposalDistribution proposalDistribution = new PriorProposalDistribution();
         private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
-        private ProposalRejectionStrategy rejectionStrategy;
-
-        MetropolisHastingsBuilder() {
-        }
+        private ProposalRejectionStrategy rejectionStrategy = new RollBackToCachedValuesOnRejection();
 
         public MetropolisHastingsBuilder random(KeanuRandom random) {
             this.random = random;

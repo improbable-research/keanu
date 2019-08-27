@@ -6,6 +6,9 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerPlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -17,7 +20,7 @@ public class Poisson implements DiscreteDistribution {
 
     private final DoubleTensor mu;
 
-    public static DiscreteDistribution withParameters(DoubleTensor mu) {
+    public static Poisson withParameters(DoubleTensor mu) {
         return new Poisson(mu);
     }
 
@@ -29,10 +32,11 @@ public class Poisson implements DiscreteDistribution {
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
 
+        long muLength = muWrapped.size();
         int length = TensorShape.getLengthAsInt(shape);
         int[] samples = new int[length];
         for (int i = 0; i < length; i++) {
-            samples[i] = sample(muWrapped.getOrScalar(i), random);
+            samples[i] = sample(muWrapped.get(i % muLength), random);
         }
 
         return IntegerTensor.create(samples, shape);
@@ -80,5 +84,23 @@ public class Poisson implements DiscreteDistribution {
         DoubleTensor logFactorialK = kDouble.plus(1).logGammaInPlace();
 
         return kDouble.timesInPlace(mu.log()).minusInPlace(mu).minusInPlace(logFactorialK);
+    }
+
+    public static DoubleVertex logProbOutput(IntegerPlaceholderVertex k, DoublePlaceholderVertex mu) {
+
+        DoubleVertex kDouble = k.toDouble();
+        DoubleVertex logFactorialK = kDouble.plus(1).logGamma();
+
+        return kDouble.times(mu.log()).minus(mu).minus(logFactorialK);
+    }
+
+    public DoubleTensor[] dLogProb(IntegerTensor k, boolean wrtMu) {
+        DoubleTensor[] result = new DoubleTensor[1];
+
+        if (wrtMu) {
+            result[0] = k.toDouble().div(mu).minusInPlace(1.0);
+        }
+
+        return result;
     }
 }

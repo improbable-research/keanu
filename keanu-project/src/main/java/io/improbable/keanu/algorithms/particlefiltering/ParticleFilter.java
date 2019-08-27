@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 
 /***
  * This class allows you to create particle filters to find likely states of a network (i.e. Particles)
@@ -34,6 +36,7 @@ public class ParticleFilter {
 
     /**
      * Creates a {@link ParticleFilterBuilder} by retrieving connected graph from the vertex
+     *
      * @param vertex vertex to retrieve connected graph from
      * @return this
      */
@@ -43,7 +46,7 @@ public class ParticleFilter {
 
     public static ParticleFilterBuilder ofGraph(Collection<? extends Vertex> vertices) {
         return new ParticleFilterBuilder(vertices);
-    };
+    }
 
     public ParticleFilter(Collection<? extends Vertex> vertices,
                           int numParticles,
@@ -80,7 +83,7 @@ public class ParticleFilter {
         List<Particle> particles = createEmptyParticles(this.numParticles);
 
         for (int i = 0; i < observedVertexOrder.size(); i++) {
-            Vertex<?> nextObsVertex = observedVertexOrder.get(i);
+            Vertex<?, ?> nextObsVertex = observedVertexOrder.get(i);
             Set<Vertex> vertexDeps = obsVertIncrDependencies.get(nextObsVertex);
             particles = updateParticles(nextObsVertex, vertexDeps, particles);
         }
@@ -88,9 +91,9 @@ public class ParticleFilter {
         this.particles = particles;
     }
 
-    private List<Particle> updateParticles(Vertex<?> nextObservedVertex,
-                                                  Set<Vertex> vertexDeps,
-                                                  List<Particle> particles) {
+    private List<Particle> updateParticles(Vertex<?, ?> nextObservedVertex,
+                                           Set<Vertex> vertexDeps,
+                                           List<Particle> particles) {
 
         List<Particle> updatedParticles = sampleAndCopy(particles, numParticles);
         addObservedVertexToParticles(updatedParticles, nextObservedVertex, vertexDeps);
@@ -118,12 +121,12 @@ public class ParticleFilter {
     }
 
     private void addObservedVertexToParticles(List<Particle> particles,
-                                                     Vertex<?> observedVertex,
-                                                     Set<Vertex> vertexDependencies) {
+                                              Vertex<?, ?> observedVertex,
+                                              Set<Vertex> vertexDependencies) {
 
         for (Particle particle : particles) {
             particle.addObservedVertex(observedVertex);
-            for (Vertex<?> latentVertex : vertexDependencies) {
+            for (Vertex<?, ?> latentVertex : vertexDependencies) {
                 sampleValueAndAddToParticle(latentVertex, particle);
             }
 
@@ -131,8 +134,8 @@ public class ParticleFilter {
         }
     }
 
-    private <T> void sampleValueAndAddToParticle(Vertex<T> vertex, Particle particle) {
-        T sample = vertex.sample(random);
+    private <T> void sampleValueAndAddToParticle(Vertex<T, ?> vertex, Particle particle) {
+        T sample = ((Probabilistic<T>) vertex).sample(random);
         particle.addLatentVertex(vertex, sample);
     }
 
@@ -169,4 +172,5 @@ public class ParticleFilter {
 
         return p;
     }
+
 }

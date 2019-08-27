@@ -2,15 +2,14 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,7 +44,7 @@ public class SimulatedAnnealingTest {
         network.probeForNonZeroProbability(100, random);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(network);
 
-        NetworkState maxAPosterioriSamples = Keanu.Sampling.SimulatedAnnealing.withDefaultConfigFor(model, random).getMaxAPosteriori(model, 10000);
+        NetworkState maxAPosterioriSamples = Keanu.Sampling.SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(model, 10000);
         NetworkState maxValuesFromVariational = findMAPWithOptimizer();
 
         assertEquals(maxValuesFromVariational.get(A).scalar(), maxAPosterioriSamples.get(A).scalar(), 0.05);
@@ -56,7 +55,7 @@ public class SimulatedAnnealingTest {
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         network.probeForNonZeroProbability(100, random);
 
-        GradientOptimizer graphOptimizer = KeanuOptimizer.Gradient.of(network);
+        GradientOptimizer graphOptimizer = Keanu.Optimizer.Gradient.of(network);
         graphOptimizer.maxAPosteriori();
 
         return new SimpleNetworkState(network.getLatentVertices().stream()

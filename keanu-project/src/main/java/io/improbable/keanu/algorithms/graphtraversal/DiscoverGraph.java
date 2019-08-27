@@ -25,27 +25,27 @@ public class DiscoverGraph {
      * @return a set containing EVERY vertex in a graph that the
      * starting vertex is apart of.
      */
-    public static Set<Vertex> getEntireGraph(Vertex<?> initialVertex) {
+    public static Set<Vertex> getEntireGraph(Vertex<?, ?> initialVertex) {
 
         Set<Vertex> discoveredGraph = new HashSet<>();
 
-        Deque<Vertex<?>> stack = new ArrayDeque<>();
+        Deque<Vertex<?, ?>> stack = new ArrayDeque<>();
 
         discoveredGraph.add(initialVertex);
         stack.addFirst(initialVertex);
 
         while (!stack.isEmpty()) {
 
-            Vertex<?> visiting = stack.removeFirst();
+            Vertex<?, ?> visiting = stack.removeFirst();
 
-            for (Vertex<?> child : visiting.getChildren()) {
+            for (Vertex<?, ?> child : visiting.getChildren()) {
                 if (!discoveredGraph.contains(child)) {
                     stack.addFirst(child);
                     discoveredGraph.add(child);
                 }
             }
 
-            for (Vertex<?> parent : visiting.getParents()) {
+            for (Vertex<?, ?> parent : visiting.getParents()) {
                 if (!discoveredGraph.contains(parent)) {
                     stack.addFirst(parent);
                     discoveredGraph.add(parent);

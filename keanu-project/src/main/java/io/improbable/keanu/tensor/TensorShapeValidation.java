@@ -1,8 +1,7 @@
 package io.improbable.keanu.tensor;
 
-
 import com.google.common.base.Preconditions;
-import org.nd4j.linalg.api.shape.Shape;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -103,8 +102,22 @@ public class TensorShapeValidation {
         );
     }
 
-    public static long[] checkIsBroadcastable(long[] left, long[] right){
-        return Shape.broadcastOutputShape(left, right);
+    public static boolean isBroadcastable(long[] left, long[] right) {
+        try {
+            TensorShape.getBroadcastResultShape(left, right);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public static boolean isBroadcastable(long[] a, long[]... b) {
+        try {
+            TensorShape.getBroadcastResultShape(a, b);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     /**
@@ -123,11 +136,11 @@ public class TensorShapeValidation {
     }
 
     public static void checkShapeIsSquareMatrix(long[] shape) {
-        if (shape.length != 2) {
+        if (shape.length < 2) {
             throw new IllegalArgumentException("Input tensor must be a matrix");
         }
 
-        if (shape[0] != shape[1]) {
+        if (shape[shape.length - 1] != shape[shape.length - 2]) {
             throw new IllegalArgumentException("Input matrix must be square");
         }
     }
@@ -198,11 +211,17 @@ public class TensorShapeValidation {
         long[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
 
         for (int i = 1; i < shapes.length; i++) {
-            if (shapes[i].length != concatShape.length) {
+            int rank = shapes[i].length;
+
+            if (rank <= dimension) {
+                throw new IllegalArgumentException(String.format("Cannot concat operand %d because dimension %d is greater than or equal to its rank %d", i, dimension, rank));
+            }
+
+            if (rank != concatShape.length) {
                 throw new IllegalArgumentException("Cannot concat shapes of different ranks");
             }
 
-            for (int dim = 0; dim < shapes[i].length; dim++) {
+            for (int dim = 0; dim < rank; dim++) {
                 if (dim == dimension) {
                     concatShape[dim] += shapes[i][dim];
                 } else {
@@ -230,5 +249,39 @@ public class TensorShapeValidation {
             }
 
         }
+    }
+
+    public static long[] getMatrixMultiplicationResultingShape(long[] left, long[] right, boolean transposeLeft, boolean transposeRight) {
+        if (left.length < 2 || right.length < 2) {
+            throwMatrixMultiplyShapeException(left, right, transposeLeft, transposeRight);
+        }
+
+        //(M, N) = (M, K)(K, N)
+        final long KLeft = transposeLeft ? left[left.length - 2] : left[left.length - 1];
+        final long KRight = transposeRight ? right[right.length - 1] : right[right.length - 2];
+
+        if (KLeft != KRight) {
+            throwMatrixMultiplyShapeException(left, right, transposeLeft, transposeRight);
+        }
+
+        final long M = transposeLeft ? left[left.length - 1] : left[left.length - 2];
+        final long N = transposeRight ? right[right.length - 2] : right[right.length - 1];
+        if (left.length == 2 && right.length == 2) {
+            return new long[]{M, N};
+        } else {
+            final long[] leftBatchShape = ArrayUtils.subarray(left, 0, left.length - 2);
+            final long[] rightBatchShape = ArrayUtils.subarray(right, 0, right.length - 2);
+            final long[] batchShape = TensorShape.getBroadcastResultShape(leftBatchShape, rightBatchShape);
+            return TensorShape.concat(batchShape, new long[]{M, N});
+        }
+    }
+
+    private static void throwMatrixMultiplyShapeException(long[] left, long[] right, boolean transposeLeft, boolean transposeRight) {
+        throw new IllegalArgumentException(
+            "Cannot matrix multiply with shapes " +
+                Arrays.toString(left) + (transposeLeft ? " transposed " : "") +
+                " and " +
+                Arrays.toString(right) + (transposeRight ? " transposed " : "")
+        );
     }
 }

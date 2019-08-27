@@ -9,5 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 public @interface LoadVertexParam {
 
+    boolean isNullable() default false;
+
     String value();
 }

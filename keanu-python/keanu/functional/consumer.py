@@ -2,6 +2,8 @@ from typing import Callable
 
 from py4j.java_gateway import JavaObject
 
+from keanu.functional.hash_shortener import shorten_hash
+
 
 class Consumer:
 
@@ -9,7 +11,15 @@ class Consumer:
         self.lambda_function = lambda_function
 
     def accept(self, arg: JavaObject) -> None:
+        """
+        >>> c = Consumer(lambda x : print(x))
+        >>> c.accept("foo")
+        foo
+        """
         self.lambda_function(arg)
+
+    def hashCode(self) -> int:
+        return shorten_hash(hash(self.lambda_function))
 
     class Java:
         implements = ["java.util.function.Consumer"]

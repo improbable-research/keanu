@@ -17,11 +17,11 @@ public class WriteCsv {
      * @param vertices the vertices whose samples will be written to CSV
      * @return a writer for the csv file
      */
-    public static SampleWriter asSamples(NetworkSamples samples, List<? extends Vertex<? extends Tensor>> vertices) {
+    public static SampleWriter asSamples(NetworkSamples samples, List<? extends Vertex<? extends Tensor, ?>> vertices) {
         return new SampleWriter(samples, vertices);
     }
 
-    public static SampleWriter asSamples(NetworkSamples samples, Vertex<? extends Tensor>... vertices) {
+    public static SampleWriter asSamples(NetworkSamples samples, Vertex<? extends Tensor, ?>... vertices) {
         return asSamples(samples, Arrays.asList(vertices));
     }
 
@@ -29,7 +29,7 @@ public class WriteCsv {
      * @param vertices the vertices whose values will be written to CSV in rows
      * @return a writer for the csv file
      */
-    public static RowWriter asRows(List<? extends Vertex<? extends Tensor>> vertices) {
+    public static RowWriter asRows(List<? extends Vertex<? extends Tensor, ?>> vertices) {
         return new RowWriter(vertices);
     }
 
@@ -37,17 +37,17 @@ public class WriteCsv {
      * @param vertices the vertices whose values will be written to CSV in columns
      * @return a writer for the csv file
      */
-    public static ColumnWriter asColumns(List<? extends Vertex<? extends Tensor>> vertices) {
+    public static ColumnWriter asColumns(List<? extends Vertex<? extends Tensor, ?>> vertices) {
         return new ColumnWriter(vertices);
     }
 
-    public static ColumnWriter asColumns(Vertex<? extends Tensor>... vertices) {
+    public static ColumnWriter asColumns(Vertex<? extends Tensor, ?>... vertices) {
         return asColumns(Arrays.asList(vertices));
     }
 
-    public static int findLongestTensor(List<? extends Vertex<? extends Tensor>> tensors) {
+    public static int findLongestTensor(List<? extends Vertex<? extends Tensor, ?>> tensors) {
         int longestTensor = 0;
-        for (Vertex<? extends Tensor> tensor : tensors) {
+        for (Vertex<? extends Tensor, ?> tensor : tensors) {
             if (tensor.getValue().getLength() > longestTensor) {
                 longestTensor = tensor.getValue().asFlatList().size();
             }

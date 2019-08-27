@@ -1,16 +1,27 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.ConstantBooleanVertex;
+import io.improbable.keanu.vertices.tensor.generic.nonprobabilistic.ConstantGenericTensorVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 public interface ConstantVertex {
+
+    static <TYPED extends ConstantVertex> TYPED scalar(Object obj) {
+        if (obj.getClass().isAssignableFrom(Double.class)) {
+            return (TYPED) of((Double) obj);
+        } else if (obj.getClass().isAssignableFrom(Integer.class)) {
+            return (TYPED) of((Integer) obj);
+        } else if (obj.getClass().isAssignableFrom(Boolean.class)) {
+            return (TYPED) of((Boolean) obj);
+        } else {
+            return (TYPED) of(obj);
+        }
+    }
 
     static ConstantBooleanVertex of(Boolean value) {
         return new ConstantBooleanVertex(value);
@@ -72,15 +83,11 @@ public interface ConstantVertex {
         return new ConstantDoubleVertex(value);
     }
 
-    static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC value) {
-        return new ConstantGenericVertex<>(new GenericTensor<>(value));
+    static <GENERIC> ConstantGenericTensorVertex<GENERIC> of(GENERIC value) {
+        return new ConstantGenericTensorVertex<>(GenericTensor.scalar(value));
     }
 
-    static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC[] values) {
-        return new ConstantGenericVertex<>(new GenericTensor<>(values));
-    }
-
-    static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {
-        return new ConstantGenericVertex<>(tensor);
+    static <GENERIC> ConstantGenericTensorVertex<GENERIC> of(GENERIC[] values) {
+        return new ConstantGenericTensorVertex<>(GenericTensor.create(values));
     }
 }

@@ -19,7 +19,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.gradient.Adam")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA")
-java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer")
+java_import(k.jvm_view(), "io.improbable.keanu.Keanu")
 
 
 class _OptimizedResult(JavaObjectWrapper):
@@ -85,14 +85,14 @@ class Optimizer:
         if not (isinstance(net, BayesNet) or isinstance(net, Vertex)):
             raise TypeError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))
         elif isinstance(net, Vertex):
-            net = BayesNet(net.get_connected_graph())
+            net = BayesNet(net.iter_connected_graph())
         return factory_class.builderFor(net.unwrap()), net
 
 
 class GradientOptimizer(Optimizer):
 
     def __init__(self, net: Union[BayesNet, Vertex], algorithm: Optional[JavaObjectWrapper] = None) -> None:
-        builder, net = Optimizer._build_bayes_net(k.jvm_view().KeanuOptimizer.Gradient, net)
+        builder, net = Optimizer._build_bayes_net(k.jvm_view().Keanu.Optimizer.Gradient, net)
 
         if algorithm is not None:
             builder.algorithm(algorithm.unwrap())
@@ -150,7 +150,7 @@ class Adam(JavaObjectWrapper):
 class NonGradientOptimizer(Optimizer):
 
     def __init__(self, net: Union[BayesNet, Vertex], algorithm: Optional[JavaObjectWrapper] = None) -> None:
-        builder, net = Optimizer._build_bayes_net(k.jvm_view().KeanuOptimizer.NonGradient, net)
+        builder, net = Optimizer._build_bayes_net(k.jvm_view().Keanu.Optimizer.NonGradient, net)
 
         if algorithm is not None:
             builder.algorithm(algorithm.unwrap())

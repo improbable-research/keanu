@@ -1,43 +1,48 @@
-from keanu.vertex import UniformInt, Gamma, Poisson, Cauchy
+from keanu.vertex import UniformInt, Gamma, Poisson, Cauchy, Const
+from keanu.vertex.base import Vertex
 from keanu import BayesNet, KeanuRandom
 from keanu.network_io import ProtobufLoader, JsonLoader, ProtobufSaver, DotSaver, JsonSaver
+from typing import cast
 import pytest
 
 
 def test_construct_bayes_net() -> None:
     uniform = UniformInt(0, 1)
-    graph = set(uniform.get_connected_graph())
+    graph = set(uniform.iter_connected_graph())
     vertex_ids = [vertex.get_id() for vertex in graph]
 
     assert len(vertex_ids) == 3
     assert uniform.get_id() in vertex_ids
 
     net = BayesNet(graph)
-    latent_vertex_ids = [vertex.get_id() for vertex in net.get_latent_vertices()]
+    latent_vertex_ids = [vertex.get_id() for vertex in net.iter_latent_vertices()]
 
     assert len(latent_vertex_ids) == 1
     assert uniform.get_id() in latent_vertex_ids
 
 
-@pytest.mark.parametrize("get_method, latent, observed, continuous, discrete",
-                         [("get_latent_or_observed_vertices", True, True, True, True),
-                          ("get_latent_vertices", True, False, True, True),
-                          ("get_observed_vertices", False, True, True, True),
-                          ("get_continuous_latent_vertices", True, False, True, False),
-                          ("get_discrete_latent_vertices", True, False, False, True)])
+@pytest.mark.parametrize("get_method, latent, observed, continuous, discrete, deterministic",
+                         [("iter_latent_or_observed_vertices", True, True, True, True, False),
+                          ("iter_latent_vertices", True, False, True, True, False),
+                          ("iter_observed_vertices", False, True, True, True, False),
+                          ("iter_continuous_latent_vertices", True, False, True, False, False),
+                          ("iter_discrete_latent_vertices", True, False, False, True, False),
+                          ("iter_all_vertices", True, True, True, True, True)])
 def test_can_get_vertices_from_bayes_net(get_method: str, latent: bool, observed: bool, continuous: bool,
-                                         discrete: bool) -> None:
+                                         discrete: bool, deterministic: bool) -> None:
     gamma = Gamma(1., 1.)
     gamma.observe(0.5)
 
     poisson = Poisson(gamma)
-    cauchy = Cauchy(gamma, 1.)
+
+    cauchy = Cauchy(1., 1.)
+    add = cauchy + gamma
 
     assert gamma.is_observed()
     assert not poisson.is_observed()
     assert not cauchy.is_observed()
 
-    net = BayesNet([gamma, poisson, cauchy])
+    net = BayesNet([gamma, poisson, cauchy, add])
     vertex_ids = [vertex.get_id() for vertex in getattr(net, get_method)()]
 
     if observed and continuous:
@@ -46,8 +51,11 @@ def test_can_get_vertices_from_bayes_net(get_method: str, latent: bool, observed
         assert poisson.get_id() in vertex_ids
     if latent and continuous:
         assert cauchy.get_id() in vertex_ids
+    if deterministic:
+        assert add.get_id() in vertex_ids
 
-    assert len(vertex_ids) == (observed and continuous) + (latent and discrete) + (latent and continuous)
+    assert len(vertex_ids) == (observed and continuous) + (latent and discrete) + (latent and
+                                                                                   continuous) + deterministic
 
 
 def test_probe_for_non_zero_probability_from_bayes_net() -> None:
@@ -66,7 +74,7 @@ def test_probe_for_non_zero_probability_from_bayes_net() -> None:
 
 
 def check_loaded_net(net) -> None:
-    latents = list(net.get_latent_vertices())
+    latents = list(net.iter_latent_vertices())
     assert len(latents) == 1
     gamma = latents[0]
     assert gamma.get_value() == 2.5
@@ -84,7 +92,7 @@ def test_can_save_and_load(tmpdir) -> None:
 
     gamma = Gamma(1.0, 1.0)
     gamma.set_value(2.5)
-    net = BayesNet(gamma.get_connected_graph())
+    net = BayesNet(gamma.iter_connected_graph())
     metadata = {"Team": "GraphOS"}
     protobuf_saver = ProtobufSaver(net)
     protobuf_saver.save(PROTO_FILE, True, metadata)
@@ -100,3 +108,29 @@ def test_can_save_and_load(tmpdir) -> None:
     check_loaded_net(new_net_from_proto)
     new_net_from_json = json_loader.load(JSON_FILE)
     check_loaded_net(new_net_from_json)
+
+
+def test_can_dot_save_list_of_vertices(tmpdir) -> None:
+    DOT_FILE = str(tmpdir.join("test.dot"))
+    metadata = {"Team": "GraphOS"}
+    theta = Const(1.)
+    k = Const(1.)
+    gamma = Gamma(theta, k)
+    gamma.set_value(2.5)
+    dot_saver = DotSaver([theta, k, gamma])
+    dot_saver.save(DOT_FILE, True, metadata)
+    check_dot_file(DOT_FILE)
+
+
+def test_dot_save_only_takes_bayes_net_or_list(tmpdir) -> None:
+    gamma = Gamma(1., 1.)
+    with pytest.raises(TypeError, match=r"DotSaver only takes BayesNet or a list of vertices."):
+        DotSaver(gamma)  # type: ignore # this is expected to fail mypy
+
+
+def test_get_vertex_by_label() -> None:
+    vertex = Gamma(1., 1., label="gamma")
+    net = BayesNet([vertex])
+    retrieved_vertex = net.get_vertex_by_label("gamma")
+    assert retrieved_vertex is not None
+    assert retrieved_vertex.get_id() == vertex.get_id()

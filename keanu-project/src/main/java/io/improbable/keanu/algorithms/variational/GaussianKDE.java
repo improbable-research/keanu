@@ -5,9 +5,9 @@ import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.Samples;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
-import io.improbable.keanu.vertices.dbl.probabilistic.KDEVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexSamples;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.KDEVertex;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +27,7 @@ public class GaussianKDE {
 
     public static KDEVertex approximate(DoubleVertex vertex, Integer nSamples) {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
-        DoubleVertexSamples vertexSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+        DoubleVertexSamples vertexSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig()
             .getPosteriorSamples(model, ImmutableList.of(vertex), nSamples).getDoubleTensorSamples(vertex);
         return approximate(vertexSamples);
     }

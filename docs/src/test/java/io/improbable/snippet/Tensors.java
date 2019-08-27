@@ -1,16 +1,16 @@
 package io.improbable.snippet;
 
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Ignore;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -30,7 +30,7 @@ public class Tensors {
         CObservation.observe(new double[]{6, 12});
 
         //Use algorithm to find MAP or posterior samples for A and/or B
-        Optimizer optimizer = KeanuOptimizer.of(new BayesianNetwork(A.getConnectedGraph()));
+        Optimizer optimizer = Keanu.Optimizer.of(new BayesianNetwork(A.getConnectedGraph()));
         optimizer.maxLikelihood();
         //%%SNIPPET_END%% TensorExample
 
@@ -69,7 +69,7 @@ public class Tensors {
         tensor.times(2.0);          // [4, 6, 8, 10]
         tensor.pow(2);              // [16, 36, 64, 100]
         tensor.sin();               // [-0.2879, -0.9918, 0.9200, -0.5064]
-        double sum = tensor.sum();  // -0.86602...
+        double sum = tensor.sumNumber();  // -0.86602...
         //%%SNIPPET_END%% TensorOps
     }
 
@@ -109,7 +109,7 @@ public class Tensors {
         CObservation.observe(new double[]{6, 12});
 
         //Use algorithm to find MAP or posterior samples for A and/or B
-        Optimizer optimizer = KeanuOptimizer.of(new BayesianNetwork(A.getConnectedGraph()));
+        Optimizer optimizer = Keanu.Optimizer.of(new BayesianNetwork(A.getConnectedGraph()));
         optimizer.maxAPosteriori();
 
         //Retrieve the most likely estimate using MAP estimation

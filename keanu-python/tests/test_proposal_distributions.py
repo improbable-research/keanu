@@ -3,41 +3,55 @@ import pytest
 
 from keanu import BayesNet, Model
 from keanu.algorithm._proposal_distribution import ProposalDistribution
-from keanu.vertex import Gaussian
+from keanu.vertex import Gamma, Gaussian
+from keanu.vartypes import tensor_arg_types
 
 
 @pytest.fixture
 def net() -> BayesNet:
     with Model() as m:
-        m.gamma = Gaussian(0., 1.)
+        m.gamma = Gamma(1., 1.)
+        m.gaussian = Gaussian(0., m.gamma)
 
     return m.to_bayes_net()
 
 
 def test_you_can_create_a_prior_proposal_distribution(net) -> None:
-    ProposalDistribution("prior", latents=net.get_latent_vertices())
+    ProposalDistribution("prior", latents=list(net.iter_latent_vertices()))
 
 
-def test_you_can_create_a_gaussian_proposal_distribution() -> None:
-    ProposalDistribution("gaussian", sigma=np.array(1.))
+@pytest.mark.parametrize("sigma", [1., np.array(1.), [1., 2.], [np.array(1.), np.array(2.)]])
+def test_you_can_create_a_gaussian_proposal_distribution(sigma: tensor_arg_types, net: BayesNet) -> None:
+    ProposalDistribution("gaussian", latents=list(net.iter_latent_vertices()), sigma=sigma)
 
 
-def test_it_throws_if_you_specify_gaussian_without_a_value_for_sigma() -> None:
-    with pytest.raises(TypeError) as excinfo:
-        ProposalDistribution("gaussian")
+def test_it_throws_if_you_specify_gaussian_without_a_value_for_sigma(net: BayesNet) -> None:
+    with pytest.raises(
+            TypeError, match=r"Gaussian Proposal Distribution requires a sigma or a list of sigmas for each latent"):
+        ProposalDistribution("gaussian", latents=list(net.iter_latent_vertices()))
 
-    assert str(excinfo.value) == "Gaussian Proposal Distribution requires a value for sigma"
+
+def test_it_throws_if_you_specify_gaussian_with_not_enough_sigmas_for_each_latent(net: BayesNet) -> None:
+    with pytest.raises(
+            TypeError, match=r"Gaussian Proposal Distribution requires a sigma or a list of sigmas for each latent"):
+        ProposalDistribution("gaussian", latents=list(net.iter_latent_vertices()), sigma=[1.])
+
+
+def test_it_throws_if_you_specify_gaussian_without_values_for_latents() -> None:
+    with pytest.raises(TypeError, match=r"Gaussian Proposal Distribution requires values for latents"):
+        ProposalDistribution("gaussian", sigma=1.)
+
+
+def test_it_throws_if_you_specify_gaussian_with_empty_list_of_latents(net: BayesNet) -> None:
+    with pytest.raises(TypeError, match=r"Gaussian Proposal Distribution requires values for latents"):
+        ProposalDistribution("gaussian", latents=[], sigma=[])
 
 
 def test_it_throws_if_you_specify_sigma_but_the_type_isnt_gaussian() -> None:
-    with pytest.raises(TypeError) as excinfo:
-        ProposalDistribution("prior", sigma=np.array(1.))
-
-    assert str(excinfo.value) == 'Parameter sigma is not valid unless type is "gaussian"'
+    with pytest.raises(TypeError, match=r'Parameter sigma is not valid unless type is "gaussian"'):
+        ProposalDistribution("prior", sigma=1.)
 
 
 def test_it_throws_if_it_doesnt_recognise_the_type() -> None:
-    with pytest.raises(KeyError) as excinfo:
+    with pytest.raises(KeyError, match=r"'foo'"):
         ProposalDistribution("foo")
-
-    assert str(excinfo.value) == "'foo'"

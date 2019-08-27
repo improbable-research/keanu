@@ -2,7 +2,6 @@ package io.improbable.keanu.distributions.discrete;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.Distribution;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
@@ -12,12 +11,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Categorical<CATEGORY, TENSOR extends Tensor<CATEGORY>> implements Distribution<TENSOR> {
+public class Categorical<CATEGORY> implements Distribution<GenericTensor<CATEGORY>> {
 
     private final Map<CATEGORY, DoubleTensor> selectableValues;
     private final List<CATEGORY> categoryOrder;
 
-    public static <CAT, TENSOR extends Tensor<CAT>> Categorical<CAT, TENSOR> withParameters(Map<CAT, DoubleTensor> selectableValues) {
+    public static <CAT> Categorical<CAT> withParameters(Map<CAT, DoubleTensor> selectableValues) {
         return new Categorical<>(selectableValues);
     }
 
@@ -26,7 +25,7 @@ public class Categorical<CATEGORY, TENSOR extends Tensor<CATEGORY>> implements D
         this.categoryOrder = new ArrayList<>(this.selectableValues.keySet());
     }
 
-    public TENSOR sample(long[] shape, KeanuRandom random) {
+    public GenericTensor<CATEGORY> sample(long[] shape, KeanuRandom random) {
 
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(shape);
 
@@ -34,7 +33,7 @@ public class Categorical<CATEGORY, TENSOR extends Tensor<CATEGORY>> implements D
         DoubleTensor sum = DoubleTensor.zeros(shape);
 
         CATEGORY lastValue = categoryOrder.get(categoryOrder.size() - 1);
-        TENSOR sample = Tensor.createFilled(lastValue, shape);
+        GenericTensor<CATEGORY> sample = GenericTensor.createFilled(lastValue, shape);
         BooleanTensor sampleValuesSetSoFar = BooleanTensor.falses(shape);
 
         for (CATEGORY category : categoryOrder) {
@@ -44,11 +43,12 @@ public class Categorical<CATEGORY, TENSOR extends Tensor<CATEGORY>> implements D
             sum = sum.plus(normalizedProbabilities);
 
             BooleanTensor maskForUnassignedSampleValues = sampleValuesSetSoFar.xor(sum.greaterThan(p));
-            sample = maskForUnassignedSampleValues.where(Tensor.scalar(category), sample);
+
+            sample = GenericTensor.scalar(category).where(maskForUnassignedSampleValues, sample);
 
             sampleValuesSetSoFar.orInPlace(maskForUnassignedSampleValues);
 
-            if (sampleValuesSetSoFar.allTrue()) {
+            if (sampleValuesSetSoFar.allTrue().scalar()) {
                 break;
             }
         }
@@ -56,7 +56,7 @@ public class Categorical<CATEGORY, TENSOR extends Tensor<CATEGORY>> implements D
         return sample;
     }
 
-    public DoubleTensor logProb(TENSOR x) {
+    public DoubleTensor logProb(GenericTensor<CATEGORY> x) {
 
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(x.getShape());
 
@@ -71,7 +71,7 @@ public class Categorical<CATEGORY, TENSOR extends Tensor<CATEGORY>> implements D
     }
 
     private boolean containsNonPositiveEntry(DoubleTensor sumOfProbabilities) {
-        return !sumOfProbabilities.lessThanOrEqual(0.).allFalse();
+        return !sumOfProbabilities.lessThanOrEqual(0.).allFalse().scalar();
     }
 
     private DoubleTensor getSumOfProbabilities(long[] shape) {

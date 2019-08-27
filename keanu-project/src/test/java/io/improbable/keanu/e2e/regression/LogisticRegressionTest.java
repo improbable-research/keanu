@@ -7,10 +7,10 @@ import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,11 +55,11 @@ public class LogisticRegressionTest {
     }
 
     private DoubleTensor generateX(int nSamples) {
-        DoubleVertex[] xVertices = new DoubleVertex[NUM_FEATURES];
+        DoubleTensor[] xValues = new DoubleTensor[NUM_FEATURES];
         for (int i = 0; i < NUM_FEATURES; i++) {
-            xVertices[i] = new GaussianVertex(new long[]{nSamples, 1}, 0.0, SIGMAS[i]);
+            xValues[i] = new GaussianVertex(new long[]{nSamples, 1}, 0.0, SIGMAS[i]).sample();
         }
-        return DoubleVertex.concat(1, xVertices).sample(random);
+        return DoubleTensor.concat(1, xValues);
     }
 
     private BooleanTensor generateY(DoubleTensor x) {

@@ -1,9 +1,8 @@
 package io.improbable.keanu.algorithms.mcmc.testcases;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,33 +13,33 @@ import static org.junit.Assert.assertTrue;
 
 public class MCMCTestDistributions {
 
-    public static BayesianNetwork createSimpleGaussian(double mu, double sigma, double initialValue, KeanuRandom random) {
-        GaussianVertex A = new GaussianVertex(new long[]{2, 1}, mu, sigma);
+    public static BayesianNetwork createSimpleGaussian(double mu, double sigma, double initialValue) {
+        GaussianVertex A = new GaussianVertex(mu, sigma);
         A.setAndCascade(initialValue);
         return new BayesianNetwork(A.getConnectedGraph());
     }
 
-    public static void samplesMatchSimpleGaussian(double mu, double sigma, List<DoubleTensor> samples, double delta) {
+    public static void samplesMatchSimpleGaussian(double mu, double sigma, List<DoubleTensor> samples) {
 
         long[] shape = samples.get(0).getShape();
 
         DoubleTensor summed = samples.stream()
             .reduce(DoubleTensor.zeros(shape), DoubleTensor::plusInPlace);
 
-        DoubleTensor averages = summed.divInPlace(samples.size());
+        DoubleTensor averages = summed.divInPlace((double) samples.size());
 
         DoubleTensor sumDiffSquared = samples.stream()
             .reduce(
                 DoubleTensor.zeros(shape),
-                (acc, tensor) -> acc.plusInPlace(tensor.minus(averages).powInPlace(2))
+                (acc, tensor) -> acc.plusInPlace(tensor.minus(averages).powInPlace(2.0))
             );
 
         double[] standardDeviations = sumDiffSquared.div(samples.size() - 1).pow(0.5).asFlatDoubleArray();
         double[] means = averages.asFlatDoubleArray();
 
         for (int i = 0; i < means.length; i++) {
-            assertEquals(mu, means[i], 0.05);
-            assertEquals(sigma, standardDeviations[i], delta);
+            assertEquals(mu, means[i], 0.1);
+            assertEquals(sigma, standardDeviations[i], 0.1);
         }
     }
 

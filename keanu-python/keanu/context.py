@@ -1,15 +1,16 @@
-import sys
-import io
-import os
 import logging
-from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView, java_import
-from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
-from py4j.protocol import Py4JError
-from typing import Dict, Any, Iterable, List, Collection, Set
+import nd4j
+import os
+import sys
 from _io import TextIOWrapper
+from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
+from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView, java_import
+from py4j.protocol import Py4JError
+from typing import Dict, Any, Iterable, Collection
+
+import io
 
 PATH = os.path.abspath(os.path.dirname(__file__))
-ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
 
 
 # python singleton implementation https://stackoverflow.com/a/6798042/741789
@@ -39,11 +40,8 @@ class KeanuContext(metaclass=Singleton):
 
     def __build_classpath(self) -> str:
         keanu_path = os.path.join(PATH, "classpath", "*")
-        nd4j_path = os.environ.get(ND4J_CLASSPATH_ENVIRONMENT_VARIABLE)
-        if nd4j_path is None:
-            return keanu_path
-        else:
-            return os.pathsep.join([keanu_path, os.path.join(nd4j_path, "*")])
+        nd4j_path = nd4j.get_classpath()
+        return os.pathsep.join([keanu_path, os.path.join(nd4j_path, "*")])
 
     def __stderr_with_redirect_disabled_for_jupyter(self) -> TextIOWrapper:
         try:
@@ -117,6 +115,12 @@ class KeanuContext(metaclass=Singleton):
 
     def to_java_int_array(self, l: Collection[Any]) -> JavaArray:
         return self.to_java_array(l, self._gateway.jvm.int)
+
+    def to_java_boolean_array(self, l: Collection[Any]) -> JavaArray:
+        return self.to_java_array(l, self._gateway.jvm.boolean)
+
+    def to_java_string_array(self, l: Collection[Any]) -> JavaArray:
+        return self.to_java_array(l, self._gateway.jvm.String)
 
     def to_java_vertex_array(self, l: Collection[Any]) -> JavaArray:
         java_import(self.jvm_view(), "io.improbable.keanu.vertices.Vertex")

@@ -1,6 +1,6 @@
 package io.improbable.keanu.e2e.regression;
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.model.regression.RegressionModel;
@@ -9,8 +9,8 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.CsvDataResource;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,11 +43,11 @@ public class DiabetesLinearRegression {
         y.observe(data.y);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.of(bayesNet);
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.of(bayesNet);
         optimizer.maxLikelihood();
 
         assertThat(weight.getValue().scalar(), closeTo(938.2378, 0.01));
-        assertThat(b.getValue().scalar(),closeTo(152.9189, 0.01));
+        assertThat(b.getValue().scalar(), closeTo(152.9189, 0.01));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class DiabetesLinearRegression {
         linearRegressionModel.fit();
 
         assertThat(linearRegressionModel.getWeightVertex().getValue().scalar(), closeTo(938.2378, 0.5));
-        assertThat(linearRegressionModel.getInterceptVertex().getValue().scalar(), closeTo(152.9189,0.5));
+        assertThat(linearRegressionModel.getInterceptVertex().getValue().scalar(), closeTo(152.9189, 0.5));
     }
 
     @Test

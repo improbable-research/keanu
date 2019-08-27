@@ -11,21 +11,23 @@ import java.util.Map;
 
 public final class ModelComposition {
 
-    private ModelComposition() { }
+    private ModelComposition() {
+    }
 
     /**
      * Connects one model within an other, marking it such that it's clear this is a nested model
      * <p>
-     *     This function will take a previously constructed BayesNet and do a number of things:
-     *     - Hook up any Proxy Vertices to the parents specified in the inputVertices
-     *     - Increment the depth for all "internal" nodes and the BayesNet itself
-     *     - Pass back any specified output nodes from the Bayesnet (keeping them at the outer depth)
-     *
-     *     Output nodes will be returned unlabelled
+     * This function will take a previously constructed BayesNet and do a number of things:
+     * - Hook up any Proxy Vertices to the parents specified in the inputVertices
+     * - Increment the depth for all "internal" nodes and the BayesNet itself
+     * - Pass back any specified output nodes from the Bayesnet (keeping them at the outer depth)
+     * <p>
+     * Output nodes will be returned unlabelled
      * </p>
+     *
      * @param bayesianNetwork The Bayesian Network to compose in to the current model
-     * @param inputVertices The mapping from Proxy label to actual input vertex
-     * @param desiredOutputs The set of labels we wish to output from the supplied BayesNet
+     * @param inputVertices   The mapping from Proxy label to actual input vertex
+     * @param desiredOutputs  The set of labels we wish to output from the supplied BayesNet
      * @return A map of Labels to Output Vertices
      */
     public static Map<VertexLabel, Vertex> composeModel(BayesianNetwork bayesianNetwork,

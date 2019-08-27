@@ -25,11 +25,8 @@ import static java.util.stream.Collectors.toMap;
 public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     private final Map<VariableReference, Vertex> vertexLookup;
-
     private final List<Vertex> latentVertices;
-
     private final List<Vertex> observedVertices;
-
     private final List<Vertex> latentOrObservedVertices;
     private final LambdaSectionSnapshot lambdaSectionSnapshot;
 
@@ -44,7 +41,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
-        this.lambdaSectionSnapshot = new LambdaSectionSnapshot(latentVertices);
+        this.lambdaSectionSnapshot = new LambdaSectionSnapshot();
 
         resetModelToObservedState();
         checkBayesNetInHealthyState();
@@ -52,7 +49,9 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
-        cascadeValues(inputs);
+        if (!inputs.isEmpty()) {
+            cascadeValues(inputs);
+        }
         return ProbabilityCalculator.calculateLogProbFor(this.latentOrObservedVertices);
     }
 
@@ -74,13 +73,15 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
-        cascadeValues(inputs);
+        if (!inputs.isEmpty()) {
+            cascadeValues(inputs);
+        }
         return ProbabilityCalculator.calculateLogProbFor(this.observedVertices);
     }
 
     @Override
-    public List<? extends Variable> getLatentVariables() {
-        return this.latentVertices;
+    public List<Variable> getLatentVariables() {
+        return (List) this.latentVertices;
     }
 
     public List<Vertex> getLatentVertices() {
@@ -92,7 +93,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
     }
 
     @Override
-    public List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
+    public List<Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
         return getLatentVariables().stream()
             .filter(v -> v.getValue() instanceof DoubleTensor)
             .map(v -> (Variable<DoubleTensor, ?>) v)
