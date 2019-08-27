@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
