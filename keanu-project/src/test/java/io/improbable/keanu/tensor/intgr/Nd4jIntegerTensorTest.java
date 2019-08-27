@@ -284,28 +284,6 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
-    public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
-        IntegerTensor tensor = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
-        IntegerTensor mask = Nd4jIntegerTensor.scalar(1);
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
-
-        tensor.setWithMaskInPlace(mask, -2);
-    }
-
-    @Test
-    public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
-        IntegerTensor tensor = Nd4jIntegerTensor.scalar(3);
-        IntegerTensor mask = Nd4jIntegerTensor.create(new int[]{1, 1, 1, 1}, new long[]{2, 2});
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
-
-        tensor.setWithMaskInPlace(mask, -2);
-    }
-
-    @Test
     public void doesApplyUnaryFunction() {
         IntegerTensor matrixA = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor result = matrixA.apply(v -> v + 1);
@@ -444,7 +422,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor notAllTheSame = allTheSame.duplicate();
         notAllTheSame.setValue(otherValue, 1, 1);
 
-        assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
+        assertThat(allTheSame.elementwiseEquals(value).allTrue().scalar(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
     }
 
@@ -583,8 +561,8 @@ public class Nd4jIntegerTensorTest {
     @Test
     public void canFindScalarMinAndMax() {
         IntegerTensor a = IntegerTensor.create(5, 4, 3, 2).reshape(2, 2);
-        int min = a.min();
-        int max = a.max();
+        int min = a.min().scalar();
+        int max = a.max().scalar();
         assertEquals(2, min);
         assertEquals(5, max);
     }
@@ -617,7 +595,7 @@ public class Nd4jIntegerTensorTest {
     public void canFindArgMaxOfRowVector() {
         IntegerTensor tensorRow = IntegerTensor.create(1, 3, 4, 5, 2).reshape(1, 5);
 
-        assertEquals(3, tensorRow.argMax());
+        assertThat(tensorRow.argMax().scalar(), equalTo(3));
         assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
         assertThat(tensorRow.argMax(1), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
     }
@@ -626,7 +604,7 @@ public class Nd4jIntegerTensorTest {
     public void canFindArgMaxOfColumnVector() {
         IntegerTensor tensorCol = IntegerTensor.create(1, 3, 4, 5, 2).reshape(5, 1);
 
-        assertEquals(3, tensorCol.argMax());
+        assertThat(tensorCol.argMax().scalar(), equalTo(3));
         assertThat(tensorCol.argMax(0), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
         assertThat(tensorCol.argMax(1), valuesAndShapesMatch(IntegerTensor.zeros(5)));
     }
@@ -637,7 +615,7 @@ public class Nd4jIntegerTensorTest {
 
         assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 0, 0, 0)));
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(2, 0)));
-        assertEquals(2, tensor.argMax());
+        assertThat(tensor.argMax().scalar(), equalTo(2));
     }
 
     @Test
@@ -646,7 +624,7 @@ public class Nd4jIntegerTensorTest {
 
         assertThat(tensor.argMin(0), valuesAndShapesMatch(IntegerTensor.create(0, 1, 1, 1)));
         assertThat(tensor.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, 1)));
-        assertEquals(0, tensor.argMin());
+        assertThat(tensor.argMin().scalar(), equalTo(0));
     }
 
     @Test
@@ -657,7 +635,7 @@ public class Nd4jIntegerTensorTest {
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(7, new long[]{2, 4, 2, 4})));
         assertThat(tensor.argMax(2), valuesAndShapesMatch(IntegerTensor.create(3, new long[]{2, 8, 2, 4})));
         assertThat(tensor.argMax(3), valuesAndShapesMatch(IntegerTensor.ones(2, 8, 4, 4)));
-        assertEquals(511, tensor.argMax());
+        assertThat(tensor.argMax().scalar(), equalTo(511));
     }
 
     @Test(expected = IllegalArgumentException.class)

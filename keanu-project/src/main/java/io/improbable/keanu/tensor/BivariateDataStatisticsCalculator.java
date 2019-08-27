@@ -32,14 +32,14 @@ public class BivariateDataStatisticsCalculator {
      * @return The mean X value from the data set
      */
     public double xMean() {
-        return xData.average();
+        return xData.mean().scalar();
     }
 
     /**
      * @return The mean Y value from the data set
      */
     public double yMean() {
-        return yData.average();
+        return yData.mean().scalar();
     }
 
     /**
@@ -73,7 +73,7 @@ public class BivariateDataStatisticsCalculator {
         DoubleTensor calculatedY = xData.times(estimatedGradient()).plusInPlace(estimatedIntercept());
         DoubleTensor residuals = yData.minus(calculatedY);
         long unbiasedMultiplier = size() - 2;
-        return residuals.times(residuals).sum() / unbiasedMultiplier;
+        return residuals.times(residuals).sumNumber() / unbiasedMultiplier;
     }
 
     /**
@@ -104,9 +104,9 @@ public class BivariateDataStatisticsCalculator {
     }
 
     private double secondMomentOf(final DoubleTensor data1, final DoubleTensor data2) {
-        double sum1 = data1.sum();
-        double sum2 = data2.sum();
-        double sumOfSquares = data1.times(data2).sum();
+        double sum1 = data1.sumNumber();
+        double sum2 = data2.sumNumber();
+        double sumOfSquares = data1.times(data2).sumNumber();
 
         return sumOfSquares - (sum1 * sum2 / size());
     }

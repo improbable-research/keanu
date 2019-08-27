@@ -35,7 +35,7 @@ public class TopologicalSort {
         Map<Vertex, Set<Vertex>> deps = new HashMap<>();
         Set<Vertex> verticesBeingSorted = new HashSet<>(vertices);
 
-        for (Vertex<?> v : vertices) {
+        for (Vertex<?, ?> v : vertices) {
             if (!deps.containsKey(v)) {
                 insertParentDependencies(v, deps, verticesBeingSorted);
             }
@@ -44,7 +44,7 @@ public class TopologicalSort {
         return deps;
     }
 
-    private static void insertParentDependencies(Vertex<?> aVertex, Map<Vertex, Set<Vertex>> dependencies, Set<Vertex> verticesToCount) {
+    private static void insertParentDependencies(Vertex<?, ?> aVertex, Map<Vertex, Set<Vertex>> dependencies, Set<Vertex> verticesToCount) {
 
         dependencies.computeIfAbsent(aVertex, v -> new HashSet<>());
 

@@ -5,8 +5,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
@@ -18,7 +18,7 @@ public class Cauchy implements ContinuousDistribution {
     private final DoubleTensor location;
     private final DoubleTensor scale;
 
-    public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
+    public static Cauchy withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Cauchy(location, scale);
     }
 
@@ -29,7 +29,7 @@ public class Cauchy implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        Preconditions.checkArgument(scale.greaterThan(0.).allTrue(),
+        Preconditions.checkArgument(scale.greaterThan(0.).allTrue().scalar(),
             "scale must be greater than 0. scale: " + scale);
 
         DoubleTensor unityCauchy = random.nextDouble(shape);
@@ -53,7 +53,6 @@ public class Cauchy implements ContinuousDistribution {
         return negLnScaleMinusLnPi.minus(lnXMinusLocationOverScalePow2Plus1);
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor xMinusLocation = x.minus(location);
         final DoubleTensor xMinusLocationPow2 = xMinusLocation.pow(2.0);

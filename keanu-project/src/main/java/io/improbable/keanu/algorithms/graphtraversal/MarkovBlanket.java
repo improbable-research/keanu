@@ -19,7 +19,7 @@ public class MarkovBlanket {
      * @param aVertex the vertex to find the Markov Blanket for
      * @return A set of vertices that are affected by, or affect, a given vertex
      */
-    public static Set<Vertex> get(Vertex<?> aVertex) {
+    public static Set<Vertex> get(Vertex<?, ?> aVertex) {
 
         LambdaSection parents = LambdaSection.getUpstreamLambdaSection(aVertex, false);
         LambdaSection children = LambdaSection.getDownstreamLambdaSection(aVertex, false);
@@ -39,7 +39,7 @@ public class MarkovBlanket {
 
         Set<Vertex> probabilistic = new HashSet<>();
 
-        for (Vertex<?> vertex : vertices) {
+        for (Vertex<?, ?> vertex : vertices) {
             LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(vertex, false);
             probabilistic.addAll(upstreamLambdaSection.getLatentAndObservedVertices());
         }

@@ -6,10 +6,10 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.intgr.IntegerPlaceholderVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerPlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 public class Binomial implements DiscreteDistribution {
 

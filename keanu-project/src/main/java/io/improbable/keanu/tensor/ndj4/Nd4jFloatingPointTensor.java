@@ -1,7 +1,6 @@
 package io.improbable.keanu.tensor.ndj4;
 
 import io.improbable.keanu.tensor.FloatingPointTensor;
-import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.TensorMulByMatrixMul;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -19,29 +18,13 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>> extends Nd4jNumberTensor<T, TENSOR> implements FloatingPointTensor<T, TENSOR> {
+import static io.improbable.keanu.tensor.ndj4.INDArrayExtensions.asBoolean;
+
+public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>>
+    extends Nd4jNumberTensor<T, TENSOR> implements FloatingPointTensor<T, TENSOR> {
 
     public Nd4jFloatingPointTensor(INDArray tensor) {
         super(tensor);
-    }
-
-    @Override
-    public TENSOR matrixInverse() {
-        return create(InvertMatrix.invert(tensor, false));
-    }
-
-    @Override
-    public TENSOR choleskyDecomposition() {
-        INDArray dup = tensor.dup();
-        Nd4j.getBlasWrapper().lapack().potrf(dup, true);
-        return create(dup);
-    }
-
-    @Override
-    public TENSOR matrixMultiply(TENSOR value) {
-        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
-        INDArray mmulResult = tensor.mmul(getTensor(value));
-        return create(mmulResult);
     }
 
     @Override
@@ -194,8 +177,26 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
 
     @Override
     public TENSOR standardizeInPlace() {
-        tensor.subi(average()).divi(standardDeviation());
+        tensor.subi(mean().scalar()).divi(standardDeviation().scalar());
         return getThis();
+    }
+
+    @Override
+    public TENSOR mean(int... overDimensions) {
+        if (overDimensions.length == 0) {
+            return duplicate();
+        }
+        return create(tensor.mean(overDimensions));
+    }
+
+    @Override
+    public TENSOR mean() {
+        return create(Nd4j.scalar(tensor.meanNumber().doubleValue()).castTo(tensor.dataType()));
+    }
+
+    @Override
+    public TENSOR standardDeviation() {
+        return create(Nd4j.scalar(tensor.stdNumber().doubleValue()).castTo(tensor.dataType()));
     }
 
     @Override
@@ -233,21 +234,42 @@ public abstract class Nd4jFloatingPointTensor<T extends Number, TENSOR extends F
     }
 
     @Override
-    public T determinant() {
+    public TENSOR matrixDeterminant() {
+        if (tensor.rank() > 2) {
+            return fromJVM(toJVM().matrixDeterminant());
+        }
         INDArray dup = tensor.dup();
         double[][] asMatrix = dup.toDoubleMatrix();
         RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
-        return getNumber(new LUDecomposition(matrix).getDeterminant());
+        return create(Nd4j.scalar(new LUDecomposition(matrix).getDeterminant()));
     }
 
     @Override
-    public T product() {
-        return getNumber(tensor.prod().getNumber(0));
+    public TENSOR matrixInverse() {
+        if (tensor.rank() > 2) {
+            return fromJVM(toJVM().matrixInverse());
+        }
+        return create(InvertMatrix.invert(tensor, false));
+    }
+
+    @Override
+    public TENSOR choleskyDecomposition() {
+        if (tensor.rank() > 2) {
+            return fromJVM(toJVM().choleskyDecomposition());
+        }
+        INDArray dup = tensor.dup();
+        Nd4j.getBlasWrapper().lapack().potrf(dup, true);
+        return create(dup);
     }
 
     @Override
     public BooleanTensor notNaN() {
-        return this.elementwiseEquals(this);
+        return isNaN().notInPlace();
+    }
+
+    @Override
+    public BooleanTensor isNaN() {
+        return BooleanTensor.create(asBoolean(tensor.isNaN()), tensor.shape());
     }
 
 }

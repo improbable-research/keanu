@@ -49,7 +49,7 @@ public class LambdaSection {
      * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
      * includeNonProbabilistic is false.
      */
-    public static LambdaSection getUpstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
+    public static LambdaSection getUpstreamLambdaSection(Vertex<?, ?> aVertex, boolean includeNonProbabilistic) {
         return getUpstreamLambdaSectionForCollection(Collections.singletonList(aVertex), includeNonProbabilistic);
     }
 
@@ -60,7 +60,7 @@ public class LambdaSection {
      * is true. All downstream probabilistic or observed vertices stopping at probabilistic or observed if
      * includeNonProbabilistic is false.
      */
-    public static LambdaSection getDownstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
+    public static LambdaSection getDownstreamLambdaSection(Vertex<?, ?> aVertex, boolean includeNonProbabilistic) {
         return getDownstreamLambdaSectionForCollection(Collections.singletonList(aVertex), includeNonProbabilistic);
     }
 

@@ -35,8 +35,6 @@ The following functions are on the todo list:
 - roll(a, shift[, axis])	Roll array elements along a given axis.
 - rot90(m[, k, axes])	Rotate an array by 90 degrees in the plane specified by axes.
 
-- where(condition, [x, y])	Return elements chosen from x or y depending on condition.
-
 - indices(dimensions[, dtype])	Return an array representing the indices of a grid.
 - diag_indices(n[, ndim])	Return the indices to access the main diagonal of an array.
 - diag_indices_from(arr)	Return the indices to access the main diagonal of an n-dimensional array.
@@ -83,8 +81,6 @@ The following functions are on the todo list:
 
 #### Static construction
 
-- diag(v[, k])	Extract a diagonal or construct a diagonal array.
-- diagflat(v[, k])	Create a two-dimensional array with the flattened input as a diagonal.
 - tri(N[, M, k, dtype])	An array with ones at and below the given diagonal and zeros elsewhere.
 - tril(m[, k])	Lower triangle of an array.
 - triu(m[, k])	Upper triangle of an array.
@@ -114,7 +110,6 @@ The following functions are on the todo list:
 - cbrt(x, /[, out, where, casting, order, …])	Return the cube-root of an array, element-wise.
 - square(x, /[, out, where, casting, order, …])	Return the element-wise square of the input.
 - fabs(x, /[, out, where, casting, order, …])	Compute the absolute values element-wise.
-- sign(x, /[, out, where, casting, order, …])	Returns an element-wise indication of the sign of a number.
 - heaviside(x1, x2, /[, out, where, casting, …])	Compute the Heaviside step function.
 - fmax(x1, x2, /[, out, where, casting, …])	Element-wise maximum of array elements.
 - fmin(x1, x2, /[, out, where, casting, …])	Element-wise minimum of array elements.
@@ -133,8 +128,6 @@ The following functions are on the todo list:
 - nanquantile(a, q[, axis, out, …])	Compute the qth quantile of the data along the specified axis, while ignoring nan values.
 
 - median(a[, axis, out, overwrite_input, keepdims])	Compute the median along the specified axis.
-- average(a[, axis, weights, returned])	Compute the weighted average along the specified axis.
-- mean(a[, axis, dtype, out, keepdims])	Compute the arithmetic mean along the specified axis.
 - std(a[, axis, dtype, out, ddof, keepdims])	Compute the standard deviation along the specified axis.
 - var(a[, axis, dtype, out, ddof, keepdims])	Compute the variance along the specified axis.
 - nanmedian(a[, axis, out, overwrite_input, …])	Compute the median along the specified axis, while ignoring NaNs.
@@ -182,7 +175,6 @@ Missing types:
 
 - linalg.norm(x[, ord, axis, keepdims])	Matrix or vector norm.
 - linalg.cond(x[, p])	Compute the condition number of a matrix.
-- linalg.det(a)	Compute the determinant of an array.
 - linalg.matrix_rank(M[, tol, hermitian])	Return matrix rank of array using SVD method
 - linalg.slogdet(a)	Compute the sign and (natural) logarithm of the determinant of an array.
 - trace(a[, offset, axis1, axis2, dtype, out])	Return the sum along diagonals of the array.
@@ -190,7 +182,6 @@ Missing types:
 - linalg.solve(a, b)	Solve a linear matrix equation, or system of linear scalar equations.
 - linalg.tensorsolve(a, b[, axes])	Solve the tensor equation a x = b for x.
 - linalg.lstsq(a, b[, rcond])	Return the least-squares solution to a linear matrix equation.
-- linalg.inv(a)	Compute the (multiplicative) inverse of a matrix.
 - linalg.pinv(a[, rcond])	Compute the (Moore-Penrose) pseudo-inverse of a matrix.
 - linalg.tensorinv(a[, ind])	Compute the ‘inverse’ of an N-dimensional array.
 

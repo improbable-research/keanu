@@ -4,8 +4,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
@@ -54,7 +54,7 @@ public class SmoothUniform implements ContinuousDistribution {
      * @param edgeSharpness sharpness as a percentage of the body width
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
+    public static SmoothUniform withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
         return new SmoothUniform(xMin, xMax, edgeSharpness);
     }
 
@@ -138,17 +138,17 @@ public class SmoothUniform implements ContinuousDistribution {
         final DoubleVertex leftCutoff = xMin.minus(shoulderWidth);
 
         final DoubleVertex firstConditional = x
-            .toGreaterThanOrEqualToMask(xMin)
-            .times(x.toLessThanOrEqualToMask(xMax));
+            .greaterThanOrEqualToMask(xMin)
+            .times(x.lessThanOrEqualToMask(xMax));
         final DoubleVertex firstConditionResult = bodyHeightVertex(shoulderWidth, bodyWidth);
 
         final DoubleVertex secondConditional = x
-            .toLessThanMask(xMin)
-            .times(x.toGreaterThanMask(leftCutoff));
+            .lessThanMask(xMin)
+            .times(x.greaterThanMask(leftCutoff));
         final DoubleVertex secondConditionalResult = shoulderVertex(shoulderWidth, bodyWidth, x.minus(leftCutoff));
 
-        final DoubleVertex thirdConditional = x.toGreaterThanMask(xMax)
-            .times(x.toLessThanMask(rightCutoff));
+        final DoubleVertex thirdConditional = x.greaterThanMask(xMax)
+            .times(x.lessThanMask(rightCutoff));
         final DoubleVertex thirdConditionalResult = shoulderVertex(shoulderWidth, bodyWidth, shoulderWidth.minus(x).plus(xMax));
 
         return firstConditional.times(firstConditionResult)
@@ -157,7 +157,6 @@ public class SmoothUniform implements ContinuousDistribution {
             .log();
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor bodyWidth = xMax.minus(xMin);
         final DoubleTensor shoulderWidth = bodyWidth.times(edgeSharpness);

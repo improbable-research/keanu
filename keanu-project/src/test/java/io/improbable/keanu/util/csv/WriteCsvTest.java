@@ -6,9 +6,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,10 +25,10 @@ import static org.junit.Assert.assertTrue;
 public class WriteCsvTest {
 
     private NetworkSamples samples;
-    private List<Vertex<DoubleTensor>> rowTensors = new ArrayList<>();
-    private List<Vertex<DoubleTensor>> columnTensors = new ArrayList<>();
-    private List<Vertex<DoubleTensor>> scalarTensors = new ArrayList<>();
-    private List<Vertex<IntegerTensor>> integerColumnTensors = new ArrayList<>();
+    private List<Vertex<DoubleTensor, ?>> rowTensors = new ArrayList<>();
+    private List<Vertex<DoubleTensor, ?>> columnTensors = new ArrayList<>();
+    private List<Vertex<DoubleTensor, ?>> scalarTensors = new ArrayList<>();
+    private List<Vertex<IntegerTensor, ?>> integerColumnTensors = new ArrayList<>();
 
     @Before
     public void setup() {

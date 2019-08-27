@@ -1,0 +1,6 @@
+dependencies {
+    compile project(":keanu-project")
+
+    //testing
+    testCompile 'junit:junit:4.12'
+}

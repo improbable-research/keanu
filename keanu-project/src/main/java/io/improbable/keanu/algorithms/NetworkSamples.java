@@ -5,12 +5,12 @@ import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.BooleanVertexSamples;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertexSamples;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertexSamples;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertexSamples;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexSamples;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;

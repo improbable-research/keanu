@@ -7,9 +7,9 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.CauchyVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -88,7 +88,7 @@ public class GaussianProposalDistributionTest {
         DoubleTensor cov = DoubleTensor.concat(sigmaForVertex1, sigmaForVertex2).pow(2.).diag();
         DoubleTensor x = DoubleTensor.concat(proposedStateForVertex1, proposedStateForVertex2);
         DoubleTensor expectedLogProb = MultivariateGaussian.withParameters(mu, cov).logProb(x);
-        assertThat(logProb, closeTo(expectedLogProb.sum(), 1e-14)); // sum of .log().sum() has rounding errors
+        assertThat(logProb, closeTo(expectedLogProb.sumNumber(), 1e-14)); // sum of .log().sum() has rounding errors
     }
 
     @Test
@@ -98,7 +98,7 @@ public class GaussianProposalDistributionTest {
         DoubleTensor cov = DoubleTensor.concat(sigmaForVertex1, sigmaForVertex2).pow(2.).diag();
         DoubleTensor x = DoubleTensor.concat(currentStateForVertex1, currentStateForVertex2);
         DoubleTensor expectedLogProb = MultivariateGaussian.withParameters(mu, cov).logProb(x);
-        assertThat(logProb, closeTo(expectedLogProb.sum(), 1e-14)); // sum of .log().sum() has rounding errors
+        assertThat(logProb, closeTo(expectedLogProb.sumNumber(), 1e-14)); // sum of .log().sum() has rounding errors
     }
 
     @Test

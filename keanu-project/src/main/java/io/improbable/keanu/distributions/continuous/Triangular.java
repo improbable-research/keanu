@@ -5,8 +5,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 public class Triangular implements ContinuousDistribution {
 
@@ -26,7 +26,7 @@ public class Triangular implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        Preconditions.checkArgument(c.greaterThanOrEqual(xMin).allTrue() && c.lessThanOrEqual(xMax).allTrue(),
+        Preconditions.checkArgument(c.greaterThanOrEqual(xMin).allTrue().scalar() && c.lessThanOrEqual(xMax).allTrue().scalar(),
             "center must be between xMin and xMax. c: " + c + " xMin: " + xMin + " xMax: " + xMax);
 
         final DoubleTensor p = random.nextDouble(shape);
@@ -64,20 +64,19 @@ public class Triangular implements ContinuousDistribution {
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex xMin, DoublePlaceholderVertex xMax, DoublePlaceholderVertex c) {
         final DoubleVertex range = xMax.minus(xMin);
 
-        final DoubleVertex conditionalFirstHalf = x.toGreaterThanMask(xMin);
-        final DoubleVertex conditionalSecondHalf = x.toLessThanMask(c);
+        final DoubleVertex conditionalFirstHalf = x.greaterThanMask(xMin);
+        final DoubleVertex conditionalSecondHalf = x.lessThanMask(c);
         final DoubleVertex conditionalAnd = conditionalFirstHalf.times(conditionalSecondHalf);
         final DoubleVertex conditionalResult = range.reverseDiv(1.).times(2.).times(x.minus(xMin)).div(c.minus(xMin));
 
-        final DoubleVertex elseIfConditionalFirstHalf = x.toGreaterThanMask(c);
-        final DoubleVertex elseIfConditionalSecondHalf = x.toLessThanOrEqualToMask(xMax);
+        final DoubleVertex elseIfConditionalFirstHalf = x.greaterThanMask(c);
+        final DoubleVertex elseIfConditionalSecondHalf = x.lessThanOrEqualToMask(xMax);
         final DoubleVertex elseIfConditionalAnd = elseIfConditionalFirstHalf.times(elseIfConditionalSecondHalf);
         final DoubleVertex elseIfConditionalResult = range.reverseDiv(1.).times(2.).times(xMax.minus(x)).div(xMax.minus(c));
 
         return (conditionalResult.times(conditionalAnd).plus(elseIfConditionalResult.times(elseIfConditionalAnd))).log();
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }

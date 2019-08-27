@@ -6,7 +6,7 @@ import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.util.status.StatusBar;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;

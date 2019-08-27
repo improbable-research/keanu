@@ -171,7 +171,7 @@ public class Keanu {
          * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from.
          * @return an {@link io.improbable.keanu.algorithms.variational.optimizer.Optimizer}
          */
-        public io.improbable.keanu.algorithms.variational.optimizer.Optimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+        public io.improbable.keanu.algorithms.variational.optimizer.Optimizer ofConnectedGraph(Vertex<?, ?> vertexFromNetwork) {
             return of(vertexFromNetwork.getConnectedGraph());
         }
 
@@ -210,7 +210,7 @@ public class Keanu {
              * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
              * @return a {@link NonGradientOptimizer}
              */
-            public NonGradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+            public NonGradientOptimizer ofConnectedGraph(Vertex<?, ?> vertexFromNetwork) {
                 return of(vertexFromNetwork.getConnectedGraph());
             }
 
@@ -260,7 +260,7 @@ public class Keanu {
              * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
              * @return a {@link GradientOptimizer}
              */
-            public GradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+            public GradientOptimizer ofConnectedGraph(Vertex<?, ?> vertexFromNetwork) {
                 return of(vertexFromNetwork.getConnectedGraph());
             }
 

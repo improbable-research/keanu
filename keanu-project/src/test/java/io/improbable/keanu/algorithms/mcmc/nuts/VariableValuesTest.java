@@ -3,8 +3,8 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 

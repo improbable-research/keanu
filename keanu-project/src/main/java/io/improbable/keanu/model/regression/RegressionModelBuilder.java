@@ -5,7 +5,7 @@ import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import java.util.function.Function;
 

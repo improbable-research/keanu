@@ -1,7 +1,7 @@
 package io.improbable.keanu.tensor;
 
-
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -103,13 +103,18 @@ public class TensorShapeValidation {
         );
     }
 
-    public static long[] checkIsBroadcastable(long[] left, long[] right) {
-        return TensorShape.getBroadcastResultShape(left, right);
-    }
-
     public static boolean isBroadcastable(long[] left, long[] right) {
         try {
             TensorShape.getBroadcastResultShape(left, right);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public static boolean isBroadcastable(long[] a, long[]... b) {
+        try {
+            TensorShape.getBroadcastResultShape(a, b);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -132,11 +137,11 @@ public class TensorShapeValidation {
     }
 
     public static void checkShapeIsSquareMatrix(long[] shape) {
-        if (shape.length != 2) {
+        if (shape.length < 2) {
             throw new IllegalArgumentException("Input tensor must be a matrix");
         }
 
-        if (shape[0] != shape[1]) {
+        if (shape[shape.length - 1] != shape[shape.length - 2]) {
             throw new IllegalArgumentException("Input matrix must be square");
         }
     }
@@ -286,14 +291,21 @@ public class TensorShapeValidation {
     }
 
     public static long[] getMatrixMultiplicationResultingShape(long[] left, long[] right) {
-        if (left.length != 2 || right.length != 2) {
-            throw new IllegalArgumentException("Matrix multiply must be used on matrices");
+        if (left.length < 2 || right.length < 2) {
+            throw new IllegalArgumentException("Cannot matrix multiply with shapes " + Arrays.toString(left) + " and " + Arrays.toString(right));
         }
 
-        if (left[1] != right[0]) {
-            throw new IllegalArgumentException("Can not multiply matrices of shapes " + Arrays.toString(left) + " X " + Arrays.toString(right));
+        if (left[left.length - 1] != right[right.length - 2]) {
+            throw new IllegalArgumentException("Cannot matrix multiply with shapes " + Arrays.toString(left) + " and " + Arrays.toString(right));
         }
 
-        return new long[]{left[0], right[1]};
+        if (left.length == 2 && right.length == 2) {
+            return new long[]{left[0], right[1]};
+        } else {
+            final long[] leftBatchShape = ArrayUtils.subarray(left, 0, left.length - 2);
+            final long[] rightBatchShape = ArrayUtils.subarray(right, 0, right.length - 2);
+            final long[] batchShape = TensorShape.getBroadcastResultShape(leftBatchShape, rightBatchShape);
+            return TensorShape.concat(batchShape, new long[]{left[left.length - 2], right[right.length - 1]});
+        }
     }
 }

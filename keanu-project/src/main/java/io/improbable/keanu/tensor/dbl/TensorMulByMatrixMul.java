@@ -2,7 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import io.improbable.keanu.tensor.FloatingPointTensor;
+import io.improbable.keanu.tensor.NumberTensor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class TensorMulByMatrixMul {
 
-    public static <T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>> TENSOR tensorMmul(TENSOR left, TENSOR right, int[] dimsLeft, int[] dimsRight) {
+    public static <T extends Number, TENSOR extends NumberTensor<T, TENSOR>> TENSOR tensorMmul(TENSOR left, TENSOR right, int[] dimsLeft, int[] dimsRight) {
 
         long[] leftShape = left.getShape();
         long[] rightShape = right.getShape();
@@ -36,6 +36,17 @@ public class TensorMulByMatrixMul {
 
         long[] resultShape = Longs.concat(leftKeptShape, rightKeptShape);
         return resultAsMatrix.reshape(resultShape);
+    }
+
+    public static long[] getResultShape(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
+
+        List<Integer> leftDimsKept = getKeptDimensions(leftShape.length, dimsLeft);
+        List<Integer> rightDimsKept = getKeptDimensions(rightShape.length, dimsRight);
+
+        long[] leftKeptShape = getKeptShape(leftShape, leftDimsKept);
+        long[] rightKeptShape = getKeptShape(rightShape, rightDimsKept);
+
+        return Longs.concat(leftKeptShape, rightKeptShape);
     }
 
     /**

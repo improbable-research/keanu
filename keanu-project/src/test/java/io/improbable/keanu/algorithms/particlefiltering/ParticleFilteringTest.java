@@ -1,9 +1,9 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Rule;
 import org.junit.Test;

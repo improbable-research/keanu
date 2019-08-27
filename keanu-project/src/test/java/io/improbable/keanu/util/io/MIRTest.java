@@ -2,10 +2,10 @@ package io.improbable.keanu.util.io;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import io.improbable.mir.MIR;
 import org.junit.Rule;
 import org.junit.Test;

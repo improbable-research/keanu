@@ -38,6 +38,69 @@ public class SlicerIndexMapperTest {
     }
 
     @Test
+    public void canCalculateResultShapeOf2DimensionsWithOverFlowStop() {
+
+        Slicer slicer = Slicer.builder()
+            .slice(2, 7, 2)
+            .build();
+
+        long[] shape = new long[]{3, 10};
+        long[] stride = TensorShape.getRowFirstStride(shape);
+
+        SlicerIndexMapper slicerIndexMapper = new SlicerIndexMapper(slicer, shape, stride);
+
+        assertThat(slicerIndexMapper.getResultShape(), equalTo(new long[]{1, 10}));
+    }
+
+    @Test
+    public void canCalculateResultShapeOf2DimensionsWithEllipsisOverTwoDimensions() {
+
+        Slicer slicer = Slicer.builder()
+            .ellipsis()
+            .slice(2)
+            .build();
+
+        long[] shape = new long[]{2, 2, 10};
+        long[] stride = TensorShape.getRowFirstStride(shape);
+
+        SlicerIndexMapper slicerIndexMapper = new SlicerIndexMapper(slicer, shape, stride);
+
+        assertThat(slicerIndexMapper.getResultShape(), equalTo(new long[]{2, 2}));
+    }
+
+    @Test
+    public void canCalculateResultShapeOf2DimensionsWithEllipsis() {
+
+        Slicer slicer = Slicer.builder()
+            .ellipsis()
+            .slice(2, 7, 2)
+            .build();
+
+        long[] shape = new long[]{3, 10};
+        long[] stride = TensorShape.getRowFirstStride(shape);
+
+        SlicerIndexMapper slicerIndexMapper = new SlicerIndexMapper(slicer, shape, stride);
+
+        assertThat(slicerIndexMapper.getResultShape(), equalTo(new long[]{3, 3}));
+    }
+
+    @Test
+    public void canCalculateResultShapeOf2DimensionsWithNegativeIndexing() {
+
+        Slicer slicer = Slicer.builder()
+            .ellipsis()
+            .slice(-2, -7, -2)
+            .build();
+
+        long[] shape = new long[]{3, 10};
+        long[] stride = TensorShape.getRowFirstStride(shape);
+
+        SlicerIndexMapper slicerIndexMapper = new SlicerIndexMapper(slicer, shape, stride);
+
+        assertThat(slicerIndexMapper.getResultShape(), equalTo(new long[]{3, 3}));
+    }
+
+    @Test
     public void canCalculateIndexMapToSourceBuffer() {
 
         Slicer slicer = Slicer.builder()

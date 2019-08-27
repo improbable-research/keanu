@@ -3,8 +3,9 @@ package io.improbable.keanu.network;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexState;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,8 +35,8 @@ public class NetworkSnapshotTest {
     public void itSetsTheStateOfAVertex() {
         VertexState<Object> s1 = VertexState.nullState();
         VertexState<Object> s2 = VertexState.nullState();
-        Vertex<Object> v1 = mock(Vertex.class);
-        Vertex<Object> v2 = mock(Vertex.class);
+        VertexImpl<Object, ?> v1 = mock(VertexImpl.class);
+        VertexImpl<Object, ?> v2 = mock(VertexImpl.class);
         when(v1.getState()).thenReturn(s1);
         when(v2.getState()).thenReturn(s2);
         doCallRealMethod().when(v1).setState(any(VertexState.class));

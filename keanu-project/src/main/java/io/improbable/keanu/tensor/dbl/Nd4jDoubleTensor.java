@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.dbl;
 
-import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -9,23 +8,28 @@ import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
-import io.improbable.keanu.tensor.ndj4.INDArrayExtensions;
 import io.improbable.keanu.tensor.ndj4.INDArrayShim;
 import io.improbable.keanu.tensor.ndj4.Nd4jFloatingPointTensor;
 import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
 import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
-import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.special.Gamma;
-import org.bytedeco.javacpp.indexer.BooleanIndexer;
+import org.bytedeco.javacpp.DoublePointer;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.scalar.ReplaceNans;
 import org.nd4j.linalg.api.ops.impl.transforms.bool.MatchConditionTransform;
+import org.nd4j.linalg.api.ops.impl.transforms.same.Sign;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 
 import java.util.Arrays;
+
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
+import static io.improbable.keanu.tensor.ndj4.INDArrayExtensions.asBoolean;
+import static java.util.Arrays.copyOf;
+import static org.bytedeco.openblas.global.openblas.LAPACKE_dpotri;
+import static org.bytedeco.openblas.global.openblas.LAPACK_ROW_MAJOR;
 
 /**
  * Class for representing n-dimensional arrays of doubles. This is
@@ -45,6 +49,10 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
 
     public Nd4jDoubleTensor(INDArray tensor) {
         super(tensor);
+    }
+
+    public Nd4jDoubleTensor(DoubleTensor from) {
+        this(TypedINDArrayFactory.create(from.asFlatDoubleArray(), from.getShape()));
     }
 
     @Override
@@ -130,13 +138,86 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
         }
     }
 
+    /**
+     * Nd4j DiagPart doesnt support non-square matrix diag. In the case where this is non-square
+     * the JVMDoubleTensor implementation is used. For square matrices, the nd4j implementation is used.
+     *
+     * @return matrices with their diagonals equal to the batched vectors from this.
+     */
     @Override
-    public int nanArgMax() {
-        return tensor.argMax().getInt(0);
+    public DoubleTensor diag() {
+        if (getRank() > 1) {
+            //TODO: use nd4j if they support this at later versions
+            return new Nd4jDoubleTensor(toJVM().diag());
+        } else {
+            return super.diag();
+        }
+    }
+
+    /**
+     * Nd4j DiagPart doesnt support non-square matrix diag. In the case where this is non-square
+     * the JVMDoubleTensor implementation is used. For square matrices, the nd4j implementation is used.
+     *
+     * @return The elements from the diagonal of this matrix.
+     */
+    @Override
+    public DoubleTensor diagPart() {
+        if (tensor.size(0) != tensor.size(1)) {
+            //TODO: use nd4j if they support this at later versions
+            return new Nd4jDoubleTensor(toJVM().diagPart());
+        } else {
+            return super.diagPart();
+        }
     }
 
     @Override
-    public int argMax() {
+    public DoubleTensor matrixMultiply(DoubleTensor value) {
+        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
+        if (tensor.shape().length > 2 || value.getShape().length > 2) {
+            return fromJVM(toJVM().matrixMultiply(value));
+        }
+        INDArray mmulResult = tensor.mmul(getTensor(value));
+        return create(mmulResult);
+    }
+
+    @Override
+    public DoubleTensor choleskyInverse() {
+        INDArray newBuffer = tensor.dup();
+
+        int N = Ints.checkedCast(getShape()[getRank() - 1]);
+
+        int inverseResult = LAPACKE_dpotri(
+            LAPACK_ROW_MAJOR,
+            (byte) 'L',
+            N,
+            (DoublePointer) newBuffer.data().pointer(),
+            N
+        );
+
+        if (inverseResult != 0) {
+            throw new IllegalStateException("Cholesky inverse failed");
+        }
+
+        return create(newBuffer);
+    }
+
+    @Override
+    protected DoubleTensor toJVM() {
+        return JVMDoubleTensorFactory.INSTANCE.create(asFlatDoubleArray(), getShape());
+    }
+
+    @Override
+    protected DoubleTensor fromJVM(DoubleTensor jvmTensor) {
+        return new Nd4jDoubleTensor(jvmTensor);
+    }
+
+    @Override
+    public IntegerTensor nanArgMax() {
+        return IntegerTensor.scalar(tensor.argMax().getInt(0));
+    }
+
+    @Override
+    public IntegerTensor argMax() {
         return duplicate()
             .replaceNaNInPlace(Double.MAX_VALUE)
             .nanArgMax();
@@ -158,12 +239,12 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     }
 
     @Override
-    public int nanArgMin() {
-        return Nd4j.argMin(tensor).getInt(0);
+    public IntegerTensor nanArgMin() {
+        return IntegerTensor.scalar(Nd4j.argMin(tensor).getInt(0));
     }
 
     @Override
-    public int argMin() {
+    public IntegerTensor argMin() {
         return duplicate()
             .replaceNaNInPlace(-Double.MAX_VALUE)
             .nanArgMin();
@@ -189,21 +270,6 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     }
 
     @Override
-    public boolean equalsWithinEpsilon(DoubleTensor o, Double epsilon) {
-        if (this == o) return true;
-
-        if (o instanceof Nd4jTensor) {
-            return tensor.equalsWithEps(((Nd4jTensor) o).getTensor(), epsilon);
-        } else {
-            if (this.hasSameShapeAs(o)) {
-                DoubleTensor difference = o.minus(this);
-                return difference.abs().lessThan(epsilon).allTrue();
-            }
-        }
-        return false;
-    }
-
-    @Override
     public DoubleTensor greaterThanMask(DoubleTensor greaterThanThis) {
         return greaterThan(greaterThanThis).toDoubleMask();
     }
@@ -225,10 +291,9 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
 
     @Override
     public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
-        TensorValidator.NAN_CATCHER.validate(getThis());
-        TensorValidator.NAN_CATCHER.validate(y);
-        DoubleTensor result = this.logInPlace().timesInPlace(y);
-        return TensorValidator.NAN_FIXER.validate(result);
+        BooleanTensor yNotZeroMask = y.elementwiseEquals(0.0);
+        DoubleTensor result = logInPlace().timesInPlace(y);
+        return DoubleTensor.scalar(0.0).where(yNotZeroMask, result);
     }
 
     @Override
@@ -242,9 +307,14 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     }
 
     @Override
+    public DoubleTensor trigammaInPlace() {
+        return applyInPlace(Gamma::trigamma);
+    }
+
+    @Override
     public DoubleTensor logAddExp2InPlace(DoubleTensor that) {
         //TODO: actually use Nd4j when logsumexp is fixed in next version
-        JVMDoubleTensor asJVM = JVMDoubleTensor.create(tensor.toDoubleVector(), tensor.shape());
+        JVMDoubleTensor asJVM = JVMDoubleTensorFactory.INSTANCE.create(tensor.toDoubleVector(), tensor.shape());
         DoubleTensor result = asJVM.logAddExp2InPlace(that);
         return Nd4jDoubleTensor.create(result.asFlatDoubleArray(), result.getShape());
     }
@@ -252,7 +322,7 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     @Override
     public DoubleTensor logAddExpInPlace(DoubleTensor that) {
         //TODO: actually use Nd4j when logsumexp is fixed in next version
-        JVMDoubleTensor asJVM = JVMDoubleTensor.create(tensor.toDoubleVector(), tensor.shape());
+        JVMDoubleTensor asJVM = JVMDoubleTensorFactory.INSTANCE.create(tensor.toDoubleVector(), tensor.shape());
         DoubleTensor result = asJVM.logAddExpInPlace(that);
         return Nd4jDoubleTensor.create(result.asFlatDoubleArray(), result.getShape());
     }
@@ -279,17 +349,6 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
         return BooleanTensor.create(asBoolean(result), tensor.shape());
     }
 
-    private boolean[] asBoolean(INDArray array) {
-        Preconditions.checkArgument(array.dataType() == DataType.BOOL);
-        boolean[] buffer = new boolean[Ints.checkedCast(array.length())];
-
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = ((BooleanIndexer) (array.data()).indexer()).get(i);
-        }
-
-        return buffer;
-    }
-
     @Override
     public BooleanTensor isNegativeInfinity() {
         INDArray result = Nd4j.getExecutioner().exec(
@@ -311,23 +370,22 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     }
 
     @Override
-    public DoubleTensor toDouble() {
-        return duplicate();
-    }
+    public DoubleTensor where(BooleanTensor predicate, DoubleTensor els) {
+        final long[] resultShape = getBroadcastResultShape(getBroadcastResultShape(getShape(), predicate.getShape()), els.getShape());
+        final DoubleTensor broadcastedTrue = this.hasShape(resultShape) ? this : this.broadcast(resultShape);
+        final DoubleTensor broadcastedFalse = els.hasShape(resultShape) ? els : els.broadcast(resultShape);
+        final BooleanTensor broadcastedPredicate = predicate.hasShape(resultShape) ? predicate : predicate.broadcast(resultShape);
 
-    @Override
-    public IntegerTensor toInteger() {
-        return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(tensor, true));
-    }
+        FlattenedView<Double> trueValuesFlattened = broadcastedTrue.getFlattenedView();
+        FlattenedView<Double> falseValuesFlattened = broadcastedFalse.getFlattenedView();
+        FlattenedView<Boolean> predicateValuesFlattened = broadcastedPredicate.getFlattenedView();
 
-    @Override
-    public double[] asFlatDoubleArray() {
-        return tensor.dup().data().asDouble();
-    }
+        double[] result = new double[TensorShape.getLengthAsInt(resultShape)];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = predicateValuesFlattened.get(i) ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
+        }
 
-    @Override
-    public int[] asFlatIntegerArray() {
-        return tensor.dup().data().asInt();
+        return DoubleTensor.create(result, copyOf(resultShape, resultShape.length));
     }
 
     @Override
@@ -338,6 +396,12 @@ public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTens
     @Override
     public FlattenedView<Double> getFlattenedView() {
         return new Nd4jDoubleFlattenedView();
+    }
+
+    @Override
+    public DoubleTensor signInPlace() {
+        Nd4j.getExecutioner().exec(new Sign(tensor));
+        return this;
     }
 
     private class Nd4jDoubleFlattenedView implements FlattenedView<Double> {

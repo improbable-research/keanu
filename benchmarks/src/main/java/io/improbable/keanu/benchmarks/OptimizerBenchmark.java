@@ -10,7 +10,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.util.status.StatusBar;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;

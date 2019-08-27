@@ -25,7 +25,7 @@ public class ScalarIntegerTensorTest {
     public void canArgFindMaxOfOneByOne() {
         IntegerTensor tensor = IntegerTensor.scalar(1).reshape(1, 1);
 
-        assertEquals(0, tensor.argMax());
+        assertThat(tensor.argMax().scalar(), equalTo(0));
         assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.scalar(0)));
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.scalar(0)));
     }

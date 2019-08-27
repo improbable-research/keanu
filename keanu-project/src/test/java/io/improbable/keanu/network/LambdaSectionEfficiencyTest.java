@@ -1,10 +1,8 @@
 package io.improbable.keanu.network;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.Test;
 
@@ -20,8 +18,8 @@ public class LambdaSectionEfficiencyTest {
     @Test
     public void doesNotVisitVerticesMoreThanOnce() {
         GaussianVertex A = new GaussianVertex(0, 1);
-        SinVertex sinA = A.sin();
-        AdditionVertex APlusSinA = A.plus(sinA);
+        DoubleVertex sinA = A.sin();
+        DoubleVertex APlusSinA = A.plus(sinA);
         GaussianVertex C = new GaussianVertex(APlusSinA, 1);
 
         MutableInt callsToNext = new MutableInt(0);

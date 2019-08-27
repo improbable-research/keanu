@@ -5,7 +5,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDouble;
 
 import java.util.Set;
 import java.util.function.Function;

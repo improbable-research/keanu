@@ -56,12 +56,12 @@ public class TensorShapeTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void throwsIfFlatIndexOverflowsShape(){
+    public void throwsIfFlatIndexOverflowsShape() {
         long[] shapeIndices = TensorShape.getShapeIndices(new long[]{5, 4}, new long[]{4, 1}, 20);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void throwsIfFlatIndexUnderflowsShape(){
+    public void throwsIfFlatIndexUnderflowsShape() {
         long[] shapeIndices = TensorShape.getShapeIndices(new long[]{5, 4}, new long[]{4, 1}, -1);
     }
 

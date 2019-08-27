@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 

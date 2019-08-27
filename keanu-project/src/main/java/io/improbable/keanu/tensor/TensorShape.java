@@ -66,6 +66,20 @@ public class TensorShape {
     }
 
     /**
+     * @param shape          for finding length of
+     * @param overDimensions the dimensions to calculate the length over.
+     * @return the number of elements in a tensor. This
+     * is the product of all ints in shape.
+     */
+    public static long getLength(long[] shape, int... overDimensions) {
+        long length = 1;
+        for (int dim : overDimensions) {
+            length *= shape[dim];
+        }
+        return length;
+    }
+
+    /**
      * @param shape shape to find stride for
      * @return the stride which is used to convert from a N dimensional index
      * to a buffer array flat index. This is based on the C convention of
@@ -96,6 +110,10 @@ public class TensorShape {
      * @return the flat index from a N dimensional index
      */
     public static long getFlatIndex(long[] shape, long[] stride, long... index) {
+        if (index.length != shape.length) {
+            throw new IllegalArgumentException("Cannot get index " + Arrays.toString(index) + " for shape " + Arrays.toString(shape));
+        }
+
         long flatIndex = 0;
         for (int i = 0; i < shape.length; i++) {
 
@@ -201,6 +219,14 @@ public class TensorShape {
         return (shape1.length >= shape2.length) ? shape1 : shape2;
     }
 
+    public static long[] getBroadcastResultShape(long[] a, long[]... b) {
+        long[] result = a;
+        for (long[] right : b) {
+            result = TensorShape.getBroadcastResultShape(result, right);
+        }
+        return result;
+    }
+
     public static long[] getBroadcastResultShape(long[] left, long[] right) {
 
         final long[] shapeOfHighestRank = left.length > right.length ? left : right;
@@ -290,13 +316,27 @@ public class TensorShape {
         return dimension;
     }
 
-    public static long[] getReductionResultShape(long[] inputShape, int[] sumOverDimensions) {
+    public static long[] getReductionResultShape(long[] inputShape, int[] reduceOverDimensions) {
         if (inputShape.length > 0) {
-            return ArrayUtils.removeAll(inputShape, sumOverDimensions);
+            return ArrayUtils.removeAll(inputShape, reduceOverDimensions);
         } else {
-            Preconditions.checkArgument(sumOverDimensions.length == 0);
+            Preconditions.checkArgument(reduceOverDimensions.length == 0);
             return inputShape;
         }
+    }
+
+    public static long[] getReductionResultShapeWithoutRankLoss(long[] shape, int[] reduceOverDimensions) {
+        long[] shapeCopy = Arrays.copyOf(shape, shape.length);
+
+        if (reduceOverDimensions == null) {
+            Arrays.fill(shapeCopy, 1L);
+        } else {
+            for (int sumOverDimension : reduceOverDimensions) {
+                shapeCopy[sumOverDimension] = 1L;
+            }
+        }
+
+        return shapeCopy;
     }
 
     public static long[] getPermutedIndices(long[] indices, int... rearrange) {
@@ -318,9 +358,9 @@ public class TensorShape {
     }
 
     public static long convertFromFlatIndexToPermutedFlatIndex(long fromFlatIndex,
-                                                              long[] shape, long[] stride,
-                                                              long[] permutedShape, long[] permutedStride,
-                                                              int[] rearrange) {
+                                                               long[] shape, long[] stride,
+                                                               long[] permutedShape, long[] permutedStride,
+                                                               int[] rearrange) {
         long[] shapeIndices = getShapeIndices(shape, stride, fromFlatIndex);
 
         long[] permutedIndex = getPermutedIndices(shapeIndices, rearrange);
@@ -432,6 +472,18 @@ public class TensorShape {
         return toFlatIndex;
     }
 
+    public static boolean incrementIndexByShape(long[] shape, long[] index) {
+
+        for (int i = shape.length - 1; i >= 0; i--) {
+            index[i] = (index[i] + 1) % shape[i];
+            if (index[i] != 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static boolean incrementIndexByShape(long[] shape, long[] index, int[] dimensionOrder) {
 
         for (int i : dimensionOrder) {
@@ -442,6 +494,21 @@ public class TensorShape {
         }
 
         return false;
+    }
+
+    public static long[] getDiagResultShape(long[] shape) {
+        final long endDim = shape[shape.length - 1];
+        return ArrayUtils.add(shape, endDim);
+    }
+
+    public static long[] getDiagPartResultShape(long[] shape) {
+        final long M = shape[shape.length - 2];
+        final long N = shape[shape.length - 1];
+        final long diagLength = Math.min(M, N);
+
+        final long[] resultShape = ArrayUtils.subarray(shape, 0, shape.length - 1);
+        resultShape[resultShape.length - 1] = diagLength;
+        return resultShape;
     }
 
 }

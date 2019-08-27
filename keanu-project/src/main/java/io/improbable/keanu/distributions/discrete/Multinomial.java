@@ -129,7 +129,7 @@ public class Multinomial implements DiscreteDistribution {
             throw new IllegalArgumentException("Probabilities must be a vector or a tensor with rank >= 1");
         }
 
-        final boolean pRangeValidated = p.greaterThan(0.0).allTrue() && p.lessThan(1.0).allTrue();
+        final boolean pRangeValidated = p.greaterThan(0.0).allTrue().scalar() && p.lessThan(1.0).allTrue().scalar();
         if (!pRangeValidated) {
             throw new IllegalArgumentException(
                 "Probabilities must be > 0 < 1 but were " + Arrays.toString(p.asFlatDoubleArray())
@@ -139,7 +139,8 @@ public class Multinomial implements DiscreteDistribution {
         final DoubleTensor pSum = p.sum(-1);
         final boolean pSumValidated = pSum.equalsWithinEpsilon(
             DoubleTensor.create(1.0, pSum.getShape()), allowedProbabilityError
-        );
+        ).allTrue().scalar();
+
         if (!pSumValidated) {
             throw new IllegalArgumentException(
                 "Probabilities must sum to 1 but summed to " + Arrays.toString(pSum.asFlatDoubleArray())
@@ -148,15 +149,15 @@ public class Multinomial implements DiscreteDistribution {
     }
 
     private static void validateN(IntegerTensor n) {
-        final boolean nRangeValidated = n.greaterThanOrEqual(0).allTrue();
+        final boolean nRangeValidated = n.greaterThanOrEqual(0).allTrue().scalar();
         if (!nRangeValidated) {
             throw new IllegalArgumentException("Number of trials (n) must be non-negative.");
         }
     }
 
     private static void validateX(IntegerTensor x, IntegerTensor n, DoubleTensor p) {
-        final boolean xRangeValidated = x.greaterThanOrEqual(0).allTrue() &&
-            x.lessThanOrEqual(n.reshape(Longs.concat(n.getShape(), new long[]{1}))).allTrue();
+        final boolean xRangeValidated = x.greaterThanOrEqual(0).allTrue().scalar() &&
+            x.lessThanOrEqual(n.reshape(Longs.concat(n.getShape(), new long[]{1}))).allTrue().scalar();
 
         if (!xRangeValidated) {
             throw new IllegalArgumentException("x must be >= 0 and <= n");
@@ -165,7 +166,7 @@ public class Multinomial implements DiscreteDistribution {
         validateXShape(x.getShape(), p.getShape());
 
         final IntegerTensor xSum = x.sum(-1);
-        final boolean xSumValidated = xSum.elementwiseEquals(n).allTrue();
+        final boolean xSumValidated = xSum.elementwiseEquals(n).allTrue().scalar();
         if (!xSumValidated) {
             throw new IllegalArgumentException(
                 "The sum of x " + Arrays.toString(xSum.asFlatArray()) +

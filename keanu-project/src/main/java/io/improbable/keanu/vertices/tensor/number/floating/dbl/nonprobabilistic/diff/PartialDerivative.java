@@ -1,0 +1,215 @@
+package io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff;
+
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
+import java.util.Arrays;
+
+public class PartialDerivative {
+
+    public static final PartialDerivative EMPTY = new PartialDerivative(null);
+
+    private final DoubleTensor partial;
+
+    public static PartialDerivative createFromWrtOf(DoubleTensor partial, int ofRank) {
+        return new PartialDerivative(partial.permute(swapDims(partial.getRank(), partial.getRank() - ofRank)));
+    }
+
+    public PartialDerivative(DoubleTensor partial) {
+        this.partial = partial;
+    }
+
+    public boolean isPresent() {
+        return partial != null;
+    }
+
+    public DoubleTensor get() {
+        return partial;
+    }
+
+    public DoubleTensor getWrtOf(int ofRank) {
+        return partial.permute(swapDims(partial.getRank(), ofRank));
+    }
+
+    private static int[] swapDims(int rank, int pivotPoint) {
+        int[] rearrange = new int[rank];
+
+        for (int i = 0; i < rank; i++) {
+            rearrange[i] = (pivotPoint + i) % rank;
+        }
+
+        return rearrange;
+    }
+
+    public long[] getOfShape(long[] wrtShape) {
+        return Arrays.copyOfRange(partial.getShape(), 0, partial.getRank() - wrtShape.length);
+    }
+
+    public long[] getWrtShape(long[] ofShape) {
+        return Arrays.copyOfRange(partial.getShape(), ofShape.length, partial.getRank());
+    }
+
+    public PartialDerivative add(PartialDerivative addition) {
+
+        if (this.isPresent() && addition.isPresent()) {
+            return new PartialDerivative(partial.plus(addition.partial));
+        } else if (this.isPresent() && !addition.isPresent()) {
+            return new PartialDerivative(get());
+        } else if (!this.isPresent() && addition.isPresent()) {
+            return new PartialDerivative(addition.partial);
+        } else {
+            return PartialDerivative.EMPTY;
+        }
+    }
+
+    public PartialDerivative subtract(PartialDerivative subtraction) {
+
+        if (this.isPresent() && subtraction.isPresent()) {
+            return new PartialDerivative(partial.minus(subtraction.partial));
+        } else if (this.isPresent() && !subtraction.isPresent()) {
+            return new PartialDerivative(get());
+        } else if (!this.isPresent() && subtraction.isPresent()) {
+            return new PartialDerivative(subtraction.partial.unaryMinus());
+        } else {
+            return PartialDerivative.EMPTY;
+        }
+    }
+
+    public PartialDerivative multiplyBy(double multiplier) {
+
+        if (!isPresent()) {
+            return this;
+        }
+
+        return new PartialDerivative(partial.times(multiplier));
+    }
+
+    /**
+     * This method assumes the partial 'of' rank is the same as the multiplier. This is usually the case except
+     * for some broadcast operations.
+     *
+     * @param multiplier the value to multiply by
+     * @return a partial derivative with of dimensions multiplied
+     */
+    public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier) {
+        return multiplyAlongOfDimensions(multiplier, multiplier.getRank());
+    }
+
+    /**
+     * @param multiplier    the value to multiply by
+     * @param partialOfRank the rank of the 'of' part of the partial. This is needed if it is different
+     *                      from the rank of the multiplier. This happens for rank changing broadcast ops.
+     * @return a partial derivative with of dimensions multiplied
+     */
+    public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier, int partialOfRank) {
+
+        if (!isPresent()) {
+            return this;
+        }
+
+        DoubleTensor multiplierAlignedAlongOf = alignAlongOf(multiplier, partial.getShape(), partialOfRank);
+        DoubleTensor result = partial.times(multiplierAlignedAlongOf);
+
+        return new PartialDerivative(result);
+    }
+
+    public PartialDerivative divideByAlongOfDimensions(DoubleTensor divisor) {
+        return divideByAlongOfDimensions(divisor, divisor.getRank());
+    }
+
+    public PartialDerivative divideByAlongOfDimensions(DoubleTensor divisor, int partialOfRank) {
+
+        if (!isPresent()) {
+            return this;
+        }
+
+        DoubleTensor divisorAlignedAlongOf = alignAlongOf(divisor, partial.getShape(), partialOfRank);
+        DoubleTensor result = partial.div(divisorAlignedAlongOf);
+
+        return new PartialDerivative(result);
+    }
+
+    public PartialDerivative multiplyAlongWrtDimensions(DoubleTensor multiplier) {
+
+        if (!isPresent()) {
+            return this;
+        }
+
+        DoubleTensor result = partial.times(multiplier);
+
+        return new PartialDerivative(result);
+    }
+
+    public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial,
+                                                                    DoubleTensor multiplier,
+                                                                    boolean partialIsLeft,
+                                                                    long[] partialOfShape,
+                                                                    int resultOfRank) {
+
+        if (!partial.isPresent()) {
+            return partial;
+        }
+
+        DoubleTensor partialWrtOf = partial.getWrtOf(partialOfShape.length);
+
+        if (partialOfShape.length != resultOfRank) {
+            long[] wrtShape = partial.getWrtShape(partialOfShape);
+            long[] ofShape = partial.getOfShape(wrtShape);
+            long[] partialWrtOfNewShape = TensorShape.concat(wrtShape, TensorShape.shapeToDesiredRankByPrependingOnes(ofShape, resultOfRank));
+            partialWrtOf = partialWrtOf.reshape(partialWrtOfNewShape);
+        }
+
+        final DoubleTensor result;
+        if (partialIsLeft) {
+            result = partialWrtOf.matrixMultiply(multiplier);
+        } else {
+            result = multiplier.matrixMultiply(partialWrtOf);
+        }
+
+        return PartialDerivative.createFromWrtOf(result, resultOfRank);
+    }
+
+    public static PartialDerivative matrixMultiply(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
+
+        if (!partial.isPresent()) {
+            return partial;
+        }
+
+        final DoubleTensor partialValue = partial.get();
+
+        final DoubleTensor result;
+        if (partialIsLeft) {
+            result = partialValue.matrixMultiply(multiplier.transpose());
+        } else {
+            result = multiplier.transpose().matrixMultiply(partialValue);
+        }
+
+        return new PartialDerivative(result);
+    }
+
+    /**
+     * This is important for the case where the partial 'of' and the tensor are different ranks but are
+     * still broadcastable.
+     *
+     * @param tensor        the tensor to align along the of dimensions
+     * @param partialShape  the full shape of the partial in the format [of,wrt]
+     * @param partialOfRank the rank of the 'of' part of the partial
+     * @return a reshaped tensor with a shape of ones everywhere except the aligned of dimensions.
+     * E.g.
+     * tensorShape = [3,4]
+     * partialShape = [2,3,4,5,6,7]
+     * partialOfRank = 3
+     * <p>
+     * returned tensor will be of shape [1,3,4,1,1,1]
+     */
+    private static DoubleTensor alignAlongOf(DoubleTensor tensor, long[] partialShape, int partialOfRank) {
+
+        final long[] alongOfShape = new long[partialShape.length];
+        Arrays.fill(alongOfShape, 1L);
+
+        final int tensorRank = tensor.getRank();
+        System.arraycopy(tensor.getShape(), 0, alongOfShape, partialOfRank - tensorRank, tensorRank);
+
+        return tensor.reshape(alongOfShape);
+    }
+}

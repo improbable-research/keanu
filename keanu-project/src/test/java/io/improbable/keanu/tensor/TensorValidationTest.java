@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.TensorValueException;
 import org.junit.Test;
 
 import java.util.function.Function;

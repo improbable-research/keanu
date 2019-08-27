@@ -4,8 +4,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
@@ -21,7 +21,7 @@ public class Logistic implements ContinuousDistribution {
      * @param s  scale parameter (b greater than 0)
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor s) {
+    public static Logistic withParameters(DoubleTensor mu, DoubleTensor s) {
         return new Logistic(mu, s);
     }
 
@@ -53,7 +53,6 @@ public class Logistic implements ContinuousDistribution {
             xMinusAOverB.exp().plus(1.).log().times(2.));
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor expAOverB = mu.div(s).expInPlace();
         final DoubleTensor expXOverB = x.div(s).expInPlace();

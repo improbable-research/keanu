@@ -1,8 +1,8 @@
 package io.improbable.keanu.tensor.validate.policy;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.validate.TensorValueException;
 
 public class ThrowValueException<T, TENSOR extends Tensor<T, TENSOR>> implements TensorValidationPolicy<T, TENSOR> {
     private final String message;
@@ -14,7 +14,7 @@ public class ThrowValueException<T, TENSOR extends Tensor<T, TENSOR>> implements
 
     @Override
     public TENSOR handle(TENSOR tensor, BooleanTensor result) {
-        if (!result.allTrue()) {
+        if (!result.allTrue().scalar()) {
             throw new TensorValueException(message, result);
         }
         return tensor;

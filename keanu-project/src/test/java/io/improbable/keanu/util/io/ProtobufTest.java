@@ -12,17 +12,17 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.Differentiator;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.If;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiator;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import io.improbable.mir.KeanuSavedBayesNet;
 import io.improbable.mir.SavedBayesNet;
 import org.junit.Rule;
@@ -134,14 +134,14 @@ public class ProtobufTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ProtobufSaver saver = new ProtobufSaver(complexNet);
         saver.save(outputStream, true);
-        DoubleIfVertex outputVertex = (DoubleIfVertex) complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        GaussianVertex inputVertex = (GaussianVertex) complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        Vertex outputVertex = complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        Vertex inputVertex = complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         ByteArrayInputStream input = new ByteArrayInputStream(outputStream.toByteArray());
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork loadedNet = loader.loadNetwork(input);
-        DoubleIfVertex outputVertex2 = (DoubleIfVertex) loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        GaussianVertex inputVertex2 = (GaussianVertex) loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        Vertex outputVertex2 = loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        Vertex inputVertex2 =  loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(
             inputVertex,
@@ -270,7 +270,7 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfWrongArgumentTypeSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Incorrect Parameter Type specified.  " +
+        expectedException.expectMessage("For ConstantDoubleVertex got incorrect parameter type specified.  " +
             "Got: class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, " +
             "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
 
@@ -455,7 +455,7 @@ public class ProtobufTest {
         return savedModel;
     }
 
-    private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {
+    private class TestNonSaveableVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonSaveableVertex {
 
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});
@@ -468,7 +468,7 @@ public class ProtobufTest {
         DoubleVertex testVertex = new TestNonSaveableVertex();
         BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
         ProtobufSaver protobufSaver = new ProtobufSaver(net);
-        testVertex.save(protobufSaver);
+        protobufSaver.save(testVertex);
     }
 
     @Category(Slow.class)

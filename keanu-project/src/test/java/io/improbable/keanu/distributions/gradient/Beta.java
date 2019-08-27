@@ -1,6 +1,5 @@
 package io.improbable.keanu.distributions.gradient;
 
-
 import static org.apache.commons.math3.special.Gamma.digamma;
 
 /**

@@ -1,8 +1,9 @@
 package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.buffer.JVMBuffer;
-import io.improbable.keanu.tensor.buffer.PrimitiveNumberWrapper;
+import io.improbable.keanu.tensor.bool.BooleanBuffer;
+import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
+import io.improbable.keanu.tensor.jvm.buffer.PrimitiveNumberWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.util.FastMath;
 
@@ -54,6 +55,8 @@ public class DoubleBuffer {
     }
 
     public interface PrimitiveDoubleWrapper extends PrimitiveNumberWrapper<Double, PrimitiveDoubleWrapper> {
+        @Override
+        Double[] asArray();
     }
 
     public static final class DoubleArrayWrapper implements PrimitiveDoubleWrapper {
@@ -111,6 +114,24 @@ public class DoubleBuffer {
             double result = 1.0;
             for (int i = 0; i < array.length; i++) {
                 result *= array[i];
+            }
+            return result;
+        }
+
+        @Override
+        public Double max() {
+            double result = -Double.MAX_VALUE;
+            for (int i = 0; i < array.length; i++) {
+                result = Math.max(array[i], result);
+            }
+            return result;
+        }
+
+        @Override
+        public Double min() {
+            double result = Double.MAX_VALUE;
+            for (int i = 0; i < array.length; i++) {
+                result = Math.min(array[i], result);
             }
             return result;
         }
@@ -184,6 +205,51 @@ public class DoubleBuffer {
         }
 
         @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper greaterThan(Double that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i] > that, i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper lessThan(Double that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i] < that, i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper greaterThanOrEqual(Double that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i] >= that, i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper lessThanOrEqual(Double that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i] <= that, i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper equal(Double that) {
+            BooleanBuffer.PrimitiveBooleanWrapper boolBuffer = BooleanBuffer.factory.createNew(array.length);
+            for (int i = 0; i < array.length; i++) {
+                boolBuffer.set(array[i] == that, i);
+            }
+            return boolBuffer;
+        }
+
+        @Override
         public DoubleArrayWrapper applyRight(BiFunction<Double, Double, Double> mapper, Double rightArg) {
             for (int i = 0; i < array.length; i++) {
                 array[i] = mapper.apply(array[i], rightArg);
@@ -213,6 +279,15 @@ public class DoubleBuffer {
             int[] intBuffer = new int[array.length];
             for (int i = 0; i < array.length; i++) {
                 intBuffer[i] = (int) array[i];
+            }
+            return intBuffer;
+        }
+
+        @Override
+        public long[] asLongArray() {
+            long[] intBuffer = new long[array.length];
+            for (int i = 0; i < array.length; i++) {
+                intBuffer[i] = (long) array[i];
             }
             return intBuffer;
         }
@@ -256,6 +331,16 @@ public class DoubleBuffer {
 
         @Override
         public Double product() {
+            return value;
+        }
+
+        @Override
+        public Double max() {
+            return value;
+        }
+
+        @Override
+        public Double min() {
             return value;
         }
 
@@ -314,8 +399,38 @@ public class DoubleBuffer {
         }
 
         @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper greaterThan(Double that) {
+            return BooleanBuffer.factory.createNew(value > that);
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper lessThan(Double that) {
+            return BooleanBuffer.factory.createNew(value < that);
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper greaterThanOrEqual(Double that) {
+            return BooleanBuffer.factory.createNew(value >= that);
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper lessThanOrEqual(Double that) {
+            return BooleanBuffer.factory.createNew(value <= that);
+        }
+
+        @Override
+        public BooleanBuffer.PrimitiveBooleanWrapper equal(Double that) {
+            return BooleanBuffer.factory.createNew(value.equals(that));
+        }
+
+        @Override
         public int[] asIntegerArray() {
             return new int[]{value.intValue()};
+        }
+
+        @Override
+        public long[] asLongArray() {
+            return new long[]{value.longValue()};
         }
 
         @Override

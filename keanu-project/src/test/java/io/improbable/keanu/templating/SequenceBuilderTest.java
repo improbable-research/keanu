@@ -12,17 +12,17 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexMatchers;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.tensor.If;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.BooleanProxyVertex;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ExponentialVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -120,7 +120,7 @@ public class SequenceBuilderTest {
     public void ifAVertexIsLabeledThatIsWhatsUsedToReferToItInTheSequenceItem() {
         VertexLabel label = new VertexLabel("label");
 
-        Vertex<?> startVertex = ConstantVertex.of(1.).setLabel(label);
+        Vertex<?, ?> startVertex = ConstantVertex.of(1.).setLabel(label);
 
         Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(startVertex)
@@ -133,9 +133,9 @@ public class SequenceBuilderTest {
             .build();
 
         for (SequenceItem item : sequence) {
-            Vertex<?> vertex = item.get(label);
+            Vertex<?, ?> vertex = item.get(label);
             assertThat(vertex, hasLabel(hasUnqualifiedName(label.getUnqualifiedName())));
-            Vertex<?> parent = Iterables.getOnlyElement(vertex.getParents());
+            Vertex<?, ?> parent = Iterables.getOnlyElement(vertex.getParents());
             assertThat(parent, hasLabel(hasUnqualifiedName(label.getUnqualifiedName())));
         }
     }
@@ -171,7 +171,7 @@ public class SequenceBuilderTest {
 
 
         for (SequenceItem item : sequence) {
-            Vertex<DoubleTensor> flip = item.get(label);
+            Vertex<DoubleTensor, ?> flip = item.get(label);
             assertThat(flip.getParents(), contains(commonTheta));
         }
     }
@@ -231,7 +231,7 @@ public class SequenceBuilderTest {
 
 
         for (SequenceItem item : sequence) {
-            Vertex<DoubleTensor> flip = item.get(label);
+            Vertex<DoubleTensor, ?> flip = item.get(label);
             assertThat(flip.getParents(), contains(commonTheta));
         }
     }
@@ -239,10 +239,10 @@ public class SequenceBuilderTest {
     /**
      * This is a Hidden Markov Model -
      * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
-     *
+     * <p>
      * ...  -->  X[t-1]  -->  X[t]  --> ...
-     *             |           |
-     *           Y[t-1]       Y[t]
+     * |           |
+     * Y[t-1]       Y[t]
      */
     @Test
     public void youCanCreateATimeSeriesFromSequenceFromACount() {
@@ -250,7 +250,7 @@ public class SequenceBuilderTest {
         VertexLabel xLabel = new VertexLabel("x");
         VertexLabel yLabel = new VertexLabel("y");
 
-        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
+        Vertex<DoubleTensor, ?> initialX = ConstantVertex.of(1.);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
         Sequence sequence = new SequenceBuilder<Integer>()
@@ -266,13 +266,13 @@ public class SequenceBuilderTest {
             .build();
 
 
-        Vertex<DoubleTensor> previousX = initialX;
+        Vertex<DoubleTensor, ?> previousX = initialX;
         VertexLabel xPreviousLabel = proxyLabelFor(xLabel);
 
         for (SequenceItem item : sequence) {
-            Vertex<DoubleTensor> xPreviousProxy = item.get(xPreviousLabel);
-            Vertex<DoubleTensor> x = item.get(xLabel);
-            Vertex<DoubleTensor> y = item.get(yLabel);
+            Vertex<DoubleTensor, ?> xPreviousProxy = item.get(xPreviousLabel);
+            Vertex<DoubleTensor, ?> x = item.get(xLabel);
+            Vertex<DoubleTensor, ?> y = item.get(yLabel);
             assertThat(xPreviousProxy.getParents(), contains(previousX));
             assertThat(x.getParents(), contains(xPreviousProxy));
             assertThat(y.getParents(), contains(x));
@@ -283,10 +283,10 @@ public class SequenceBuilderTest {
     /**
      * This is a Hidden Markov Model -
      * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
-     *
+     * <p>
      * ...  -->  X[t-1]  -->  X[t]  --> ...
-     *             |           |
-     *           Y[t-1]       Y[t]
+     * |           |
+     * Y[t-1]       Y[t]
      */
     @Test
     public void youCanCreateATimeSeriesFromSequenceFromAnIterator() {
@@ -294,7 +294,7 @@ public class SequenceBuilderTest {
         VertexLabel xLabel = new VertexLabel("x");
         VertexLabel yLabel = new VertexLabel("y");
 
-        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
+        Vertex<DoubleTensor, ?> initialX = ConstantVertex.of(1.);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
         Sequence sequence = new SequenceBuilder<Integer>()
@@ -311,14 +311,14 @@ public class SequenceBuilderTest {
             .build();
 
 
-        Vertex<DoubleTensor> previousX = initialX;
+        Vertex<DoubleTensor, ?> previousX = initialX;
         VertexLabel xPreviousLabel = proxyLabelFor(xLabel);
 
         int i = 0;
         for (SequenceItem item : sequence) {
-            Vertex<DoubleTensor> xPreviousProxy = item.get(xPreviousLabel);
-            Vertex<DoubleTensor> x = item.get(xLabel);
-            Vertex<DoubleTensor> y = item.get(yLabel);
+            Vertex<DoubleTensor, ?> xPreviousProxy = item.get(xPreviousLabel);
+            Vertex<DoubleTensor, ?> x = item.get(xLabel);
+            Vertex<DoubleTensor, ?> y = item.get(yLabel);
             assertThat(xPreviousProxy.getParents(), contains(previousX));
             assertThat(x.getParents(), contains(xPreviousProxy));
             assertThat(y.getParents(), contains(x));
@@ -495,7 +495,7 @@ public class SequenceBuilderTest {
         VertexLabel yLabel = new VertexLabel("y");
         String uniqueNamespace = "UNIQUE";
 
-        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
+        Vertex<DoubleTensor, ?> initialX = ConstantVertex.of(1.);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
         Sequence sequence = new SequenceBuilder<Integer>()
@@ -513,12 +513,12 @@ public class SequenceBuilderTest {
             .build();
 
 
-        Vertex<DoubleTensor> previousX = initialX;
+        Vertex<DoubleTensor, ?> previousX = initialX;
 
         for (SequenceItem item : sequence) {
-            Vertex<DoubleTensor> xPreviousProxy = item.get(SequenceBuilder.proxyLabelFor(xLabel));
-            Vertex<DoubleTensor> x = item.get(xLabel);
-            Vertex<DoubleTensor> y = item.get(yLabel);
+            Vertex<DoubleTensor, ?> xPreviousProxy = item.get(SequenceBuilder.proxyLabelFor(xLabel));
+            Vertex<DoubleTensor, ?> x = item.get(xLabel);
+            Vertex<DoubleTensor, ?> y = item.get(yLabel);
             assertThat(xPreviousProxy.getParents(), contains(previousX));
             assertThat(x.getParents(), contains(xPreviousProxy));
             assertThat(y.getParents(), contains(x));
@@ -633,7 +633,7 @@ public class SequenceBuilderTest {
             .withFactory(factory)
             .build();
 
-        Vertex<? extends DoubleTensor> xOutput = sequence.getLastItem().get(xLabel);
+        Vertex<? extends DoubleTensor, ?> xOutput = sequence.getLastItem().get(xLabel);
         assertThat(xOutput.getValue().scalar(), is(4.0));
         assertThat(xOutput.getLabel().getQualifiedName(), notNullValue());
         assertThat(xOutput.getLabel().getOuterNamespace(), is(Optional.of(sequenceName)));

@@ -1,13 +1,14 @@
-import sys
-import io
-import os
 import logging
 import nd4j
+import os
+import sys
+from _io import TextIOWrapper
+from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
 from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView, java_import
 from py4j.protocol import Py4JError
-from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
-from typing import Dict, Any, Iterable, List, Collection
-from _io import TextIOWrapper
+from typing import Dict, Any, Iterable, Collection
+
+import io
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -114,6 +115,9 @@ class KeanuContext(metaclass=Singleton):
 
     def to_java_int_array(self, l: Collection[Any]) -> JavaArray:
         return self.to_java_array(l, self._gateway.jvm.int)
+
+    def to_java_boolean_array(self, l: Collection[Any]) -> JavaArray:
+        return self.to_java_array(l, self._gateway.jvm.boolean)
 
     def to_java_string_array(self, l: Collection[Any]) -> JavaArray:
         return self.to_java_array(l, self._gateway.jvm.String)

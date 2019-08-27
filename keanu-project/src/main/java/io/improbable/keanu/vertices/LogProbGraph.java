@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
@@ -19,7 +19,7 @@ public class LogProbGraph {
      */
     @Getter
     @Singular
-    private final Map<Vertex<?>, Vertex<?>> inputs;
+    private final Map<Vertex<?, ?>, Vertex<?, ?>> inputs;
 
     /**
      * A vertex representing the result of log probability computation
@@ -27,8 +27,8 @@ public class LogProbGraph {
     @Getter
     private final DoubleVertex logProbOutput;
 
-    public <T> Vertex<T> getPlaceholder(Vertex<T> input) {
-        return (Vertex<T>) inputs.get(input);
+    public <T> Vertex<T, ?> getPlaceholder(Vertex<T, ?> input) {
+        return (Vertex<T, ?>) inputs.get(input);
     }
 
     public interface PlaceholderVertex {

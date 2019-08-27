@@ -1,11 +1,15 @@
 package io.improbable.keanu.tensor.ndj4;
 
-
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
+import io.improbable.keanu.tensor.jvm.SlicerIndexMapper;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.shape.Diag;
+import org.nd4j.linalg.api.ops.impl.shape.DiagPart;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
@@ -54,7 +58,7 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
             }
         }
 
-        if(indices.isEmpty()){
+        if (indices.isEmpty()) {
             return create(Nd4j.empty(tensor.dataType()));
         }
 
@@ -80,7 +84,38 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
 
     @Override
     public TENSOR diag() {
-        return create(Nd4j.diag(tensor));
+        Preconditions.checkArgument(tensor.rank() >= 1, "Diag operates on rank >= 1");
+        INDArray result = Nd4j.create(tensor.length(), tensor.length());
+        Nd4j.getExecutioner().execAndReturn(new Diag(new INDArray[]{tensor}, new INDArray[]{result}));
+        return create(result);
+    }
+
+    @Override
+    public TENSOR diagPart() {
+        Preconditions.checkArgument(tensor.rank() >= 2, "Diag operates on rank >= 2");
+        INDArray result = Nd4j.createUninitialized(new long[]{Math.min(tensor.size(0), tensor.size(1))});
+        Nd4j.getExecutioner().execAndReturn(new DiagPart(tensor, result));
+        return create(result);
+    }
+
+    @Override
+    public TENSOR fillTriangular(boolean fillUpper, boolean fillLower) {
+        return fromJVM(toJVM().fillTriangular(fillUpper, fillLower));
+    }
+
+    @Override
+    public TENSOR trianglePart(boolean upperPart) {
+        return fromJVM(toJVM().trianglePart(upperPart));
+    }
+
+    @Override
+    public TENSOR triUpper(int k) {
+        return fromJVM(toJVM().triUpper(k));
+    }
+
+    @Override
+    public TENSOR triLower(int k) {
+        return fromJVM(toJVM().triLower(k));
     }
 
     @Override
@@ -97,6 +132,18 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     }
 
     @Override
+    public TENSOR reverseSlice(TENSOR setTo, Slicer slicer) {
+
+        JVMTensor.reverseSlice(
+            getFlattenedView(),
+            setTo.getFlattenedView(),
+            new SlicerIndexMapper(slicer, setTo.getShape(), setTo.getStride())
+        );
+
+        return setTo;
+    }
+
+    @Override
     public TENSOR slice(int dimension, long index) {
         return create(tensor.slice(index, dimension));
     }
@@ -104,27 +151,24 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     @Override
     public TENSOR slice(Slicer slicer) {
 
-        final List<Slicer.StartStopStep> slices = slicer.getSlices();
-        final INDArrayIndex[] indArrayIndices = new INDArrayIndex[slices.size()];
+        final long[] shape = tensor.shape();
+        final INDArrayIndex[] indArrayIndices = new INDArrayIndex[shape.length];
 
-        for (int i = 0; i < indArrayIndices.length; i++) {
-            final Slicer.StartStopStep s = slices.get(i);
-            long stop = s.getStop();
+        for (int i = 0; i < shape.length; i++) {
 
-            if (stop == Slicer.StartStopStep.START_PLUS_ONE_STOP) {
-                indArrayIndices[i] = NDArrayIndex.point(s.getStart());
+            final Slicer.Slice s = slicer.getSlice(i, shape.length);
+
+            final long dimLength = shape[i];
+            if (s.isDropDimension()) {
+                indArrayIndices[i] = NDArrayIndex.point(s.getStart(dimLength));
 
             } else {
 
-                if (stop == Slicer.StartStopStep.UPPER_BOUND_STOP) {
-                    stop = tensor.shape()[i];
-                }
-
-                indArrayIndices[i] = NDArrayIndex.interval(s.getStart(), s.getStep(), stop);
+                indArrayIndices[i] = NDArrayIndex.interval(s.getStart(dimLength), s.getStep(), s.getStop(dimLength));
             }
         }
 
-        return create(tensor.get(indArrayIndices));
+        return create(tensor.get(indArrayIndices).dup());
     }
 
     @Override
@@ -175,6 +219,10 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
     }
 
     protected abstract INDArray getTensor(Tensor<T, ?> tensor);
+
+    protected abstract TENSOR toJVM();
+
+    protected abstract TENSOR fromJVM(TENSOR jvmTensor);
 
     protected abstract TENSOR create(INDArray tensor);
 
