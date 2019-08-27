@@ -22,6 +22,7 @@ linux: &linux
     - "permission_set=builder"
     - "platform=linux"
     - "queue=${CI_LINUX_BUILDER_QUEUE:-v2-1550668667-a9410887d4b815dd-------z}"
+    - "scaler_version=2"
 
 windows: &windows
   agents:
