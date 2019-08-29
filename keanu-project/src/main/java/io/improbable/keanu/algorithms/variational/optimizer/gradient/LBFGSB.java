@@ -9,7 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// based on:
+// based on: https://github.com/miikama/cpp-math/blob/master/CppNumericalSolvers/include/cppoptlib/solver/lbfgsbsolver.h
 // L-BFGS-B: A LIMITED MEMORY ALGORITHM FOR BOUND CONSTRAINED OPTIMIZATION
 // Richard H. Byrd, Peihuang Lu, Jorge Nocedal and Ciyou Zhu
 public class LBFGSB {
