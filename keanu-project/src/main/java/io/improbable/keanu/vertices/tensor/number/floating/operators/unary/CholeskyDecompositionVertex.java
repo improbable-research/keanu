@@ -10,13 +10,15 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
 
 /**
  * Gradient calculations sourced from https://arxiv.org/pdf/1602.07527.pdf
+ *
  * @param <T>
  * @param <TENSOR>
  * @param <VERTEX>
@@ -38,12 +40,12 @@ public class CholeskyDecompositionVertex<T extends Number, TENSOR extends Floati
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
 
         DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
         DoubleTensor L = getValue().toDouble();
@@ -53,13 +55,13 @@ public class CholeskyDecompositionVertex<T extends Number, TENSOR extends Floati
 
         DoubleTensor result = L.matrixMultiply(phi(toPhi));
 
-        return Collections.singletonMap(inputVertex, new PartialDerivative(result));
+        return Collections.singletonMap(inputVertex, new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), result));
     }
 
-    private DoubleTensor phi(DoubleTensor input){
+    private DoubleTensor phi(DoubleTensor input) {
         final long[] shape = input.getShape();
-        final long M = shape[shape.length-1];
-        final long N = shape[shape.length-2];
+        final long M = shape[shape.length - 1];
+        final long N = shape[shape.length - 2];
 
         final DoubleTensor diag = DoubleTensor.create(0.5, new long[]{N}).diag();
         final DoubleTensor factor = DoubleTensor.ones(M, N).minus(diag).triLower(0);

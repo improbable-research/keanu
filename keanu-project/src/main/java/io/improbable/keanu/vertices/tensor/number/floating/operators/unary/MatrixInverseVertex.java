@@ -10,7 +10,8 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,20 +30,20 @@ public class MatrixInverseVertex<T extends Number, TENSOR extends FloatingPointT
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
         //dc = -A^-1 * da * A^-1
         DoubleTensor negatedValue = this.getValue().toDouble().unaryMinus();
-        DoubleTensor wrtOf = derivativeOfParentWithRespectToInputs.getWrtOf(inputVertex.getRank());
+        DoubleTensor wrtOf = derivativeOfParentWithRespectToInputs.get();
         DoubleTensor result = negatedValue.matrixMultiply(wrtOf).matrixMultiply(this.getValue().toDouble());
 
-        return PartialDerivative.createFromWrtOf(result, this.getRank());
+        return new ForwardModePartialDerivative(derivativeOfParentWithRespectToInputs.getWrtShape(), result);
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
         DoubleTensor parentValue = getValue().toDouble();
         DoubleTensor negativeValue = getValue().toDouble().unaryMinus();
 
@@ -50,7 +51,7 @@ public class MatrixInverseVertex<T extends Number, TENSOR extends FloatingPointT
             .matrixMultiply(derivativeOfOutputWithRespectToSelf.get())
             .matrixMultiply(parentValue.transpose());
 
-        partials.put(inputVertex, new PartialDerivative(p));
+        partials.put(inputVertex, new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), p));
         return partials;
     }
 

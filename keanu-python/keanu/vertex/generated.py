@@ -957,14 +957,16 @@ def LessThanOrEqualToMask(left: vertex_constructor_param_types, right: vertex_co
     return Vertex(context.jvm_view().LessThanOrEqualToMaskVertex, label, cast_to_vertex(left), cast_to_vertex(right))
 
 
-def MatrixMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+def MatrixMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, transpose_left: bool, transpose_right: bool, label: Optional[str]=None) -> Vertex:
     """
     Matrix multiplies one vertex by another. C = AB
     
     :param left: vertex A
     :param right: vertex B
+    :param transpose_left: transpose the left operand before multiply
+    :param transpose_right: transpose the right operand before multiply
     """
-    return Vertex(context.jvm_view().MatrixMultiplicationVertex, label, cast_to_vertex(left), cast_to_vertex(right))
+    return Vertex(context.jvm_view().MatrixMultiplicationVertex, label, cast_to_vertex(left), cast_to_vertex(right), cast_to_boolean(transpose_left), cast_to_boolean(transpose_right))
 
 
 def Max(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

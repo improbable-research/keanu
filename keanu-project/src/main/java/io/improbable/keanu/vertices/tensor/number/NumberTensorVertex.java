@@ -236,7 +236,7 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
      * This returns a MatrixMultiplicationVertex.
      */
     @Override
-    default VERTEX matrixMultiply(VERTEX that) {
+    default VERTEX matrixMultiply(VERTEX that, boolean transposeLeft, boolean transposeRight) {
         int leftRank = this.getRank();
         int rightRank = that.getRank();
 
@@ -247,7 +247,7 @@ public interface NumberTensorVertex<T extends Number, TENSOR extends NumberTenso
         TensorVertex<T, TENSOR, VERTEX> leftMatrix = leftRank == 1 ? this.reshape(1, this.getShape()[0]) : this;
         TensorVertex<T, TENSOR, VERTEX> rightMatrix = rightRank == 1 ? that.reshape(that.getShape()[0], 1) : that;
 
-        VERTEX result = wrap(new MatrixMultiplicationVertex<>(leftMatrix, rightMatrix));
+        VERTEX result = wrap(new MatrixMultiplicationVertex<>(leftMatrix, rightMatrix, transposeLeft, transposeRight));
 
         if (leftRank == 1 && rightRank == 1) {
             return result.reshape(new long[0]);

@@ -136,10 +136,10 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
     }
 
     @Override
-    public IntegerTensor matrixMultiply(IntegerTensor value) {
-        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape());
+    public IntegerTensor matrixMultiply(IntegerTensor value, boolean transposeLeft, boolean transposeRight) {
+        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape(), transposeLeft, transposeRight);
         if (tensor.shape().length > 2 || value.getShape().length > 2) {
-            return asJVMDoubleTensor().matrixMultiply(value.toDouble()).toInteger();
+            return asJVMDoubleTensor().matrixMultiply(value.toDouble(), transposeLeft, transposeRight).toInteger();
         }
         INDArray mmulResult = tensor.castTo(DataType.DOUBLE).mmul(getTensor(value).castTo(DataType.DOUBLE)).castTo(DataType.INT);
         return create(mmulResult);

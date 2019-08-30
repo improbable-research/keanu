@@ -9,7 +9,8 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,20 +48,20 @@ public class SliceVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Ten
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
 
         DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
         DoubleTensor padded = padSliceWithZerosToMatchInputShape(partial);
-        partials.put(inputVertex, new PartialDerivative(padded));
+        partials.put(inputVertex, new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), padded));
 
         return partials;
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return new PartialDerivative(dInputVertex.get().slice(dimension, index));
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        return new ForwardModePartialDerivative(dInputVertex.getWrtShape(), dInputVertex.get().slice(dimension + dInputVertex.getWrtShape().length, index));
     }
 
     private DoubleTensor padSliceWithZerosToMatchInputShape(DoubleTensor tensor) {

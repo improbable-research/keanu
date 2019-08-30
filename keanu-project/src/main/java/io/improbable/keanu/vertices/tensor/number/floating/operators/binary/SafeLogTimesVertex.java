@@ -12,7 +12,8 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,41 +33,38 @@ public class SafeLogTimesVertex<T extends Number, TENSOR extends FloatingPointTe
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        final PartialDerivative dXWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
-        final PartialDerivative dYWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
-
-        final PartialDerivative fromLeft = AutoDiffBroadcast.correctForBroadcastPartialForward(dXWrtInput, left.getShape(), this.getShape());
-        final PartialDerivative fromRight = AutoDiffBroadcast.correctForBroadcastPartialForward(dYWrtInput, right.getShape(), this.getShape());
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        final ForwardModePartialDerivative dXWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, ForwardModePartialDerivative.EMPTY);
+        final ForwardModePartialDerivative dYWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, ForwardModePartialDerivative.EMPTY);
 
         final DoubleTensor x = left.getValue().toDouble();
         final DoubleTensor y = right.getValue().toDouble();
         final BooleanTensor yZeroMask = y.elementwiseEquals(0.0);
 
-        final PartialDerivative partialsFromX = fromLeft.multiplyAlongOfDimensions(y.div(x), this.getRank());
-        final PartialDerivative partialsFromY = fromRight.multiplyAlongOfDimensions(DoubleTensor.scalar(Double.NaN).where(yZeroMask, x.log()), this.getRank());
+        final ForwardModePartialDerivative partialsFromX = dXWrtInput.multiply(y.div(x));
+        final ForwardModePartialDerivative partialsFromY = dYWrtInput.multiply(DoubleTensor.scalar(Double.NaN).where(yZeroMask, x.log()));
 
-        return partialsFromX.add(partialsFromY);
+        return partialsFromX.add(partialsFromY, this.getShape());
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        final Map<Vertex, PartialDerivative> partials = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        final Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
 
         final DoubleTensor x = left.getValue().toDouble();
         final DoubleTensor y = right.getValue().toDouble();
         final BooleanTensor yZeroMask = y.elementwiseEquals(0.0);
 
-        final PartialDerivative dOutputsWrtX = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(
+        final ReverseModePartialDerivative dOutputsWrtX = derivativeOfOutputWithRespectToSelf.multiply(
             y.div(x)
         );
 
-        final PartialDerivative dOutputsWrtY = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(
+        final ReverseModePartialDerivative dOutputsWrtY = derivativeOfOutputWithRespectToSelf.multiply(
             DoubleTensor.scalar(Double.NaN).where(yZeroMask, x.log())
         );
 
-        final PartialDerivative toLeft = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtX, this.getShape(), left.getShape());
-        final PartialDerivative toRight = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtY, this.getShape(), right.getShape());
+        final ReverseModePartialDerivative toLeft = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtX, this.getShape(), left.getShape());
+        final ReverseModePartialDerivative toRight = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtY, this.getShape(), right.getShape());
 
         partials.put(left, toLeft);
         partials.put(right, toRight);

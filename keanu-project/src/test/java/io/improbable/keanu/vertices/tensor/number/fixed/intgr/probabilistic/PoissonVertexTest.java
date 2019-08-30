@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic;
 
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -8,11 +9,17 @@ import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.VertexVariationalMAP;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.PoissonDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
@@ -20,6 +27,13 @@ import static org.junit.Assert.assertEquals;
 
 @Slf4j
 public class PoissonVertexTest {
+
+    private KeanuRandom random;
+
+    @Before
+    public void setup() {
+        random = new KeanuRandom(1);
+    }
 
     @Category(Slow.class)
     @Test
@@ -125,5 +139,49 @@ public class PoissonVertexTest {
         double expectedLogProb = distribution1.logProbability(39) + distribution2.logProbability(49);
 
         LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedLogProb);
+    }
+
+    @Test
+    public void inferHyperParamsFromSamples() {
+
+        double trueMu = 4.5;
+
+        List<DoubleVertex> mu = new ArrayList<>();
+        mu.add(ConstantVertex.of(trueMu));
+
+        List<DoubleVertex> latents = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(0.01, 10.0);
+        latentMu.setAndCascade(DoubleTensor.scalar(9.9));
+        latents.add(latentMu);
+
+        int numSamples = 2000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new PoissonVertex(new long[]{numSamples}, hyperParams.get(0)),
+            mu,
+            latents,
+            random
+        );
+    }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(4.5, 8);
+
+        List<DoubleVertex> mu = new ArrayList<>();
+        mu.add(ConstantVertex.of(trueMu));
+
+        List<DoubleVertex> latents = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(0.01, 10.0);
+        latentMu.setAndCascade(DoubleTensor.create(9.9, 2));
+        latents.add(latentMu);
+
+        int numSamples = 2000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new PoissonVertex(new long[]{numSamples, 2}, hyperParams.get(0)),
+            mu,
+            latents,
+            random
+        );
     }
 }

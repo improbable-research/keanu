@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.ArrayUtils.removeAll;
 
 public class TensorShapeValidation {
 
@@ -252,60 +251,37 @@ public class TensorShapeValidation {
         }
     }
 
-    public static long[] getTensorMultiplyResultShape(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
-
-        if (dimsLeft.length != dimsRight.length) {
-            throw new IllegalArgumentException("Tensor multiply must match dimension lengths " +
-                toStringArgs(leftShape, rightShape, dimsLeft, dimsRight)
-            );
-        }
-
-
-        for (int i = 0; i < dimsLeft.length; i++) {
-
-            if (dimsLeft[i] >= leftShape.length || dimsLeft[i] < 0) {
-                throw new IllegalArgumentException("Left dimensions " + Arrays.toString(dimsLeft) +
-                    " is invalid for left shape " + Arrays.toString(leftShape)
-                );
-            }
-
-            if (dimsRight[i] >= rightShape.length || dimsRight[i] < 0) {
-                throw new IllegalArgumentException("Right dimensions " + Arrays.toString(dimsRight) +
-                    " is invalid for right shape " + Arrays.toString(rightShape)
-                );
-            }
-
-            if (leftShape[dimsLeft[i]] != rightShape[dimsRight[i]]) {
-                throw new IllegalArgumentException("Cannot tensor multiply dimension " + i + " for " +
-                    toStringArgs(leftShape, rightShape, dimsLeft, dimsRight)
-                );
-            }
-        }
-
-        return TensorShape.concat(removeAll(leftShape, dimsLeft), removeAll(rightShape, dimsRight));
-    }
-
-    private static String toStringArgs(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
-        return "left shape: " + Arrays.toString(leftShape) + " right shape: " + Arrays.toString(rightShape) + " on left dimensions " +
-            Arrays.toString(dimsLeft) + " and right dimensions " + Arrays.toString(dimsRight);
-    }
-
-    public static long[] getMatrixMultiplicationResultingShape(long[] left, long[] right) {
+    public static long[] getMatrixMultiplicationResultingShape(long[] left, long[] right, boolean transposeLeft, boolean transposeRight) {
         if (left.length < 2 || right.length < 2) {
-            throw new IllegalArgumentException("Cannot matrix multiply with shapes " + Arrays.toString(left) + " and " + Arrays.toString(right));
+            throwMatrixMultiplyShapeException(left, right, transposeLeft, transposeRight);
         }
 
-        if (left[left.length - 1] != right[right.length - 2]) {
-            throw new IllegalArgumentException("Cannot matrix multiply with shapes " + Arrays.toString(left) + " and " + Arrays.toString(right));
+        //(M, N) = (M, K)(K, N)
+        final long KLeft = transposeLeft ? left[left.length - 2] : left[left.length - 1];
+        final long KRight = transposeRight ? right[right.length - 1] : right[right.length - 2];
+
+        if (KLeft != KRight) {
+            throwMatrixMultiplyShapeException(left, right, transposeLeft, transposeRight);
         }
 
+        final long M = transposeLeft ? left[left.length - 1] : left[left.length - 2];
+        final long N = transposeRight ? right[right.length - 2] : right[right.length - 1];
         if (left.length == 2 && right.length == 2) {
-            return new long[]{left[0], right[1]};
+            return new long[]{M, N};
         } else {
             final long[] leftBatchShape = ArrayUtils.subarray(left, 0, left.length - 2);
             final long[] rightBatchShape = ArrayUtils.subarray(right, 0, right.length - 2);
             final long[] batchShape = TensorShape.getBroadcastResultShape(leftBatchShape, rightBatchShape);
-            return TensorShape.concat(batchShape, new long[]{left[left.length - 2], right[right.length - 1]});
+            return TensorShape.concat(batchShape, new long[]{M, N});
         }
+    }
+
+    private static void throwMatrixMultiplyShapeException(long[] left, long[] right, boolean transposeLeft, boolean transposeRight) {
+        throw new IllegalArgumentException(
+            "Cannot matrix multiply with shapes " +
+                Arrays.toString(left) + (transposeLeft ? " transposed " : "") +
+                " and " +
+                Arrays.toString(right) + (transposeRight ? " transposed " : "")
+        );
     }
 }

@@ -87,6 +87,9 @@ public class KeanuCompiledGraphTest {
     @Test
     public void compilesMatrixMultiply() {
         assertBinaryDoubleMatches(new long[]{2, 3}, new long[]{3, 2}, DoubleVertex::matrixMultiply);
+        assertBinaryDoubleMatches(new long[]{2, 3}, new long[]{2, 3}, (left, right) -> left.matrixMultiply(right, false, true));
+        assertBinaryDoubleMatches(new long[]{3, 2}, new long[]{3, 2}, (left, right) -> left.matrixMultiply(right, true, false));
+        assertBinaryDoubleMatches(new long[]{2, 3}, new long[]{4, 2}, (left, right) -> left.matrixMultiply(right, true, true));
     }
 
     @Test

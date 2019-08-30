@@ -217,6 +217,23 @@ public class SumVertexTest {
     }
 
     @Test
+    public void changesMatchGradientWhenSummingDimensionsFromRight() {
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+
+        DoubleVertex outputVertex = inputVertex.sum(-1)
+            .times(
+                inputVertex.sum(-2)
+            ).times(
+                inputVertex.sum(-3)
+            ).times(
+                inputVertex.sum()
+            );
+
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-6);
+    }
+
+    @Test
     public void changesMatchGradientWhenSummingSpecificDimensions() {
         UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));

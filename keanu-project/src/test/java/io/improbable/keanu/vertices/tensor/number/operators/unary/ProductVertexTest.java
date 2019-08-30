@@ -40,6 +40,23 @@ public class ProductVertexTest {
     }
 
     @Test
+    public void changesMatchGradientWhenProductDimensionsFromRight() {
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        inputVertex.setValue(DoubleTensor.arange(1, 9).reshape(2, 2, 2));
+
+        DoubleVertex outputVertex = inputVertex.product(-1)
+            .times(
+                inputVertex.product(-2)
+            ).times(
+                inputVertex.product(-3)
+            ).times(
+                inputVertex.product()
+            );
+
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-3);
+    }
+
+    @Test
     public void changesMatchGradientProductDim0() {
         UniformVertex inputA = new UniformVertex(new long[]{2, 3}, -10.0, 10.0);
         DoubleVertex product = inputA.product(0);

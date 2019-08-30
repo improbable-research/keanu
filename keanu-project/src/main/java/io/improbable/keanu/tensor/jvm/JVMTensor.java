@@ -265,7 +265,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
         B resultBuffer = getFactory().createNew(resultLength);
 
         int pos = 0;
-        if(upperPart) {
+        if (upperPart) {
             for (int i = 0; i < batchLength; i++) {
                 long batchOffset = i * batchSize;
                 for (int r = 0; r < N; r++) {
@@ -275,7 +275,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
                     }
                 }
             }
-        }else{
+        } else {
             for (int i = 0; i < batchLength; i++) {
                 long batchOffset = i * batchSize;
                 for (int c = 0; c < N; c++) {
@@ -533,6 +533,12 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
     @Override
     public TENSOR broadcast(long... toShape) {
+        if (!Arrays.equals(TensorShape.getBroadcastResultShape(shape, toShape), toShape)) {
+            throw new IllegalArgumentException(
+                "Invalid broadcast shape " + Arrays.toString(toShape) + " from shape " + Arrays.toString(shape)
+            );
+        }
+
         long outputLength = TensorShape.getLength(toShape);
         long[] outputStride = TensorShape.getRowFirstStride(toShape);
         B outputBuffer = getFactory().createNew(outputLength);

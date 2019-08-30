@@ -14,13 +14,13 @@ public class PartialsWithRespectTo {
     @Getter
     private final Vertex wrt;
 
-    private final Map<VertexId, PartialDerivative> partials;
+    private final Map<VertexId, ForwardModePartialDerivative> partials;
 
     public DoubleTensor of(Vertex vertex) {
         return of(vertex.getId());
     }
 
     public DoubleTensor of(VertexId id) {
-        return partials.get(id).get();
+        return partials.get(id).getOfWrt();
     }
 }

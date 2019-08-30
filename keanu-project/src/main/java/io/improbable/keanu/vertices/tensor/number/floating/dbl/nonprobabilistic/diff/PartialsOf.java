@@ -14,7 +14,7 @@ public class PartialsOf {
     @Getter
     private final Vertex<?, ?> of;
 
-    private final Map<VertexId, PartialDerivative> partials;
+    private final Map<VertexId, ReverseModePartialDerivative> partials;
 
     public DoubleTensor withRespectTo(Vertex vertex) {
         return withRespectTo(vertex.getId());
@@ -24,7 +24,7 @@ public class PartialsOf {
         return partials.get(id).get();
     }
 
-    public Map<VertexId, PartialDerivative> asMap() {
+    public Map<VertexId, ReverseModePartialDerivative> asMap() {
         return partials;
     }
 

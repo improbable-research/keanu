@@ -11,7 +11,8 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,26 +41,23 @@ public class ArcTan2Vertex<T extends Number, TENSOR extends FloatingPointTensor<
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative dxWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
-        PartialDerivative dyWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative dxWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, ForwardModePartialDerivative.EMPTY);
+        ForwardModePartialDerivative dyWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, ForwardModePartialDerivative.EMPTY);
 
         DoubleTensor yValue = right.getValue().toDouble();
         DoubleTensor xValue = left.getValue().toDouble();
         DoubleTensor denominator = yValue.pow(2).plusInPlace(xValue.pow(2));
 
-        PartialDerivative fromX = AutoDiffBroadcast.correctForBroadcastPartialForward(dxWrtInput, left.getShape(), this.getShape());
-        PartialDerivative fromY = AutoDiffBroadcast.correctForBroadcastPartialForward(dyWrtInput, right.getShape(), this.getShape());
+        ForwardModePartialDerivative diffFromX = dxWrtInput.multiply(yValue.div(denominator).unaryMinusInPlace());
+        ForwardModePartialDerivative diffFromY = dyWrtInput.multiply(xValue.div(denominator));
 
-        PartialDerivative diffFromX = fromX.multiplyAlongOfDimensions(yValue.div(denominator).unaryMinusInPlace());
-        PartialDerivative diffFromY = fromY.multiplyAlongOfDimensions(xValue.div(denominator));
-
-        return diffFromX.add(diffFromY);
+        return diffFromX.add(diffFromY, this.getShape());
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
         DoubleTensor xValue = left.getValue().toDouble();
         DoubleTensor yValue = right.getValue().toDouble();
 
@@ -67,11 +65,11 @@ public class ArcTan2Vertex<T extends Number, TENSOR extends FloatingPointTensor<
         DoubleTensor dOutWrtX = yValue.div(denominator).unaryMinusInPlace();
         DoubleTensor dOutWrtY = xValue.div(denominator);
 
-        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX);
-        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY);
+        ReverseModePartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiply(dOutWrtX);
+        ReverseModePartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiply(dOutWrtY);
 
-        PartialDerivative toLeft = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
-        PartialDerivative toRight = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());
+        ReverseModePartialDerivative toLeft = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
+        ReverseModePartialDerivative toRight = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());
 
         partials.put(left, toLeft);
         partials.put(right, toRight);

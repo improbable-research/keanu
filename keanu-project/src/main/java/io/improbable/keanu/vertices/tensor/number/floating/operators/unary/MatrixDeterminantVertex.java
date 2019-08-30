@@ -13,7 +13,8 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
@@ -42,18 +43,19 @@ public class MatrixDeterminantVertex<T extends Number, TENSOR extends FloatingPo
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
 
-        final DoubleTensor dA = derivativeOfParentsWithRespectToInput.get(inputVertex).getWrtOf(inputVertex.getRank());
+        final ForwardModePartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        final DoubleTensor dA = partial.get();
         final DoubleTensor AInverseTranspose = inputVertex.getValue().toDouble().matrixInverse();
         final DoubleTensor C = this.getValue().toDouble();
         final DoubleTensor result = C.times(AInverseTranspose.matrixMultiply(dA).diagPart().sum(-1));
 
-        return PartialDerivative.createFromWrtOf(result, this.getRank());
+        return new ForwardModePartialDerivative(partial.getWrtShape(), result);
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
 
         DoubleTensor dC = derivativeOfOutputWithRespectToSelf.get();
         DoubleTensor C = this.getValue().toDouble();
@@ -61,7 +63,10 @@ public class MatrixDeterminantVertex<T extends Number, TENSOR extends FloatingPo
 
         long[] dCCExpandedShape = TensorShape.concat(dCC.getShape(), new long[]{1, 1});
         DoubleTensor AInverseTranspose = inputVertex.getValue().toDouble().matrixInverse().transpose();
-        PartialDerivative toInput = new PartialDerivative(dCC.reshape(dCCExpandedShape).times(AInverseTranspose));
+        ReverseModePartialDerivative toInput = new ReverseModePartialDerivative(
+            derivativeOfOutputWithRespectToSelf.getOfShape(),
+            dCC.reshape(dCCExpandedShape).times(AInverseTranspose)
+        );
 
         return Collections.singletonMap(inputVertex, toInput);
     }

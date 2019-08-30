@@ -4,14 +4,15 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +30,8 @@ public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
         TENSOR newValue = this.getValue();
 
@@ -39,24 +40,24 @@ public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
         long[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
         atIndexTensor = atIndexTensor.reshape(paddedShape);
 
-        return new PartialDerivative(atIndexTensor);
+        return new ForwardModePartialDerivative(derivativeOfParentWithRespectToInputs.getWrtShape(), atIndexTensor);
     }
 
     private DoubleTensor takeFromPartial(DoubleTensor from, long... indices) {
-        long[] fromShape = from.getShape();
-        long[] subFromShape = Arrays.copyOf(fromShape, indices.length);
-        long indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
-        long[] takeShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
-        long subShapeLength = TensorShape.getLength(subFromShape);
+        Slicer.SlicerBuilder builder = Slicer.builder().ellipsis();
 
-        return from.reshape(subShapeLength, -1)
-            .slice(0, indexToTakeFrom)
-            .reshape(takeShape);
+        for (long i : indices) {
+            builder.slice(i);
+        }
+
+        return from.slice(
+            builder.build()
+        );
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> reshapedDerivatives = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, ReverseModePartialDerivative> reshapedDerivatives = new HashMap<>();
 
         DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
         long[] newPartialShape = TensorShape.concat(
@@ -68,7 +69,7 @@ public class TakeVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends Tens
         DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape());
         takeMask.setValue(1., index);
         DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
-        reshapedDerivatives.put(inputVertex, new PartialDerivative(highRankMask));
+        reshapedDerivatives.put(inputVertex, new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), highRankMask));
 
         return reshapedDerivatives;
     }

@@ -16,25 +16,7 @@ import java.util.List;
 @UtilityClass
 public class AutoDiffBroadcast {
 
-    public static PartialDerivative correctForBroadcastPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
-
-        if (shouldCorrectPartialForBroadcast(partial, partialOfShape, targetOfShape)) {
-            return broadcastPartialForward(partial, partialOfShape, targetOfShape);
-        } else {
-            return partial;
-        }
-    }
-
-    public static PartialDerivative broadcastPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
-        long[] wrtShape = partial.getWrtShape(partialOfShape);
-        long[] resultShape = TensorShape.concat(targetOfShape, wrtShape);
-
-        DoubleTensor correctedPartial = partial.get().broadcast(resultShape);
-
-        return new PartialDerivative(correctedPartial);
-    }
-
-    public static PartialDerivative correctForBroadcastPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
+    public static ReverseModePartialDerivative correctForBroadcastPartialReverse(ReverseModePartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
 
         if (shouldCorrectPartialForBroadcast(partial, partialWrtShape, targetWrtShape)) {
             return broadcastPartialReverse(partial, partialWrtShape, targetWrtShape);
@@ -43,7 +25,7 @@ public class AutoDiffBroadcast {
         }
     }
 
-    public static PartialDerivative broadcastPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
+    public static ReverseModePartialDerivative broadcastPartialReverse(ReverseModePartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
         long[] partialShape = partial.get().getShape();
 
         int[] broadcastDimensions = dimensionsWithShapeChange(partialShape, partialWrtShape.length, targetWrtShape);
@@ -51,22 +33,14 @@ public class AutoDiffBroadcast {
         DoubleTensor partialSummed = partial.get().sum(broadcastDimensions);
 
         long[] resultShape = TensorShape.concat(
-            partial.getOfShape(partialWrtShape),
+            partial.getOfShape(),
             targetWrtShape
         );
 
-        return new PartialDerivative(partialSummed.reshape(resultShape));
+        return new ReverseModePartialDerivative(partial.getOfShape(), partialSummed.reshape(resultShape));
     }
 
-    /**
-     * @param partial       The partial derivative that may or may not come from a broadcasted operation.
-     * @param actualShape   The part of the partial shape that should match the expected shape in the case no broadcast was
-     *                      performed. This would be the of shape for forward mode and the with respect to shape for reverse.
-     * @param expectedShape The shape of the operation result in forward mode or the shape of the operand in reverse mode.
-     *                      This should match the actual shape if no broadcast was performed.
-     * @return true if a broadcast should be taken into account and corrected for in the auto diff calculation, false otherwise.
-     */
-    private static boolean shouldCorrectPartialForBroadcast(PartialDerivative partial, long[] actualShape, long[] expectedShape) {
+    private static boolean shouldCorrectPartialForBroadcast(ReverseModePartialDerivative partial, long[] actualShape, long[] expectedShape) {
         return partial.isPresent() && !Arrays.equals(actualShape, expectedShape);
     }
 

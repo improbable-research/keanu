@@ -424,6 +424,28 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canBatchMatrixMultiply3x2x3And3x1x3x2() {
+
+        DoubleTensor left = DoubleTensor.arange(1, 19).reshape(3, 2, 3);
+        DoubleTensor right = DoubleTensor.arange(1, 19).reshape(3, 1, 3, 2);
+        DoubleTensor result = left.matrixMultiply(right);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            22, 28, 49, 64,
+            76, 100, 103, 136,
+            130, 172, 157, 208,
+            58, 64, 139, 154,
+            220, 244, 301, 334,
+            382, 424, 463, 514,
+            94, 100, 229, 244,
+            364, 388, 499, 532,
+            634, 676, 769, 820
+        }, 3, 3, 2, 2);
+
+        assertThat(result, valuesAndShapesMatch(expected));
+    }
+
+    @Test
     public void canFindDeterminantOf2By2Matrix() {
         DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
         double expected = 1 * 4 - 2 * 3;

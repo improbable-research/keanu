@@ -4,6 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
@@ -24,7 +25,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
@@ -33,17 +33,14 @@ public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex> impl
     private static final String MU_NAME = "mu";
 
     /**
-     * One mu that must match a proposed tensor shape of Poisson.
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     * Poisson with mu as a hyperparameter. Mu here is aka lambda.
      *
-     * @param shape the desired shape of the vertex
-     * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
+     * @param shape the desired shape of the vertex. This must be broadcastable with the mu shape.
+     * @param mu    the mu of the Poisson. The shape of mu must be broadcastable with shape.
      */
     public PoissonVertex(@LoadShape long[] shape,
                          @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu) {
-        super(shape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, mu.getShape());
+        super(TensorShape.getBroadcastResultShape(shape, mu.getShape()));
 
         this.mu = wrapIfNeeded(mu);
         setParents(mu);
@@ -92,7 +89,14 @@ public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex> impl
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
-        return Collections.emptyMap();
+        boolean wrtMu = withRespectTo.contains(mu);
+
+        DoubleTensor[] result = Poisson.withParameters(mu.getValue()).dLogProb(value, wrtMu);
+        if (wrtMu) {
+            return Collections.singletonMap(mu, result[0]);
+        } else {
+            return Collections.emptyMap();
+        }
     }
 
     @Override

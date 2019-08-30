@@ -74,7 +74,11 @@ public class TensorShape {
     public static long getLength(long[] shape, int... overDimensions) {
         long length = 1;
         for (int dim : overDimensions) {
-            length *= shape[dim];
+            if(dim >= 0) {
+                length *= shape[dim];
+            }else{
+                length *= shape[dim + shape.length];
+            }
         }
         return length;
     }
@@ -275,15 +279,16 @@ public class TensorShape {
      * It's possible to express negative dimensions, which are relative to the rank of a
      * tensor. E.g. given a rank 3 tensor, dimensions [-1, -2] would refer to the 3rd and 2nd dimension.
      *
-     * @param rank       the rank that the dimension array is related to
-     * @param dimensions positive dimensions are absolute and negative are relative to the rank
+     * @param rank  the rank that the dimension array is related to
+     * @param input positive dimensions are absolute and negative are relative to the rank
      * @return the dimensions converted to all absolute (positive). This mutates the passed in dimension argument.
      */
-    public static int[] setToAbsoluteDimensions(int rank, int[] dimensions) {
-        for (int i = 0; i < dimensions.length; i++) {
-            dimensions[i] = getAbsoluteDimension(dimensions[i], rank);
+    public static int[] getAbsoluteDimensions(int rank, int[] input) {
+        int[] output = new int[input.length];
+        for (int i = 0; i < output.length; i++) {
+            output[i] = getAbsoluteDimension(input[i], rank);
         }
-        return dimensions;
+        return output;
     }
 
     /**
@@ -318,6 +323,7 @@ public class TensorShape {
 
     public static long[] getReductionResultShape(long[] inputShape, int[] reduceOverDimensions) {
         if (inputShape.length > 0) {
+            reduceOverDimensions = getAbsoluteDimensions(inputShape.length, reduceOverDimensions);
             return ArrayUtils.removeAll(inputShape, reduceOverDimensions);
         } else {
             Preconditions.checkArgument(reduceOverDimensions.length == 0);
@@ -331,6 +337,7 @@ public class TensorShape {
         if (reduceOverDimensions == null) {
             Arrays.fill(shapeCopy, 1L);
         } else {
+            reduceOverDimensions = getAbsoluteDimensions(shape.length, reduceOverDimensions);
             for (int sumOverDimension : reduceOverDimensions) {
                 shapeCopy[sumOverDimension] = 1L;
             }

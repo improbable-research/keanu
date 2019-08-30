@@ -10,7 +10,8 @@ import io.improbable.keanu.vertices.tensor.TensorVertex;
 import io.improbable.keanu.vertices.tensor.UnaryTensorOpVertex;
 import io.improbable.keanu.vertices.tensor.number.NumberTensorVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,20 +36,19 @@ public class AbsVertex<T extends Number, TENSOR extends NumberTensor<T, TENSOR>,
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
 
         final DoubleTensor signOfInput = inputVertex.getValue().toDouble().sign();
 
-        return derivativeOfParentsWithRespectToInput.get(inputVertex)
-            .multiplyAlongOfDimensions(signOfInput);
+        return derivativeOfParentsWithRespectToInput.get(inputVertex).multiply(signOfInput);
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
         final DoubleTensor signOfInput = inputVertex.getValue().toDouble().sign();
 
-        final Map<Vertex, PartialDerivative> result = new HashMap<>();
-        result.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(signOfInput));
+        final Map<Vertex, ReverseModePartialDerivative> result = new HashMap<>();
+        result.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiply(signOfInput));
         return result;
     }
 }

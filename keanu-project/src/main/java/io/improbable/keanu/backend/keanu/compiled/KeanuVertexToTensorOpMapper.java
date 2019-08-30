@@ -188,7 +188,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(CumSumVertex.class, KeanuVertexToTensorOpMapper::cumSumOp);
         opMappers.put(CumProdVertex.class, KeanuVertexToTensorOpMapper::cumProdOp);
         opMappers.put(ProductVertex.class, KeanuVertexToTensorOpMapper::productOp);
-        opMappers.put(MatrixMultiplicationVertex.class, fluentBinaryOp("matrixMultiply"));
+        opMappers.put(MatrixMultiplicationVertex.class, KeanuVertexToTensorOpMapper::matrixMultiply);
         opMappers.put(TensorMultiplicationVertex.class, KeanuVertexToTensorOpMapper::tensorMultiply);
         opMappers.put(PowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
         opMappers.put(AbsVertex.class, fluentUnaryOp("abs", "absInPlace"));
@@ -390,6 +390,15 @@ public class KeanuVertexToTensorOpMapper {
 
     private static String constant(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         throw new IllegalArgumentException("Constant should not be operation mapped");
+    }
+
+    private static String matrixMultiply(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        MatrixMultiplicationVertex mmul = (MatrixMultiplicationVertex) vertex;
+        String leftName = lookup.get(mmul.getLeft().getId()).getName();
+        String rightName = lookup.get(mmul.getRight().getId()).getName();
+        boolean transposeLeft = mmul.isTransposeLeft();
+        boolean transposeRight = mmul.isTransposeRight();
+        return leftName + ".matrixMultiply(" + rightName + "," + transposeLeft + "," + transposeRight + ");";
     }
 
     private static String tensorMultiply(Vertex<?, ?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {

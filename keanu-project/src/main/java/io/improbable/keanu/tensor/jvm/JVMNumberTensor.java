@@ -18,11 +18,11 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShape.dimensionRange;
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimensions;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getReductionResultShape;
 import static io.improbable.keanu.tensor.TensorShape.getRowFirstStride;
 import static io.improbable.keanu.tensor.TensorShape.incrementIndexByShape;
-import static io.improbable.keanu.tensor.TensorShape.setToAbsoluteDimensions;
 
 public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTensor<T, TENSOR>, B extends PrimitiveNumberWrapper<T, B>>
     extends JVMTensor<T, TENSOR, B> implements NumberTensor<T, TENSOR> {
@@ -88,7 +88,7 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
                                         Function<B, T> totalReduction,
                                         int... overDimensions) {
 
-        setToAbsoluteDimensions(this.shape.length, overDimensions);
+        overDimensions = getAbsoluteDimensions(this.shape.length, overDimensions);
 
         if (this.isScalar() || overDimensions.length == 0) {
             return duplicate();

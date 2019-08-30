@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.tensor.number.operators.binary;
 
 import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiator;
@@ -8,6 +9,7 @@ import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -19,6 +21,9 @@ import static io.improbable.keanu.vertices.tensor.number.TensorTestOperations.fi
 import static org.junit.Assert.assertEquals;
 
 public class MatrixMultiplicationVertexTest {
+
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
 
     @Test
     public void canSimpleMatrixMultiply() {
@@ -380,6 +385,40 @@ public class MatrixMultiplicationVertexTest {
             new long[]{5, 3},
             DoubleTensor.arange(3 * 4 * 3).reshape(3, 4, 3)
         );
+
+        assertChangesMatchGradientForward(
+            new long[]{3, 2, 3},
+            new long[]{3, 1, 3, 2},
+            DoubleTensor.arange(12).reshape(3, 2, 2)
+        );
+    }
+
+    @Test
+    public void canBatchForwardFromWrtSingleVariable() {
+        UniformVertex input = new UniformVertex(new long[]{3, 3, 2}, -10.0, 10.0);
+        DoubleVertex mmultVertex = input.transpose().matrixMultiply(input.reshape(3, 1, 3, 2));
+        DoubleVertex outputVertex = mmultVertex.times(
+            new ConstantDoubleVertex(DoubleTensor.arange(4).reshape(2, 2))
+        );
+
+        final double INCREMENT = 1e-3;
+        final double DELTA = 1e-5;
+
+        finiteDifferenceMatchesForwardModeGradient(ImmutableList.of(input), outputVertex, INCREMENT, DELTA);
+    }
+
+    @Test
+    public void canBatchReverseFromWrtSingleVariable() {
+        UniformVertex input = new UniformVertex(new long[]{3, 3, 2}, -10.0, 10.0);
+        DoubleVertex mmultVertex = input.transpose().matrixMultiply(input.reshape(3, 1, 3, 2));
+        DoubleVertex outputVertex = mmultVertex.times(
+            new ConstantDoubleVertex(DoubleTensor.arange(4).reshape(2, 2))
+        );
+
+        final double INCREMENT = 1e-3;
+        final double DELTA = 1e-5;
+
+        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(input), outputVertex, INCREMENT, DELTA);
     }
 
     private void assertChangesMatchGradientForward(long[] leftShape, long[] rightShape, DoubleTensor postOpFactor) {
@@ -390,8 +429,8 @@ public class MatrixMultiplicationVertexTest {
             new ConstantDoubleVertex(postOpFactor)
         );
 
-        final double INCREMENT = 10;
-        final double DELTA = 1e-10;
+        final double INCREMENT = 1e-3;
+        final double DELTA = 1e-5;
 
         finiteDifferenceMatchesForwardModeGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
     }
@@ -404,8 +443,8 @@ public class MatrixMultiplicationVertexTest {
             new ConstantDoubleVertex(postOpFactor)
         );
 
-        final double INCREMENT = 10;
-        final double DELTA = 1e-10;
+        final double INCREMENT = 1e-3;
+        final double DELTA = 1e-5;
 
         finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
     }
@@ -420,8 +459,8 @@ public class MatrixMultiplicationVertexTest {
             new ConstantDoubleVertex(new double[]{1., 2., 3., 4., 5., 6., 7., 8.}, new long[]{2, 2, 2})
         );
 
-        final double INCREMENT = 10;
-        final double DELTA = 1e-10;
+        final double INCREMENT = 1e-3;
+        final double DELTA = 1e-5;
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
     }

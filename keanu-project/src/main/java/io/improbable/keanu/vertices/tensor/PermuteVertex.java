@@ -8,7 +8,8 @@ import io.improbable.keanu.vertices.NonProbabilisticVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ForwardModePartialDerivative;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.ReverseModePartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,28 +39,29 @@ public class PermuteVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        int[] permuteToApply = forwardPermute(derivativeOfParentWithRespectToInputs);
-        DoubleTensor result = derivativeOfParentWithRespectToInputs.get().permute(permuteToApply);
-        return new PartialDerivative(result);
+    public ForwardModePartialDerivative forwardModeAutoDifferentiation(Map<Vertex, ForwardModePartialDerivative> derivativeOfParentsWithRespectToInput) {
+        ForwardModePartialDerivative partial = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        int[] permuteToApply = forwardPermute(partial, partial.getWrtShape().length);
+        DoubleTensor result = partial.get().permute(permuteToApply);
+        return new ForwardModePartialDerivative(partial.getWrtShape(), result);
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+    public Map<Vertex, ReverseModePartialDerivative> reverseModeAutoDifferentiation(ReverseModePartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, ReverseModePartialDerivative> partials = new HashMap<>();
         int[] permuteToApply = reversePermute(derivativeOfOutputWithRespectToSelf);
         DoubleTensor result = derivativeOfOutputWithRespectToSelf.get().permute(permuteToApply);
-        partials.put(inputVertex, new PartialDerivative(result));
+        partials.put(inputVertex, new ReverseModePartialDerivative(derivativeOfOutputWithRespectToSelf.getOfShape(), result));
         return partials;
     }
 
-    private int[] forwardPermute(PartialDerivative partial) {
-        int[] permuteToApply = new int[partial.get().getRank()];
+    private int[] forwardPermute(ForwardModePartialDerivative partial, int wrtRank) {
+        int partialRank = partial.get().getRank();
+        int[] permuteToApply = new int[partialRank];
 
-        for (int i = 0; i < partial.get().getRank(); i++) {
-            if (i < rearrange.length) {
-                permuteToApply[i] = rearrange[i];
+        for (int i = 0; i < partialRank; i++) {
+            if (i >= wrtRank) {
+                permuteToApply[i] = rearrange[i - wrtRank] + wrtRank;
             } else {
                 permuteToApply[i] = i;
             }
@@ -68,7 +70,7 @@ public class PermuteVertex<T, TENSOR extends Tensor<T, TENSOR>, VERTEX extends T
         return permuteToApply;
     }
 
-    private int[] reversePermute(PartialDerivative partial) {
+    private int[] reversePermute(ReverseModePartialDerivative partial) {
 
         int partialRank = partial.get().getRank();
         int[] permuteToApply = new int[partialRank];
