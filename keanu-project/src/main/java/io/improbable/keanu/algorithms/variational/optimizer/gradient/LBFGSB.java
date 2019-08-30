@@ -252,4 +252,56 @@ public class LBFGSB {
         return alphastar;
     }
 
+    /**
+     * @brief solving unbounded probelm
+     * @details [long description]
+     *
+     * @param SubspaceMin [description]
+     */
+    void SubspaceMinimization(const Problem problem, double[] x_cauchy, double[] x, double[] c, double[] g, double[] SubspaceMin) {
+        double theta_inverse = 1 / theta;
+        List<Integer> FreeVariablesIndex = new ArrayList<>();
+        for (int i = 0; i < x_cauchy.length; i++) {
+            if ((x_cauchy[i] != problem.upperBound()[i]) && (x_cauchy[i] != problem.lowerBound()[i])) {
+                FreeVariablesIndex.add(i);
+            }
+        }
+
+    const int FreeVarCount = FreeVariablesIndex.size();
+//        MatrixType WZ = MatrixType::Zero(W.cols(), FreeVarCount);
+        DoubleTensor WZ = DoubleTensor.zeros(W.getShape()[1], FreeVarCount);
+
+        for (int i = 0; i < FreeVarCount; i++) {
+//            WZ.col(i) = W.row(FreeVariablesIndex[i]);
+
+            WZ.col(i) = W.row(FreeVariablesIndex[i]);
+        }
+
+        TVector rr = (g + theta * (x_cauchy - x) - W * (M * c));
+        // r=r(FreeVariables);
+        MatrixType r = MatrixType::Zero(FreeVarCount, 1);
+        for (int i = 0; i < FreeVarCount; i++)
+            r.row(i) = rr.row(FreeVariablesIndex[i]);
+        // STEP 2: "v = w^T*Z*r" and STEP 3: "v = M*v"
+        VariableTVector v = M * (WZ * r);
+        // STEP 4: N = 1/theta*W^T*Z*(W^T*Z)^T
+        MatrixType N = theta_inverse * WZ * WZ.transpose();
+        // N = I - MN
+        N = MatrixType::Identity(N.rows(), N.rows()) - M * N;
+        // STEP: 5
+        // v = N^{-1}*v
+        v = N.lu().solve(v);
+        // STEP: 6
+        // HERE IS A MISTAKE IN THE ORIGINAL PAPER!
+        VariableTVector du = -theta_inverse * r - theta_inverse * theta_inverse * WZ.transpose() * v;
+        // STEP: 7
+        Scalar alpha_star = findAlpha(problem, x_cauchy, du, FreeVariablesIndex);
+        // STEP: 8
+        VariableTVector dStar = alpha_star * du;
+        SubspaceMin = x_cauchy;
+        for (int i = 0; i < FreeVarCount; i++) {
+            SubspaceMin(FreeVariablesIndex[i]) = SubspaceMin(FreeVariablesIndex[i]) + dStar(i);
+        }
+    }
+
 }

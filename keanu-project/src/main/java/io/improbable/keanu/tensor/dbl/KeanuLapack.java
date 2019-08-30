@@ -14,6 +14,8 @@ import static org.bytedeco.openblas.global.openblas.LAPACK_ROW_MAJOR;
 
 /**
  * https://software.intel.com/en-us/mkl-developer-reference-c-matrix-factorization-lapack-computational-routines
+ *
+ * http://www.icl.utk.edu/~mgates3/docs/lapack.html
  * <p>
  * This is a wrapper around a few LAPACK functions used directly in Keanu
  */
