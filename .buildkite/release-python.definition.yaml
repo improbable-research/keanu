@@ -8,5 +8,5 @@ github:
 teams:
 - name: Everyone
   permission: BUILD_AND_READ
-- name: ebu/graphos-engineering
+- name: ior/simx
   permission: MANAGE_BUILD_AND_READ
