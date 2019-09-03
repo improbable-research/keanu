@@ -69,7 +69,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         DoubleTensor s = DoubleTensor.zeros(DIM);
         DoubleTensor y = DoubleTensor.zeros(DIM);
 
-        grad = DoubleTensor.create(objFuncGradient.value(x0.asFlatDoubleArray()));
+        grad = DoubleTensor.create(objFuncGradient.value(x0.asFlatDoubleArray())).unaryMinus();
         DoubleTensor x_old = x0;
 
         int iter = 0;
@@ -96,15 +96,15 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 //                const double rho = 1.0 / static_cast<TVector>(sVector.col(i))
 //                    .dot(static_cast<TVector>(yVector.col(i)));
 
-                double rho = 1.0 / (dot(sVector.slice(1, i), yVector.slice(1, i)).scalar());
+                double rho = 1.0 / (dot(sVector.slice(0, i), yVector.slice(0, i)).scalar());
 
 //                alpha(i) = rho * static_cast<TVector>(sVector.col(i)).dot(q);
-                double a = rho * dot(sVector.slice(1, i), q).scalar();
+                double a = rho * dot(sVector.slice(0, i), q).scalar();
                 alpha.setValue(a, i);
 
                 // q <- q - alpha_i*y_i
 //                q = q - alpha(i) * yVector.col(i);
-                q = q.minus(yVector.slice(1, i).times(a));
+                q = q.minus(yVector.slice(0, i).times(a));
             }
             // r <- H_k^0*q
 //            q = H0k * q;
@@ -116,19 +116,19 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 
 //                const Scalar rho = 1.0 / static_cast < TVector > (sVector.col(i))
 //                    .dot(static_cast < TVector > (yVector.col(i)));
-                double rho = 1.0 / (dot(sVector.slice(1, i), yVector.slice(1, i)).scalar());
+                double rho = 1.0 / (dot(sVector.slice(0, i), yVector.slice(0, i)).scalar());
 
 //                const Scalar beta = rho * static_cast < TVector > (yVector.col(i)).dot(q);
-                double beta = rho * yVector.slice(1, i).times(q).sum().scalar();
+                double beta = rho * yVector.slice(0, i).times(q).sum().scalar();
 
                 // r <- r + s_i * ( alpha_i - beta)
 //                q = q + sVector.col(i) * (alpha(i) - beta);
-                q = q.plus(sVector.slice(1, i).times(alpha.getValue(i) - beta));
+                q = q.plus(sVector.slice(0, i).times(alpha.getValue(i) - beta));
             }
             // stop with result "H_k*f_f'=q"
 
             // any issues with the descent direction ?
-            double descent = -grad.times(q).sumNumber();
+            double descent = -dot(grad, q).scalar();
             double alpha_init = 1.0 / norm(grad).scalar();
             if (descent > -0.0001 * relativeEpsilon) {
 //                q = -1 * grad;
@@ -146,7 +146,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             x0 = x0.minus(q.times(rate));
 
             grad_old = grad;
-            grad = DoubleTensor.create(objFuncGradient.value(x0.asFlatDoubleArray()));
+            grad = DoubleTensor.create(objFuncGradient.value(x0.asFlatDoubleArray())).unaryMinus();
 
 //            s = x0 - x_old;
             s = x0.minus(x_old);
@@ -193,13 +193,13 @@ public class LBFGS implements GradientOptimizationAlgorithm {
     }
 
     private static void setRow(DoubleTensor target, int row, DoubleTensor operand) {
-        for (int i = 0; i < target.getShape()[0]; i++) {
+        for (int i = 0; i < target.getShape()[1]; i++) {
             target.setValue(operand.getValue(i), row, i);
         }
     }
 
     private static DoubleTensor shiftAndAddRow(DoubleTensor matrix, DoubleTensor vector) {
-        return DoubleTensor.concat(matrix.slice(Slicer.builder().slice(1).build()), vector.reshape(1, -1));
+        return DoubleTensor.concat(matrix.slice(Slicer.builder().slice(1, 10).build()), vector.reshape(1, -1));
     }
 
     private static DoubleTensor norm(DoubleTensor input) {

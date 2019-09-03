@@ -35,6 +35,11 @@ public class GradientOptimizationAlgorithmTest {
                 .build();
         }),
 
+        LBFGS(() -> {
+
+            return new LBFGS();
+        }),
+
         CONJUGATE_GRADIENT_POLAK_RIBIERE(() -> {
 
             return ConjugateGradient.builder()

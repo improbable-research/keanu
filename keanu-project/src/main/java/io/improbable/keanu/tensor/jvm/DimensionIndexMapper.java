@@ -5,6 +5,8 @@ import io.improbable.keanu.tensor.TensorShape;
 import lombok.Value;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Arrays;
+
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static io.improbable.keanu.tensor.TensorShape.getShapeIndices;
 
@@ -19,7 +21,8 @@ public class DimensionIndexMapper implements IndexMapper {
     final long[] resultStride;
 
     public DimensionIndexMapper(long[] sourceShape, long[] sourceStride, int dimension, long index) {
-        Preconditions.checkArgument(dimension < sourceShape.length && index < sourceShape[dimension]);
+        Preconditions.checkArgument(dimension < sourceShape.length, "Invalid dimension " + dimension + " for shape " + Arrays.toString(sourceShape));
+        Preconditions.checkArgument(index < sourceShape[dimension], "Invalid index at dimension " + dimension + " at index " + index + " for shape " + Arrays.toString(sourceShape));
         this.dimension = dimension;
         this.index = index;
         this.sourceShape = sourceShape;

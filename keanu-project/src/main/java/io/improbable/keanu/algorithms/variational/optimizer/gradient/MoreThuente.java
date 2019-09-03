@@ -15,9 +15,9 @@ public class MoreThuente {
                              ApacheFitnessFunctionGradientAdapter objFuncGradient,
                              double alpha_init) {
 
-        double fitness = objFunc.value(x.asFlatDoubleArray());
+        double fitness = objFunc.value(x.asFlatDoubleArray()) * -1;
 
-        DoubleTensor g = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray()));
+        DoubleTensor g = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray())).unaryMinus();
 
         return cvsrch(objFunc, objFuncGradient, x, fitness, g, alpha_init, searchDir);
     }
@@ -38,8 +38,8 @@ public class MoreThuente {
         double xtol = 1e-15;
         double ftol = 1e-4;
         double gtol = 1e-2;
-        double stpmin = 1e-15;
-        double stpmax = 1e15;
+        final double stpmin = 1e-15;
+        final double stpmax = 1e15;
         double xtrapf = 4;
         final int maxfev = 20;
         int nfev = 0;
@@ -67,39 +67,40 @@ public class MoreThuente {
         cStep.fy = finit;
         cStep.dy = dginit;
 
+        double stmin = 0.0, stmax =0.0;
+
         while (true) {
 
             // make sure we stay in the interval when setting min/max-step-width
             if (cStep.brackt) {
-                stpmin = Math.min(cStep.stx, cStep.sty);
-                stpmax = Math.max(cStep.stx, cStep.sty);
+                stmin = Math.min(cStep.stx, cStep.sty);
+                stmax = Math.max(cStep.stx, cStep.sty);
             } else {
-                stpmin = cStep.stx;
-                stpmax = cStep.stp + xtrapf * (cStep.stp - cStep.stx);
+                stmin = cStep.stx;
+                stmax = cStep.stp + xtrapf * (cStep.stp - cStep.stx);
+            }
+
+            // Oops, let us return the last reliable values
+            if ((cStep.brackt && ((cStep.stp <= stmin) || (cStep.stp >= stmax)))
+                    || (nfev >= maxfev - 1) || (cStep.info == 0)
+                    || (cStep.brackt && ((stmax - stmin) <= (xtol * stmax)))) {
+                cStep.stp = cStep.stx;
             }
 
             // Force the step to be within the bounds stpmax and stpmin.
             cStep.stp = Math.max(cStep.stp, stpmin);
             cStep.stp = Math.min(cStep.stp, stpmax);
 
-            // Oops, let us return the last reliable values
-            if (
-                (cStep.brackt && ((cStep.stp <= stpmin) || (cStep.stp >= stpmax)))
-                    || (nfev >= maxfev - 1) || (cStep.info == 0)
-                    || (cStep.brackt && ((stpmax - stpmin) <= (xtol * stpmax)))) {
-                cStep.stp = cStep.stx;
-            }
-
             // test new point
             x = wa.plus(searchDirection.times(cStep.stp));
-            f = objFunc.value(x.asFlatDoubleArray());
-            g = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray()));
+            f = objFunc.value(x.asFlatDoubleArray()) * -1;
+            g = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray())).unaryMinus();
             nfev++;
             double dg = dot(g, searchDirection).scalar();
             double ftest1 = finit + cStep.stp * dgtest;
 
             // all possible convergence tests
-            if ((cStep.brackt & ((cStep.stp <= stpmin) | (cStep.stp >= stpmax))) | (cStep.info == 0)) {
+            if ((cStep.brackt & ((cStep.stp <= stmin) | (cStep.stp >= stmax))) | (cStep.info == 0)) {
                 info = 6;
             }
 
@@ -115,7 +116,7 @@ public class MoreThuente {
                 info = 3;
             }
 
-            if (cStep.brackt & (stpmax - stpmin <= xtol * stpmax)) {
+            if (cStep.brackt & (stmax - stmin <= xtol * stmax)) {
                 info = 2;
             }
 
@@ -125,6 +126,9 @@ public class MoreThuente {
 
             // terminate when convergence reached
             if (info != 0) {
+                if(cStep.stp == 0){
+                    System.out.println("");
+                }
                 return cStep.stp;
             }
 
@@ -144,10 +148,10 @@ public class MoreThuente {
 
                 //cstep( stx, fxm, dgxm, sty, fym, dgym, stp, fm, dgm, brackt, stmin, stmax, infoc);
 
-                cstep(newCstep, fm, dgm, stpmin, stpmax);
+                cstep(newCstep, fm, dgm, stmin, stmax);
 
-                cStep.fx = newCstep.fx + cStep.stx * dgtest;
-                cStep.fy = newCstep.fy + cStep.sty * dgtest;
+                cStep.fx = newCstep.fx + newCstep.stx * dgtest;
+                cStep.fy = newCstep.fy + newCstep.sty * dgtest;
                 cStep.dx = newCstep.dx + dgtest;
                 cStep.dy = newCstep.dy + dgtest;
 
@@ -159,7 +163,7 @@ public class MoreThuente {
 
             } else {
                 // this is ugly and some variables should be moved to the class scope
-                cstep(cStep, f, dg, stpmin, stpmax);
+                cstep(cStep, f, dg, stmin, stmax);
 //                cstep(cStep.stx, cStep.fx, cStep.dx, cStep.sty, cStep.fy, cStep.dy, cStep.stp, f, dg, cStep.brackt, cStep.stpmin, cStep.stpmax, cStep.info);
             }
 
@@ -325,6 +329,10 @@ public class MoreThuente {
             cStep.stx = stp;
             cStep.fx = fp;
             cStep.dx = dp;
+
+            if(cStep.stx == 0){
+                System.out.println();
+            }
         }
 
         stpf = Math.min(stpmax, stpf);
