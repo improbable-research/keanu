@@ -17,49 +17,49 @@ public class MoreThuente {
 
         double fitness = objFunc.value(x.asFlatDoubleArray()) * -1;
 
-        DoubleTensor g = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray())).unaryMinus();
+        DoubleTensor gradient = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray())).unaryMinus();
 
-        return cvsrch(objFunc, objFuncGradient, x, fitness, g, alpha_init, searchDir);
+        return cvsrch(objFunc, objFuncGradient, x, fitness, gradient, alpha_init, searchDir);
     }
 
     private static double cvsrch(ApacheFitnessFunctionAdapter objFunc,
                                  ApacheFitnessFunctionGradientAdapter objFuncGradient,
                                  DoubleTensor x,
-                                 double f,
-                                 DoubleTensor g,
+                                 double fitness,
+                                 DoubleTensor gradient,
                                  final double stp,
                                  DoubleTensor searchDirection) {
 
-        CStep cStep = new CStep();
-        cStep.stp = stp;
+        final double xtol = 1e-15;
+        final double ftol = 1e-4;
+        final double gtol = 1e-2;
 
-        int info = 0;
-        cStep.info = 1;
-        double xtol = 1e-15;
-        double ftol = 1e-4;
-        double gtol = 1e-2;
         final double stpmin = 1e-15;
         final double stpmax = 1e15;
-        double xtrapf = 4;
+        final double xtrapf = 4;
         final int maxfev = 20;
-        int nfev = 0;
+        final double finit = fitness;
+        final DoubleTensor initialX = x.duplicate();
 
-        double dginit = dot(g, searchDirection).scalar();
+        double dginit = dot(gradient, searchDirection).scalar();
         if (dginit >= 0.0) {
             // no descent direction
             // TODO: handle this case
             return -1;
         }
 
-        cStep.brackt = false;
-        boolean stage1 = true;
+        final double dgtest = ftol * dginit;
 
-        double finit = f;
-        double dgtest = ftol * dginit;
+        int info = 0;
+        int nfev = 0;
+        boolean stage1 = true;
         double width = stpmax - stpmin;
         double width1 = 2 * width;
-        DoubleTensor wa = x.duplicate();
 
+        final CStep cStep = new CStep();
+        cStep.stp = stp;
+        cStep.info = 1;
+        cStep.brackt = false;
         cStep.stx = 0.0;
         cStep.fx = finit;
         cStep.dx = dginit;
@@ -67,7 +67,8 @@ public class MoreThuente {
         cStep.fy = finit;
         cStep.dy = dginit;
 
-        double stmin = 0.0, stmax =0.0;
+        double stmin;
+        double stmax;
 
         while (true) {
 
@@ -82,8 +83,8 @@ public class MoreThuente {
 
             // Oops, let us return the last reliable values
             if ((cStep.brackt && ((cStep.stp <= stmin) || (cStep.stp >= stmax)))
-                    || (nfev >= maxfev - 1) || (cStep.info == 0)
-                    || (cStep.brackt && ((stmax - stmin) <= (xtol * stmax)))) {
+                || (nfev >= maxfev - 1) || (cStep.info == 0)
+                || (cStep.brackt && ((stmax - stmin) <= (xtol * stmax)))) {
                 cStep.stp = cStep.stx;
             }
 
@@ -92,23 +93,24 @@ public class MoreThuente {
             cStep.stp = Math.min(cStep.stp, stpmax);
 
             // test new point
-            x = wa.plus(searchDirection.times(cStep.stp));
-            f = objFunc.value(x.asFlatDoubleArray()) * -1;
-            g = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray())).unaryMinus();
+            x = initialX.plus(searchDirection.times(cStep.stp));
+            fitness = objFunc.value(x.asFlatDoubleArray()) * -1;
+            gradient = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray())).unaryMinus();
             nfev++;
-            double dg = dot(g, searchDirection).scalar();
-            double ftest1 = finit + cStep.stp * dgtest;
+
+            final double dg = dot(gradient, searchDirection).scalar();
+            final double ftest1 = finit + cStep.stp * dgtest;
 
             // all possible convergence tests
             if ((cStep.brackt & ((cStep.stp <= stmin) | (cStep.stp >= stmax))) | (cStep.info == 0)) {
                 info = 6;
             }
 
-            if ((cStep.stp == stpmax) & (f <= ftest1) & (dg <= dgtest)) {
+            if ((cStep.stp == stpmax) & (fitness <= ftest1) & (dg <= dgtest)) {
                 info = 5;
             }
 
-            if ((cStep.stp == stpmin) & ((f > ftest1) | (dg >= dgtest))) {
+            if ((cStep.stp == stpmin) & ((fitness > ftest1) | (dg >= dgtest))) {
                 info = 4;
             }
 
@@ -120,33 +122,28 @@ public class MoreThuente {
                 info = 2;
             }
 
-            if ((f <= ftest1) & (Math.abs(dg) <= gtol * (-dginit))) {
+            if ((fitness <= ftest1) & (Math.abs(dg) <= gtol * (-dginit))) {
                 info = 1;
             }
 
             // terminate when convergence reached
             if (info != 0) {
-                if(cStep.stp == 0){
-                    System.out.println("");
-                }
                 return cStep.stp;
             }
 
-            if (stage1 & (f <= ftest1) & (dg >= Math.min(ftol, gtol) * dginit)) {
+            if (stage1 & (fitness <= ftest1) & (dg >= Math.min(ftol, gtol) * dginit)) {
                 stage1 = false;
             }
 
-            if (stage1 & (f <= cStep.fx) & (f > ftest1)) {
-                double fm = f - cStep.stp * dgtest;
-                double fxm = cStep.fx - cStep.stx * dgtest;
-                double fym = cStep.fy - cStep.sty * dgtest;
-                double dgm = dg - dgtest;
-                double dgxm = cStep.dx - dgtest;
-                double dgym = cStep.dy - dgtest;
+            if (stage1 & (fitness <= cStep.fx) & (fitness > ftest1)) {
+                final double fm = fitness - cStep.stp * dgtest;
+                final double fxm = cStep.fx - cStep.stx * dgtest;
+                final double fym = cStep.fy - cStep.sty * dgtest;
+                final double dgm = dg - dgtest;
+                final double dgxm = cStep.dx - dgtest;
+                final double dgym = cStep.dy - dgtest;
 
-                CStep newCstep = new CStep(cStep.stx, fxm, dgxm, cStep.sty, fym, dgym, cStep.stp, cStep.brackt, cStep.info);
-
-                //cstep( stx, fxm, dgxm, sty, fym, dgym, stp, fm, dgm, brackt, stmin, stmax, infoc);
+                final CStep newCstep = new CStep(cStep.stx, fxm, dgxm, cStep.sty, fym, dgym, cStep.stp, cStep.brackt, cStep.info);
 
                 cstep(newCstep, fm, dgm, stmin, stmax);
 
@@ -162,9 +159,8 @@ public class MoreThuente {
                 cStep.stp = newCstep.stp;
 
             } else {
-                // this is ugly and some variables should be moved to the class scope
-                cstep(cStep, f, dg, stmin, stmax);
-//                cstep(cStep.stx, cStep.fx, cStep.dx, cStep.sty, cStep.fy, cStep.dy, cStep.stp, f, dg, cStep.brackt, cStep.stpmin, cStep.stpmax, cStep.info);
+
+                cstep(cStep, fitness, dg, stmin, stmax);
             }
 
             if (cStep.brackt) {
@@ -178,22 +174,7 @@ public class MoreThuente {
 
     }
 
-//    static int cstep(double stx,
-//                     double fx,
-//                     double dx,
-//                     double sty,
-//                     double fy,
-//                     double dy,
-//                     double stp,
-//                     double fp,
-//                     double dp,
-//                     boolean brackt,
-//                     double stpmin,
-//                     double stpmax,
-//                     int info
-//    ) {
-
-    static int cstep(CStep cStep, final double fp, final double dp, final double stpmin, final double stpmax) {
+    private static void cstep(final CStep cStep, final double fp, final double dp, final double stpmin, final double stpmax) {
 
         final double stx = cStep.stx;
         final double fx = cStep.fx;
@@ -205,71 +186,88 @@ public class MoreThuente {
         final boolean brackt = cStep.brackt;
 
         cStep.info = 0;
-        boolean bound = false;
+        boolean bound;
 
         // Check the input parameters for errors.
         if ((brackt & ((stp <= Math.min(stx, sty)) | (stp >= Math.max(stx, sty)))) | (dx * (stp - stx) >= 0.0)
             | (stpmax < stpmin)) {
-            return -1;
+            return;
         }
 
-        double sgnd = dp * (dx / Math.abs(dx));
+        final double sgnd = dp * (dx / Math.abs(dx));
+
         double stpf = 0;
         double stpc = 0;
         double stpq = 0;
 
         if (fp > fx) {
+
             cStep.info = 1;
             bound = true;
-            double theta = 3. * (fx - fp) / (stp - stx) + dx + dp;
-            double s = Math.max(theta, Math.max(dx, dp));
+            final double theta = 3. * (fx - fp) / (stp - stx) + dx + dp;
+            final double s = Math.max(theta, Math.max(dx, dp));
             double gamma = s * Math.sqrt((theta / s) * (theta / s) - (dx / s) * (dp / s));
-            if (stp < stx)
+
+            if (stp < stx) {
                 gamma = -gamma;
-            double p = (gamma - dx) + theta;
-            double q = ((gamma - dx) + gamma) + dp;
-            double r = p / q;
+            }
+
+            final double p = (gamma - dx) + theta;
+            final double q = ((gamma - dx) + gamma) + dp;
+            final double r = p / q;
+
             stpc = stx + r * (stp - stx);
             stpq = stx + ((dx / ((fx - fp) / (stp - stx) + dx)) / 2.) * (stp - stx);
+
             if (Math.abs(stpc - stx) < Math.abs(stpq - stx)) {
                 stpf = stpc;
-            }else {
+            } else {
                 stpf = stpc + (stpq - stpc) / 2;
             }
             cStep.brackt = true;
+
         } else if (sgnd < 0.0) {
+
             cStep.info = 2;
             bound = false;
-            double theta = 3 * (fx - fp) / (stp - stx) + dx + dp;
-            double s = Math.max(theta, Math.max(dx, dp));
+            final double theta = 3 * (fx - fp) / (stp - stx) + dx + dp;
+            final double s = Math.max(theta, Math.max(dx, dp));
+
             double gamma = s * Math.sqrt((theta / s) * (theta / s) - (dx / s) * (dp / s));
             if (stp > stx) {
                 gamma = -gamma;
             }
 
-            double p = (gamma - dp) + theta;
-            double q = ((gamma - dp) + gamma) + dx;
-            double r = p / q;
+            final double p = (gamma - dp) + theta;
+            final double q = ((gamma - dp) + gamma) + dx;
+            final double r = p / q;
+
             stpc = stp + r * (stx - stp);
             stpq = stp + (dp / (dp - dx)) * (stx - stp);
+
             if (Math.abs(stpc - stp) > Math.abs(stpq - stp)) {
                 stpf = stpc;
             } else {
                 stpf = stpq;
             }
             cStep.brackt = true;
+
         } else if (Math.abs(dp) < Math.abs(dx)) {
+
             cStep.info = 3;
             bound = true;
-            double theta = 3 * (fx - fp) / (stp - stx) + dx + dp;
-            double s = Math.max(theta, Math.max(dx, dp));
+            final double theta = 3 * (fx - fp) / (stp - stx) + dx + dp;
+            final double s = Math.max(theta, Math.max(dx, dp));
+
             double gamma = s * Math.sqrt(Math.max(0., (theta / s) * (theta / s) - (dx / s) * (dp / s)));
             if (stp > stx) {
                 gamma = -gamma;
             }
-            double p = (gamma - dp) + theta;
-            double q = (gamma + (dx - dp)) + gamma;
-            double r = p / q;
+
+            final double p = (gamma - dp) + theta;
+            final double q = (gamma + (dx - dp)) + gamma;
+            final double r = p / q;
+
             if ((r < 0.0) & (gamma != 0.0)) {
                 stpc = stp + r * (stx - stp);
             } else if (stp > stx) {
@@ -277,7 +275,9 @@ public class MoreThuente {
             } else {
                 stpc = stpmin;
             }
+
             stpq = stp + (dp / (dp - dx)) * (stx - stp);
+
             if (brackt) {
                 if (Math.abs(stp - stpc) < Math.abs(stp - stpq)) {
                     stpf = stpc;
@@ -293,26 +293,31 @@ public class MoreThuente {
 
             }
         } else {
+
             cStep.info = 4;
             bound = false;
+
             if (brackt) {
-                double theta = 3 * (fp - fy) / (sty - stp) + dy + dp;
-                double s = Math.max(theta, Math.max(dy, dp));
+                final double theta = 3 * (fp - fy) / (sty - stp) + dy + dp;
+                final double s = Math.max(theta, Math.max(dy, dp));
+
                 double gamma = s * Math.sqrt((theta / s) * (theta / s) - (dy / s) * (dp / s));
                 if (stp > sty) {
                     gamma = -gamma;
                 }
 
-                double p = (gamma - dp) + theta;
-                double q = ((gamma - dp) + gamma) + dy;
-                double r = p / q;
+                final double p = (gamma - dp) + theta;
+                final double q = ((gamma - dp) + gamma) + dy;
+                final double r = p / q;
                 stpc = stp + r * (sty - stp);
                 stpf = stpc;
+
             } else if (stp > stx)
                 stpf = stpmax;
             else {
                 stpf = stpmin;
             }
+
         }
 
         if (fp > fx) {
@@ -329,10 +334,6 @@ public class MoreThuente {
             cStep.stx = stp;
             cStep.fx = fp;
             cStep.dx = dp;
-
-            if(cStep.stx == 0){
-                System.out.println();
-            }
         }
 
         stpf = Math.min(stpmax, stpf);
@@ -346,8 +347,6 @@ public class MoreThuente {
                 cStep.stp = Math.max(stx + 0.66 * (sty - stx), stp);
             }
         }
-
-        return 0;
     }
 
     @Data
