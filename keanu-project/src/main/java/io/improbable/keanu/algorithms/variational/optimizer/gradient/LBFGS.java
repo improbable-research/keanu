@@ -25,6 +25,8 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 
     private Criteria stopCriteria = new Criteria(100, 1e-3);
 
+    private final int m = 10;
+
     @Override
     public OptimizedResult optimize(List<? extends Variable> latentVariables,
                                     FitnessFunction fitnessFunction,
@@ -32,7 +34,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 
         double[] startingPoint = Optimizer.convertToArrayPoint(getAsDoubleTensors(latentVariables));
 
-        DoubleTensor result = minimize(
+        DoubleTensor result = maximize(
             new ApacheFitnessFunctionAdapter(fitnessFunction, latentVariables),
             new ApacheFitnessFunctionGradientAdapter(fitnessFunctionGradient, latentVariables),
             DoubleTensor.create(startingPoint)
@@ -46,150 +48,119 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         return new OptimizedResult(optimizedValues, 0);
     }
 
-    public DoubleTensor minimize(ApacheFitnessFunctionAdapter objFunc,
-                                 ApacheFitnessFunctionGradientAdapter objFuncGradient,
-                                 DoubleTensor x0) {
+    private DoubleTensor maximize(ApacheFitnessFunctionAdapter objFunc,
+                                  ApacheFitnessFunctionGradientAdapter objFuncGradient,
+                                  DoubleTensor position) {
 
-        int m = 10;
-        int DIM = Ints.checkedCast(x0.getShape()[0]);
-//        MatrixType sVector = MatrixType::Zero(DIM, m);
-//        MatrixType yVector = MatrixType::Zero(DIM, m);
+        final int dimensionCount = Ints.checkedCast(position.getShape()[0]);
 
-        DoubleTensor sVector = DoubleTensor.zeros(m, DIM);
-        DoubleTensor yVector = DoubleTensor.zeros(m, DIM);
+        DoubleTensor sVector = DoubleTensor.zeros(m, dimensionCount);
+        DoubleTensor yVector = DoubleTensor.zeros(m, dimensionCount);
+        final double[] alpha = new double[m];
 
-//        Eigen::Matrix<Scalar, Eigen::Dynamic, 1> alpha = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>::Zero(m);
+        DoubleTensor gradient;
+        DoubleTensor q;
+        DoubleTensor gradientPrevious;
+        DoubleTensor s;
+        DoubleTensor y;
 
-        DoubleTensor alpha = DoubleTensor.zeros(m);
-
-//        TVector grad(DIM), q(DIM), grad_old(DIM), s(DIM), y(DIM);
-        DoubleTensor grad = DoubleTensor.zeros(DIM);
-        DoubleTensor q = DoubleTensor.zeros(DIM);
-        DoubleTensor grad_old = DoubleTensor.zeros(DIM);
-        DoubleTensor s = DoubleTensor.zeros(DIM);
-        DoubleTensor y = DoubleTensor.zeros(DIM);
-
-        grad = DoubleTensor.create(objFuncGradient.value(x0.asFlatDoubleArray())).unaryMinus();
-        DoubleTensor x_old = x0;
+        gradient = DoubleTensor.create(objFuncGradient.value(position.asFlatDoubleArray())).unaryMinusInPlace();
+        DoubleTensor positionPrevious = position;
 
         int iter = 0;
-        double H0k = 1;
-//        this->m_current.reset();
+        double H0k = 1.0;
 
         Criteria current = new Criteria();
         do {
-//            const Scalar relativeEpsilon = static_cast<Scalar>(0.0001) * std::max(static_cast<Scalar>(1.0), x0.norm());
 
-            double relativeEpsilon = 0.0001 * Math.max(1.0, norm(x0).scalar());
+            double relativeEpsilon = 0.0001 * Math.max(1.0, norm(position).scalar());
 
-            if (norm(grad).scalar() < relativeEpsilon)
+            if (norm(gradient).scalar() < relativeEpsilon) {
                 break;
+            }
 
             //Algorithm 7.4 (L-BFGS two-loop recursion)
-            q = grad;
-//            const int k = std::min(m, iter);
-            int k = Math.min(m, iter);
+            q = gradient;
+            final int k = Math.min(m, iter);
 
-            // for i = k − 1, k − 2, . . . , k − m§
+            // for i = k − 1, k − 2, . . . , k − m
             for (int i = k - 1; i >= 0; i--) {
                 // alpha_i <- rho_i*s_i^T*q
-//                const double rho = 1.0 / static_cast<TVector>(sVector.col(i))
-//                    .dot(static_cast<TVector>(yVector.col(i)));
 
-                double rho = 1.0 / (dot(sVector.slice(0, i), yVector.slice(0, i)).scalar());
+                final DoubleTensor sRow = getRow(sVector, i);
+                final DoubleTensor yRow = getRow(yVector, i);
 
-//                alpha(i) = rho * static_cast<TVector>(sVector.col(i)).dot(q);
-                double a = rho * dot(sVector.slice(0, i), q).scalar();
-                alpha.setValue(a, i);
+                final double rho = 1.0 / (dot(sRow, yRow).scalar());
+                alpha[i] = rho * dot(sRow, q).scalar();
 
                 // q <- q - alpha_i*y_i
-//                q = q - alpha(i) * yVector.col(i);
-                q = q.minus(yVector.slice(0, i).times(a));
+                q = q.minus(yRow.times(alpha[i]));
             }
+
             // r <- H_k^0*q
-//            q = H0k * q;
             q = q.times(H0k);
 
             //for i k − m, k − m + 1, . . . , k − 1
             for (int i = 0; i < k; i++) {
                 // beta <- rho_i * y_i^T * r
 
-//                const Scalar rho = 1.0 / static_cast < TVector > (sVector.col(i))
-//                    .dot(static_cast < TVector > (yVector.col(i)));
-                double rho = 1.0 / (dot(sVector.slice(0, i), yVector.slice(0, i)).scalar());
+                final DoubleTensor sRow = getRow(sVector, i);
+                final DoubleTensor yRow = getRow(yVector, i);
 
-//                const Scalar beta = rho * static_cast < TVector > (yVector.col(i)).dot(q);
-                double beta = rho * yVector.slice(0, i).times(q).sum().scalar();
+                double rho = 1.0 / (dot(sRow, yRow).scalar());
+                double beta = rho * dot(yRow, q).scalar();
 
                 // r <- r + s_i * ( alpha_i - beta)
-//                q = q + sVector.col(i) * (alpha(i) - beta);
-                q = q.plus(sVector.slice(0, i).times(alpha.getValue(i) - beta));
+                q = q.plus(sRow.times(alpha[i] - beta));
             }
             // stop with result "H_k*f_f'=q"
 
             // any issues with the descent direction ?
-            double descent = -dot(grad, q).scalar();
-            double alpha_init = 1.0 / norm(grad).scalar();
+            double descent = -dot(gradient, q).scalar();
+            double alphaInit = 1.0 / norm(gradient).scalar();
             if (descent > -0.0001 * relativeEpsilon) {
-//                q = -1 * grad;
-                q = grad.times(-1);
+                q = gradient.unaryMinus();
                 iter = 0;
-                alpha_init = 1.0;
+                alphaInit = 1.0;
             }
 
-            // find steplength
-//            double rate = MoreThuente < ProblemType, 1 >::linesearch(x0, -q, objFunc, alpha_init);
-            double rate = MoreThuente.linesearch(x0, q.unaryMinus(), objFunc, objFuncGradient, alpha_init);
+            // find step length
+            double rate = MoreThuente.linesearch(position, q.unaryMinus(), objFunc, objFuncGradient, alphaInit);
 
             // update guess
-//            x0 = x0 - rate * q;
-            x0 = x0.minus(q.times(rate));
+            position = position.minus(q.times(rate));
 
-            grad_old = grad;
-            grad = DoubleTensor.create(objFuncGradient.value(x0.asFlatDoubleArray())).unaryMinus();
+            gradientPrevious = gradient;
+            gradient = DoubleTensor.create(objFuncGradient.value(position.asFlatDoubleArray())).unaryMinusInPlace();
 
-//            s = x0 - x_old;
-            s = x0.minus(x_old);
-//            y = grad - grad_old;
-            y = grad.minus(grad_old);
+            s = position.minus(positionPrevious);
+            y = gradient.minus(gradientPrevious);
 
             // update the history
             if (iter < m) {
-//                sVector.col(iter) = s;
                 setRow(sVector, iter, s);
-//                yVector.col(iter) = y;
                 setRow(yVector, iter, y);
             } else {
-
-//                sVector.leftCols(m - 1) = sVector.rightCols(m - 1).eval();
-//                sVector.rightCols(1) = s;
-//                yVector.leftCols(m - 1) = yVector.rightCols(m - 1).eval();
-//                yVector.rightCols(1) = y;
-
-                shiftAndAddRow(sVector, s);
-                shiftAndAddRow(yVector, y);
+                sVector = shiftAndAddRow(sVector, s);
+                yVector = shiftAndAddRow(yVector, y);
             }
+
             // update the scaling factor
-//            H0k = y.dot(s) / static_cast < double>(y.dot(y));
             H0k = dot(y, s).divInPlace(dot(y, y)).scalar();
 
-            x_old = x0;
-            // std::cout << "iter: "<<globIter<< ", f = " <<  objFunc.value(x0) << ", ||g||_inf "
-            // <<gradNorm  << std::endl;
+            positionPrevious = position;
 
             iter++;
             current.iterations++;
-//            ++this->m_current.iterations;
+            current.gradNorm = gradient.abs().max().scalar();
 
-//            this->m_current.gradNorm = grad.template lpNorm<Eigen::Infinity > ();
-            current.gradNorm = grad.abs().max().scalar();
-
-//            this->m_status = checkConvergence(this->m_stop, this->m_current);
-
-//        } while ((objFunc.callback(this->m_current, x0)) &&(this->m_status == Status::Continue));
         } while (!stopCriteria.isConverged(current));
 
-        return x0;
+        return position;
+    }
+
+    private static DoubleTensor getRow(DoubleTensor matrix, int row) {
+        return matrix.slice(0, row);
     }
 
     private static void setRow(DoubleTensor target, int row, DoubleTensor operand) {
@@ -198,8 +169,8 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         }
     }
 
-    private static DoubleTensor shiftAndAddRow(DoubleTensor matrix, DoubleTensor vector) {
-        return DoubleTensor.concat(matrix.slice(Slicer.builder().slice(1, 10).build()), vector.reshape(1, -1));
+    private DoubleTensor shiftAndAddRow(DoubleTensor matrix, DoubleTensor vector) {
+        return DoubleTensor.concat(matrix.slice(Slicer.builder().slice(1, m).build()), vector.reshape(1, -1));
     }
 
     private static DoubleTensor norm(DoubleTensor input) {
