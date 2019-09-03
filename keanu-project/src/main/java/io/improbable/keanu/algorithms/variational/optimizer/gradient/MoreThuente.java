@@ -1,14 +1,9 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
-import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Map;
 
 import static io.improbable.keanu.algorithms.variational.optimizer.gradient.LBFGS.dot;
 
@@ -16,29 +11,24 @@ public class MoreThuente {
 
     static double linesearch(DoubleTensor x,
                              DoubleTensor searchDir,
-                             FitnessFunction objFunc,
-                             FitnessFunctionGradient objFuncGradient,
+                             ApacheFitnessFunctionAdapter objFunc,
+                             ApacheFitnessFunctionGradientAdapter objFuncGradient,
                              double alpha_init) {
 
-        // assume step width
-        double ak = alpha_init;
+        double fitness = objFunc.value(x.asFlatDoubleArray());
 
-        double fval = objFunc.getFitnessAt(x);
+        DoubleTensor g = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray()));
 
-        Map<VariableReference, DoubleTensor> g = objFuncGradient.getGradientsAt(x);
-
-        cvsrch(objFunc, objFuncGradient, x, fval, g, ak, searchDir);
-
-        return ak;
+        return cvsrch(objFunc, objFuncGradient, x, fitness, g, alpha_init, searchDir);
     }
 
-    static int cvsrch(FitnessFunction objFunc,
-                      FitnessFunctionGradient objFuncGradient,
-                      DoubleTensor x,
-                      double f,
-                      DoubleTensor g,
-                      final double stp,
-                      DoubleTensor s) {
+    private static double cvsrch(ApacheFitnessFunctionAdapter objFunc,
+                                 ApacheFitnessFunctionGradientAdapter objFuncGradient,
+                                 DoubleTensor x,
+                                 double f,
+                                 DoubleTensor g,
+                                 final double stp,
+                                 DoubleTensor searchDirection) {
 
         CStep cStep = new CStep();
         cStep.stp = stp;
@@ -54,7 +44,7 @@ public class MoreThuente {
         final int maxfev = 20;
         int nfev = 0;
 
-        double dginit = dot(g, s).scalar();
+        double dginit = dot(g, searchDirection).scalar();
         if (dginit >= 0.0) {
             // no descent direction
             // TODO: handle this case
@@ -101,11 +91,11 @@ public class MoreThuente {
             }
 
             // test new point
-            x = wa.plus(s.times(cStep.stp));
-            f = objFunc.getFitnessAt(x);
-            g = objFuncGradient.getGradientsAt(x);
+            x = wa.plus(searchDirection.times(cStep.stp));
+            f = objFunc.value(x.asFlatDoubleArray());
+            g = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray()));
             nfev++;
-            double dg = dot(g, s).scalar();
+            double dg = dot(g, searchDirection).scalar();
             double ftest1 = finit + cStep.stp * dgtest;
 
             // all possible convergence tests
@@ -135,11 +125,12 @@ public class MoreThuente {
 
             // terminate when convergence reached
             if (info != 0) {
-                return -1;
+                return cStep.stp;
             }
 
-            if (stage1 & (f <= ftest1) & (dg >= Math.min(ftol, gtol) * dginit))
+            if (stage1 & (f <= ftest1) & (dg >= Math.min(ftol, gtol) * dginit)) {
                 stage1 = false;
+            }
 
             if (stage1 & (f <= cStep.fx) & (f > ftest1)) {
                 double fm = f - cStep.stp * dgtest;
@@ -181,7 +172,6 @@ public class MoreThuente {
             }
         }
 
-        return 0;
     }
 
 //    static int cstep(double stx,
@@ -237,10 +227,11 @@ public class MoreThuente {
             double r = p / q;
             stpc = stx + r * (stp - stx);
             stpq = stx + ((dx / ((fx - fp) / (stp - stx) + dx)) / 2.) * (stp - stx);
-            if (Math.abs(stpc - stx) < Math.abs(stpq - stx))
+            if (Math.abs(stpc - stx) < Math.abs(stpq - stx)) {
                 stpf = stpc;
-            else
+            }else {
                 stpf = stpc + (stpq - stpc) / 2;
+            }
             cStep.brackt = true;
         } else if (sgnd < 0.0) {
             cStep.info = 2;

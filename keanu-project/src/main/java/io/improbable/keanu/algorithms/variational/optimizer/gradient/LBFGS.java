@@ -1,22 +1,55 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Map;
+
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsDoubleTensors;
+
 /**
  * https://github.com/miikama/cpp-math/blob/master/CppNumericalSolvers/include/cppoptlib/solver/lbfgssolver.h
  */
-public class LBFGS {
+public class LBFGS implements GradientOptimizationAlgorithm {
 
     private Criteria stopCriteria = new Criteria(100, 1e-3);
 
-    public void minimize(FitnessFunction objFunc, FitnessFunctionGradient objFuncGradient, DoubleTensor x0) {
+    @Override
+    public OptimizedResult optimize(List<? extends Variable> latentVariables,
+                                    FitnessFunction fitnessFunction,
+                                    FitnessFunctionGradient fitnessFunctionGradient) {
+
+        double[] startingPoint = Optimizer.convertToArrayPoint(getAsDoubleTensors(latentVariables));
+
+        DoubleTensor result = minimize(
+            new ApacheFitnessFunctionAdapter(fitnessFunction, latentVariables),
+            new ApacheFitnessFunctionGradientAdapter(fitnessFunctionGradient, latentVariables),
+            DoubleTensor.create(startingPoint)
+        );
+
+        Map<VariableReference, DoubleTensor> optimizedValues = Optimizer.convertFromPoint(
+            result.asFlatDoubleArray(),
+            latentVariables
+        );
+
+        return new OptimizedResult(optimizedValues, 0);
+    }
+
+    public DoubleTensor minimize(ApacheFitnessFunctionAdapter objFunc,
+                                 ApacheFitnessFunctionGradientAdapter objFuncGradient,
+                                 DoubleTensor x0) {
+
         int m = 10;
         int DIM = Ints.checkedCast(x0.getShape()[0]);
 //        MatrixType sVector = MatrixType::Zero(DIM, m);
@@ -36,11 +69,10 @@ public class LBFGS {
         DoubleTensor s = DoubleTensor.zeros(DIM);
         DoubleTensor y = DoubleTensor.zeros(DIM);
 
-        grad = objFuncGradient.getGradientsAt(x0);
+        grad = DoubleTensor.create(objFuncGradient.value(x0.asFlatDoubleArray()));
         DoubleTensor x_old = x0;
-        DoubleTensor x_old2 = x0;
 
-        int iter = 0, globIter = 0;
+        int iter = 0;
         double H0k = 1;
 //        this->m_current.reset();
 
@@ -114,7 +146,7 @@ public class LBFGS {
             x0 = x0.minus(q.times(rate));
 
             grad_old = grad;
-            grad = objFuncGradient.getGradientsAt(x0);
+            grad = DoubleTensor.create(objFuncGradient.value(x0.asFlatDoubleArray()));
 
 //            s = x0 - x_old;
             s = x0.minus(x_old);
@@ -146,7 +178,6 @@ public class LBFGS {
             // <<gradNorm  << std::endl;
 
             iter++;
-            globIter++;
             current.iterations++;
 //            ++this->m_current.iterations;
 
@@ -158,6 +189,7 @@ public class LBFGS {
 //        } while ((objFunc.callback(this->m_current, x0)) &&(this->m_status == Status::Continue));
         } while (!stopCriteria.isConverged(current));
 
+        return x0;
     }
 
     private static void setRow(DoubleTensor target, int row, DoubleTensor operand) {
@@ -166,7 +198,7 @@ public class LBFGS {
         }
     }
 
-    private static DoubleTensor shiftAndAddRow(DoubleTensor matrix, DoubleTensor vector){
+    private static DoubleTensor shiftAndAddRow(DoubleTensor matrix, DoubleTensor vector) {
         return DoubleTensor.concat(matrix.slice(Slicer.builder().slice(1).build()), vector.reshape(1, -1));
     }
 
