@@ -9,7 +9,13 @@ import static io.improbable.keanu.algorithms.variational.optimizer.gradient.LBFG
 
 public class MoreThuente {
 
-    static double linesearch(DoubleTensor x,
+    @AllArgsConstructor
+    public static class Results{
+        boolean success;
+        double alpha;
+    }
+
+    static Results linesearch(DoubleTensor x,
                              DoubleTensor searchDir,
                              ApacheFitnessFunctionAdapter objFunc,
                              ApacheFitnessFunctionGradientAdapter objFuncGradient,
@@ -22,7 +28,7 @@ public class MoreThuente {
         return cvsrch(objFunc, objFuncGradient, x, fitness, gradient, alpha_init, searchDir);
     }
 
-    private static double cvsrch(ApacheFitnessFunctionAdapter objFunc,
+    private static Results cvsrch(ApacheFitnessFunctionAdapter objFunc,
                                  ApacheFitnessFunctionGradientAdapter objFuncGradient,
                                  DoubleTensor x,
                                  double fitness,
@@ -34,8 +40,8 @@ public class MoreThuente {
         final double ftol = 1e-4;
         final double gtol = 1e-2;
 
-        final double stpmin = 1e-15;
-        final double stpmax = 1e15;
+        final double stpmin = 1e-8;
+        final double stpmax = 1e8;
         final double xtrapf = 4;
         final int maxfev = 20;
         final double finit = fitness;
@@ -45,7 +51,7 @@ public class MoreThuente {
         if (dginit >= 0.0) {
             // no descent direction
             // TODO: handle this case
-            return -1;
+            return new Results(false, stp);
         }
 
         final double dgtest = ftol * dginit;
@@ -96,6 +102,13 @@ public class MoreThuente {
             x = initialX.plus(searchDirection.times(cStep.stp));
             fitness = objFunc.value(x.asFlatDoubleArray()) * -1;
             gradient = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray())).unaryMinus();
+
+            if(fitness == Double.POSITIVE_INFINITY){
+                fitness = 1e20;
+            }
+
+            gradient = gradient.replaceNaN(0.0);
+
             nfev++;
 
             final double dg = dot(gradient, searchDirection).scalar();
@@ -128,7 +141,7 @@ public class MoreThuente {
 
             // terminate when convergence reached
             if (info != 0) {
-                return cStep.stp;
+                return new Results(true, cStep.stp);
             }
 
             if (stage1 & (fitness <= ftest1) & (dg >= Math.min(ftol, gtol) * dginit)) {
@@ -312,6 +325,10 @@ public class MoreThuente {
                 stpc = stp + r * (sty - stp);
                 stpf = stpc;
 
+                if(Double.isNaN(stpf)){
+                    System.out.println();
+                }
+
             } else if (stp > stx)
                 stpf = stpmax;
             else {
@@ -346,6 +363,10 @@ public class MoreThuente {
             } else {
                 cStep.stp = Math.max(stx + 0.66 * (sty - stx), stp);
             }
+        }
+
+        if(Double.isNaN(cStep.stp)){
+            System.out.println();
         }
     }
 

@@ -153,7 +153,7 @@ public class GradientOptimizer implements Optimizer {
     public static class GradientOptimizerBuilder {
 
         private ProbabilisticModelWithGradient probabilisticModelWithGradient;
-        private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = ConjugateGradient.builder().build();
+        private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = new LBFGS();//ConjugateGradient.builder().build();
         private boolean checkInitialFitnessConditions = true;
 
         public GradientOptimizerBuilder probabilisticModel(ProbabilisticModelWithGradient probabilisticModelWithGradient) {

@@ -123,8 +123,8 @@ public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> implem
 
         if (withRespectTo.contains(this)) {
             DoubleTensor dLogPdx = DoubleTensor.zeros(this.xMax.getShape());
-            dLogPdx = dLogPdx.setWithMaskInPlace(value.greaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
-            dLogPdx = dLogPdx.setWithMaskInPlace(value.lessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
+            dLogPdx = dLogPdx.setWithMaskInPlace(value.greaterThanMask(xMax.getValue()), 0.0);
+            dLogPdx = dLogPdx.setWithMaskInPlace(value.lessThanOrEqualToMask(xMin.getValue()), 0.0);
 
             return singletonMap(this, dLogPdx);
         }

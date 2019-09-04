@@ -57,6 +57,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         DoubleTensor sVector = DoubleTensor.zeros(m, dimensionCount);
         DoubleTensor yVector = DoubleTensor.zeros(m, dimensionCount);
         final double[] alpha = new double[m];
+        final double[] rho = new double[m];
 
         DoubleTensor gradient;
         DoubleTensor q;
@@ -90,13 +91,12 @@ public class LBFGS implements GradientOptimizationAlgorithm {
                 final DoubleTensor sRow = getRow(sVector, i);
                 final DoubleTensor yRow = getRow(yVector, i);
 
-                final double rho = 1.0 / (dot(sRow, yRow).scalar());
-                alpha[i] = rho * dot(sRow, q).scalar();
+                rho[i] = 1.0 / (dot(sRow, yRow).scalar());
+                alpha[i] = rho[i] * dot(sRow, q).scalar();
 
                 // q <- q - alpha_i*y_i
                 q = q.minus(yRow.times(alpha[i]));
             }
-
             // r <- H_k^0*q
             q = q.times(H0k);
 
@@ -107,8 +107,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
                 final DoubleTensor sRow = getRow(sVector, i);
                 final DoubleTensor yRow = getRow(yVector, i);
 
-                double rho = 1.0 / (dot(sRow, yRow).scalar());
-                double beta = rho * dot(yRow, q).scalar();
+                double beta = rho[i] * dot(yRow, q).scalar();
 
                 // r <- r + s_i * ( alpha_i - beta)
                 q = q.plus(sRow.times(alpha[i] - beta));
@@ -116,20 +115,21 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             // stop with result "H_k*f_f'=q"
 
             // any issues with the descent direction ?
-            double descent = -dot(gradient, q).scalar();
             double alphaInit = 1.0 / norm(gradient).scalar();
-            if (descent > -0.0001 * relativeEpsilon) {
-                q = gradient.unaryMinus();
-                iter = 0;
-                alphaInit = 1.0;
-            }
+
+//            double descent = -dot(gradient, q).scalar();
+//            if (descent > -0.0001 * relativeEpsilon) {
+//                q = gradient.unaryMinus();
+//                iter = 0;
+//                alphaInit = 1.0;
+//            }
 
             // find step length
-            double rate = MoreThuente.linesearch(position, q.unaryMinus(), objFunc, objFuncGradient, alphaInit);
+            MoreThuente.Results linesearchResult = MoreThuente.linesearch(position, q.unaryMinus(), objFunc, objFuncGradient, alphaInit);
+
 
             // update guess
-            position = position.minus(q.times(rate));
-
+            position = position.minus(q.times(linesearchResult.alpha));
             gradientPrevious = gradient;
             gradient = DoubleTensor.create(objFuncGradient.value(position.asFlatDoubleArray())).unaryMinusInPlace();
 
@@ -146,13 +146,23 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             }
 
             // update the scaling factor
-            H0k = dot(y, s).divInPlace(dot(y, y)).scalar();
+            double yDoty = dot(y, y).scalar();
+            if (Double.isNaN(yDoty)) {
+                throw new IllegalStateException();
+            }
+
+            if (yDoty == 0.0) {
+                throw new IllegalStateException();
+            }
+
+            H0k = dot(y, s).divInPlace(yDoty).scalar();
 
             positionPrevious = position;
 
+            current.gradNorm = gradient.abs().max().scalar();
+
             iter++;
             current.iterations++;
-            current.gradNorm = gradient.abs().max().scalar();
 
         } while (!stopCriteria.isConverged(current));
 
