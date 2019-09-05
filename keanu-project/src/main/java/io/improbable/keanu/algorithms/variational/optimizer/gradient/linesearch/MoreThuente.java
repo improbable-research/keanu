@@ -1,5 +1,7 @@
-package io.improbable.keanu.algorithms.variational.optimizer.gradient;
+package io.improbable.keanu.algorithms.variational.optimizer.gradient.linesearch;
 
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionAdapter;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionGradientAdapter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,12 +12,13 @@ import static io.improbable.keanu.algorithms.variational.optimizer.gradient.LBFG
 public class MoreThuente {
 
     @AllArgsConstructor
+    @Data
     public static class Results{
         boolean success;
         double alpha;
     }
 
-    static Results linesearch(DoubleTensor x,
+    public static Results linesearch(DoubleTensor x,
                              DoubleTensor searchDir,
                              ApacheFitnessFunctionAdapter objFunc,
                              ApacheFitnessFunctionGradientAdapter objFuncGradient,

@@ -18,6 +18,10 @@ public class JVMTensorBroadcast {
                                                     BiFunction<IN, IN, OUT> op,
                                                     boolean inPlace) {
 
+        if (rightBuffer.getLength() == 0 || leftBuffer.getLength() == 0) {
+            throw new IllegalArgumentException("Cannot operate on zero length arguments");
+        }
+
         final boolean needsBroadcast = !Arrays.equals(leftShape, rightShape);
 
         OUTBUFFER outputBuffer;
