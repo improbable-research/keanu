@@ -11,18 +11,44 @@ import static io.improbable.keanu.algorithms.variational.optimizer.gradient.LBFG
 
 public class MoreThuente {
 
+    private MoreThuente(double xTolerance, double fitnessTolerance, double gradientTolerance, double stepMin, double stepMax, double xtrapf, int maxFitnessEvaluations) {
+        this.xTolerance = xTolerance;
+        this.fitnessTolerance = fitnessTolerance;
+        this.gradientTolerance = gradientTolerance;
+        this.stepMin = stepMin;
+        this.stepMax = stepMax;
+        this.xtrapf = xtrapf;
+        this.maxFitnessEvaluations = maxFitnessEvaluations;
+    }
+
+    public static MoreThuente withDefaults() {
+        return builder().build();
+    }
+
+    public static MoreThuenteBuilder builder() {
+        return new MoreThuenteBuilder();
+    }
+
     @AllArgsConstructor
     @Data
-    public static class Results{
+    public static class Results {
         boolean success;
         double alpha;
     }
 
-    public static Results linesearch(DoubleTensor x,
-                             DoubleTensor searchDir,
-                             ApacheFitnessFunctionAdapter objFunc,
-                             ApacheFitnessFunctionGradientAdapter objFuncGradient,
-                             double alpha_init) {
+    private final double xTolerance;
+    private final double fitnessTolerance;
+    private final double gradientTolerance;
+    private final double stepMin;
+    private final double stepMax;
+    private final double xtrapf;
+    private final int maxFitnessEvaluations;
+
+    public Results lineSearch(DoubleTensor x,
+                              DoubleTensor searchDir,
+                              ApacheFitnessFunctionAdapter objFunc,
+                              ApacheFitnessFunctionGradientAdapter objFuncGradient,
+                              double alpha_init) {
 
         double fitness = objFunc.value(x.asFlatDoubleArray()) * -1;
 
@@ -31,22 +57,15 @@ public class MoreThuente {
         return cvsrch(objFunc, objFuncGradient, x, fitness, gradient, alpha_init, searchDir);
     }
 
-    private static Results cvsrch(ApacheFitnessFunctionAdapter objFunc,
-                                 ApacheFitnessFunctionGradientAdapter objFuncGradient,
-                                 DoubleTensor x,
-                                 double fitness,
-                                 DoubleTensor gradient,
-                                 final double stp,
-                                 DoubleTensor searchDirection) {
+    private Results cvsrch(ApacheFitnessFunctionAdapter objFunc,
+                           ApacheFitnessFunctionGradientAdapter objFuncGradient,
+                           DoubleTensor x,
+                           double fitness,
+                           DoubleTensor gradient,
+                           final double stp,
+                           DoubleTensor searchDirection) {
 
-        final double xtol = 1e-15;
-        final double ftol = 1e-4;
-        final double gtol = 1e-2;
 
-        final double stpmin = 1e-8;
-        final double stpmax = 1e8;
-        final double xtrapf = 4;
-        final int maxfev = 20;
         final double finit = fitness;
         final DoubleTensor initialX = x.duplicate();
 
@@ -57,12 +76,12 @@ public class MoreThuente {
             return new Results(false, stp);
         }
 
-        final double dgtest = ftol * dginit;
+        final double dgtest = fitnessTolerance * dginit;
 
         int info = 0;
         int nfev = 0;
         boolean stage1 = true;
-        double width = stpmax - stpmin;
+        double width = stepMax - stepMin;
         double width1 = 2 * width;
 
         final CStep cStep = new CStep();
@@ -92,21 +111,21 @@ public class MoreThuente {
 
             // Oops, let us return the last reliable values
             if ((cStep.brackt && ((cStep.stp <= stmin) || (cStep.stp >= stmax)))
-                || (nfev >= maxfev - 1) || (cStep.info == 0)
-                || (cStep.brackt && ((stmax - stmin) <= (xtol * stmax)))) {
+                || (nfev >= maxFitnessEvaluations - 1) || (cStep.info == 0)
+                || (cStep.brackt && ((stmax - stmin) <= (xTolerance * stmax)))) {
                 cStep.stp = cStep.stx;
             }
 
             // Force the step to be within the bounds stpmax and stpmin.
-            cStep.stp = Math.max(cStep.stp, stpmin);
-            cStep.stp = Math.min(cStep.stp, stpmax);
+            cStep.stp = Math.max(cStep.stp, stepMin);
+            cStep.stp = Math.min(cStep.stp, stepMax);
 
             // test new point
             x = initialX.plus(searchDirection.times(cStep.stp));
             fitness = objFunc.value(x.asFlatDoubleArray()) * -1;
             gradient = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray())).unaryMinus();
 
-            if(fitness == Double.POSITIVE_INFINITY){
+            if (fitness == Double.POSITIVE_INFINITY) {
                 fitness = 1e20;
             }
 
@@ -122,23 +141,23 @@ public class MoreThuente {
                 info = 6;
             }
 
-            if ((cStep.stp == stpmax) & (fitness <= ftest1) & (dg <= dgtest)) {
+            if ((cStep.stp == stepMax) & (fitness <= ftest1) & (dg <= dgtest)) {
                 info = 5;
             }
 
-            if ((cStep.stp == stpmin) & ((fitness > ftest1) | (dg >= dgtest))) {
+            if ((cStep.stp == stepMin) & ((fitness > ftest1) | (dg >= dgtest))) {
                 info = 4;
             }
 
-            if (nfev >= maxfev) {
+            if (nfev >= maxFitnessEvaluations) {
                 info = 3;
             }
 
-            if (cStep.brackt & (stmax - stmin <= xtol * stmax)) {
+            if (cStep.brackt & (stmax - stmin <= xTolerance * stmax)) {
                 info = 2;
             }
 
-            if ((fitness <= ftest1) & (Math.abs(dg) <= gtol * (-dginit))) {
+            if ((fitness <= ftest1) & (Math.abs(dg) <= gradientTolerance * (-dginit))) {
                 info = 1;
             }
 
@@ -147,7 +166,7 @@ public class MoreThuente {
                 return new Results(true, cStep.stp);
             }
 
-            if (stage1 & (fitness <= ftest1) & (dg >= Math.min(ftol, gtol) * dginit)) {
+            if (stage1 & (fitness <= ftest1) & (dg >= Math.min(fitnessTolerance, gradientTolerance) * dginit)) {
                 stage1 = false;
             }
 
@@ -328,7 +347,7 @@ public class MoreThuente {
                 stpc = stp + r * (sty - stp);
                 stpf = stpc;
 
-                if(Double.isNaN(stpf)){
+                if (Double.isNaN(stpf)) {
                     System.out.println();
                 }
 
@@ -368,7 +387,7 @@ public class MoreThuente {
             }
         }
 
-        if(Double.isNaN(cStep.stp)){
+        if (Double.isNaN(cStep.stp)) {
             System.out.println();
         }
     }
@@ -381,4 +400,61 @@ public class MoreThuente {
         boolean brackt;
         int info;
     }
+
+    public static class MoreThuenteBuilder {
+        private double xTolerance = 1e-15;
+        private double fitnessTolerance = 1e-4;
+        private double gradientTolerance = 1e-2;
+        private double stepMin = 1e-8;
+        private double stepMax = 1e8;
+        private double xtrapf = 4;
+        private int maxFitnessEvaluations = 20;
+
+        MoreThuenteBuilder() {
+        }
+
+        public MoreThuenteBuilder xTolerance(double xTolerance) {
+            this.xTolerance = xTolerance;
+            return this;
+        }
+
+        public MoreThuenteBuilder fitnessTolerance(double fitnessTolerance) {
+            this.fitnessTolerance = fitnessTolerance;
+            return this;
+        }
+
+        public MoreThuenteBuilder gradientTolerance(double gradientTolerance) {
+            this.gradientTolerance = gradientTolerance;
+            return this;
+        }
+
+        public MoreThuenteBuilder stepMin(double stepMin) {
+            this.stepMin = stepMin;
+            return this;
+        }
+
+        public MoreThuenteBuilder stepMax(double stepMax) {
+            this.stepMax = stepMax;
+            return this;
+        }
+
+        public MoreThuenteBuilder xtrapf(double xtrapf) {
+            this.xtrapf = xtrapf;
+            return this;
+        }
+
+        public MoreThuenteBuilder maxFitnessEvaluations(int maxFitnessEvaluations) {
+            this.maxFitnessEvaluations = maxFitnessEvaluations;
+            return this;
+        }
+
+        public MoreThuente build() {
+            return new MoreThuente(xTolerance, fitnessTolerance, gradientTolerance, stepMin, stepMax, xtrapf, maxFitnessEvaluations);
+        }
+
+        public String toString() {
+            return "MoreThuente.MoreThuenteBuilder(xTolerance=" + this.xTolerance + ", fitnessTolerance=" + this.fitnessTolerance + ", gradientTolerance=" + this.gradientTolerance + ", stepMin=" + this.stepMin + ", stepMax=" + this.stepMax + ", xtrapf=" + this.xtrapf + ", maxFitnessEvaluations=" + this.maxFitnessEvaluations + ")";
+        }
+    }
+
 }

@@ -20,7 +20,7 @@ import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.get
 
 /**
  * https://github.com/miikama/cpp-math/blob/master/CppNumericalSolvers/include/cppoptlib/solver/lbfgssolver.h
- *
+ * <p>
  * Pages 177-179 from:
  * http://pages.mtu.edu/~struther/Courses/OLD/Sp2013/5630/Jorge_Nocedal_Numerical_optimization_267490.pdf
  */
@@ -29,6 +29,8 @@ public class LBFGS implements GradientOptimizationAlgorithm {
     private Criteria stopCriteria = new Criteria(100, 1e-3);
 
     private final int m = 10;
+
+    private final MoreThuente moreThuente = MoreThuente.withDefaults();
 
     @Override
     public OptimizedResult optimize(List<? extends Variable> latentVariables,
@@ -131,7 +133,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 //            }
 
             // find step length
-            MoreThuente.Results linesearchResult = MoreThuente.linesearch(position, r.unaryMinus(), objFunc, objFuncGradient, alphaInit);
+            MoreThuente.Results linesearchResult = moreThuente.lineSearch(position, r.unaryMinus(), objFunc, objFuncGradient, alphaInit);
 
             // update guess
             position = position.minus(r.times(linesearchResult.getAlpha()));
