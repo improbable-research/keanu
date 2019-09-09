@@ -54,6 +54,23 @@ public abstract class BivariateFunctionTestCase implements GradientOptimizationA
         public List<? extends Variable> getVariables() {
             return ImmutableList.of(x, y);
         }
+
+        public FitnessFunction getFitnessFunction() {
+
+            return (point) -> evalFunction(
+                point.get(x.getReference()).scalar(),
+                point.get(y.getReference()).scalar()
+            );
+        }
+
+
+        public FitnessFunctionGradient getFitnessFunctionGradient() {
+
+            return (point) -> evalGradients(
+                point.get(x.getReference()).scalar(),
+                point.get(y.getReference()).scalar()
+            );
+        }
     }
 
     private final BivariateFunction bivariateFunction;
@@ -64,21 +81,13 @@ public abstract class BivariateFunctionTestCase implements GradientOptimizationA
 
     @Override
     public FitnessFunction getFitnessFunction() {
-
-        return (point) -> bivariateFunction.evalFunction(
-            point.get(bivariateFunction.x.getReference()).scalar(),
-            point.get(bivariateFunction.y.getReference()).scalar()
-        );
+        return bivariateFunction.getFitnessFunction();
     }
 
 
     @Override
     public FitnessFunctionGradient getFitnessFunctionGradient() {
-
-        return (point) -> bivariateFunction.evalGradients(
-            point.get(bivariateFunction.x.getReference()).scalar(),
-            point.get(bivariateFunction.y.getReference()).scalar()
-        );
+        return bivariateFunction.getFitnessFunctionGradient();
     }
 
     @Override

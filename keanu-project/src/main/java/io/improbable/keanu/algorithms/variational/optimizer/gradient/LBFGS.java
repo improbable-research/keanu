@@ -6,6 +6,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.linesearch.HagerZhang;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.linesearch.MoreThuente;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,8 @@ public class LBFGS implements GradientOptimizationAlgorithm {
     private final int m = 10;
 
     private final MoreThuente moreThuente = MoreThuente.withDefaults();
+
+    private final HagerZhang hagerZhang = new HagerZhang();
 
     @Override
     public OptimizedResult optimize(List<? extends Variable> latentVariables,
@@ -122,18 +125,22 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             // stop with result "H_k*f_f'=q"
 
             // any issues with the descent direction ?
-            double alphaInit = 1.0 / norm(gradient).scalar();
+            double alphaInit = 1.0; /// norm(gradient).scalar();
 
             //TODO: What's this about?
-//            double descent = -dot(gradient, q).scalar();
-//            if (descent > -0.0001 * relativeEpsilon) {
-//                q = gradient.unaryMinus();
-//                iter = 0;
-//                alphaInit = 1.0;
-//            }
+            double descent = -dot(gradient, r).scalar();
+            if (descent > 0) {
+                r = gradient;
+                iter = 0;
+                alphaInit = 1.0;
+            }
 
             // find step length
-            MoreThuente.Results linesearchResult = moreThuente.lineSearch(position, r.unaryMinus(), objFunc, objFuncGradient, alphaInit);
+            HagerZhang.Results linesearchResult = hagerZhang.lineSearch(position, r.unaryMinus(), objFunc, objFuncGradient, alphaInit);
+
+            if (!linesearchResult.isSuccess()) {
+                return position;
+            }
 
             // update guess
             position = position.minus(r.times(linesearchResult.getAlpha()));
@@ -163,7 +170,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             }
 
             if (yDoty == 0.0) {
-                throw new IllegalStateException();
+                return position;
             }
 
             H0k = dot(y, s).divInPlace(yDoty).scalar();
