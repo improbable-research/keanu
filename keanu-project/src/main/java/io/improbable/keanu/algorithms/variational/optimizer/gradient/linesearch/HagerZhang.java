@@ -10,19 +10,31 @@ import lombok.RequiredArgsConstructor;
 
 public class HagerZhang {
 
-    private final double thresholdUseApproximateWolfeCondition = 1e-6;
+    private final double thresholdUseApproximateWolfeCondition;
+    private final double stepSizeShrink;
+    private final double rho;
+    private final double theta;
+    private final double gamma;
+    private final double delta;
+    private final double sigma;
+    private final int maxEvaluations;
 
-    private final double stepSizeShrink = 0.1;
+    private HagerZhang(double thresholdUseApproximateWolfeCondition,
+                       double stepSizeShrink, double rho, double theta,
+                       double gamma, double delta, double sigma, int maxEvaluations) {
+        this.thresholdUseApproximateWolfeCondition = thresholdUseApproximateWolfeCondition;
+        this.stepSizeShrink = stepSizeShrink;
+        this.rho = rho;
+        this.theta = theta;
+        this.gamma = gamma;
+        this.delta = delta;
+        this.sigma = sigma;
+        this.maxEvaluations = maxEvaluations;
+    }
 
-    private final double rho = 5.0;
-
-    private final double theta = 0.5;
-
-    private final double gamma = 0.66;
-
-    private final double delta = 0.1;
-
-    private final double sigma = 0.9;
+    public static HagerZhangBuilder builder() {
+        return new HagerZhangBuilder();
+    }
 
     @AllArgsConstructor
     @Data
@@ -61,7 +73,6 @@ public class HagerZhang {
                               ApacheFitnessFunctionGradientAdapter objFuncGradient,
                               double initialAlpha) {
 
-        final int maxEval = 1000;
         Phi phi = new Phi(objFunc, objFuncGradient, x, searchDir);
 
         EvalResult phi0 = phi.eval(0);
@@ -70,21 +81,21 @@ public class HagerZhang {
 
         EvalResult cInitial = phi.eval(initialAlpha);
 
-        boolean validInputs = phi0.isFinite() && phi0.df < 0 && Double.isFinite(cInitial.x) && cInitial.x > 0;
+        boolean validInputs = phi0.isValid() && phi0.df < 0 && Double.isFinite(cInitial.x) && cInitial.x > 0;
         if (!validInputs) {
             return new Results(false, initialAlpha);
         }
 
         cInitial = fixStepSize(phi, phi0.f, stepSizeShrink, cInitial);
 
-        Interval currentInterval = bracket(phi, maxEval, theta, phi0, rho, fLimit, cInitial);
+        Interval currentInterval = bracket(phi, maxEvaluations, theta, phi0, rho, fLimit, cInitial);
 
         if (veryClose(currentInterval.a.x, currentInterval.b.x)) {
             return new Results(true, currentInterval.a.x);
         }
 
-        while (phi.getEvalCount() < maxEval && !currentInterval.isConverged() && !currentInterval.isFailed()) {
-            Interval nextInterval = secant2(phi, maxEval, fLimit, theta, delta, sigma, phi0, currentInterval.a, currentInterval.b);
+        while (phi.getEvalCount() < maxEvaluations && !currentInterval.isConverged() && !currentInterval.isFailed()) {
+            Interval nextInterval = secant2(phi, maxEvaluations, fLimit, theta, delta, sigma, phi0, currentInterval.a, currentInterval.b);
 
             boolean shouldCheckShrinkage = !nextInterval.isConverged() && !nextInterval.isFailed();
 
@@ -97,8 +108,8 @@ public class HagerZhang {
                     final double cPosition = (nextInterval.a.x + nextInterval.b.x) / 2;
                     EvalResult c = phi.eval(cPosition);
 
-                    if (c.isFinite()) {
-                        nextInterval = update(phi, maxEval, fLimit, theta, nextInterval.a, nextInterval.b, c);
+                    if (c.isValid()) {
+                        nextInterval = update(phi, maxEvaluations, fLimit, theta, nextInterval.a, nextInterval.b, c);
 
                     } else {
                         nextInterval = new Interval(nextInterval.a, nextInterval.b, Status.INSUFFICIENT_SHRINKAGE_FAILED, false);
@@ -119,24 +130,16 @@ public class HagerZhang {
             }
         }
 
-        if (currentInterval.isFailed()) {
-            System.out.println("Failed " + currentInterval.status);
-        }
-
-        if (currentInterval.a.x <= 0) {
-            System.out.println("wtf");
-        }
-
         return new Results(!currentInterval.isFailed(), currentInterval.a.x);
     }
 
     private EvalResult fixStepSize(Phi phi, double f, double stepSizeShrink, EvalResult cValue) {
 
-        if (!cValue.isFinite()) {
+        if (!cValue.isValid()) {
             double eps = Math.ulp(f);
             int iMax = (int) Math.ceil(-Math.log(eps) / Math.log(2));
 
-            for (int i = 0; i < iMax && !cValue.isFinite(); i++) {
+            for (int i = 0; i < iMax && !cValue.isValid(); i++) {
                 double nextC = stepSizeShrink * cValue.x;
                 cValue = phi.eval(nextC);
             }
@@ -152,8 +155,8 @@ public class HagerZhang {
         double df;
         double x;
 
-        public boolean isFinite() {
-            return Double.isFinite(f) && Double.isFinite(df);
+        public boolean isValid() {
+            return Double.isFinite(f) && Double.isFinite(df) && x >= 0;
         }
     }
 
@@ -216,7 +219,7 @@ public class HagerZhang {
 
             //If the midpoint is not finite or cannot be distinguished from the
             //left (aHat) or right (bHat) then bisect has failed.
-            if (!d.isFinite() || d.x == aHat.x || d.x == bHat.x) {
+            if (!d.isValid() || d.x == aHat.x || d.x == bHat.x) {
                 return new Interval(aHat, bHat, Status.BISECT_FAILED, false);
             }
 
@@ -247,7 +250,7 @@ public class HagerZhang {
 
         EvalResult c = secant(phi, a, b);
 
-        if (c.isFinite() && satisfiesWolfeConditions(delta, fLimit, sigma, c, phi0)) {
+        if (c.isValid() && satisfiesWolfeConditions(delta, fLimit, sigma, c, phi0)) {
             return new Interval(c, c, Status.SUCCESS, true);
         }
 
@@ -262,7 +265,7 @@ public class HagerZhang {
                 cHat = secant(phi, a, update.a);
             }
 
-            if (cHat.isFinite() && satisfiesWolfeConditions(delta, fLimit, sigma, cHat, phi0)) {
+            if (cHat.isValid() && satisfiesWolfeConditions(delta, fLimit, sigma, cHat, phi0)) {
                 return new Interval(cHat, cHat, Status.SUCCESS, true);
             }
 
@@ -291,7 +294,7 @@ public class HagerZhang {
 
             EvalResult nextC = phi.eval(c.x * rho);
 
-            if (nextC.isFinite()) {
+            if (nextC.isValid()) {
                 ci = c;
                 c = nextC;
             } else {
@@ -308,11 +311,6 @@ public class HagerZhang {
     }
 
     private boolean satisfiesWolfeConditions(double delta, double fLimit, double sigma, EvalResult c, EvalResult zero) {
-
-        if (c.x <= 0) {
-            return false;
-        }
-
         boolean exactWolfeSufficientDecreased = (delta * zero.df >= (c.f - zero.f) / c.x);
         boolean wolfeCurvature = c.df >= sigma * zero.df;
         boolean exactWolfe = exactWolfeSufficientDecreased & wolfeCurvature;
@@ -323,4 +321,63 @@ public class HagerZhang {
     }
 
 
+    public static class HagerZhangBuilder {
+        private double thresholdUseApproximateWolfeCondition = 1e-6;
+        private double stepSizeShrink = 0.1;
+        private double rho = 5.0;
+        private double theta = 0.5;
+        private double gamma = 0.66;
+        private double delta = 0.1;
+        private double sigma = 0.9;
+        private int maxEvaluations = 50;
+
+        HagerZhangBuilder() {
+        }
+
+        public HagerZhangBuilder thresholdUseApproximateWolfeCondition(double thresholdUseApproximateWolfeCondition) {
+            this.thresholdUseApproximateWolfeCondition = thresholdUseApproximateWolfeCondition;
+            return this;
+        }
+
+        public HagerZhangBuilder stepSizeShrink(double stepSizeShrink) {
+            this.stepSizeShrink = stepSizeShrink;
+            return this;
+        }
+
+        public HagerZhangBuilder rho(double rho) {
+            this.rho = rho;
+            return this;
+        }
+
+        public HagerZhangBuilder theta(double theta) {
+            this.theta = theta;
+            return this;
+        }
+
+        public HagerZhangBuilder gamma(double gamma) {
+            this.gamma = gamma;
+            return this;
+        }
+
+        public HagerZhangBuilder delta(double delta) {
+            this.delta = delta;
+            return this;
+        }
+
+        public HagerZhangBuilder sigma(double sigma) {
+            this.sigma = sigma;
+            return this;
+        }
+
+        public HagerZhangBuilder maxEvaluations(int maxEvaluations) {
+            this.maxEvaluations = maxEvaluations;
+            return this;
+        }
+
+        public HagerZhang build() {
+            return new HagerZhang(
+                thresholdUseApproximateWolfeCondition, stepSizeShrink, rho, theta,
+                gamma, delta, sigma, maxEvaluations);
+        }
+    }
 }

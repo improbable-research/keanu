@@ -35,9 +35,8 @@ public class GradientOptimizationAlgorithmTest {
                 .build();
         }),
 
-        LBFGS(() -> {
-
-            return new LBFGS();
+        LimitedMemoryBFGS(() -> {
+            return LBFGS.builder().build();
         }),
 
         CONJUGATE_GRADIENT_POLAK_RIBIERE(() -> {

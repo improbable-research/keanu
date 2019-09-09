@@ -7,7 +7,6 @@ import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradi
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.linesearch.HagerZhang;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.linesearch.MoreThuente;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,13 +26,19 @@ import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.get
  */
 public class LBFGS implements GradientOptimizationAlgorithm {
 
-    private Criteria stopCriteria = new Criteria(100, 1e-3);
+    private final Criteria stopCriteria;
+    private final int m;
+    private final HagerZhang hagerZhang;
 
-    private final int m = 10;
+    private LBFGS(Criteria stopCriteria, int m, HagerZhang hagerZhang) {
+        this.stopCriteria = stopCriteria;
+        this.m = m;
+        this.hagerZhang = hagerZhang;
+    }
 
-    private final MoreThuente moreThuente = MoreThuente.withDefaults();
-
-    private final HagerZhang hagerZhang = new HagerZhang();
+    public static LBFGSBuilder builder() {
+        return new LBFGSBuilder();
+    }
 
     @Override
     public OptimizedResult optimize(List<? extends Variable> latentVariables,
@@ -125,7 +130,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             // stop with result "H_k*f_f'=q"
 
             // any issues with the descent direction ?
-            double alphaInit = 1.0; /// norm(gradient).scalar();
+            double alphaInit = 1.0 / norm(gradient).scalar();
 
             //TODO: What's this about?
             double descent = -dot(gradient, r).scalar();
@@ -175,6 +180,10 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 
             H0k = dot(y, s).divInPlace(yDoty).scalar();
 
+            if (H0k == 0) {
+                return position;
+            }
+
             positionPrevious = position;
 
             current.gradNorm = gradient.abs().max().scalar();
@@ -191,7 +200,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         return input.pow(2).sum().sqrtInPlace();
     }
 
-    public static DoubleTensor dot(DoubleTensor left, DoubleTensor right) {
+    private static DoubleTensor dot(DoubleTensor left, DoubleTensor right) {
         return left.times(right).sum();
     }
 
@@ -201,9 +210,11 @@ public class LBFGS implements GradientOptimizationAlgorithm {
     private static class Criteria {
         int iterations;
         double gradNorm;
+        double xTolerance;
+        double fTolerance;
 
         public enum Status {
-            ITERATION_LIMIT, GRAD_NORM_TOLERANCE, CONTINUE
+            ITERATION_LIMIT, GRAD_NORM_TOLERANCE, X_TOLERANCE, F_TOLERANCE, CONTINUE
         }
 
         boolean isConverged(Criteria current) {
@@ -211,16 +222,51 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         }
 
         public Status checkConvergence(Criteria current) {
-            if ((this.iterations > 0) && (current.iterations > this.iterations)) {
+            if (this.iterations > 0 && current.iterations > this.iterations) {
                 return Status.ITERATION_LIMIT;
             }
 
-            if ((this.gradNorm > 0) && (current.gradNorm < this.gradNorm)) {
+            if (this.gradNorm > 0 && current.gradNorm < this.gradNorm) {
                 return Status.GRAD_NORM_TOLERANCE;
+            }
+
+            if (this.xTolerance > 0 && current.xTolerance < this.xTolerance) {
+                return Status.X_TOLERANCE;
+            }
+
+            if (this.fTolerance > 0 && current.fTolerance < this.fTolerance) {
+                return Status.F_TOLERANCE;
             }
 
             return Status.CONTINUE;
         }
     }
 
+    public static class LBFGSBuilder {
+        private Criteria stopCriteria = new Criteria(1000, 1e-8, 0, 0);
+        private int m = 10;
+        private HagerZhang hagerZhang = HagerZhang.builder().build();
+
+        private LBFGSBuilder() {
+        }
+
+        public LBFGSBuilder stopCriteria(Criteria stopCriteria) {
+            this.stopCriteria = stopCriteria;
+            return this;
+        }
+
+        public LBFGSBuilder m(int m) {
+            this.m = m;
+            return this;
+        }
+
+        public LBFGSBuilder hagerZhang(HagerZhang hagerZhang) {
+            this.hagerZhang = hagerZhang;
+            return this;
+        }
+
+        public LBFGS build() {
+            return new LBFGS(stopCriteria, m, hagerZhang);
+        }
+    }
 }

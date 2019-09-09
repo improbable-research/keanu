@@ -7,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import static io.improbable.keanu.algorithms.variational.optimizer.gradient.LBFGS.dot;
-
 public class MoreThuente {
 
     private MoreThuente(double xTolerance, double fitnessTolerance, double gradientTolerance, double stepMin, double stepMax, double xtrapf, int maxFitnessEvaluations) {
@@ -390,6 +388,10 @@ public class MoreThuente {
         if (Double.isNaN(cStep.stp)) {
             System.out.println();
         }
+    }
+
+    private static DoubleTensor dot(DoubleTensor left, DoubleTensor right) {
+        return left.times(right).sum();
     }
 
     @Data

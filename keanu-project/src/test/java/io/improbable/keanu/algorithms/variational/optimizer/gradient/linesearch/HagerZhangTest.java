@@ -34,7 +34,7 @@ public class HagerZhangTest {
 
         DoubleTensor g = DoubleTensor.create(gradient.value(position.asFlatDoubleArray())).unaryMinus();
 
-        HagerZhang hagerZhang = new HagerZhang();
+        HagerZhang hagerZhang = HagerZhang.builder().build();
         DoubleTensor searchDirection = g.unaryMinus();
 
         HagerZhang.Results results = hagerZhang.lineSearch(position, searchDirection, fitness, gradient, 1.0);

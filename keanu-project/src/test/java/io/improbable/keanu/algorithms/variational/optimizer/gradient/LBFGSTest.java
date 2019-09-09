@@ -32,7 +32,7 @@ public class LBFGSTest {
     }
 
     private void assertPassesTestCase(GradientOptimizationAlgorithmTestCase testCase) {
-        LBFGS lbfgs = new LBFGS();
+        LBFGS lbfgs = LBFGS.builder().build();
 
         OptimizedResult result = lbfgs.optimize(
             testCase.getVariables(),
