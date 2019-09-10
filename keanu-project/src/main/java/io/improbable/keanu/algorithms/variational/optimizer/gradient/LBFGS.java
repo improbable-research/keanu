@@ -27,12 +27,12 @@ import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.get
 public class LBFGS implements GradientOptimizationAlgorithm {
 
     private final Criteria stopCriteria;
-    private final int m;
+    private final int correctionCount;
     private final HagerZhang hagerZhang;
 
-    private LBFGS(Criteria stopCriteria, int m, HagerZhang hagerZhang) {
+    private LBFGS(Criteria stopCriteria, int correctionCount, HagerZhang hagerZhang) {
         this.stopCriteria = stopCriteria;
-        this.m = m;
+        this.correctionCount = correctionCount;
         this.hagerZhang = hagerZhang;
     }
 
@@ -66,8 +66,8 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         ArrayList<DoubleTensor> sQueue = new ArrayList<>();
         ArrayList<DoubleTensor> yQueue = new ArrayList<>();
 
-        final double[] alpha = new double[m];
-        final double[] rho = new double[m];
+        final double[] alpha = new double[correctionCount];
+        final double[] rho = new double[correctionCount];
 
         DoubleTensor gradient;
         DoubleTensor q;
@@ -94,7 +94,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 
             //Algorithm 7.4 (L-BFGS two-loop recursion)
             q = gradient;
-            final int k = Math.min(m, iter);
+            final int k = Math.min(correctionCount, iter);
 
             // for i = k − 1, k − 2, . . . , k − m
             for (int i = k - 1; i >= 0; i--) {
@@ -142,8 +142,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             HagerZhang.Results linesearchResult = hagerZhang.lineSearch(position, r.unaryMinus(), objFuncGradient, alphaInit);
 
             if (!linesearchResult.isSuccess()) {
-                throw new IllegalStateException();
-//                return position;
+                return position;
             }
 
             // update guess
@@ -155,7 +154,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             y = gradient.minus(gradientPrevious);
 
             // update the history
-            if (iter < m) {
+            if (iter < correctionCount) {
                 yQueue.add(y);
                 sQueue.add(s);
 
@@ -244,7 +243,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 
     public static class LBFGSBuilder {
         private Criteria stopCriteria = new Criteria(1000, 1e-2, 0, 0);
-        private int m = 10;
+        private int correctionCount = 10;
         private HagerZhang hagerZhang = HagerZhang.builder().build();
 
         private LBFGSBuilder() {
@@ -255,8 +254,8 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             return this;
         }
 
-        public LBFGSBuilder m(int m) {
-            this.m = m;
+        public LBFGSBuilder correctionCount(int correctionCount) {
+            this.correctionCount = correctionCount;
             return this;
         }
 
@@ -266,7 +265,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         }
 
         public LBFGS build() {
-            return new LBFGS(stopCriteria, m, hagerZhang);
+            return new LBFGS(stopCriteria, correctionCount, hagerZhang);
         }
     }
 }
