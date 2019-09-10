@@ -2,10 +2,9 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessAndGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import lombok.AllArgsConstructor;
-import org.apache.commons.math3.analysis.MultivariateVectorFunction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,20 +12,35 @@ import java.util.Map;
 
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.convertFromPoint;
 
-@AllArgsConstructor
-public class ApacheFitnessFunctionGradientAdapter implements MultivariateVectorFunction {
+public class FitnessFunctionGradientFlatAdapter extends FitnessFunctionFlatAdapter {
 
     private final FitnessFunctionGradient fitnessFunctionGradient;
-    private final List<? extends Variable> latentVariables;
 
-    @Override
-    public double[] value(double[] point) {
+    public FitnessFunctionGradientFlatAdapter(FitnessFunctionGradient fitnessFunctionGradient,
+                                              List<? extends Variable> latentVariables) {
+        super(fitnessFunctionGradient, latentVariables);
+        this.fitnessFunctionGradient = fitnessFunctionGradient;
+    }
+
+    public double[] gradient(double[] point) {
 
         Map<VariableReference, DoubleTensor> values = convertFromPoint(point, latentVariables);
 
         Map<? extends VariableReference, DoubleTensor> diffs = fitnessFunctionGradient.getGradientsAt(values);
 
         return alignGradientsToAppropriateIndex(diffs, latentVariables);
+    }
+
+    public FitnessAndGradientFlat fitnessAndGradient(double[] point) {
+        Map<VariableReference, DoubleTensor> values = convertFromPoint(point, latentVariables);
+
+        FitnessAndGradient fitnessAndGradients = fitnessFunctionGradient.getFitnessAndGradientsAt(values);
+
+        return new FitnessAndGradientFlat(
+            fitnessAndGradients.getFitness(),
+            alignGradientsToAppropriateIndex(fitnessAndGradients.getGradients(), latentVariables)
+        );
+
     }
 
     private static double[] alignGradientsToAppropriateIndex(Map<? extends VariableReference, DoubleTensor> diffs,

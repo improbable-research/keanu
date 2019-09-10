@@ -13,13 +13,12 @@ import java.util.Map;
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.convertFromPoint;
 
 @AllArgsConstructor
-public class ApacheFitnessFunctionAdapter implements MultivariateFunction {
+public class FitnessFunctionFlatAdapter {
 
     private final FitnessFunction fitnessFunction;
-    private final List<? extends Variable> latentVariables;
+    protected final List<? extends Variable> latentVariables;
 
-    @Override
-    public double value(double[] point) {
+    public double fitness(double[] point) {
 
         Map<VariableReference, DoubleTensor> values = convertFromPoint(point, latentVariables);
 

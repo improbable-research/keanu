@@ -106,7 +106,8 @@ public class GradientOptimizer implements Optimizer {
 
         FitnessFunctionGradient fitnessFunctionGradient = probabilityFitness.getFitnessFunctionGradient(
             probabilisticModelWithGradient,
-            this::handleGradientCalculation
+            this::handleGradientCalculation,
+            this::handleFitnessCalculation
         );
 
         return optimize(fitnessFunction, fitnessFunctionGradient);

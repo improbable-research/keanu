@@ -48,8 +48,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         double[] startingPoint = Optimizer.convertToArrayPoint(getAsDoubleTensors(latentVariables));
 
         DoubleTensor result = maximize(
-            new ApacheFitnessFunctionAdapter(fitnessFunction, latentVariables),
-            new ApacheFitnessFunctionGradientAdapter(fitnessFunctionGradient, latentVariables),
+            new FitnessFunctionGradientFlatAdapter(fitnessFunctionGradient, latentVariables),
             DoubleTensor.create(startingPoint)
         );
 
@@ -61,8 +60,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         return new OptimizedResult(optimizedValues, 0);
     }
 
-    private DoubleTensor maximize(ApacheFitnessFunctionAdapter objFunc,
-                                  ApacheFitnessFunctionGradientAdapter objFuncGradient,
+    private DoubleTensor maximize(FitnessFunctionGradientFlatAdapter objFuncGradient,
                                   DoubleTensor position) {
 
         ArrayList<DoubleTensor> sQueue = new ArrayList<>();
@@ -78,7 +76,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         DoubleTensor s;
         DoubleTensor y;
 
-        gradient = DoubleTensor.create(objFuncGradient.value(position.asFlatDoubleArray())).unaryMinusInPlace();
+        gradient = DoubleTensor.create(objFuncGradient.gradient(position.asFlatDoubleArray())).unaryMinusInPlace();
         DoubleTensor positionPrevious = position;
 
         int iter = 0;
@@ -141,16 +139,17 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             }
 
             // find step length
-            HagerZhang.Results linesearchResult = hagerZhang.lineSearch(position, r.unaryMinus(), objFunc, objFuncGradient, alphaInit);
+            HagerZhang.Results linesearchResult = hagerZhang.lineSearch(position, r.unaryMinus(), objFuncGradient, alphaInit);
 
             if (!linesearchResult.isSuccess()) {
-                return position;
+                throw new IllegalStateException();
+//                return position;
             }
 
             // update guess
             position = position.minus(r.times(linesearchResult.getAlpha()));
             gradientPrevious = gradient;
-            gradient = DoubleTensor.create(objFuncGradient.value(position.asFlatDoubleArray())).unaryMinusInPlace();
+            gradient = DoubleTensor.create(objFuncGradient.gradient(position.asFlatDoubleArray())).unaryMinusInPlace();
 
             s = position.minus(positionPrevious);
             y = gradient.minus(gradientPrevious);
@@ -181,6 +180,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             H0k = dot(y, s).divInPlace(yDoty).scalar();
 
             if (H0k == 0) {
+                //TODO: what's this about?
                 return position;
             }
 

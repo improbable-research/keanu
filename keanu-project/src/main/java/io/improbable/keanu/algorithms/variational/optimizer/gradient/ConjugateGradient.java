@@ -62,11 +62,11 @@ public class ConjugateGradient implements GradientOptimizationAlgorithm {
                                     FitnessFunctionGradient fitnessFunctionGradient) {
 
         ObjectiveFunction fitness = new ObjectiveFunction(
-            new ApacheFitnessFunctionAdapter(fitnessFunction, latentVariables)
+            new ApacheFitnessFunctionAdaptor(new FitnessFunctionFlatAdapter(fitnessFunction, latentVariables))
         );
 
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(
-            new ApacheFitnessFunctionGradientAdapter(fitnessFunctionGradient, latentVariables)
+            new ApacheFitnessFunctionGradientAdaptor(new FitnessFunctionGradientFlatAdapter(fitnessFunctionGradient, latentVariables))
         );
 
         double[] startingPoint = Optimizer.convertToArrayPoint(getAsDoubleTensors(latentVariables));

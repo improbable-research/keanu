@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient.linesearch;
 
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionAdapter;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionGradientAdapter;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.FitnessAndGradientFlat;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.FitnessFunctionGradientFlatAdapter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,8 +46,7 @@ public class HagerZhang {
     @RequiredArgsConstructor
     private static class Phi {
 
-        private final ApacheFitnessFunctionAdapter fitnessFunction;
-        private final ApacheFitnessFunctionGradientAdapter gradientAdapter;
+        private final FitnessFunctionGradientFlatAdapter gradientAdapter;
 
         private final DoubleTensor x;
         private final DoubleTensor searchDir;
@@ -57,10 +56,12 @@ public class HagerZhang {
 
         private EvalResult eval(double alpha) {
 
-            final double df = DoubleTensor.create(gradientAdapter.value(x.plus(searchDir.times(alpha)).asFlatDoubleArray()))
-                .times(searchDir).sum().scalar();
+            final double[] position = x.plus(searchDir.times(alpha)).asFlatDoubleArray();
 
-            final double f = fitnessFunction.value(x.plus(searchDir.times(alpha)).asFlatDoubleArray());
+            final FitnessAndGradientFlat fitnessAndGradient = gradientAdapter.fitnessAndGradient(position);
+
+            final double df = DoubleTensor.create(fitnessAndGradient.getGradient()).times(searchDir).sum().scalar();
+            final double f = fitnessAndGradient.getFitness();
 
             evalCount++;
             return new EvalResult(-f, -df, alpha);
@@ -69,11 +70,10 @@ public class HagerZhang {
 
     public Results lineSearch(DoubleTensor x,
                               DoubleTensor searchDir,
-                              ApacheFitnessFunctionAdapter objFunc,
-                              ApacheFitnessFunctionGradientAdapter objFuncGradient,
+                              FitnessFunctionGradientFlatAdapter objFuncGradient,
                               double initialAlpha) {
 
-        Phi phi = new Phi(objFunc, objFuncGradient, x, searchDir);
+        Phi phi = new Phi(objFuncGradient, x, searchDir);
 
         EvalResult phi0 = phi.eval(0);
 
@@ -151,12 +151,12 @@ public class HagerZhang {
     @Data
     @AllArgsConstructor
     public static class EvalResult {
-        double f;
-        double df;
-        double x;
+        private Double f;
+        private Double df;
+        private double x;
 
         public boolean isValid() {
-            return Double.isFinite(f) && Double.isFinite(df) && x >= 0;
+            return x >= 0 && Double.isFinite(f) && Double.isFinite(df);
         }
     }
 
@@ -174,7 +174,7 @@ public class HagerZhang {
     }
 
     private enum Status {
-        SUCCESS, EXCEEDED_MAX_EVAL, BISECT_FAILED, SECANT2_FAILED, INSUFFICIENT_SHRINKAGE_FAILED
+        SUCCESS, EXCEEDED_MAX_EVAL, BISECT_FAILED, INSUFFICIENT_SHRINKAGE_FAILED
     }
 
     private Interval update(Phi phi, int maxEval, double fLimit, double theta,

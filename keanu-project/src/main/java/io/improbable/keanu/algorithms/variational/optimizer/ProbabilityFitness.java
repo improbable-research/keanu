@@ -23,8 +23,9 @@ public enum ProbabilityFitness {
 
         @Override
         public FitnessFunctionGradient getFitnessFunctionGradient(ProbabilisticModelWithGradient model,
-                                                                  BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> handleFitnessCalculation) {
-            return new LogLikelihoodFitnessFunctionGradient(model, handleFitnessCalculation);
+                                                                  BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> handleGradientCalculation,
+                                                                  BiConsumer<Map<VariableReference, DoubleTensor>, Double> handleFitnessCalculation) {
+            return new LogLikelihoodFitnessFunctionGradient(model, handleGradientCalculation, handleFitnessCalculation);
 
         }
     },
@@ -37,8 +38,9 @@ public enum ProbabilityFitness {
 
         @Override
         public FitnessFunctionGradient getFitnessFunctionGradient(ProbabilisticModelWithGradient model,
-                                                                  BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> handleFitnessCalculation) {
-            return new LogProbFitnessFunctionGradient(model, handleFitnessCalculation);
+                                                                  BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> handleGradientCalculation,
+                                                                  BiConsumer<Map<VariableReference, DoubleTensor>, Double> handleFitnessCalculation) {
+            return new LogProbFitnessFunctionGradient(model, handleGradientCalculation, handleFitnessCalculation);
         }
     };
 
@@ -51,10 +53,12 @@ public enum ProbabilityFitness {
     }
 
     public abstract FitnessFunctionGradient getFitnessFunctionGradient(ProbabilisticModelWithGradient model,
-                                                                       BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> handleFitnessCalculation);
+                                                                       BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> handleGradientCalculation,
+                                                                       BiConsumer<Map<VariableReference, DoubleTensor>, Double> handleFitnessCalculation);
 
     public FitnessFunctionGradient getFitnessFunctionGradient(ProbabilisticModelWithGradient model) {
         return getFitnessFunctionGradient(model, (point, gradient) -> {
+        }, (point, fitness) -> {
         });
     }
 

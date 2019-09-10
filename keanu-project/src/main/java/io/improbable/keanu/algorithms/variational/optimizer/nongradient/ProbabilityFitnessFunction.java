@@ -13,7 +13,7 @@ import java.util.function.BiConsumer;
 public abstract class ProbabilityFitnessFunction implements FitnessFunction {
 
     private final ProbabilisticModel probabilisticModel;
-    private final BiConsumer<Map<VariableReference, DoubleTensor>, Double> onFitnessCalculation;
+    protected final BiConsumer<Map<VariableReference, DoubleTensor>, Double> onFitnessCalculation;
 
     public ProbabilityFitnessFunction(ProbabilisticModel probabilisticModel) {
         this(probabilisticModel, (point, fitness) -> {
@@ -30,6 +30,6 @@ public abstract class ProbabilityFitnessFunction implements FitnessFunction {
         return logProb;
     }
 
-    abstract double calculateFitness(ProbabilisticModel probabilisticModel,
-                                     Map<VariableReference, DoubleTensor> values);
+    protected abstract double calculateFitness(ProbabilisticModel probabilisticModel,
+                                               Map<VariableReference, DoubleTensor> values);
 }

@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient.linesearch;
 
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionAdapter;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionGradientAdapter;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.FitnessFunctionFlatAdapter;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.FitnessFunctionGradientFlatAdapter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,19 +44,19 @@ public class MoreThuente {
 
     public Results lineSearch(DoubleTensor x,
                               DoubleTensor searchDir,
-                              ApacheFitnessFunctionAdapter objFunc,
-                              ApacheFitnessFunctionGradientAdapter objFuncGradient,
+                              FitnessFunctionFlatAdapter objFunc,
+                              FitnessFunctionGradientFlatAdapter objFuncGradient,
                               double alpha_init) {
 
-        double fitness = objFunc.value(x.asFlatDoubleArray()) * -1;
+        double fitness = objFunc.fitness(x.asFlatDoubleArray()) * -1;
 
-        DoubleTensor gradient = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray())).unaryMinus();
+        DoubleTensor gradient = DoubleTensor.create(objFuncGradient.gradient(x.asFlatDoubleArray())).unaryMinus();
 
         return cvsrch(objFunc, objFuncGradient, x, fitness, gradient, alpha_init, searchDir);
     }
 
-    private Results cvsrch(ApacheFitnessFunctionAdapter objFunc,
-                           ApacheFitnessFunctionGradientAdapter objFuncGradient,
+    private Results cvsrch(FitnessFunctionFlatAdapter objFunc,
+                           FitnessFunctionGradientFlatAdapter objFuncGradient,
                            DoubleTensor x,
                            double fitness,
                            DoubleTensor gradient,
@@ -120,8 +120,8 @@ public class MoreThuente {
 
             // test new point
             x = initialX.plus(searchDirection.times(cStep.stp));
-            fitness = objFunc.value(x.asFlatDoubleArray()) * -1;
-            gradient = DoubleTensor.create(objFuncGradient.value(x.asFlatDoubleArray())).unaryMinus();
+            fitness = objFunc.fitness(x.asFlatDoubleArray()) * -1;
+            gradient = DoubleTensor.create(objFuncGradient.gradient(x.asFlatDoubleArray())).unaryMinus();
 
             if (fitness == Double.POSITIVE_INFINITY) {
                 fitness = 1e20;

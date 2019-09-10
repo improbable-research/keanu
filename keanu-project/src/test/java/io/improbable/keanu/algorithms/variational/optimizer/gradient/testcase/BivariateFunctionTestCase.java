@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessAndGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
@@ -31,7 +32,7 @@ public abstract class BivariateFunctionTestCase implements GradientOptimizationA
             return f.eval().scalar();
         }
 
-        public final Map<VariableReference, DoubleTensor> evalGradients(double xPoint, double yPoint) {
+        public final FitnessAndGradient evalGradients(double xPoint, double yPoint) {
 
             double fEval = evalFunction(
                 xPoint,
@@ -48,7 +49,7 @@ public abstract class BivariateFunctionTestCase implements GradientOptimizationA
             gradients.put(x.getReference(), dfdx);
             gradients.put(y.getReference(), dfdy);
 
-            return gradients;
+            return new FitnessAndGradient(fEval, gradients);
         }
 
         public List<? extends Variable> getVariables() {
@@ -66,10 +67,33 @@ public abstract class BivariateFunctionTestCase implements GradientOptimizationA
 
         public FitnessFunctionGradient getFitnessFunctionGradient() {
 
-            return (point) -> evalGradients(
-                point.get(x.getReference()).scalar(),
-                point.get(y.getReference()).scalar()
-            );
+            return new FitnessFunctionGradient() {
+
+                @Override
+                public double getFitnessAt(Map<VariableReference, DoubleTensor> point) {
+                    return evalFunction(
+                        point.get(x.getReference()).scalar(),
+                        point.get(y.getReference()).scalar()
+                    );
+                }
+
+                @Override
+                public Map<? extends VariableReference, DoubleTensor> getGradientsAt(Map<VariableReference, DoubleTensor> point) {
+                    return evalGradients(
+                        point.get(x.getReference()).scalar(),
+                        point.get(y.getReference()).scalar()
+                    ).getGradients();
+                }
+
+                @Override
+                public FitnessAndGradient getFitnessAndGradientsAt(Map<VariableReference, DoubleTensor> point) {
+
+                    return evalGradients(
+                        point.get(x.getReference()).scalar(),
+                        point.get(y.getReference()).scalar()
+                    );
+                }
+            };
         }
     }
 

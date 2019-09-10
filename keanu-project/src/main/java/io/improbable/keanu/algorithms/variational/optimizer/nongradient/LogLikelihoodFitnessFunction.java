@@ -19,7 +19,7 @@ public class LogLikelihoodFitnessFunction extends ProbabilityFitnessFunction {
     }
 
     @Override
-    double calculateFitness(ProbabilisticModel probabilisticModel, Map<VariableReference, DoubleTensor> values) {
+    protected double calculateFitness(ProbabilisticModel probabilisticModel, Map<VariableReference, DoubleTensor> values) {
         return probabilisticModel.logLikelihood(values);
     }
 

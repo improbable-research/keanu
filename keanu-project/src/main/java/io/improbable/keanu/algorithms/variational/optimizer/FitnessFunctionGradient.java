@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Map;
 
-public interface FitnessFunctionGradient {
+public interface FitnessFunctionGradient extends FitnessFunction {
 
     /**
      * @param values the values of the variables in the fitness function.
@@ -13,4 +13,6 @@ public interface FitnessFunctionGradient {
      * values specified.
      */
     Map<? extends VariableReference, DoubleTensor> getGradientsAt(Map<VariableReference, DoubleTensor> values);
+
+    FitnessAndGradient getFitnessAndGradientsAt(Map<VariableReference, DoubleTensor> values);
 }

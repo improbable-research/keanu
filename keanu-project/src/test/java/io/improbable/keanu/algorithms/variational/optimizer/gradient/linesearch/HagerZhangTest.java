@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient.linesearch;
 
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionAdapter;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionGradientAdapter;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.FitnessFunctionGradientFlatAdapter;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.BivariateFunctionTestCase;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
@@ -21,23 +20,19 @@ public class HagerZhangTest {
 
         BivariateFunctionTestCase.BivariateFunction bivariateFunction = new BivariateFunctionTestCase.BivariateFunction(x, y, f);
 
-        ApacheFitnessFunctionAdapter fitness = new ApacheFitnessFunctionAdapter(
-            bivariateFunction.getFitnessFunction(), bivariateFunction.getVariables()
-        );
-
-        ApacheFitnessFunctionGradientAdapter gradient = new ApacheFitnessFunctionGradientAdapter(
+        FitnessFunctionGradientFlatAdapter gradient = new FitnessFunctionGradientFlatAdapter(
             bivariateFunction.getFitnessFunctionGradient(),
             bivariateFunction.getVariables()
         );
 
         DoubleTensor position = DoubleTensor.create(1, 1);
 
-        DoubleTensor g = DoubleTensor.create(gradient.value(position.asFlatDoubleArray())).unaryMinus();
+        DoubleTensor g = DoubleTensor.create(gradient.gradient(position.asFlatDoubleArray())).unaryMinus();
 
         HagerZhang hagerZhang = HagerZhang.builder().build();
         DoubleTensor searchDirection = g.unaryMinus();
 
-        HagerZhang.Results results = hagerZhang.lineSearch(position, searchDirection, fitness, gradient, 1.0);
+        HagerZhang.Results results = hagerZhang.lineSearch(position, searchDirection, gradient, 1.0);
 
         DoubleTensor resultPosition = position.plus(searchDirection.times(results.alpha));
 
