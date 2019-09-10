@@ -249,11 +249,11 @@ public class HagerZhang {
 
         double cPosition = secant(a, b);
 
-        if (cPosition <= b.x && cPosition >= a.x) {
+        if (cPosition > 0) {
 
             EvalResult c = phi.eval(cPosition);
 
-            if (satisfiesWolfeConditions(delta, fLimit, sigma, c, phi0)) {
+            if (c.isValid() && satisfiesWolfeConditions(delta, fLimit, sigma, c, phi0)) {
                 return new Interval(c, c, Status.SUCCESS, true);
             }
 
@@ -268,23 +268,20 @@ public class HagerZhang {
                     cHatPosition = secant(a, update.a);
                 }
 
-                if (cHatPosition <= update.b.x && cHatPosition >= update.a.x) {
+                if (cHatPosition > 0) {
 
                     EvalResult cHat = phi.eval(cHatPosition);
 
-                    if (satisfiesWolfeConditions(delta, fLimit, sigma, cHat, phi0)) {
+                    if (cHat.isValid() && satisfiesWolfeConditions(delta, fLimit, sigma, cHat, phi0)) {
                         return new Interval(cHat, cHat, Status.SUCCESS, true);
                     }
 
                     return update(phi, maxEval, fLimit, theta, update.a, update.b, cHat);
-
-                } else {
-                    return update;
                 }
-
-            } else {
-                return update;
             }
+
+            return update;
+
         } else {
             return new Interval(a, b, Status.SUCCESS, false);
         }
