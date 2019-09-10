@@ -100,4 +100,9 @@ public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex> imp
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public DoubleTensor lowerBound() {
+        return DoubleTensor.scalar(0);
+    }
+
 }

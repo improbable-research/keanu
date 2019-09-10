@@ -116,4 +116,9 @@ public class ExponentialVertex extends VertexImpl<DoubleTensor, DoubleVertex> im
         return Exponential.withParameters(rate.getValue()).sample(shape, random);
     }
 
+    @Override
+    public DoubleTensor lowerBound() {
+        return DoubleTensor.scalar(0.0);
+    }
+
 }

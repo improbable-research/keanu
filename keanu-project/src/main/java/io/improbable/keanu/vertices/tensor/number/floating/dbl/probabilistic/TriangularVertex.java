@@ -166,4 +166,14 @@ public class TriangularVertex extends VertexImpl<DoubleTensor, DoubleVertex> imp
     public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return Triangular.withParameters(xMin.getValue(), xMax.getValue(), c.getValue()).sample(shape, random);
     }
+
+    @Override
+    public DoubleTensor upperBound() {
+        return xMax.getValue();
+    }
+
+    @Override
+    public DoubleTensor lowerBound() {
+        return xMin.getValue();
+    }
 }

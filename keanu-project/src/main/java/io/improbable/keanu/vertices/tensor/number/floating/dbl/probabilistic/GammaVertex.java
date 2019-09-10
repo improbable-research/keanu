@@ -139,4 +139,9 @@ public class GammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implemen
         return Gamma.withParameters(theta.getValue(), k.getValue()).sample(shape, random);
     }
 
+    @Override
+    public DoubleTensor lowerBound() {
+        return DoubleTensor.scalar(0.0);
+    }
+
 }

@@ -45,4 +45,12 @@ public interface ProbabilisticDouble extends Probabilistic<DoubleTensor> {
     default Map<Vertex, DoubleTensor> dLogPdf(DoubleTensor value, Vertex... withRespectTo) {
         return dLogPdf(value, new HashSet<>(Arrays.asList(withRespectTo)));
     }
+
+    default DoubleTensor upperBound() {
+        return DoubleTensor.scalar(Double.POSITIVE_INFINITY);
+    }
+
+    default DoubleTensor lowerBound() {
+        return DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
+    }
 }

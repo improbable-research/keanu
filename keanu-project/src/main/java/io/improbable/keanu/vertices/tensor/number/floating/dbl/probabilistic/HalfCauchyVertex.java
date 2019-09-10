@@ -95,4 +95,9 @@ public class HalfCauchyVertex extends CauchyVertex {
         return super.sampleWithShape(shape, random).absInPlace();
     }
 
+    @Override
+    public DoubleTensor lowerBound() {
+        return DoubleTensor.scalar(0.0);
+    }
+
 }

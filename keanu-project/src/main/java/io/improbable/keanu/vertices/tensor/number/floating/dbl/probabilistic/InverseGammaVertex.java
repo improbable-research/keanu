@@ -151,4 +151,9 @@ public class InverseGammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> i
         return InverseGamma.withParameters(alpha.getValue(), beta.getValue()).sample(shape, random);
     }
 
+    @Override
+    public DoubleTensor lowerBound() {
+        return DoubleTensor.scalar(0.0);
+    }
+
 }

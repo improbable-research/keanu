@@ -145,4 +145,9 @@ public class ParetoVertex extends VertexImpl<DoubleTensor, DoubleVertex> impleme
         return Pareto.withParameters(location.getValue(), scale.getValue()).sample(shape, random);
     }
 
+    @Override
+    public DoubleTensor lowerBound() {
+        return location.getValue();
+    }
+
 }

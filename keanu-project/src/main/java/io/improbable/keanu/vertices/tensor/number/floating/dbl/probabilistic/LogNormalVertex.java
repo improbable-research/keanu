@@ -144,4 +144,9 @@ public class LogNormalVertex extends VertexImpl<DoubleTensor, DoubleVertex> impl
     public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return LogNormal.withParameters(mu.getValue(), sigma.getValue()).sample(shape, random);
     }
+
+    @Override
+    public DoubleTensor lowerBound() {
+        return DoubleTensor.scalar(0.0);
+    }
 }

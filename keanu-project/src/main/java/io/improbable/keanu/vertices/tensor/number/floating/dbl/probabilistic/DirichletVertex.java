@@ -122,4 +122,14 @@ public class DirichletVertex extends VertexImpl<DoubleTensor, DoubleVertex> impl
     public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return Dirichlet.withParameters(concentration.getValue()).sample(shape, random);
     }
+
+    @Override
+    public DoubleTensor upperBound() {
+        return DoubleTensor.scalar(1.0);
+    }
+
+    @Override
+    public DoubleTensor lowerBound() {
+        return DoubleTensor.scalar(0.0);
+    }
 }

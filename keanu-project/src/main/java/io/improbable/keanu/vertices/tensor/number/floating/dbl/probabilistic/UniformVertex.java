@@ -137,4 +137,14 @@ public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex> implem
         return Uniform.withParameters(xMin.getValue(), xMax.getValue()).sample(shape, random);
     }
 
+    @Override
+    public DoubleTensor upperBound() {
+        return xMax.getValue();
+    }
+
+    @Override
+    public DoubleTensor lowerBound() {
+        return xMin.getValue();
+    }
+
 }
