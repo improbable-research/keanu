@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
 public class HagerZhang {
 
@@ -148,12 +149,12 @@ public class HagerZhang {
         return cValue;
     }
 
-    @Data
+    @Value
     @AllArgsConstructor
     public static class EvalResult {
-        private Double f;
-        private Double df;
-        private double x;
+        private final double f;
+        private final double df;
+        private final double x;
 
         public boolean isValid() {
             return x >= 0 && Double.isFinite(f) && Double.isFinite(df);
@@ -235,43 +236,57 @@ public class HagerZhang {
 
         }
 
-        return new Interval(null, null, Status.EXCEEDED_MAX_EVAL, false);
+        return new Interval(aHat, bHat, Status.EXCEEDED_MAX_EVAL, false);
     }
 
-    private EvalResult secant(Phi phi,
-                              EvalResult a, EvalResult b) {
-        double cPosition = (a.x * b.df - b.x * a.df) / (b.df - a.df);
-        return phi.eval(cPosition);
+    private double secant(EvalResult a, EvalResult b) {
+        return (a.x * b.df - b.x * a.df) / (b.df - a.df);
     }
 
     private Interval secant2(Phi phi, int maxEval,
                              double fLimit, double theta, double delta, double sigma, EvalResult phi0,
                              EvalResult a, EvalResult b) {
 
-        EvalResult c = secant(phi, a, b);
+        double cPosition = secant(a, b);
 
-        if (c.isValid() && satisfiesWolfeConditions(delta, fLimit, sigma, c, phi0)) {
-            return new Interval(c, c, Status.SUCCESS, true);
-        }
+        if (cPosition <= b.x && cPosition >= a.x) {
 
-        Interval update = update(phi, maxEval, fLimit, theta, a, b, c);
+            EvalResult c = phi.eval(cPosition);
 
-        if (c.x == update.b.x || c.x == update.a.x) {
+            if (satisfiesWolfeConditions(delta, fLimit, sigma, c, phi0)) {
+                return new Interval(c, c, Status.SUCCESS, true);
+            }
 
-            EvalResult cHat;
-            if (c.x == update.b.x) {
-                cHat = secant(phi, b, update.b);
+            Interval update = update(phi, maxEval, fLimit, theta, a, b, c);
+
+            if (!update.isFailed() && c.x == update.b.x || c.x == update.a.x) {
+
+                double cHatPosition;
+                if (c.x == update.b.x) {
+                    cHatPosition = secant(b, update.b);
+                } else {
+                    cHatPosition = secant(a, update.a);
+                }
+
+                if (cHatPosition <= update.b.x && cHatPosition >= update.a.x) {
+
+                    EvalResult cHat = phi.eval(cHatPosition);
+
+                    if (satisfiesWolfeConditions(delta, fLimit, sigma, cHat, phi0)) {
+                        return new Interval(cHat, cHat, Status.SUCCESS, true);
+                    }
+
+                    return update(phi, maxEval, fLimit, theta, update.a, update.b, cHat);
+
+                } else {
+                    return update;
+                }
+
             } else {
-                cHat = secant(phi, a, update.a);
+                return update;
             }
-
-            if (cHat.isValid() && satisfiesWolfeConditions(delta, fLimit, sigma, cHat, phi0)) {
-                return new Interval(cHat, cHat, Status.SUCCESS, true);
-            }
-
-            return update(phi, maxEval, fLimit, theta, update.a, update.b, cHat);
         } else {
-            return update;
+            return new Interval(a, b, Status.SUCCESS, false);
         }
 
     }
@@ -329,7 +344,7 @@ public class HagerZhang {
         private double gamma = 0.66;
         private double delta = 0.1;
         private double sigma = 0.9;
-        private int maxEvaluations = 50;
+        private int maxEvaluations = 1000;
 
         HagerZhangBuilder() {
         }

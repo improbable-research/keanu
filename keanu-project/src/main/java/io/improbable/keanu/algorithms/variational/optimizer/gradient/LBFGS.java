@@ -243,7 +243,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
     }
 
     public static class LBFGSBuilder {
-        private Criteria stopCriteria = new Criteria(1000, 1e-8, 0, 0);
+        private Criteria stopCriteria = new Criteria(1000, 1e-2, 0, 0);
         private int m = 10;
         private HagerZhang hagerZhang = HagerZhang.builder().build();
 
