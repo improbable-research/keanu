@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -28,7 +27,8 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
+public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex>
+    implements ProbabilisticInteger, LogProbGraphSupplier {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
@@ -100,7 +100,7 @@ public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> imp
     }
 
     @Override
-    public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public IntegerTensor sample(long[] shape, KeanuRandom random) {
         return Binomial.withParameters(p.getValue(), n.getValue()).sample(shape, random);
     }
 

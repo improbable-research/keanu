@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -25,7 +24,7 @@ import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex>
-    implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+    implements ProbabilisticDouble, Differentiable, LogProbGraphSupplier {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -153,7 +152,7 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex>
     }
 
     @Override
-    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(shape, random);
     }
 

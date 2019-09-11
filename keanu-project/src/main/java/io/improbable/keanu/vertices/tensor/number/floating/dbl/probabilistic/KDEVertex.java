@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.Samplable;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class KDEVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, Samplable<DoubleTensor> {
+public class KDEVertex extends VertexImpl<DoubleTensor, DoubleVertex>
+    implements Differentiable, ProbabilisticDouble {
 
     private final double bandwidth;
     private DoubleTensor samples;
@@ -104,16 +105,17 @@ public class KDEVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements
         return 1.06 * samples.standardDeviation().scalar() * Math.pow(samples.getLength(), -1. / 5.);
     }
 
-    public DoubleTensor sample(int nSamples, KeanuRandom random) {
+    @Override
+    public DoubleTensor sample(long[] nSamples, KeanuRandom random) {
         // get a random sample as the mean of a gaussian
         // then draw a sample from the gaussian around that mean with the bandwidth as the standard deviation
         DoubleTensor value = Uniform.withParameters(
             DoubleTensor.scalar(0),
             DoubleTensor.scalar(samples.getLength())
-        ).sample(new long[]{nSamples}, random);
+        ).sample(nSamples, random);
 
         DoubleTensor index = value.floorInPlace();
-        double[] shuffledSamples = new double[nSamples];
+        double[] shuffledSamples = new double[Ints.checkedCast(value.getLength())];
         int j = 0;
         for (Double i : index.asFlatList()) {
             shuffledSamples[j] = samples.getValue(i.intValue());
@@ -121,15 +123,15 @@ public class KDEVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements
         }
 
         DoubleTensor sampleMus = DoubleTensor.create(shuffledSamples);
-        return random.nextGaussian(new long[]{nSamples}).timesInPlace(bandwidth).plusInPlace(sampleMus);
+        return random.nextGaussian(nSamples).timesInPlace(bandwidth).plusInPlace(sampleMus);
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return sample(1, random);
+        return sample(new long[]{1}, random);
     }
 
-    public void resample(int nSamples, KeanuRandom random) {
+    public void resample(long[] nSamples, KeanuRandom random) {
         samples = sample(nSamples, random);
     }
 

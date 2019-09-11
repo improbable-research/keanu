@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -27,7 +26,8 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertexWrapper.wrapIfNeeded;
 
-public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex>
+    implements ProbabilisticDouble, Differentiable, LogProbGraphSupplier {
 
     private IntegerVertex k;
     private static final String K_NAME = "k";
@@ -74,7 +74,7 @@ public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex> imp
     }
 
     @Override
-    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         return ChiSquared.withParameters(k.getValue()).sample(shape, random);
     }
 

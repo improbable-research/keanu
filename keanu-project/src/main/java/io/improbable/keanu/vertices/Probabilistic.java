@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public interface Probabilistic<T> extends Observable<T>, Samplable<T> {
+public interface Probabilistic<T> extends Samplable<T> {
 
     /**
      * This is the natural log of the probability at the supplied value. In the
@@ -36,8 +36,6 @@ public interface Probabilistic<T> extends Observable<T>, Samplable<T> {
         return dLogProb(atValue, new HashSet<>(Arrays.asList(withRespectTo)));
     }
 
-    T getValue();
-
     default double logProbAtValue() {
         return logProb(getValue());
     }
@@ -50,4 +48,5 @@ public interface Probabilistic<T> extends Observable<T>, Samplable<T> {
         return dLogProb(getValue(), withRespectTo);
     }
 
+    T getValue();
 }

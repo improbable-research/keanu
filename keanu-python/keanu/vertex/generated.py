@@ -120,7 +120,6 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floa
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.LogisticVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.MultivariateGaussianVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ParetoVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.SmoothUniformVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.StudentTVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.TriangularVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex")
@@ -572,10 +571,6 @@ def MultivariateGaussian(mu: vertex_constructor_param_types, covariance: vertex_
 
 def Pareto(location: vertex_constructor_param_types, scale: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     return Double(context.jvm_view().ParetoVertex, label, cast_to_double_vertex(location), cast_to_double_vertex(scale))
-
-
-def SmoothUniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().SmoothUniformVertex, label, cast_to_double_vertex(x_min), cast_to_double_vertex(x_max))
 
 
 def StudentT(v: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

@@ -92,8 +92,8 @@ public class HalfGaussianVertex extends GaussianVertex {
     }
 
     @Override
-    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
-        return super.sampleWithShape(shape, random).absInPlace();
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
+        return super.sample(shape, random).absInPlace();
     }
 
     @Override

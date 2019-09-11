@@ -16,14 +16,14 @@ public class SamplableWithShapeTest {
 
     public static final long[] SHAPE = {2, 3, 4};
 
-    public SamplableWithManyScalars<BooleanTensor> mockSamplable(long[] shape) {
-        SamplableWithManyScalars<BooleanTensor> samplable = mock(SamplableWithManyScalars.class);
+    public Samplable<BooleanTensor> mockSamplable(long[] shape) {
+        Samplable<BooleanTensor> samplable = mock(Samplable.class);
         when(samplable.getShape()).thenReturn(shape);
         when(samplable.sample()).thenCallRealMethod();
         when(samplable.sample(any(KeanuRandom.class))).thenCallRealMethod();
-        when(samplable.sampleManyScalars(any(long[].class))).thenCallRealMethod();
-        when(samplable.sampleManyScalars(any(long[].class), any(KeanuRandom.class))).thenCallRealMethod();
-        when(samplable.sampleWithShape(any(long[].class), any(KeanuRandom.class)))
+        when(samplable.batchSample(any(long[].class))).thenCallRealMethod();
+        when(samplable.batchSample(any(long[].class), any(KeanuRandom.class))).thenCallRealMethod();
+        when(samplable.sample(any(long[].class), any(KeanuRandom.class)))
             .thenAnswer(invocation -> {
                 long[] newShape = invocation.getArgument(0);
                 return BooleanTensor.create(true, newShape);
@@ -33,23 +33,23 @@ public class SamplableWithShapeTest {
 
     @Test
     public void sampleUsesShapeOfTensor() {
-        SamplableWithManyScalars<BooleanTensor> samplable = mockSamplable(SHAPE);
+        Samplable<BooleanTensor> samplable = mockSamplable(SHAPE);
         BooleanTensor result = samplable.sample();
-        verify(samplable).sampleWithShape(SHAPE, KeanuRandom.getDefaultRandom());
+        verify(samplable).sample(SHAPE, KeanuRandom.getDefaultRandom());
         assertThat(result, hasShape(samplable.getShape()));
     }
 
     @Test
     public void sampleManyScalarsUsesInputShape() {
-        SamplableWithManyScalars<BooleanTensor> samplable = mockSamplable(Tensor.SCALAR_SHAPE);
-        BooleanTensor result = samplable.sampleManyScalars(SHAPE);
-        verify(samplable).sampleWithShape(SHAPE, KeanuRandom.getDefaultRandom());
+        Samplable<BooleanTensor> samplable = mockSamplable(Tensor.SCALAR_SHAPE);
+        BooleanTensor result = samplable.batchSample(SHAPE);
+        verify(samplable).sample(SHAPE, KeanuRandom.getDefaultRandom());
         assertThat(result, hasShape(SHAPE));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotSampleManyScalarsOfNonScalar() {
-        SamplableWithManyScalars<BooleanTensor> samplable = mockSamplable(SHAPE);
-        samplable.sampleManyScalars(SHAPE);
+        Samplable<BooleanTensor> samplable = mockSamplable(SHAPE);
+        samplable.batchSample(SHAPE);
     }
 }

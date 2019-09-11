@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -25,7 +24,8 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLen
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertexWrapper.wrapIfNeeded;
 
-public class UniformIntVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
+public class UniformIntVertex extends VertexImpl<IntegerTensor, IntegerVertex>
+    implements ProbabilisticInteger, LogProbGraphSupplier {
 
     private IntegerVertex min;
     private IntegerVertex max;
@@ -116,7 +116,7 @@ public class UniformIntVertex extends VertexImpl<IntegerTensor, IntegerVertex> i
     }
 
     @Override
-    public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public IntegerTensor sample(long[] shape, KeanuRandom random) {
         return UniformInt.withParameters(min.getValue(), max.getValue()).sample(shape, random);
     }
 }

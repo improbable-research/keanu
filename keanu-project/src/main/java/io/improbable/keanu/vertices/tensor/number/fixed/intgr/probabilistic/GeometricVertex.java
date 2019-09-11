@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -26,7 +25,8 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class GeometricVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
+public class GeometricVertex extends VertexImpl<IntegerTensor, IntegerVertex>
+    implements ProbabilisticInteger, LogProbGraphSupplier {
 
     private final DoubleVertex p;
     private final static String P_NAME = "p";
@@ -65,7 +65,7 @@ public class GeometricVertex extends VertexImpl<IntegerTensor, IntegerVertex> im
     }
 
     @Override
-    public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public IntegerTensor sample(long[] shape, KeanuRandom random) {
         return Geometric.withParameters(p.getValue()).sample(shape, random);
     }
 

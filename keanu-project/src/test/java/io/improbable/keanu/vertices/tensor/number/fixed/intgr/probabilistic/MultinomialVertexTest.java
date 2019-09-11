@@ -116,7 +116,7 @@ public class MultinomialVertexTest {
 
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
         multinomialVertex.setValidationEnabled(true);
-        multinomialVertex.sampleWithShape(new long[]{2, 2});
+        multinomialVertex.sample(new long[]{2, 2});
     }
 
     @Test
@@ -130,7 +130,7 @@ public class MultinomialVertexTest {
         }, 4, 2);
 
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
-        IntegerTensor sample = multinomialVertex.sampleWithShape(new long[]{2, 4, 2}, KeanuRandom.getDefaultRandom());
+        IntegerTensor sample = multinomialVertex.sample(new long[]{2, 4, 2}, KeanuRandom.getDefaultRandom());
 
         assertThat(sample, hasShape(2, 4, 2));
     }
@@ -538,7 +538,7 @@ public class MultinomialVertexTest {
 
         MultinomialVertex vertex = new MultinomialVertex(n, p);
 
-        IntegerTensor samples = vertex.sampleWithShape(new long[]{sampleCount, 4});
+        IntegerTensor samples = vertex.sample(new long[]{sampleCount, 4});
         assertThat(samples, hasShape(sampleCount, 4));
 
         for (int i = 0; i < samples.getShape()[1]; i++) {

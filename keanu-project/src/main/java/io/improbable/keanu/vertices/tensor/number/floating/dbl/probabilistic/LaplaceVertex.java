@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -29,7 +28,8 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLen
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex>
+    implements ProbabilisticDouble, Differentiable, LogProbGraphSupplier {
 
     private final DoubleVertex mu;
     private final DoubleVertex beta;
@@ -150,7 +150,7 @@ public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex> implem
     }
 
     @Override
-    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         return Laplace.withParameters(mu.getValue(), beta.getValue()).sample(shape, random);
     }
 

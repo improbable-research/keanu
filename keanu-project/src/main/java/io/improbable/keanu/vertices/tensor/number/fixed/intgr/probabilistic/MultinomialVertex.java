@@ -10,7 +10,6 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -51,7 +50,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
  * therefore k = 3
  * and the result shape is (2, 2, 3), which is (2, 2) broadcasted with (2) and k appended.
  */
-public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
+public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements ProbabilisticInteger {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
@@ -129,7 +128,7 @@ public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> 
     }
 
     @Override
-    public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public IntegerTensor sample(long[] shape, KeanuRandom random) {
         return Multinomial.withParameters(n.getValue(), p.getValue(), validationEnabled).sample(shape, random);
     }
 

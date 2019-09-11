@@ -276,7 +276,7 @@ public class ForwardSamplerTest {
         }
 
         @Override
-        public DoubleTensor sample(KeanuRandom random) {
+        public DoubleTensor sample(long[] shape, KeanuRandom random) {
             ids.add(this.getId());
             return DoubleTensor.scalar(0.0);
         }

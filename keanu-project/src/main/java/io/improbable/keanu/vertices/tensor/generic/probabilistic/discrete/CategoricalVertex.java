@@ -26,7 +26,8 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 import static java.util.stream.Collectors.toMap;
 
 
-public class CategoricalVertex<CATEGORY> extends VertexImpl<GenericTensor<CATEGORY>, GenericTensorVertex<CATEGORY>> implements GenericTensorVertex<CATEGORY>, Probabilistic<GenericTensor<CATEGORY>>, NonSaveableVertex {
+public class CategoricalVertex<CATEGORY> extends VertexImpl<GenericTensor<CATEGORY>, GenericTensorVertex<CATEGORY>>
+    implements GenericTensorVertex<CATEGORY>, Probabilistic<GenericTensor<CATEGORY>>, NonSaveableVertex {
 
     private final Map<CATEGORY, DoubleVertex> selectableValues;
 
@@ -91,10 +92,10 @@ public class CategoricalVertex<CATEGORY> extends VertexImpl<GenericTensor<CATEGO
     }
 
     @Override
-    public GenericTensor<CATEGORY> sample(KeanuRandom random) {
+    public GenericTensor<CATEGORY> sample(long[] shape, KeanuRandom random) {
         Categorical<CATEGORY> categorical =
             Categorical.withParameters(selectableValuesMappedToDoubleTensor());
-        return categorical.sample(getShape(), random);
+        return categorical.sample(shape, random);
     }
 
     @Override

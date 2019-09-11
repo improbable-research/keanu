@@ -11,7 +11,6 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -30,7 +29,8 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertexWrapper.wrapIfNeeded;
 
-public class StudentTVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class StudentTVertex extends VertexImpl<DoubleTensor, DoubleVertex>
+    implements ProbabilisticDouble, Differentiable, LogProbGraphSupplier {
 
     private final IntegerVertex v;
     private static final String V_NAME = "v";
@@ -99,7 +99,7 @@ public class StudentTVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
     }
 
     @Override
-    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         return StudentT.withParameters(v.getValue()).sample(shape, random);
     }
 }

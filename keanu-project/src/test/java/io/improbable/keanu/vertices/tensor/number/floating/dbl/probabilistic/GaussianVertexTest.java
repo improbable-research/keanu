@@ -186,7 +186,7 @@ public class GaussianVertexTest {
 
         assertEquals(g.logProb(sample), expectedLogDensity, 1e-6);
 
-        DoubleTensor batchSample = g.sampleWithShape(new long[]{2, 2, 2});
+        DoubleTensor batchSample = g.sample(new long[]{2, 2, 2});
         assertArrayEquals(new long[]{2, 2, 2}, batchSample.getShape());
 
         double expected =

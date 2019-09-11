@@ -2,7 +2,6 @@ package com.example;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Samplable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
@@ -13,7 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class CustomProbabilisticVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, Samplable<DoubleTensor> {
+public class CustomProbabilisticVertex extends VertexImpl<DoubleTensor, DoubleVertex>
+    implements Differentiable, ProbabilisticDouble {
 
     public CustomProbabilisticVertex() {
         //This sets the shape of the output. Looks like it's a vector of length 2.
@@ -49,7 +49,8 @@ public class CustomProbabilisticVertex extends VertexImpl<DoubleTensor, DoubleVe
         return result;
     }
 
-    public DoubleTensor sample(KeanuRandom random) {
+    @Override
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         //This needs to be implemented if you use the priors as a Metropolis hastings proposal
         throw new UnsupportedOperationException();
     }

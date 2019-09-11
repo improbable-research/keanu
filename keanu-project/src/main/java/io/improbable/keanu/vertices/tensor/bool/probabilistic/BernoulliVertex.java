@@ -6,11 +6,11 @@ import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Samplable;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexImpl;
@@ -27,7 +27,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class BernoulliVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor>, LogProbGraphSupplier {
+public class BernoulliVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, ProbabilisticBoolean, Samplable<BooleanTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex probTrue;
     private final static String PROBTRUE_NAME = "probTrue";
@@ -105,7 +105,7 @@ public class BernoulliVertex extends VertexImpl<BooleanTensor, BooleanVertex> im
     }
 
     @Override
-    public BooleanTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public BooleanTensor sample(long[] shape, KeanuRandom random) {
         return Bernoulli.withParameters(probTrue.getValue()).sample(shape, random);
     }
 }

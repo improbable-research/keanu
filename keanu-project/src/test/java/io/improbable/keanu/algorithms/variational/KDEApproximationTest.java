@@ -145,7 +145,7 @@ public class KDEApproximationTest {
         KDEVertex KDE = GaussianKDE.approximate(samples);
 
         int numSamples = 100;
-        DoubleTensor sample = KDE.sample(numSamples, KeanuRandom.getDefaultRandom());
+        DoubleTensor sample = KDE.sample(new long[]{numSamples}, KeanuRandom.getDefaultRandom());
         assertThat(sample, hasShape(100));
     }
 
@@ -160,7 +160,7 @@ public class KDEApproximationTest {
         KDEVertex resampledKDE = GaussianKDE.approximate(samples);
 
         int nSamples = 1000;
-        resampledKDE.resample(nSamples, KeanuRandom.getDefaultRandom());
+        resampledKDE.resample(new long[]{nSamples}, KeanuRandom.getDefaultRandom());
         assertEquals(nSamples, resampledKDE.getSampleShape()[0]);
     }
 
