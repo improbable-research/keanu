@@ -58,11 +58,10 @@ public class ConjugateGradient implements GradientOptimizationAlgorithm {
 
     @Override
     public OptimizedResult optimize(final List<? extends Variable> latentVariables,
-                                    FitnessFunction fitnessFunction,
                                     FitnessFunctionGradient fitnessFunctionGradient) {
 
         ObjectiveFunction fitness = new ObjectiveFunction(
-            new ApacheFitnessFunctionAdaptor(new FitnessFunctionFlatAdapter(fitnessFunction, latentVariables))
+            new ApacheFitnessFunctionAdaptor(new FitnessFunctionFlatAdapter(fitnessFunctionGradient, latentVariables))
         );
 
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(

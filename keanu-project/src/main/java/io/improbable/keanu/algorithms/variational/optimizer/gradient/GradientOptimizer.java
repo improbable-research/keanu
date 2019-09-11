@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
@@ -99,28 +98,23 @@ public class GradientOptimizer implements Optimizer {
     private OptimizedResult optimize(ProbabilityFitness probabilityFitness) {
         assertHasLatents();
 
-        FitnessFunction fitnessFunction = probabilityFitness.getFitnessFunction(
-            probabilisticModelWithGradient,
-            this::handleFitnessCalculation
-        );
-
         FitnessFunctionGradient fitnessFunctionGradient = probabilityFitness.getFitnessFunctionGradient(
             probabilisticModelWithGradient,
             this::handleGradientCalculation,
             this::handleFitnessCalculation
         );
 
-        return optimize(fitnessFunction, fitnessFunctionGradient);
+        return optimize(fitnessFunctionGradient);
     }
 
-    private OptimizedResult optimize(FitnessFunction fitnessFunction, FitnessFunctionGradient fitnessFunctionGradient) {
+    private OptimizedResult optimize(FitnessFunctionGradient fitnessFunctionGradient) {
 
         StatusBar statusBar = Optimizer.createFitnessStatusBar(this);
 
         if (checkInitialFitnessConditions) {
             Map<VariableReference, DoubleTensor> startingPoint = Optimizer.convertToMapPoint(probabilisticModelWithGradient.getLatentVariables());
 
-            double initialFitness = fitnessFunction.getFitnessAt(startingPoint);
+            double initialFitness = fitnessFunctionGradient.getFitnessAt(startingPoint);
 
             if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
                 throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
@@ -132,7 +126,6 @@ public class GradientOptimizer implements Optimizer {
 
         OptimizedResult result = gradientOptimizationAlgorithm.optimize(
             probabilisticModelWithGradient.getLatentVariables(),
-            fitnessFunction,
             fitnessFunctionGradient
         );
 

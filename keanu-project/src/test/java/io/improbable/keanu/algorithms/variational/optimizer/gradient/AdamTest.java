@@ -24,7 +24,6 @@ public class AdamTest {
 
         OptimizedResult result = adamOptimizer.optimize(
             testCase.getVariables(),
-            testCase.getFitnessFunction(),
             testCase.getFitnessFunctionGradient()
         );
 
@@ -42,7 +41,6 @@ public class AdamTest {
 
         OptimizedResult result = adamOptimizer.optimize(
             testCase.getVariables(),
-            testCase.getFitnessFunction(),
             testCase.getFitnessFunctionGradient()
         );
 
@@ -62,7 +60,6 @@ public class AdamTest {
 
         adamOptimizer.optimize(
             testCase.getVariables(),
-            testCase.getFitnessFunction(),
             testCase.getFitnessFunctionGradient()
         );
 
@@ -86,7 +83,6 @@ public class AdamTest {
 
         adamOptimizer.optimize(
             testCase.getVariables(),
-            testCase.getFitnessFunction(),
             testCase.getFitnessFunctionGradient()
         );
 

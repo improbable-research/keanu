@@ -36,7 +36,6 @@ public class LBFGSTest {
 
         OptimizedResult result = lbfgs.optimize(
             testCase.getVariables(),
-            testCase.getFitnessFunction(),
             testCase.getFitnessFunctionGradient()
         );
 

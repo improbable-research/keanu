@@ -41,7 +41,6 @@ public class Adam implements GradientOptimizationAlgorithm {
 
     @Override
     public OptimizedResult optimize(List<? extends Variable> latentVariables,
-                                    FitnessFunction fitnessFunction,
                                     FitnessFunctionGradient fitnessFunctionGradient) {
 
         DoubleTensor[] theta = getTheta(latentVariables);
@@ -83,7 +82,7 @@ public class Adam implements GradientOptimizationAlgorithm {
 
         updatePoint(latentVariables, theta, thetaAsPoint);
 
-        double logProb = fitnessFunction.getFitnessAt(thetaAsPoint);
+        double logProb = fitnessFunctionGradient.getFitnessAt(thetaAsPoint);
 
         this.statistics = new AdamStatistics(converged);
 

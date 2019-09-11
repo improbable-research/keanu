@@ -20,7 +20,7 @@ public interface GradientOptimizationAlgorithmTestCase {
 
     default void assertUsingOptimizer(GradientOptimizationAlgorithm algorithm) {
 
-        OptimizedResult result = algorithm.optimize(getVariables(), getFitnessFunction(), getFitnessFunctionGradient());
+        OptimizedResult result = algorithm.optimize(getVariables(), getFitnessFunctionGradient());
         assertResult(result);
     }
 }

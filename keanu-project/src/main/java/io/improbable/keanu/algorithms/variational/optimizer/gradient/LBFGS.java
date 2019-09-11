@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
@@ -42,7 +41,6 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 
     @Override
     public OptimizedResult optimize(List<? extends Variable> latentVariables,
-                                    FitnessFunction fitnessFunction,
                                     FitnessFunctionGradient fitnessFunctionGradient) {
 
         double[] startingPoint = Optimizer.convertToArrayPoint(getAsDoubleTensors(latentVariables));

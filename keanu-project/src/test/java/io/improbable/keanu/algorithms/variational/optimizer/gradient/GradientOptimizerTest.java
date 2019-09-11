@@ -98,7 +98,7 @@ public class GradientOptimizerTest {
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(A.getConnectedGraph());
         GradientOptimizer optimizer = Keanu.Optimizer.Gradient.builderFor(A.getConnectedGraph())
             .probabilisticModel(model)
-            .algorithm((vars, fitness, gradient) -> new OptimizedResult(null, 0))
+            .algorithm((vars, fitnessFunctionGradient) -> new OptimizedResult(null, 0))
             .checkInitialFitnessConditions(enableCheck)
             .build();
 
@@ -112,7 +112,7 @@ public class GradientOptimizerTest {
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(A.getConnectedGraph());
         GradientOptimizer optimizer = Keanu.Optimizer.Gradient.builderFor(A.getConnectedGraph())
             .probabilisticModel(model)
-            .algorithm((vars, fitness, gradient) -> new OptimizedResult(null, 0))
+            .algorithm((vars, fitnessFunctionGradient) -> new OptimizedResult(null, 0))
             .checkInitialFitnessConditions(enableCheck)
             .build();
 
