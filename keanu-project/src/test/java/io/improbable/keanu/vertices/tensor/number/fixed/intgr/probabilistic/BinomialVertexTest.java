@@ -29,7 +29,6 @@ public class BinomialVertexTest {
         random = new KeanuRandom(1);
     }
 
-
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
         int N = 100000;

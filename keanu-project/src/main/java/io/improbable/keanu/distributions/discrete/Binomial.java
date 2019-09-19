@@ -73,7 +73,6 @@ public class Binomial implements DiscreteDistribution {
         return result;
     }
 
-
     public static DoubleVertex logProbOutput(IntegerPlaceholderVertex k, DoublePlaceholderVertex p, IntegerPlaceholderVertex n) {
         DoubleVertex logBinomialCoefficient = getLogBinomialCoefficient(k, n);
 
