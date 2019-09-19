@@ -116,7 +116,7 @@ public class CauchyVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(this, xPlaceholder)
             .input(location, locationPlaceholder)
             .input(scale, scalePlaceholder)
-            .logProbOutput(Cauchy.logProbOutput(xPlaceholder, locationPlaceholder, scalePlaceholder))
+            .output(Cauchy.logProbOutput(xPlaceholder, locationPlaceholder, scalePlaceholder))
             .build();
     }
 

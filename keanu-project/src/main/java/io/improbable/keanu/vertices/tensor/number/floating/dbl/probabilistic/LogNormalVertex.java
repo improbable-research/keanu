@@ -115,7 +115,7 @@ public class LogNormalVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(this, xPlaceholder)
             .input(mu, muPlaceholder)
             .input(sigma, sigmaPlaceholder)
-            .logProbOutput(LogNormal.logProbOutput(xPlaceholder, muPlaceholder, sigmaPlaceholder))
+            .output(LogNormal.logProbOutput(xPlaceholder, muPlaceholder, sigmaPlaceholder))
             .build();
     }
 

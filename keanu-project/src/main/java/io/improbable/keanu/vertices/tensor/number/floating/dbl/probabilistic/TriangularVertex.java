@@ -153,7 +153,7 @@ public class TriangularVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(xMin, xMinPlaceholder)
             .input(xMax, xMaxPlaceholder)
             .input(c, cPlaceholder)
-            .logProbOutput(Triangular.logProbOutput(xPlaceholder, xMinPlaceholder, xMaxPlaceholder, cPlaceholder))
+            .output(Triangular.logProbOutput(xPlaceholder, xMinPlaceholder, xMaxPlaceholder, cPlaceholder))
             .build();
     }
 

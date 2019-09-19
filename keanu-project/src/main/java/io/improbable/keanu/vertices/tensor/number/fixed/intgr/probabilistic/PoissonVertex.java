@@ -83,7 +83,7 @@ public class PoissonVertex extends VertexImpl<IntegerTensor, IntegerVertex>
         return LogProbGraph.builder()
             .input(this, valuePlaceholder)
             .input(mu, muPlaceholder)
-            .logProbOutput(Poisson.logProbOutput(valuePlaceholder, muPlaceholder))
+            .output(Poisson.logProbOutput(valuePlaceholder, muPlaceholder))
             .build();
     }
 

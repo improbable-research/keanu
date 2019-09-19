@@ -73,7 +73,7 @@ public class HalfGaussianVertex extends GaussianVertex {
             .input(this, xPlaceholder)
             .input(getMu(), muPlaceholder)
             .input(getSigma(), sigmaPlaceholder)
-            .logProbOutput(halfGaussianLogProbOutput)
+            .output(halfGaussianLogProbOutput)
             .build();
     }
 

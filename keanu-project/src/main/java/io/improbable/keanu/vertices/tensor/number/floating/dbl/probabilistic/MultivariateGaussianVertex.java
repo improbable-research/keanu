@@ -165,7 +165,7 @@ public class MultivariateGaussianVertex extends VertexImpl<DoubleTensor, DoubleV
             .input(this, xPlaceholder)
             .input(mu, muPlaceholder)
             .input(covariance, covPlaceholder)
-            .logProbOutput(MultivariateGaussian.logProbGraph(xPlaceholder, muPlaceholder, covPlaceholder))
+            .output(MultivariateGaussian.logProbGraph(xPlaceholder, muPlaceholder, covPlaceholder))
             .build();
     }
 

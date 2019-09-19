@@ -1,12 +1,16 @@
 package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.junit.Before;
@@ -19,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -114,5 +120,31 @@ public class UniformVertexTest {
     public void uniformSampleMethodMatchesLogProbMethod() {
         UniformVertex testUniformVertex = new UniformVertex(new long[]{1, N}, ConstantVertex.of(lowerBound), ConstantVertex.of(upperBound));
         ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(testUniformVertex, lowerBound, upperBound - 1, 0.5, 1e-2, random);
+    }
+
+    @Test
+    public void canUnboundUniform() {
+
+        DoubleVertex placeholder = new DoublePlaceholderVertex();
+        DoubleVertex output = placeholder.tanh().times(2.0);
+
+        VariableTransform transform = new VariableTransform(placeholder, output);
+
+        UniformVertex a = new UniformVertex(-2, 2);
+        a.setTransform(transform);
+
+        DoubleVertex b = a.plus(3);
+
+        DoubleVertex obs = new GaussianVertex(b, 1);
+        obs.observe(5.0);
+
+        Optimizer optimizer = Keanu.Optimizer.ofConnectedGraph(obs);
+        optimizer.addFitnessCalculationHandler((point, fitness) -> {
+            System.out.println("A= " + point.get(a.getId()));
+        });
+
+        OptimizedResult result = optimizer.maxAPosteriori();
+
+        assertThat(a.getValue(), valuesWithinEpsilonAndShapesMatch(DoubleTensor.scalar(2), 1e-6));
     }
 }

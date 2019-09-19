@@ -1,13 +1,13 @@
 package io.improbable.keanu.vertices.tensor.number.fixed.intgr;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.PlaceholderVertex;
 import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 
-public class IntegerPlaceholderVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, LogProbGraph.PlaceholderVertex, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
+public class IntegerPlaceholderVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, PlaceholderVertex, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
 
     private final IntegerVertex defaultVertex;
 

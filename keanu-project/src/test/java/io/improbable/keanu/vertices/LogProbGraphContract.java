@@ -11,17 +11,17 @@ import static org.junit.Assert.assertThat;
 public class LogProbGraphContract {
 
     public static void matchesKnownLogDensity(LogProbGraph logProbGraph, double expectedLogDensity) {
-        DoubleVertex logProbGraphOutput = logProbGraph.getLogProbOutput();
+        DoubleVertex logProbGraphOutput = logProbGraph.getOutput();
         double actualDensity = logProbGraphOutput.getValue().sumNumber();
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
     public static void equal(LogProbGraph actual, LogProbGraph expected) {
-        assertThat(actual.getLogProbOutput().getValue(), equalTo(expected.getLogProbOutput().getValue()));
+        assertThat(actual.getOutput().getValue(), equalTo(expected.getOutput().getValue()));
     }
 
     public static void equalTensor(LogProbGraph logProbGraph, DoubleTensor expectedLogDensityTensor) {
-        DoubleTensor logProbGraphOutputTensor = logProbGraph.getLogProbOutput().getValue();
+        DoubleTensor logProbGraphOutputTensor = logProbGraph.getOutput().getValue();
         assertThat(expectedLogDensityTensor, TensorMatchers.valuesAndShapesMatch(logProbGraphOutputTensor));
     }
 }

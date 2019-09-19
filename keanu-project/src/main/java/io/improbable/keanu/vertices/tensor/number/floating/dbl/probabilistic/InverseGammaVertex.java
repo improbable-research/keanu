@@ -121,7 +121,7 @@ public class InverseGammaVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(this, xPlaceholder)
             .input(alpha, alphaPlaceholder)
             .input(beta, betaPlaceholder)
-            .logProbOutput(InverseGamma.logProbOutput(xPlaceholder, alphaPlaceholder, betaPlaceholder))
+            .output(InverseGamma.logProbOutput(xPlaceholder, alphaPlaceholder, betaPlaceholder))
             .build();
     }
 

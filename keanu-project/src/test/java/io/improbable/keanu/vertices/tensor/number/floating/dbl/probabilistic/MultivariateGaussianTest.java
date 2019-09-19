@@ -507,7 +507,7 @@ public class MultivariateGaussianTest {
         logProbGraph.getPlaceholder(mvg).setValue(mvg.getValue());
 
         PartialsOf partialsOf = Differentiator.reverseModeAutoDiff(
-            logProbGraph.getLogProbOutput(),
+            logProbGraph.getOutput(),
             logProbGraph.getPlaceholder(mu),
             logProbGraph.getPlaceholder(variance)
         );

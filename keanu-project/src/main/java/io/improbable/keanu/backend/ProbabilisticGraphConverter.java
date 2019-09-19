@@ -60,8 +60,8 @@ public class ProbabilisticGraphConverter {
                                                      ComputableGraphBuilder<?> graphBuilder) {
 
         graphBuilder.connect(logProbGraph.getInputs());
-        graphBuilder.convert(logProbGraph.getLogProbOutput().getConnectedGraph());
-        return logProbGraph.getLogProbOutput().getReference();
+        graphBuilder.convert(logProbGraph.getOutput().getConnectedGraph());
+        return logProbGraph.getOutput().getReference();
     }
 
 }

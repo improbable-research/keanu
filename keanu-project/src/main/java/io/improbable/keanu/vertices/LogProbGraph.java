@@ -8,7 +8,7 @@ import lombok.Singular;
 import java.util.Map;
 
 /**
- * A graph of vertices representing the computation of a log probability for a specific random variable
+ * A graph of vertices representing a computation
  */
 @Builder
 public class LogProbGraph {
@@ -22,15 +22,12 @@ public class LogProbGraph {
     private final Map<Vertex<?, ?>, Vertex<?, ?>> inputs;
 
     /**
-     * A vertex representing the result of log probability computation
+     * A vertex representing the result of computation
      */
     @Getter
-    private final DoubleVertex logProbOutput;
+    private final DoubleVertex output;
 
     public <T> Vertex<T, ?> getPlaceholder(Vertex<T, ?> input) {
         return (Vertex<T, ?>) inputs.get(input);
-    }
-
-    public interface PlaceholderVertex {
     }
 }

@@ -82,7 +82,7 @@ public class GeometricVertex extends VertexImpl<IntegerTensor, IntegerVertex>
         return LogProbGraph.builder()
             .input(this, valuePlaceholder)
             .input(p, pPlaceholder)
-            .logProbOutput(Geometric.logProbOutput(valuePlaceholder, pPlaceholder))
+            .output(Geometric.logProbOutput(valuePlaceholder, pPlaceholder))
             .build();
     }
 

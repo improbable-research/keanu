@@ -90,7 +90,7 @@ public class ExponentialVertex extends VertexImpl<DoubleTensor, DoubleVertex>
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
             .input(rate, ratePlaceholder)
-            .logProbOutput(Exponential.logProbOutput(xPlaceholder, ratePlaceholder))
+            .output(Exponential.logProbOutput(xPlaceholder, ratePlaceholder))
             .build();
     }
 

@@ -121,7 +121,7 @@ public class GaussianVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(this, xPlaceholder)
             .input(mu, muPlaceholder)
             .input(sigma, sigmaPlaceholder)
-            .logProbOutput(Gaussian.logProbOutput(xPlaceholder, muPlaceholder, sigmaPlaceholder).sum())
+            .output(Gaussian.logProbOutput(xPlaceholder, muPlaceholder, sigmaPlaceholder).sum())
             .build();
     }
 

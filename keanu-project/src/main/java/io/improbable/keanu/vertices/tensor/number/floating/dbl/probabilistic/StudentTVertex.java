@@ -82,7 +82,7 @@ public class StudentTVertex extends VertexImpl<DoubleTensor, DoubleVertex>
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
             .input(v, vPlaceholder)
-            .logProbOutput(StudentT.logProbOutput(xPlaceholder, vPlaceholder))
+            .output(StudentT.logProbOutput(xPlaceholder, vPlaceholder))
             .build();
     }
 

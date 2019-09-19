@@ -91,7 +91,7 @@ public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex>
         return LogProbGraph.builder()
             .input(this, xPlaceHolder)
             .input(k, kPlaceHolder)
-            .logProbOutput(ChiSquared.logProbOutput(xPlaceHolder, kPlaceHolder))
+            .output(ChiSquared.logProbOutput(xPlaceHolder, kPlaceHolder))
             .build();
     }
 

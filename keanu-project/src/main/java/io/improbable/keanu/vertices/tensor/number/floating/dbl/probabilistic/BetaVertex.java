@@ -122,7 +122,7 @@ public class BetaVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(this, xPlaceHolder)
             .input(alpha, alphaPlaceHolder)
             .input(beta, betaPlaceHolder)
-            .logProbOutput(Beta.logProbOutput(xPlaceHolder, alphaPlaceHolder, betaPlaceHolder))
+            .output(Beta.logProbOutput(xPlaceHolder, alphaPlaceHolder, betaPlaceHolder))
             .build();
     }
 

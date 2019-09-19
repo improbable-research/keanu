@@ -109,7 +109,7 @@ public class GammaVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(this, xPlaceholder)
             .input(theta, thetaPlaceholder)
             .input(k, kPlaceholder)
-            .logProbOutput(Gamma.logProbOutput(xPlaceholder, thetaPlaceholder, kPlaceholder))
+            .output(Gamma.logProbOutput(xPlaceholder, thetaPlaceholder, kPlaceholder))
             .build();
     }
 

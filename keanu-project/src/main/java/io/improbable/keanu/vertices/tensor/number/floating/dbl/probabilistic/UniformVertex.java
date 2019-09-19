@@ -15,6 +15,8 @@ import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collections;
 import java.util.Map;
@@ -32,6 +34,10 @@ public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex>
     private final DoubleVertex xMax;
     private static final String X_MIN_NAME = "xMin";
     private static final String X_MAX_NAME = "xMax";
+
+    @Getter
+    @Setter
+    private VariableTransform transform;
 
     /**
      * One xMin or xMax or both that match a proposed tensor shape of Uniform Vertex
@@ -101,7 +107,7 @@ public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex>
 
     @Override
     public double logProb(DoubleTensor value) {
-        return Uniform.withParameters(xMin.getValue(), xMax.getValue()).logProb(value).sumNumber();
+        return Uniform.withParameters(xMin.getValue(), xMax.getValue()).logProb(T(value)).sumNumber();
     }
 
     @Override
@@ -114,7 +120,7 @@ public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(this, xPlaceholder)
             .input(xMin, xMinPlaceholder)
             .input(xMax, xMaxPlaceholder)
-            .logProbOutput(Uniform.logProbOutput(xPlaceholder, xMinPlaceholder, xMaxPlaceholder))
+            .output(Uniform.logProbOutput(xPlaceholder, xMinPlaceholder, xMaxPlaceholder))
             .build();
     }
 
@@ -123,9 +129,6 @@ public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex>
 
         if (withRespectTo.contains(this)) {
             DoubleTensor dLogPdx = DoubleTensor.zeros(this.xMax.getShape());
-            dLogPdx = dLogPdx.setWithMaskInPlace(value.greaterThanMask(xMax.getValue()), 0.0);
-            dLogPdx = dLogPdx.setWithMaskInPlace(value.lessThanOrEqualToMask(xMin.getValue()), 0.0);
-
             return singletonMap(this, dLogPdx);
         }
 
@@ -145,6 +148,19 @@ public class UniformVertex extends VertexImpl<DoubleTensor, DoubleVertex>
     @Override
     public DoubleTensor lowerBound() {
         return xMin.getValue();
+    }
+
+    @Override
+    public void setValue(DoubleTensor value) {
+        super.setValue(T(value));
+    }
+
+    private DoubleTensor T(DoubleTensor value) {
+        if (transform != null) {
+            return transform.transform(value);
+        } else {
+            return value;
+        }
     }
 
 }

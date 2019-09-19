@@ -90,7 +90,7 @@ public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex>
             .input(this, kPlaceholder)
             .input(p, pPlaceholder)
             .input(n, nPlaceholder)
-            .logProbOutput(Binomial.logProbOutput(kPlaceholder, pPlaceholder, nPlaceholder))
+            .output(Binomial.logProbOutput(kPlaceholder, pPlaceholder, nPlaceholder))
             .build();
     }
 

@@ -115,7 +115,7 @@ public class ParetoVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(this, xPlaceholder)
             .input(location, locationPlaceholder)
             .input(scale, scalePlaceholder)
-            .logProbOutput(Pareto.logProbOutput(xPlaceholder, locationPlaceholder, scalePlaceholder))
+            .output(Pareto.logProbOutput(xPlaceholder, locationPlaceholder, scalePlaceholder))
             .build();
     }
 

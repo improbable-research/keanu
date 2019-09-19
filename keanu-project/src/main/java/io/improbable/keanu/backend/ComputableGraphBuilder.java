@@ -2,7 +2,7 @@ package io.improbable.keanu.backend;
 
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.LambdaSection;
-import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.PlaceholderVertex;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 
@@ -100,7 +100,7 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
         Vertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
 
-            if (visiting instanceof LogProbGraph.PlaceholderVertex) {
+            if (visiting instanceof PlaceholderVertex) {
                 continue;
             }
 

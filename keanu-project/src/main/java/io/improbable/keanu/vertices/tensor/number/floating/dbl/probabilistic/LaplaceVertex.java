@@ -124,7 +124,7 @@ public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(this, xPlaceholder)
             .input(mu, muPlaceholder)
             .input(beta, betaPlaceholder)
-            .logProbOutput(Laplace.logProbOutput(xPlaceholder, muPlaceholder, betaPlaceholder))
+            .output(Laplace.logProbOutput(xPlaceholder, muPlaceholder, betaPlaceholder))
             .build();
     }
 

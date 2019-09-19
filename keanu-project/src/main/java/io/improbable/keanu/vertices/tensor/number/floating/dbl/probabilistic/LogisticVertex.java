@@ -103,7 +103,7 @@ public class LogisticVertex extends VertexImpl<DoubleTensor, DoubleVertex>
             .input(this, xPlaceholder)
             .input(mu, muPlaceholder)
             .input(s, sPlaceholder)
-            .logProbOutput(Logistic.logProbOutput(xPlaceholder, muPlaceholder, sPlaceholder))
+            .output(Logistic.logProbOutput(xPlaceholder, muPlaceholder, sPlaceholder))
             .build();
     }
 

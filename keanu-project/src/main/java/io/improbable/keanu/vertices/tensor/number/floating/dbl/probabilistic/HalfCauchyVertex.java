@@ -72,7 +72,7 @@ public class HalfCauchyVertex extends CauchyVertex {
             .input(this, xPlaceholder)
             .input(getLocation(), locationPlaceholder)
             .input(getScale(), scalePlaceholder)
-            .logProbOutput(halfCauchyLogProbOutput)
+            .output(halfCauchyLogProbOutput)
             .build();
     }
 

@@ -85,7 +85,7 @@ public class BernoulliVertex extends VertexImpl<BooleanTensor, BooleanVertex> im
         return LogProbGraph.builder()
             .input(this, valuePlaceholder)
             .input(probTrue, probTruePlaceholder)
-            .logProbOutput(Bernoulli.logProbGraph(valuePlaceholder, probTruePlaceholder))
+            .output(Bernoulli.logProbGraph(valuePlaceholder, probTruePlaceholder))
             .build();
     }
 

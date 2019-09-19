@@ -106,7 +106,7 @@ public class UniformIntVertex extends VertexImpl<IntegerTensor, IntegerVertex>
             .input(this, valuePlaceholder)
             .input(min, minPlaceholder)
             .input(max, maxPlaceholder)
-            .logProbOutput(UniformInt.logProbOutput(valuePlaceholder, minPlaceholder, maxPlaceholder))
+            .output(UniformInt.logProbOutput(valuePlaceholder, minPlaceholder, maxPlaceholder))
             .build();
     }
 

@@ -97,7 +97,7 @@ public class DirichletVertex extends VertexImpl<DoubleTensor, DoubleVertex>
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
             .input(concentration, concentrationPlaceholder)
-            .logProbOutput(Dirichlet.logProbOutput(xPlaceholder, concentrationPlaceholder))
+            .output(Dirichlet.logProbOutput(xPlaceholder, concentrationPlaceholder))
             .build();
     }
 
