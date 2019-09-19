@@ -29,7 +29,7 @@ public class Binomial implements DiscreteDistribution {
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
         long[] broadcastedShape = TensorShape.getBroadcastResultShape(shape, p.getShape(), n.getShape());
         Tensor.FlattenedView<Double> pWrapped = p.broadcast(broadcastedShape).getFlattenedView();
-        Tensor.FlattenedView<Integer> nWrapped = n.toDouble().broadcast(broadcastedShape).toInteger().getFlattenedView();
+        Tensor.FlattenedView<Integer> nWrapped = n.broadcast(broadcastedShape).getFlattenedView();
 
         int length = TensorShape.getLengthAsInt(shape);
         int[] samples = new int[length];

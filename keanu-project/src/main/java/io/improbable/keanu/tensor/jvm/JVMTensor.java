@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.bool.BooleanBuffer;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.JVMBooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.JVMIntegerTensorFactory;
 import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -606,7 +607,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
 
         }
 
-        return IntegerTensor.create(maxIndex, ArrayUtils.remove(shape, axis));
+        return JVMIntegerTensorFactory.INSTANCE.create(maxIndex, ArrayUtils.remove(shape, axis));
     }
 
     public int argCompare(BiFunction<T, T, Boolean> compareOp) {
@@ -636,7 +637,7 @@ public abstract class JVMTensor<T, TENSOR extends Tensor<T, TENSOR>, B extends J
             newBuffer[i] = op.apply(buffer.get(i));
         }
 
-        return BooleanTensor.create(newBuffer, Arrays.copyOf(shape, shape.length));
+        return new JVMBooleanTensor(newBuffer, Arrays.copyOf(shape, shape.length));
     }
 
     @Override

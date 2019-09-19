@@ -14,7 +14,7 @@ public class IntegerScalarTensorShapePreservationTest {
 
     private static Nd4jIntegerTensor intTensor;
     private static Nd4jIntegerTensor lengthOneTensor;
-    private static ScalarIntegerTensor scalarIntTensor;
+    private static IntegerTensor scalarIntTensor;
     private static IntegerTensor[] tensors;
 
 
@@ -22,7 +22,7 @@ public class IntegerScalarTensorShapePreservationTest {
     public void setup() {
         intTensor = new Nd4jIntegerTensor(new int[]{5, 6, 7, 8, 9, 10}, new long[]{3, 2});
         lengthOneTensor = new Nd4jIntegerTensor(new int[]{1}, new long[]{1, 1, 1});
-        scalarIntTensor = new ScalarIntegerTensor(1);
+        scalarIntTensor = IntegerTensor.scalar(1);
         tensors = new IntegerTensor[]{intTensor, lengthOneTensor, scalarIntTensor};
     }
 

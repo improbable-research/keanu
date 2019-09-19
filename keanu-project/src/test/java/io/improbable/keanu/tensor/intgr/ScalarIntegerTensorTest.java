@@ -26,8 +26,8 @@ public class ScalarIntegerTensorTest {
         IntegerTensor tensor = IntegerTensor.scalar(1).reshape(1, 1);
 
         assertThat(tensor.argMax().scalar(), equalTo(0));
-        assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.scalar(0)));
-        assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.scalar(0)));
+        assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.create(0)));
+        assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(0)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -92,10 +92,9 @@ public class ScalarIntegerTensorTest {
 
     @Test
     public void canBooleanIndex() {
-        ScalarIntegerTensor a = new ScalarIntegerTensor(1);
+        IntegerTensor a = IntegerTensor.scalar(1);
         IntegerTensor result = a.get(BooleanTensor.scalar(false));
 
         assertThat(result.getLength(), equalTo(0L));
-        assertThat(result.getShape(), equalTo(new long[0]));
     }
 }

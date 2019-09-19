@@ -29,7 +29,7 @@ public interface LongTensor extends FixedPointTensor<Long, LongTensor> {
     }
 
     static LongTensor zeros(long... shape) {
-        return TensorFactories.longTensorFactory.create(shape);
+        return TensorFactories.longTensorFactory.zeros(shape);
     }
 
     static LongTensor scalar(long scalarValue) {
