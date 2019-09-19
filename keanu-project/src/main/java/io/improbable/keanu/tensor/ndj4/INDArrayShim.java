@@ -102,7 +102,7 @@ public class INDArrayShim {
                                                     INDArray right,
                                                     QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp) {
         List<Integer> broadcastDimensions = getBroadcastDimensions(left.shape(), right.shape());
-        INDArray result = Nd4j.create(Shape.broadcastOutputShape(left.shape(), right.shape()));
+        INDArray result = Nd4j.create(left.dataType(), Shape.broadcastOutputShape(left.shape(), right.shape()));
         return baseBroadcastOp.apply(left, right, result, broadcastDimensions);
     }
 
