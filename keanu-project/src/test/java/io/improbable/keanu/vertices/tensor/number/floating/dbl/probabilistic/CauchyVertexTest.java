@@ -226,7 +226,7 @@ public class CauchyVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new CauchyVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new CauchyVertex(new long[]{numSamples}, hyperParams.get(0), hyperParams.get(1)),
             locationScale,
             latentLocationScale,
             random

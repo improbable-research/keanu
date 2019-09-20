@@ -213,14 +213,44 @@ public class GammaVertexTest {
         latentThetaK.add(latentTheta);
         latentThetaK.add(latentK);
 
-        int numSamples = 5000;
+        int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
             hyperParams -> new GammaVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             thetaK,
             latentThetaK,
             random
         );
+    }
 
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueTheta = DoubleTensor.create(2.0, 2.5);
+        DoubleTensor trueK = DoubleTensor.create(3.0, 3.5, 3.25, 5).reshape(2, 2);
+
+        DoubleVertex constTheta = ConstantVertex.of(trueTheta);
+        DoubleVertex constK = ConstantVertex.of(trueK);
+
+        List<DoubleVertex> thetaK = new ArrayList<>();
+        thetaK.add(constTheta);
+        thetaK.add(constK);
+
+        List<DoubleVertex> latentThetaK = new ArrayList<>();
+        UniformVertex latentTheta = new UniformVertex(0.01, 10.0);
+        latentTheta.setAndCascade(DoubleTensor.create(9.9, 9.9));
+        UniformVertex latentK = new UniformVertex(0.01, 10.0);
+        latentK.setAndCascade(DoubleTensor.create(0.1, 0.1, 0.2, 0.3).reshape(2, 2));
+
+        latentThetaK.add(latentTheta);
+        latentThetaK.add(latentK);
+
+        int numSamples = 2000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new GammaVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0), hyperParams.get(1)),
+            thetaK,
+            latentThetaK,
+            random
+        );
     }
 
 }

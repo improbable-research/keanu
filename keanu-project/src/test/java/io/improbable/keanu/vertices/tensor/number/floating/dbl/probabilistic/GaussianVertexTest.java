@@ -304,4 +304,31 @@ public class GaussianVertexTest {
             random
         );
     }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(4.5, 6);
+        DoubleTensor trueSigma = DoubleTensor.create(2.0, 3, 4, 1).reshape(2, 2);
+
+        List<DoubleVertex> muSigma = new ArrayList<>();
+        muSigma.add(ConstantVertex.of(trueMu));
+        muSigma.add(ConstantVertex.of(trueSigma));
+
+        List<DoubleVertex> latentMuSigma = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(0.01, 100.0);
+        latentMu.setAndCascade(DoubleTensor.create(9.9, 3.0));
+        UniformVertex latentSigma = new UniformVertex(0.01, 100.0);
+        latentSigma.setAndCascade(DoubleTensor.create(0.1, 0.1, 0.5, 2).reshape(2, 2));
+        latentMuSigma.add(latentMu);
+        latentMuSigma.add(latentSigma);
+
+        int numSamples = 1500;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new GaussianVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0), hyperParams.get(1)),
+            muSigma,
+            latentMuSigma,
+            random
+        );
+    }
 }
