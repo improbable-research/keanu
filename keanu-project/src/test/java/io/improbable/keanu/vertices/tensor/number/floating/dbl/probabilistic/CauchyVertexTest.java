@@ -232,4 +232,31 @@ public class CauchyVertexTest {
             random
         );
     }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueLocation = DoubleTensor.create(4.5, 5.0);
+        DoubleTensor trueScale = DoubleTensor.create(2.0, 2.5, 3.0, 3.5).reshape(2, 2);
+
+        List<DoubleVertex> locationScale = new ArrayList<>();
+        locationScale.add(ConstantVertex.of(trueLocation));
+        locationScale.add(ConstantVertex.of(trueScale));
+
+        List<DoubleVertex> latentLocationScale = new ArrayList<>();
+        UniformVertex latentLocation = new UniformVertex(0.01, 10.0);
+        latentLocation.setAndCascade(DoubleTensor.create(9.9, 9.9));
+        UniformVertex latentScale = new UniformVertex(0.01, 10.0);
+        latentScale.setAndCascade(DoubleTensor.create(0.1, 0.1, 0.1, 0.1).reshape(2, 2));
+        latentLocationScale.add(latentLocation);
+        latentLocationScale.add(latentScale);
+
+        int numSamples = 2000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new CauchyVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0), hyperParams.get(1)),
+            locationScale,
+            latentLocationScale,
+            random
+        );
+    }
 }

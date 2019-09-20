@@ -262,4 +262,31 @@ public class BetaVertexTest {
             random
         );
     }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueAlpha = DoubleTensor.create(2., 3.);
+        DoubleTensor trueBeta = DoubleTensor.create(2., 3.);
+
+        List<DoubleVertex> alphaBeta = new ArrayList<>();
+        alphaBeta.add(ConstantVertex.of(trueAlpha));
+        alphaBeta.add(ConstantVertex.of(trueBeta));
+
+        List<DoubleVertex> latentAlphaBeta = new ArrayList<>();
+        UniformVertex latentAlpha = new UniformVertex(0.01, 10.0);
+        latentAlpha.setAndCascade(DoubleTensor.create(9.9, 9.9));
+        UniformVertex latentBeta = new UniformVertex(0.01, 10.0);
+        latentBeta.setAndCascade(DoubleTensor.create(0.1, 0.1));
+        latentAlphaBeta.add(latentAlpha);
+        latentAlphaBeta.add(latentBeta);
+
+        int numSamples = 2500;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new BetaVertex(new long[]{numSamples, 2}, hyperParams.get(0), hyperParams.get(1)),
+            alphaBeta,
+            latentAlphaBeta,
+            random
+        );
+    }
 }
