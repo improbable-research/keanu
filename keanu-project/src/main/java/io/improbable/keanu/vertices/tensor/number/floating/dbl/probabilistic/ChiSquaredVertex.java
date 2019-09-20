@@ -21,6 +21,7 @@ import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -97,7 +98,16 @@ public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex> imp
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        throw new UnsupportedOperationException();
+        final boolean wrtX = withRespectTo.contains(this);
+
+        final DoubleTensor[] dlnP = ChiSquared.withParameters(k.getValue()).dLogProb(value, wrtX);
+        final Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+
+        if (withRespectTo.contains(this)) {
+            dLogProbWrtParameters.put(this, dlnP[0]);
+        }
+
+        return dLogProbWrtParameters;
     }
 
 }

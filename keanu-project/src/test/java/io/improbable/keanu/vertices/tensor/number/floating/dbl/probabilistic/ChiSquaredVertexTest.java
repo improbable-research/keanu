@@ -1,7 +1,10 @@
 package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -17,7 +20,9 @@ import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 @Slf4j
 public class ChiSquaredVertexTest {
@@ -83,7 +88,7 @@ public class ChiSquaredVertexTest {
     @Test
     public void chiSampleMethodMatchesLogProbMethod() {
         int sampleCount = 1000000;
-        ChiSquaredVertex vertex = new ChiSquaredVertex(new long[]{sampleCount, 1}, 2);
+        ChiSquaredVertex vertex = new ChiSquaredVertex(new long[]{sampleCount}, 2);
 
         double from = 2;
         double to = 4;
@@ -97,6 +102,28 @@ public class ChiSquaredVertexTest {
             1e-2,
             random
         );
+    }
+
+    @Test
+    public void calcMAP() {
+        IntegerTensor k = IntegerTensor.create(4);
+        ChiSquaredVertex chiSquaredVertex = new ChiSquaredVertex(ConstantVertex.of(k));
+        chiSquaredVertex.setAndCascade(DoubleTensor.create(9));
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.ofConnectedGraph(chiSquaredVertex);
+
+        optimizer.maxAPosteriori();
+        assertThat(chiSquaredVertex.getValue(), valuesWithinEpsilonAndShapesMatch(k.toDouble().minus(2.0), 0.1));
+    }
+
+    @Test
+    public void calcBatchMAP() {
+        IntegerTensor k = IntegerTensor.create(4, 6);
+        ChiSquaredVertex chiSquaredVertex = new ChiSquaredVertex(ConstantVertex.of(k));
+        chiSquaredVertex.setAndCascade(DoubleTensor.create(2, 2));
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.ofConnectedGraph(chiSquaredVertex);
+
+        optimizer.maxAPosteriori();
+        assertThat(chiSquaredVertex.getValue(), valuesWithinEpsilonAndShapesMatch(k.toDouble().minus(2.0), 0.1));
     }
 
 }
