@@ -4,6 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
@@ -25,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertexWrapper.wrapIfNeeded;
 
 public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
@@ -43,8 +43,7 @@ public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex> imp
      */
     public ChiSquaredVertex(@LoadShape long[] tensorShape,
                             @LoadVertexParam(K_NAME) Vertex<IntegerTensor, ?> k) {
-        super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, k.getShape());
+        super(TensorShape.getBroadcastResultShape(tensorShape, k.getShape()));
 
         this.k = wrapIfNeeded(k);
         setParents(k);

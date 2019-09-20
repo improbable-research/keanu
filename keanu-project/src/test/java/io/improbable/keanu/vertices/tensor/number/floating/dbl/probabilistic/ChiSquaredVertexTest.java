@@ -118,12 +118,12 @@ public class ChiSquaredVertexTest {
     @Test
     public void calcBatchMAP() {
         IntegerTensor k = IntegerTensor.create(4, 6);
-        ChiSquaredVertex chiSquaredVertex = new ChiSquaredVertex(ConstantVertex.of(k));
-        chiSquaredVertex.setAndCascade(DoubleTensor.create(2, 2));
+        ChiSquaredVertex chiSquaredVertex = new ChiSquaredVertex(new long[]{2, 2}, ConstantVertex.of(k));
+        chiSquaredVertex.setAndCascade(DoubleTensor.create(2, 2, 2, 2).reshape(2, 2));
         GradientOptimizer optimizer = Keanu.Optimizer.Gradient.ofConnectedGraph(chiSquaredVertex);
 
         optimizer.maxAPosteriori();
-        assertThat(chiSquaredVertex.getValue(), valuesWithinEpsilonAndShapesMatch(k.toDouble().minus(2.0), 0.1));
+        assertThat(chiSquaredVertex.getValue(), valuesWithinEpsilonAndShapesMatch(k.toDouble().broadcast(2, 2).minus(2.0), 0.1));
     }
 
 }
