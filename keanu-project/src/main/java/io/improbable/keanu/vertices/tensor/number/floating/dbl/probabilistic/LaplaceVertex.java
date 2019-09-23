@@ -4,6 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -25,11 +26,9 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.BETA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
-public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex,  Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex mu;
     private final DoubleVertex beta;
@@ -48,8 +47,7 @@ public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex> implem
     public LaplaceVertex(@LoadShape long[] tensorShape,
                          @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu,
                          @LoadVertexParam(BETA_NAME) Vertex<DoubleTensor, ?> beta) {
-        super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), beta.getShape());
+        super(TensorShape.getBroadcastResultShape(tensorShape, mu.getShape(), beta.getShape()));
 
         this.mu = wrapIfNeeded(mu);
         this.beta = wrapIfNeeded(beta);
@@ -78,7 +76,7 @@ public class LaplaceVertex extends VertexImpl<DoubleTensor, DoubleVertex> implem
     @ExportVertexToPythonBindings
     public LaplaceVertex(Vertex<DoubleTensor, ?> mu,
                          Vertex<DoubleTensor, ?> beta) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), beta.getShape()), mu, beta);
+        this(TensorShape.getBroadcastResultShape(mu.getShape(), beta.getShape()), mu, beta);
     }
 
     public LaplaceVertex(Vertex<DoubleTensor, ?> mu, double beta) {

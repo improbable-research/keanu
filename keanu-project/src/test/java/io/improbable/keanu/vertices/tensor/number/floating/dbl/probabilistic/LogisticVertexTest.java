@@ -167,7 +167,7 @@ public class LogisticVertexTest {
         int sampleCount = 1000000;
         LogisticVertex vertex = new LogisticVertex(
             new long[]{sampleCount, 1},
-            ConstantVertex.of(0.0),
+            ConstantVertex.of(1.0),
             ConstantVertex.of(0.5)
         );
 
@@ -181,24 +181,53 @@ public class LogisticVertexTest {
     @Test
     public void inferHyperParamsFromSamples() {
 
-        double trueA = 0.0;
-        double trueB = 0.5;
+        double trueA = 0.5;
+        double trueB = 1.2;
 
         List<DoubleVertex> aB = new ArrayList<>();
         aB.add(ConstantVertex.of(trueA));
         aB.add(ConstantVertex.of(trueB));
 
         List<DoubleVertex> latentAB = new ArrayList<>();
+        UniformVertex latentA = new UniformVertex(0.01, 10.0);
         UniformVertex latentB = new UniformVertex(0.01, 10.0);
+        latentA.setAndCascade(1.5);
         latentB.setAndCascade(0.1);
-        latentAB.add(ConstantVertex.of(trueA));
+        latentAB.add(latentA);
         latentAB.add(latentB);
 
-        int numSamples = 2000;
+        int numSamples = 1000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new LogisticVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new LogisticVertex(new long[]{numSamples}, hyperParams.get(0), hyperParams.get(1)),
             aB,
             latentAB,
+            random
+        );
+    }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(0.0, 0.5);
+        DoubleTensor trueS = DoubleTensor.create(0.5, 1.2, 2.2, 3).reshape(2, 2);
+
+        List<DoubleVertex> muS = new ArrayList<>();
+        muS.add(ConstantVertex.of(trueMu));
+        muS.add(ConstantVertex.of(trueS));
+
+        List<DoubleVertex> latentMuS = new ArrayList<>();
+        UniformVertex mu = new UniformVertex(-10.0, 10.0);
+        UniformVertex s = new UniformVertex(-10.0, 10.0);
+        mu.setAndCascade(DoubleTensor.create(1.5, 2.0));
+        s.setAndCascade(DoubleTensor.create(0.1, 0.5, 7.0, 1.0).reshape(2, 2));
+        latentMuS.add(mu);
+        latentMuS.add(s);
+
+        int numSamples = 500;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new LogisticVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0), hyperParams.get(1).abs()),
+            muS,
+            latentMuS,
             random
         );
     }

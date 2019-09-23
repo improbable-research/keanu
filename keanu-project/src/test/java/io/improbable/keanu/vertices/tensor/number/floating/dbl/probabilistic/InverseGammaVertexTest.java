@@ -216,4 +216,32 @@ public class InverseGammaVertexTest {
             random
         );
     }
+
+    @Category(Slow.class)
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueA = DoubleTensor.create(4.5, 4);
+        DoubleTensor trueB = DoubleTensor.create(2.0, 3, 4, 1).reshape(2, 2);
+
+        List<DoubleVertex> aB = new ArrayList<>();
+        aB.add(ConstantVertex.of(trueA));
+        aB.add(ConstantVertex.of(trueB));
+
+        List<DoubleVertex> latentAB = new ArrayList<>();
+        UniformVertex latentA = new UniformVertex(0.01, 10.0);
+        latentA.setAndCascade(DoubleTensor.create(9.9, 9.9));
+        UniformVertex latentB = new UniformVertex(0.01, 10.0);
+        latentB.setAndCascade(DoubleTensor.create(0.1, 0.1, 0.1, 0.1).reshape(2, 2));
+        latentAB.add(latentA);
+        latentAB.add(latentB);
+
+        int numSamples = 5000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new InverseGammaVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0), hyperParams.get(1)),
+            aB,
+            latentAB,
+            random
+        );
+    }
 }

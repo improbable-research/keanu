@@ -4,6 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.InverseGamma;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -25,8 +26,6 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class InverseGammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
@@ -48,8 +47,7 @@ public class InverseGammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> i
     public InverseGammaVertex(@LoadShape long[] tensorShape,
                               @LoadVertexParam(ALPHA_NAME) Vertex<DoubleTensor, ?> alpha,
                               @LoadVertexParam(BETA_NAME) Vertex<DoubleTensor, ?> beta) {
-        super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, alpha.getShape(), beta.getShape());
+        super(TensorShape.getBroadcastResultShape(tensorShape, alpha.getShape(), beta.getShape()));
 
         this.alpha = wrapIfNeeded(alpha);
         this.beta = wrapIfNeeded(beta);
@@ -65,7 +63,7 @@ public class InverseGammaVertex extends VertexImpl<DoubleTensor, DoubleVertex> i
      */
     @ExportVertexToPythonBindings
     public InverseGammaVertex(Vertex<DoubleTensor, ?> alpha, Vertex<DoubleTensor, ?> beta) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(alpha.getShape(), beta.getShape()), alpha, beta);
+        this(TensorShape.getBroadcastResultShape(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
     public InverseGammaVertex(Vertex<DoubleTensor, ?> alpha, double beta) {

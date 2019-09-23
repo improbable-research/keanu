@@ -43,7 +43,7 @@ public class Gamma implements ContinuousDistribution {
         Tensor.FlattenedView<Double> thetaWrapped = theta.broadcast(broadcastedShape).getFlattenedView();
         Tensor.FlattenedView<Double> kWrapped = k.broadcast(broadcastedShape).getFlattenedView();
 
-        int length = TensorShape.getLengthAsInt(shape);
+        int length = TensorShape.getLengthAsInt(broadcastedShape);
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
             samples[i] = sample(thetaWrapped.get(i), kWrapped.get(i), random);
