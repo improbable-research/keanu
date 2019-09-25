@@ -51,6 +51,8 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
  * p = [[0.2, 0.2, 0.6], [0.5, 0.25, 0.25]] with shape 2, 3
  * therefore k = 3
  * and the result shape is (2, 2, 3), which is (2, 2) broadcasted with (2) and k appended.
+ * <p>
+ * The probabilities will be normalized to sum to 1 and must be greater than or equal to 0.
  */
 public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> implements IntegerVertex, ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 

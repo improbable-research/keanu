@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.distributions.discrete.Binomial;
@@ -16,6 +17,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.tensor.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -549,6 +551,41 @@ public class MultinomialVertexTest {
             assertEquals(n * probability, mean, epsilonForMean);
             assertEquals(n * probability * (1 - probability), std * std, epsilonForVariance);
         }
+    }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        IntegerTensor trueN = IntegerTensor.create(10, 8, 7);
+        DoubleTensor trueP = DoubleTensor.create(
+            0.5, 0.5,
+            25, 75,
+            0, 3
+        ).reshape(3, 2);
+
+        UniformVertex latentP = new UniformVertex(0.01, 100.0);
+        latentP.setAndCascade(DoubleTensor.create(9.9, 9.9, 5, 5, 5, 5).reshape(3, 2));
+
+        int numSamples = 500;
+
+        //Generate data
+        IntegerTensor data = new MultinomialVertex(new long[]{numSamples, 3, 2}, ConstantVertex.of(trueN), ConstantVertex.of(trueP)).sample();
+
+        //Observe data and infer probabilities
+        MultinomialVertex multinomialVertex = new MultinomialVertex(new long[]{numSamples, 3, 2}, ConstantVertex.of(trueN), latentP.abs());
+        multinomialVertex.observe(data);
+
+        Keanu.Optimizer.Gradient.ofConnectedGraph(multinomialVertex).maxAPosteriori();
+
+        DoubleTensor optimalP = latentP.getValue();
+
+        DoubleTensor normalizedP = normalizeProbabilities(optimalP);
+
+        assertThat(normalizedP, valuesWithinEpsilonAndShapesMatch(normalizeProbabilities(trueP), 1e-1));
+    }
+
+    private DoubleTensor normalizeProbabilities(DoubleTensor p) {
+        return p.div(p.sum(-1).expandDims(-1));
     }
 
 }

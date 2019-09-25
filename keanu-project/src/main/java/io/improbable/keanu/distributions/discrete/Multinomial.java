@@ -31,7 +31,7 @@ public class Multinomial implements DiscreteDistribution {
 
     /**
      * @param n The number of draws from the variable
-     * @param p The probability of observing each of the k values (which sum to 1)
+     * @param p The probability of observing each of the k values (which will be normalized to sum to 1)
      *          p is a Tensor whose last dimension must be of size k
      * @see <a href="https://en.wikipedia.org/wiki/Multinomial_distribution">Multinomial Distribution</a>
      * Generalisation of the Binomial distribution to variables with more than 2 possible values
