@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,10 +67,7 @@ public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> 
     public MultinomialVertex(@LoadShape long[] tensorShape,
                              @LoadVertexParam(N_NAME) Vertex<IntegerTensor, ?> n,
                              @LoadVertexParam(P_NAME) Vertex<DoubleTensor, ?> p) {
-        super(tensorShape);
-
-        long[] expectedShape = calculateExpectedShape(n.getShape(), p.getShape());
-        Preconditions.checkArgument(Arrays.equals(expectedShape, tensorShape));
+        super(TensorShape.getBroadcastResultShape(tensorShape, calculateExpectedShape(n.getShape(), p.getShape())));
 
         this.p = DoubleVertexWrapper.wrapIfNeeded(p);
         this.n = IntegerVertexWrapper.wrapIfNeeded(n);
@@ -119,13 +117,19 @@ public class MultinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex> 
     }
 
     @Override
-    public double logProb(IntegerTensor xTensor) {
-        return Multinomial.withParameters(n.getValue(), p.getValue(), validationEnabled).logProb(xTensor).sumNumber();
+    public double logProb(IntegerTensor x) {
+        return Multinomial.withParameters(n.getValue(), p.getValue(), validationEnabled).logProb(x).sumNumber();
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
-        throw new UnsupportedOperationException();
+    public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor x, Set<? extends Vertex> withRespectTo) {
+
+        if (withRespectTo.contains(p)) {
+            final DoubleTensor dlogProbWrtP = Multinomial.withParameters(n.getValue(), p.getValue(), validationEnabled).dLogProb(x);
+            return Collections.singletonMap(p, dlogProbWrtP);
+        }
+
+        return Collections.emptyMap();
     }
 
     @Override
