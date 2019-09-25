@@ -5,6 +5,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
@@ -45,8 +46,7 @@ public class StudentTVertex extends VertexImpl<DoubleTensor, DoubleVertex> imple
      */
     public StudentTVertex(@LoadShape long[] tensorShape,
                           @LoadVertexParam(V_NAME) Vertex<IntegerTensor, ?> v) {
-        super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, v.getShape());
+        super(TensorShape.getBroadcastResultShape(tensorShape, v.getShape()));
         this.v = wrapIfNeeded(v);
         setParents(v);
     }
