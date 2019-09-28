@@ -6,6 +6,9 @@ import io.improbable.keanu.tensor.dbl.JVMDoubleTensor;
 import io.improbable.keanu.tensor.dbl.JVMDoubleTensorFactory;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.JVMIntegerTensor;
+import io.improbable.keanu.tensor.intgr.JVMIntegerTensorFactory;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -62,7 +65,11 @@ public class BaseTensorTests {
         ));
 
         tensorImpls.add(new TensorImpl(
-            (shape) -> Nd4jIntegerTensor.arange(0, (int) getLength(shape)).reshape(shape).mod(2).greaterThan(0), JVMBooleanTensor.class
+            (shape) -> JVMIntegerTensorFactory.INSTANCE.arange(0, (int) getLength(shape)).reshape(shape), JVMIntegerTensor.class
+        ));
+
+        tensorImpls.add(new TensorImpl(
+            (shape) -> IntegerTensor.arange(0, (int) getLength(shape)).reshape(shape).mod(2).greaterThan(0), JVMBooleanTensor.class
         ));
 
         tensorImpls.add(new TensorImpl(

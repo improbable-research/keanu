@@ -39,13 +39,14 @@ public class Gamma implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        Tensor.FlattenedView<Double> thetaWrapped = theta.getFlattenedView();
-        Tensor.FlattenedView<Double> kWrapped = k.getFlattenedView();
+        long[] broadcastedShape = TensorShape.getBroadcastResultShape(shape, theta.getShape(), k.getShape());
+        Tensor.FlattenedView<Double> thetaWrapped = theta.broadcast(broadcastedShape).getFlattenedView();
+        Tensor.FlattenedView<Double> kWrapped = k.broadcast(broadcastedShape).getFlattenedView();
 
-        int length = TensorShape.getLengthAsInt(shape);
+        int length = TensorShape.getLengthAsInt(broadcastedShape);
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
-            samples[i] = sample(thetaWrapped.getOrScalar(i), kWrapped.getOrScalar(i), random);
+            samples[i] = sample(thetaWrapped.get(i), kWrapped.get(i), random);
         }
 
         return DoubleTensor.create(samples, shape);

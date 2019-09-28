@@ -1,7 +1,10 @@
 package io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic;
 
-import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
@@ -9,15 +12,13 @@ import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.TDistribution;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.List;
-
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static java.lang.Math.pow;
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertThat;
 
 @Slf4j
 public class StudentTVertexTest {
@@ -25,26 +26,27 @@ public class StudentTVertexTest {
     private static final int[] TEST_VALUES_OF_V = new int[]{
         1, 2, 3
     };
-    private KeanuRandom random;
 
-    @Before
-    public void setup() {
-        random = new KeanuRandom(1);
-    }
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
 
     @Test
     public void testSamplesMatchExpectedMeanAndVariance() {
         int N = 5_000;
 
-        double sampleDelta = 0.1;
+        IntegerTensor v = IntegerTensor.create(3, 4);
 
-        int v = 3;
+        StudentTVertex studentT = new StudentTVertex(new long[]{N, 2, 2}, ConstantVertex.of(v));
 
-        StudentTVertex studentT = new StudentTVertex(new long[]{N, 1}, v);
+        DoubleTensor sample = studentT.sample();
 
-        List<Double> samples = studentT.sample(random).asFlatList();
+        DoubleTensor vDbl = v.broadcast(2, 2).toDouble();
+        DoubleTensor expectedStd = vDbl.div(vDbl.minus(2)).sqrt();
 
-        testSampleMeanAndStdDeviation(v, 0.0, Math.sqrt(v / (v - 2)), samples, sampleDelta);
+        //Calculate variance of sample along dimension 0
+        DoubleTensor stdActual = sample.minus(sample.mean(0)).pow(2).sum(0).div(N).sqrt();
+
+        assertThat(stdActual, valuesWithinEpsilonAndShapesMatch(expectedStd, 1e-1));
     }
 
     @Test
@@ -94,19 +96,6 @@ public class StudentTVertexTest {
         }
     }
 
-    private void testSampleMeanAndStdDeviation(int v, double expectedMean, double expectedSd, List<Double> samples, double delta) {
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        double mean = stats.getMean();
-        double sd = stats.getStandardDeviation();
-        log.trace("Degrees of freedom: " + v);
-        log.trace("Mean: " + mean);
-        log.trace("Standard deviation: " + sd);
-        Assert.assertEquals(expectedMean, mean, delta);
-        Assert.assertEquals(expectedSd, sd, delta);
-    }
-
     private void testLogPdfAtGivenDegreesOfFreedom(int v) {
         TDistribution apache = new TDistribution(v);
         StudentTVertex studentT = new StudentTVertex(v);
@@ -139,5 +128,27 @@ public class StudentTVertexTest {
             }
             assertEquals(expected, actual, DELTA);
         }
+    }
+
+    @Test
+    public void calcMAP() {
+        IntegerTensor v = IntegerTensor.create(4);
+        StudentTVertex studentTVertex = new StudentTVertex(ConstantVertex.of(v));
+        studentTVertex.setAndCascade(DoubleTensor.create(9.0));
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.ofConnectedGraph(studentTVertex);
+
+        optimizer.maxAPosteriori();
+        assertThat(studentTVertex.getValue(), valuesWithinEpsilonAndShapesMatch(DoubleTensor.create(0), 1e-3));
+    }
+
+    @Test
+    public void calcBatchMAP() {
+        IntegerTensor v = IntegerTensor.create(4, 3);
+        StudentTVertex studentTVertex = new StudentTVertex(new long[]{2, 2}, ConstantVertex.of(v));
+        studentTVertex.setAndCascade(DoubleTensor.create(9, 5, 6, 7).reshape(2, 2));
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.ofConnectedGraph(studentTVertex);
+
+        optimizer.maxAPosteriori();
+        assertThat(studentTVertex.getValue(), valuesWithinEpsilonAndShapesMatch(DoubleTensor.create(0, 0, 0, 0).reshape(2, 2), 1e-3));
     }
 }

@@ -4,6 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
@@ -20,10 +21,10 @@ import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertexWrapper.wrapIfNeeded;
 
 public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex>
@@ -42,8 +43,7 @@ public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex>
      */
     public ChiSquaredVertex(@LoadShape long[] tensorShape,
                             @LoadVertexParam(K_NAME) Vertex<IntegerTensor, ?> k) {
-        super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, k.getShape());
+        super(TensorShape.getBroadcastResultShape(tensorShape, k.getShape()));
 
         this.k = wrapIfNeeded(k);
         setParents(k);
@@ -97,7 +97,16 @@ public class ChiSquaredVertex extends VertexImpl<DoubleTensor, DoubleVertex>
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        throw new UnsupportedOperationException();
+        final boolean wrtX = withRespectTo.contains(this);
+
+        final DoubleTensor[] dlnP = ChiSquared.withParameters(k.getValue()).dLogProb(value, wrtX);
+        final Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+
+        if (withRespectTo.contains(this)) {
+            dLogProbWrtParameters.put(this, dlnP[0]);
+        }
+
+        return dLogProbWrtParameters;
     }
 
     @Override

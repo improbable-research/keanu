@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;

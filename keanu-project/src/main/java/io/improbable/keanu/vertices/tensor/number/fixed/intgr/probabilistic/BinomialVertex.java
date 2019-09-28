@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Binomial;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -24,9 +25,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
-
 public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex>
     implements ProbabilisticInteger, LogProbGraphSupplier {
 
@@ -38,8 +36,7 @@ public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex>
     public BinomialVertex(@LoadShape long[] tensorShape,
                           @LoadVertexParam(P_NAME) Vertex<DoubleTensor, ?> p,
                           @LoadVertexParam(N_NAME) Vertex<IntegerTensor, ?> n) {
-        super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, p.getShape(), n.getShape());
+        super(TensorShape.getBroadcastResultShape(tensorShape, p.getShape(), n.getShape()));
         this.p = DoubleVertexWrapper.wrapIfNeeded(p);
         this.n = IntegerVertexWrapper.wrapIfNeeded(n);
 
@@ -60,7 +57,7 @@ public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex>
 
     @ExportVertexToPythonBindings
     public BinomialVertex(Vertex<DoubleTensor, ?> p, Vertex<IntegerTensor, ?> n) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(p.getShape(), n.getShape()), p, n);
+        this(TensorShape.getBroadcastResultShape(p.getShape(), n.getShape()), p, n);
     }
 
     public BinomialVertex(double p, Vertex<IntegerTensor, ?> n) {
@@ -96,7 +93,14 @@ public class BinomialVertex extends VertexImpl<IntegerTensor, IntegerVertex>
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
-        return Collections.emptyMap();
+        boolean wrtP = withRespectTo.contains(p);
+
+        DoubleTensor[] result = Binomial.withParameters(p.getValue(), n.getValue()).dLogProb(value, wrtP);
+        if (wrtP) {
+            return Collections.singletonMap(p, result[0]);
+        } else {
+            return Collections.emptyMap();
+        }
     }
 
     @Override

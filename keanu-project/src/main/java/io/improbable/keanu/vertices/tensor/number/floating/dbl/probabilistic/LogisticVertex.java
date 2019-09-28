@@ -4,6 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -24,8 +25,6 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class LogisticVertex extends VertexImpl<DoubleTensor, DoubleVertex>
@@ -48,8 +47,7 @@ public class LogisticVertex extends VertexImpl<DoubleTensor, DoubleVertex>
     public LogisticVertex(@LoadShape long[] tensorShape,
                           @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu,
                           @LoadVertexParam(S_NAME) Vertex<DoubleTensor, ?> s) {
-        super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), s.getShape());
+        super(TensorShape.getBroadcastResultShape(tensorShape, mu.getShape(), s.getShape()));
 
         this.mu = wrapIfNeeded(mu);
         this.s = wrapIfNeeded(s);
@@ -58,7 +56,7 @@ public class LogisticVertex extends VertexImpl<DoubleTensor, DoubleVertex>
 
     @ExportVertexToPythonBindings
     public LogisticVertex(Vertex<DoubleTensor, ?> mu, Vertex<DoubleTensor, ?> s) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), s.getShape()), mu, s);
+        this(TensorShape.getBroadcastResultShape(mu.getShape(), s.getShape()), mu, s);
     }
 
     public LogisticVertex(Vertex<DoubleTensor, ?> mu, double s) {

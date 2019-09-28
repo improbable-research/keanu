@@ -34,11 +34,11 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
      * @param buffer tensor buffer used c ordering
      * @param shape  desired shape of tensor
      */
-    private JVMBooleanTensor(boolean[] buffer, long[] shape) {
+    public JVMBooleanTensor(boolean[] buffer, long[] shape) {
         this(factory.create(buffer), shape);
     }
 
-    private JVMBooleanTensor(boolean[] buffer, long[] shape, long[] stride) {
+    public JVMBooleanTensor(boolean[] buffer, long[] shape, long[] stride) {
         this(factory.create(buffer), shape, stride);
     }
 

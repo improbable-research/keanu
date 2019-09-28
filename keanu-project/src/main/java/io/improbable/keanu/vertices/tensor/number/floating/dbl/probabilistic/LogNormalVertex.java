@@ -4,6 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.LogNormal;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
@@ -24,8 +25,6 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class LogNormalVertex extends VertexImpl<DoubleTensor, DoubleVertex>
@@ -48,8 +47,7 @@ public class LogNormalVertex extends VertexImpl<DoubleTensor, DoubleVertex>
     public LogNormalVertex(@LoadShape long[] tensorShape,
                            @LoadVertexParam(MU_NAME) Vertex<DoubleTensor, ?> mu,
                            @LoadVertexParam(SIGMA_NAME) Vertex<DoubleTensor, ?> sigma) {
-        super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), sigma.getShape());
+        super(TensorShape.getBroadcastResultShape(tensorShape, mu.getShape(), sigma.getShape()));
 
         this.mu = wrapIfNeeded(mu);
         this.sigma = wrapIfNeeded(sigma);
@@ -70,7 +68,7 @@ public class LogNormalVertex extends VertexImpl<DoubleTensor, DoubleVertex>
 
     @ExportVertexToPythonBindings
     public LogNormalVertex(Vertex<DoubleTensor, ?> mu, Vertex<DoubleTensor, ?> sigma) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), sigma.getShape()), mu, sigma);
+        this(TensorShape.getBroadcastResultShape(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
     public LogNormalVertex(double mu, Vertex<DoubleTensor, ?> sigma) {

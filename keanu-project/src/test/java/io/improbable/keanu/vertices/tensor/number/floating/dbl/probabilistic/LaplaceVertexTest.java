@@ -218,4 +218,31 @@ public class LaplaceVertexTest {
             random
         );
     }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(4.5, 5.0);
+        DoubleTensor trueBeta = DoubleTensor.create(2.0, 3, 2.5, 3.5).reshape(2, 2);
+
+        List<DoubleVertex> muBeta = new ArrayList<>();
+        muBeta.add(ConstantVertex.of(trueMu));
+        muBeta.add(ConstantVertex.of(trueBeta));
+
+        List<DoubleVertex> latentMuBeta = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(0.01, 10.0);
+        latentMu.setAndCascade(DoubleTensor.create(9.9, 9.9));
+        UniformVertex latentBeta = new UniformVertex(0.01, 10.0);
+        latentBeta.setAndCascade(DoubleTensor.create(0.1, 0.1, 0.1, 0.1).reshape(2, 2));
+        latentMuBeta.add(latentMu);
+        latentMuBeta.add(latentBeta);
+
+        int numSamples = 2000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new LaplaceVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0), hyperParams.get(1)),
+            muBeta,
+            latentMuBeta,
+            random
+        );
+    }
 }
