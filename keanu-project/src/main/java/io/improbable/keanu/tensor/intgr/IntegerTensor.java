@@ -66,6 +66,29 @@ public interface IntegerTensor extends FixedPointTensor<Integer, IntegerTensor>,
         return create(values, values.length);
     }
 
+    /**
+     * @param start start of range
+     * @param end   end of range (exclusive)
+     * @return a vector of numbers from start incrementing by one to end (exclusively)
+     */
+    static IntegerTensor arange(int start, int end) {
+        return TensorFactories.integerTensorFactory.arange(start, end);
+    }
+
+    static IntegerTensor arange(int end) {
+        return TensorFactories.integerTensorFactory.arange(0, end);
+    }
+
+    /**
+     * @param start    start of range
+     * @param end      end of range (exclusive)
+     * @param stepSize size of step from start to end
+     * @return a vector of numbers starting at start and stepping to end (exclusively)
+     */
+    static IntegerTensor arange(int start, int end, int stepSize) {
+        return TensorFactories.integerTensorFactory.arange(start, end, stepSize);
+    }
+
     static IntegerTensor stack(int dimension, IntegerTensor... toStack) {
         long[] shape = toStack[0].getShape();
         int absoluteDimension = getAbsoluteDimension(dimension, shape.length + 1);

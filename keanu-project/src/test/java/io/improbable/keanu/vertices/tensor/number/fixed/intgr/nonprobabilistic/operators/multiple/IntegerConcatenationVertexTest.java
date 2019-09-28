@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.junit.Assert;
@@ -69,8 +68,8 @@ public class IntegerConcatenationVertexTest {
 
     @Test
     public void canConcatMatricesOfSameSize() {
-        IntegerVertex m = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2}));
-        IntegerVertex a = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{10, 15, 20, 25}, new long[]{2, 2}));
+        IntegerVertex m = new ConstantIntegerVertex(IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2}));
+        IntegerVertex a = new ConstantIntegerVertex(IntegerTensor.create(new int[]{10, 15, 20, 25}, new long[]{2, 2}));
 
         IntegerConcatenationVertex concatZero = new IntegerConcatenationVertex(0, m, a);
 
@@ -85,8 +84,8 @@ public class IntegerConcatenationVertexTest {
 
     @Test
     public void canConcatHighDimensionalShapes() {
-        IntegerVertex a = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2}));
-        IntegerVertex b = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{10, 20, 30, 40, 50, 60, 70, 80}, new long[]{2, 2, 2}));
+        IntegerVertex a = new ConstantIntegerVertex(IntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2}));
+        IntegerVertex b = new ConstantIntegerVertex(IntegerTensor.create(new int[]{10, 20, 30, 40, 50, 60, 70, 80}, new long[]{2, 2, 2}));
 
         IntegerConcatenationVertex concatZero = new IntegerConcatenationVertex(0, a, b);
 
