@@ -102,9 +102,7 @@ public class JVMIntegerTensor extends JVMFixedPointTensor<Integer, IntegerTensor
 
     @Override
     public IntegerTensor matrixMultiply(IntegerTensor that, boolean transposeLeft, boolean transposeRight) {
-        throw new UnsupportedOperationException(
-            "Integer mmul is not currently supported. Convert to double, matrix multiply, and then convert back to long."
-        );
+        return toDouble().matrixMultiply(that.toDouble(), transposeLeft, transposeRight).toInteger();
     }
 
     @Override
