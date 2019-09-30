@@ -10,6 +10,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,21 +46,33 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 
         double[] startingPoint = Optimizer.convertToArrayPoint(getAsDoubleTensors(latentVariables));
 
-        DoubleTensor result = maximize(
-            new FitnessFunctionGradientFlatAdapter(fitnessFunctionGradient, latentVariables),
+        FitnessFunctionGradientFlatAdapter fitnessAndGradientAdaptor = new FitnessFunctionGradientFlatAdapter(
+            fitnessFunctionGradient,
+            latentVariables
+        );
+
+        PositionAndFitness result = maximize(
+            fitnessAndGradientAdaptor,
             DoubleTensor.create(startingPoint)
         );
 
         Map<VariableReference, DoubleTensor> optimizedValues = Optimizer.convertFromPoint(
-            result.asFlatDoubleArray(),
+            result.position.asFlatDoubleArray(),
             latentVariables
         );
 
-        return new OptimizedResult(optimizedValues, 0);
+        return new OptimizedResult(optimizedValues, result.fitness);
     }
 
-    private DoubleTensor maximize(FitnessFunctionGradientFlatAdapter objFuncGradient,
-                                  DoubleTensor position) {
+    @Value
+    @AllArgsConstructor
+    private static class PositionAndFitness {
+        final double fitness;
+        final DoubleTensor position;
+    }
+
+    private PositionAndFitness maximize(FitnessFunctionGradientFlatAdapter objFuncGradient,
+                                        DoubleTensor position) {
 
         ArrayList<DoubleTensor> sQueue = new ArrayList<>();
         ArrayList<DoubleTensor> yQueue = new ArrayList<>();
@@ -67,14 +80,15 @@ public class LBFGS implements GradientOptimizationAlgorithm {
         final double[] alpha = new double[correctionCount];
         final double[] rho = new double[correctionCount];
 
-        DoubleTensor gradient;
         DoubleTensor q;
         DoubleTensor r;
         DoubleTensor gradientPrevious;
         DoubleTensor s;
         DoubleTensor y;
 
-        gradient = DoubleTensor.create(objFuncGradient.gradient(position.asFlatDoubleArray())).unaryMinusInPlace();
+        FitnessAndGradientFlat fitnessAndGradient = objFuncGradient.fitnessAndGradient(position.asFlatDoubleArray());
+        DoubleTensor gradient = DoubleTensor.create(fitnessAndGradient.getGradient()).unaryMinusInPlace();
+
         DoubleTensor positionPrevious = position;
 
         int iter = 0;
@@ -140,13 +154,14 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             HagerZhang.Results linesearchResult = hagerZhang.lineSearch(position, r.unaryMinus(), objFuncGradient, alphaInit);
 
             if (!linesearchResult.isSuccess()) {
-                return position;
+                return new PositionAndFitness(fitnessAndGradient.getFitness(), position);
             }
 
             // update guess
             position = position.minus(r.times(linesearchResult.getAlpha()));
             gradientPrevious = gradient;
-            gradient = DoubleTensor.create(objFuncGradient.gradient(position.asFlatDoubleArray())).unaryMinusInPlace();
+            fitnessAndGradient = objFuncGradient.fitnessAndGradient(position.asFlatDoubleArray());
+            gradient = DoubleTensor.create(fitnessAndGradient.getGradient()).unaryMinusInPlace();
 
             s = position.minus(positionPrevious);
             y = gradient.minus(gradientPrevious);
@@ -171,14 +186,14 @@ public class LBFGS implements GradientOptimizationAlgorithm {
             }
 
             if (yDoty == 0.0) {
-                return position;
+                return new PositionAndFitness(fitnessAndGradient.getFitness(), position);
             }
 
             H0k = dot(y, s).divInPlace(yDoty).scalar();
 
             if (H0k == 0) {
                 //TODO: what's this about?
-                return position;
+                return new PositionAndFitness(fitnessAndGradient.getFitness(), position);
             }
 
             positionPrevious = position;
@@ -190,7 +205,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
 
         } while (!stopCriteria.isConverged(current));
 
-        return position;
+        return new PositionAndFitness(fitnessAndGradient.getFitness(), position);
     }
 
     private static DoubleTensor norm(DoubleTensor input) {
