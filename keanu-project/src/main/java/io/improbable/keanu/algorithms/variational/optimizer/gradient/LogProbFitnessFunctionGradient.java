@@ -27,7 +27,7 @@ public class LogProbFitnessFunctionGradient extends ProbabilityFitnessFunctionGr
     }
 
     @Override
-    protected Map<? extends VariableReference, DoubleTensor> calculateGradients(ProbabilisticModelWithGradient probabilisticModelWithGradient,
+    protected Map<VariableReference, DoubleTensor> calculateGradients(ProbabilisticModelWithGradient probabilisticModelWithGradient,
                                                                                 Map<VariableReference, DoubleTensor> values) {
         return probabilisticModelWithGradient.logProbGradients(values);
     }

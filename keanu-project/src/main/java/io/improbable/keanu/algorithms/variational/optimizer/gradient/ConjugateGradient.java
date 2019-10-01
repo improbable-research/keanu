@@ -6,6 +6,11 @@ import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradi
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.VariableTransform;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
@@ -19,6 +24,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjuga
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsDoubleTensors;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
@@ -56,15 +62,33 @@ public class ConjugateGradient implements GradientOptimizationAlgorithm {
     private UpdateFormula updateFormula;
 
     @Override
-    public OptimizedResult optimize(final List<? extends Variable> latentVariables,
+    public OptimizedResult optimize(List<? extends Variable<DoubleTensor, ?>> latentVariables,
                                     FitnessFunctionGradient fitnessFunctionGradient) {
 
+        Map<VariableReference, VariableTransform> transforms = latentVariables.stream()
+            .filter(v -> v instanceof UniformVertex)
+            .collect(Collectors.toMap(Variable::getReference, v -> {
+
+                DoubleTensor min = ((UniformVertex) v).getXMin().getValue();
+                DoubleTensor max = ((UniformVertex) v).getXMax().getValue();
+                DoubleTensor range = max.minus(min);
+
+                DoubleVertex placeholder = new DoublePlaceholderVertex();
+                DoubleVertex output = placeholder.sigmoid().times(ConstantVertex.of(range)).plus(ConstantVertex.of(min));
+
+                VariableTransform transform = new VariableTransform(placeholder, output);
+
+                return transform;
+            }));
+
+        ReparameterizationAdapter reparameterizationAdapter = new ReparameterizationAdapter(fitnessFunctionGradient, transforms);
+
         ObjectiveFunction fitness = new ObjectiveFunction(
-            new ApacheFitnessFunctionAdaptor(new FitnessFunctionFlatAdapter(fitnessFunctionGradient, latentVariables))
+            new ApacheFitnessFunctionAdaptor(new FitnessFunctionFlatAdapter(reparameterizationAdapter, latentVariables))
         );
 
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(
-            new ApacheFitnessFunctionGradientAdaptor(new FitnessFunctionGradientFlatAdapter(fitnessFunctionGradient, latentVariables))
+            new ApacheFitnessFunctionGradientAdaptor(new FitnessFunctionGradientFlatAdapter(reparameterizationAdapter, latentVariables))
         );
 
         double[] startingPoint = Optimizer.convertToArrayPoint(getAsDoubleTensors(latentVariables));
@@ -89,7 +113,9 @@ public class ConjugateGradient implements GradientOptimizationAlgorithm {
             latentVariables
         );
 
-        return new OptimizedResult(optimizedValues, pointValuePair.getValue());
+        Map<VariableReference, DoubleTensor> transformedOptimizedValues = reparameterizationAdapter.transform(optimizedValues);
+
+        return new OptimizedResult(transformedOptimizedValues, pointValuePair.getValue());
     }
 
     @ToString

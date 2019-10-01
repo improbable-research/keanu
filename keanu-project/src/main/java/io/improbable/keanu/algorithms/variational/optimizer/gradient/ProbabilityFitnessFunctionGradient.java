@@ -32,9 +32,9 @@ public abstract class ProbabilityFitnessFunctionGradient extends ProbabilityFitn
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> getGradientsAt(Map<VariableReference, DoubleTensor> values) {
+    public Map<VariableReference, DoubleTensor> getGradientsAt(Map<VariableReference, DoubleTensor> values) {
 
-        final Map<? extends VariableReference, DoubleTensor> gradients = calculateGradients(probabilisticModelWithGradient, values);
+        final Map<VariableReference, DoubleTensor> gradients = calculateGradients(probabilisticModelWithGradient, values);
 
         onGradientCalculation.accept(values, gradients);
 
@@ -52,8 +52,8 @@ public abstract class ProbabilityFitnessFunctionGradient extends ProbabilityFitn
         return fitnessAndGradient;
     }
 
-    protected abstract Map<? extends VariableReference, DoubleTensor> calculateGradients(ProbabilisticModelWithGradient probabilisticModelWithGradient,
-                                                                                         Map<VariableReference, DoubleTensor> values);
+    protected abstract Map<VariableReference, DoubleTensor> calculateGradients(ProbabilisticModelWithGradient probabilisticModelWithGradient,
+                                                                               Map<VariableReference, DoubleTensor> values);
 
     protected abstract FitnessAndGradient calculateFitnessAndGradientsAt(ProbabilisticModelWithGradient probabilisticModelWithGradient,
                                                                          Map<VariableReference, DoubleTensor> values);

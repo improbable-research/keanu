@@ -39,7 +39,7 @@ public class Adam implements GradientOptimizationAlgorithm {
     private AdamStatistics statistics;
 
     @Override
-    public OptimizedResult optimize(List<? extends Variable> latentVariables,
+    public OptimizedResult optimize(List<? extends Variable<DoubleTensor, ?>> latentVariables,
                                     FitnessFunctionGradient fitnessFunctionGradient) {
 
         DoubleTensor[] theta = getTheta(latentVariables);

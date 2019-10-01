@@ -125,7 +125,7 @@ public class GradientOptimizer implements Optimizer {
         }
 
         OptimizedResult result = gradientOptimizationAlgorithm.optimize(
-            probabilisticModelWithGradient.getLatentVariables(),
+            probabilisticModelWithGradient.getContinuousLatentVariables(),
             fitnessFunctionGradient
         );
 

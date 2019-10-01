@@ -5,6 +5,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizationAlgorithm;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface GradientOptimizationAlgorithmTestCase {
 
     FitnessFunctionGradient getFitnessFunctionGradient();
 
-    List<? extends Variable> getVariables();
+    List<? extends Variable<DoubleTensor, ?>> getVariables();
 
     void assertResult(OptimizedResult result);
 

@@ -52,7 +52,7 @@ public abstract class BivariateFunctionTestCase implements GradientOptimizationA
             return new FitnessAndGradient(fEval, gradients);
         }
 
-        public List<? extends Variable> getVariables() {
+        public List<? extends Variable<DoubleTensor, ?>> getVariables() {
             return ImmutableList.of(x, y);
         }
 
@@ -78,7 +78,7 @@ public abstract class BivariateFunctionTestCase implements GradientOptimizationA
                 }
 
                 @Override
-                public Map<? extends VariableReference, DoubleTensor> getGradientsAt(Map<VariableReference, DoubleTensor> point) {
+                public Map<VariableReference, DoubleTensor> getGradientsAt(Map<VariableReference, DoubleTensor> point) {
                     return evalGradients(
                         point.get(x.getReference()).scalar(),
                         point.get(y.getReference()).scalar()
@@ -115,7 +115,7 @@ public abstract class BivariateFunctionTestCase implements GradientOptimizationA
     }
 
     @Override
-    public List<? extends Variable> getVariables() {
+    public List<? extends Variable<DoubleTensor, ?>> getVariables() {
         return bivariateFunction.getVariables();
     }
 

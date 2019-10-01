@@ -12,7 +12,7 @@ public interface FitnessFunctionGradient extends FitnessFunction {
      * @return The gradient of the fitness function with respect to each of the variables specified in values at the
      * values specified.
      */
-    Map<? extends VariableReference, DoubleTensor> getGradientsAt(Map<VariableReference, DoubleTensor> values);
+    Map<VariableReference, DoubleTensor> getGradientsAt(Map<VariableReference, DoubleTensor> values);
 
     FitnessAndGradient getFitnessAndGradientsAt(Map<VariableReference, DoubleTensor> values);
 }

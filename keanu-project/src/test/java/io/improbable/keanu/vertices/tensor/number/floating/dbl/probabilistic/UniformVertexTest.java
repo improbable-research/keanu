@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
-import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.junit.Before;
@@ -123,27 +122,17 @@ public class UniformVertexTest {
 
     @Test
     public void canUnboundUniform() {
-
-        DoubleVertex placeholder = new DoublePlaceholderVertex();
-        DoubleVertex output = placeholder.tanh().times(2.0);
-
-        VariableTransform transform = new VariableTransform(placeholder, output);
-
-        UniformVertex a = new UniformVertex(-2, 2);
-        a.setTransform(transform);
-
+        UniformVertex a = new UniformVertex(-2, 1.8);
         DoubleVertex b = a.plus(3);
 
         DoubleVertex obs = new GaussianVertex(b, 1);
         obs.observe(5.0);
 
         Optimizer optimizer = Keanu.Optimizer.ofConnectedGraph(obs);
-        optimizer.addFitnessCalculationHandler((point, fitness) -> {
-            System.out.println("A= " + point.get(a.getId()));
-        });
 
         OptimizedResult result = optimizer.maxAPosteriori();
 
-        assertThat(a.getValue(), valuesWithinEpsilonAndShapesMatch(DoubleTensor.scalar(2), 1e-6));
+        assertThat(a.getValue(), valuesWithinEpsilonAndShapesMatch(DoubleTensor.scalar(1.8), 1e-6));
+        assertThat(result.getValueFor(a.getReference()), valuesWithinEpsilonAndShapesMatch(DoubleTensor.scalar(1.8), 1e-6));
     }
 }

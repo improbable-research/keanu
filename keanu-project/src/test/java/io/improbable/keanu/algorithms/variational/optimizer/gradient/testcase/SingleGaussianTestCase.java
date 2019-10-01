@@ -69,8 +69,8 @@ public class SingleGaussianTestCase implements GradientOptimizationAlgorithmTest
     }
 
     @Override
-    public List<? extends Variable> getVariables() {
-        return model.getLatentVariables();
+    public List<? extends Variable<DoubleTensor, ?>> getVariables() {
+        return model.getContinuousLatentVariables();
     }
 
     @Override

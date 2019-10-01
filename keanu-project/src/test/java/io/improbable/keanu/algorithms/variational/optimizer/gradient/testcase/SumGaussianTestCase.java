@@ -8,6 +8,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.testcase.NonGradientOptimizationAlgorithmTestCase;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 
@@ -69,8 +70,8 @@ public class SumGaussianTestCase implements GradientOptimizationAlgorithmTestCas
     }
 
     @Override
-    public List<? extends Variable> getVariables() {
-        return model.getLatentVariables();
+    public List<? extends Variable<DoubleTensor, ?>> getVariables() {
+        return model.getContinuousLatentVariables();
     }
 
     @Override

@@ -41,7 +41,7 @@ public class LBFGS implements GradientOptimizationAlgorithm {
     }
 
     @Override
-    public OptimizedResult optimize(List<? extends Variable> latentVariables,
+    public OptimizedResult optimize(List<? extends Variable<DoubleTensor, ?>> latentVariables,
                                     FitnessFunctionGradient fitnessFunctionGradient) {
 
         double[] startingPoint = Optimizer.convertToArrayPoint(getAsDoubleTensors(latentVariables));

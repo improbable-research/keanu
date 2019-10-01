@@ -10,5 +10,5 @@ import java.util.Map;
 public class FitnessAndGradient {
 
     double fitness;
-    Map<? extends VariableReference, DoubleTensor> gradients;
+    Map<VariableReference, DoubleTensor> gradients;
 }
