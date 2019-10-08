@@ -211,7 +211,9 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     @Override
     public TENSOR minusInPlace(TENSOR that) {
         if (this.isScalar()) {
-            return that.reverseMinus(buffer.get(0));
+            JVMTensor<T, TENSOR, B> asJVMTensor = getAsJVMTensor(that);
+            buffer = asJVMTensor.buffer.copy().reverseMinus(buffer.get(0));
+            return set(buffer, asJVMTensor.shape, asJVMTensor.stride);
         } else if (that.isScalar()) {
             return minusInPlace(that.scalar());
         }
@@ -227,7 +229,9 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     @Override
     public TENSOR timesInPlace(TENSOR that) {
         if (this.isScalar()) {
-            return that.times(buffer.get(0));
+            JVMTensor<T, TENSOR, B> asJVMTensor = getAsJVMTensor(that);
+            buffer = asJVMTensor.buffer.copy().times(buffer.get(0));
+            return set(buffer, asJVMTensor.shape, asJVMTensor.stride);
         } else if (that.isScalar()) {
             return timesInPlace(that.scalar());
         }
@@ -243,7 +247,9 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     @Override
     public TENSOR divInPlace(TENSOR that) {
         if (this.isScalar()) {
-            return that.reverseDiv(buffer.get(0));
+            JVMTensor<T, TENSOR, B> asJVMTensor = getAsJVMTensor(that);
+            buffer = asJVMTensor.buffer.copy().reverseDiv(buffer.get(0));
+            return set(buffer, asJVMTensor.shape, asJVMTensor.stride);
         } else if (that.isScalar()) {
             return divInPlace(that.scalar());
         }
@@ -259,7 +265,9 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     @Override
     public TENSOR reverseDivInPlace(TENSOR that) {
         if (this.isScalar()) {
-            return that.div(buffer.get(0));
+            JVMTensor<T, TENSOR, B> asJVMTensor = getAsJVMTensor(that);
+            buffer = asJVMTensor.buffer.copy().div(buffer.get(0));
+            return set(buffer, asJVMTensor.shape, asJVMTensor.stride);
         } else if (that.isScalar()) {
             return reverseDivInPlace(that.scalar());
         }
@@ -275,7 +283,9 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     @Override
     public TENSOR reverseMinusInPlace(TENSOR that) {
         if (this.isScalar()) {
-            return that.minus(buffer.get(0));
+            JVMTensor<T, TENSOR, B> asJVMTensor = getAsJVMTensor(that);
+            buffer = asJVMTensor.buffer.copy().minus(buffer.get(0));
+            return set(buffer, asJVMTensor.shape, asJVMTensor.stride);
         } else if (that.isScalar()) {
             return reverseMinusInPlace(that.scalar());
         }
@@ -291,7 +301,9 @@ public abstract class JVMNumberTensor<T extends Number, TENSOR extends NumberTen
     @Override
     public TENSOR plusInPlace(TENSOR that) {
         if (this.isScalar()) {
-            return that.plus(buffer.get(0));
+            JVMTensor<T, TENSOR, B> asJVMTensor = getAsJVMTensor(that);
+            buffer = asJVMTensor.buffer.copy().plus(buffer.get(0));
+            return set(buffer, asJVMTensor.shape, asJVMTensor.stride);
         } else if (that.isScalar()) {
             return plusInPlace(that.scalar());
         }
