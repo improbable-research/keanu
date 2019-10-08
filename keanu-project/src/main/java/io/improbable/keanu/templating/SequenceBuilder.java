@@ -47,7 +47,7 @@ public class SequenceBuilder<T> {
         return label.withExtraNamespace(PROXY_LABEL_MARKER);
     }
 
-    public SequenceBuilder<T> withInitialState(Vertex<?> vertex) {
+    public SequenceBuilder<T> withInitialState(Vertex<?, ?> vertex) {
         return withInitialState(VertexDictionary.of(vertex));
     }
 
@@ -56,7 +56,7 @@ public class SequenceBuilder<T> {
         return this;
     }
 
-    public SequenceBuilder<T> withInitialState(VertexLabel label, Vertex<?> vertex) {
+    public SequenceBuilder<T> withInitialState(VertexLabel label, Vertex<?, ?> vertex) {
         return withInitialState(VertexDictionary.backedBy(ImmutableMap.of(label, vertex)));
     }
 
@@ -216,9 +216,9 @@ public class SequenceBuilder<T> {
     }
 
     private void connectTransitionVariables(VertexDictionary candidateVertices, SequenceItem item, Map<VertexLabel, VertexLabel> transitionMapping) throws SequenceConstructionException {
-        Collection<Vertex<?>> proxyVertices = item.getProxyVertices();
+        Collection<Vertex<?, ?>> proxyVertices = item.getProxyVertices();
 
-        for (Vertex<?> proxy : proxyVertices) {
+        for (Vertex<?, ?> proxy : proxyVertices) {
             VertexLabel proxyLabel = getUnscopedLabel(proxy.getLabel(), this.sequenceName != null);
             VertexLabel defaultParentLabel = getDefaultParentLabel(proxyLabel);
             VertexLabel parentLabel = transitionMapping.getOrDefault(proxyLabel, defaultParentLabel);
@@ -231,7 +231,7 @@ public class SequenceBuilder<T> {
                 throw new IllegalArgumentException("You must provide a base case for the Transition Vertices - use withInitialState()");
             }
 
-            Vertex<?> parent = candidateVertices.get(parentLabel);
+            Vertex<?, ?> parent = candidateVertices.get(parentLabel);
             if (parent == null) {
                 throw new SequenceConstructionException("Cannot find VertexLabel " + parentLabel);
             }

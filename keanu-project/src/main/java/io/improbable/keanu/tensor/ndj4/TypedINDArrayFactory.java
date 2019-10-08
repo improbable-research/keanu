@@ -54,7 +54,7 @@ public class TypedINDArrayFactory {
 
     public static INDArray arange(int start, int end) {
         Nd4j.setDefaultDataTypes(DataType.INT, DEFAULT_FLOATING_POINT_TYPE);
-        return Nd4j.arange(start, end);
+        return Nd4j.arange(start, end).castTo(DataType.INT);
     }
 
 }

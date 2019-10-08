@@ -1,14 +1,12 @@
 package io.improbable.keanu.tensor.bool;
 
 import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.buffer.JVMBuffer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.JVMTensor;
 import io.improbable.keanu.tensor.jvm.ResultWrapper;
+import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
@@ -22,9 +20,9 @@ import static java.util.Arrays.copyOf;
 
 public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanBuffer.PrimitiveBooleanWrapper> implements BooleanTensor {
 
-    private static final BooleanBuffer.BooleanArrayWrapperFactory factory = new BooleanBuffer.BooleanArrayWrapperFactory();
+    private static final BooleanBuffer.BooleanArrayWrapperFactory factory = BooleanBuffer.factory;
 
-    private JVMBooleanTensor(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
+    public JVMBooleanTensor(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
         super(buffer, shape, stride);
     }
 
@@ -36,11 +34,11 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
      * @param buffer tensor buffer used c ordering
      * @param shape  desired shape of tensor
      */
-    private JVMBooleanTensor(boolean[] buffer, long[] shape) {
+    public JVMBooleanTensor(boolean[] buffer, long[] shape) {
         this(factory.create(buffer), shape);
     }
 
-    private JVMBooleanTensor(boolean[] buffer, long[] shape, long[] stride) {
+    public JVMBooleanTensor(boolean[] buffer, long[] shape, long[] stride) {
         this(factory.create(buffer), shape, stride);
     }
 
@@ -56,12 +54,12 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    protected BooleanTensor create(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
+    protected JVMBooleanTensor create(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
         return new JVMBooleanTensor(buffer, shape, stride);
     }
 
     @Override
-    protected BooleanTensor set(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
+    protected JVMBooleanTensor set(BooleanBuffer.PrimitiveBooleanWrapper buffer, long[] shape, long[] stride) {
         this.buffer = buffer;
         this.shape = shape;
         this.stride = stride;
@@ -99,12 +97,16 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
         return new JVMBooleanTensor(
             JVMTensor.concat(factory, toConcat, dimension,
                 Arrays.stream(toConcat)
-                    .map(tensor -> getAsJVMTensor(tensor).buffer)
+                    .map(tensor -> asJVM(tensor).buffer)
                     .collect(Collectors.toList())
             ));
     }
 
-    private static JVMBooleanTensor getAsJVMTensor(BooleanTensor tensor) {
+    protected JVMTensor<Boolean, BooleanTensor, BooleanBuffer.PrimitiveBooleanWrapper> getAsJVMTensor(BooleanTensor that) {
+        return asJVM(that);
+    }
+
+    private static JVMBooleanTensor asJVM(BooleanTensor tensor) {
         if (tensor instanceof JVMBooleanTensor) {
             return ((JVMBooleanTensor) tensor);
         } else {
@@ -113,68 +115,8 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    public DoubleTensor doubleWhere(DoubleTensor trueValue, DoubleTensor falseValue) {
-        FlattenedView<Double> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<Double> falseValuesFlattened = falseValue.getFlattenedView();
-
-        double[] result = new double[Ints.checkedCast(buffer.getLength())];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
-        }
-
-        return DoubleTensor.create(result, copyOf(shape, shape.length));
-    }
-
-    @Override
-    public IntegerTensor integerWhere(IntegerTensor trueValue, IntegerTensor falseValue) {
-        FlattenedView<Integer> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<Integer> falseValuesFlattened = falseValue.getFlattenedView();
-
-        int[] result = new int[Ints.checkedCast(buffer.getLength())];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
-        }
-
-        return IntegerTensor.create(result, copyOf(shape, shape.length));
-    }
-
-    @Override
-    public BooleanTensor booleanWhere(BooleanTensor trueValue, BooleanTensor falseValue) {
-        FlattenedView<Boolean> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<Boolean> falseValuesFlattened = falseValue.getFlattenedView();
-
-        boolean[] result = new boolean[Ints.checkedCast(buffer.getLength())];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
-        }
-
-        return BooleanTensor.create(result, copyOf(shape, shape.length));
-    }
-
-    @Override
-    public <T, TENSOR extends Tensor<T, TENSOR>> TENSOR where(TENSOR trueValue, TENSOR falseValue) {
-        if (trueValue instanceof DoubleTensor && falseValue instanceof DoubleTensor) {
-            return (TENSOR) doubleWhere((DoubleTensor) trueValue, (DoubleTensor) falseValue);
-        } else if (trueValue instanceof IntegerTensor && falseValue instanceof IntegerTensor) {
-            return (TENSOR) integerWhere((IntegerTensor) trueValue, (IntegerTensor) falseValue);
-        } else if (trueValue instanceof BooleanTensor && falseValue instanceof BooleanTensor) {
-            return (TENSOR) booleanWhere((BooleanTensor) trueValue, (BooleanTensor) falseValue);
-        } else {
-            FlattenedView<T> trueValuesFlattened = trueValue.getFlattenedView();
-            FlattenedView<T> falseValuesFlattened = falseValue.getFlattenedView();
-
-            T[] result = (T[]) (new Object[Ints.checkedCast(buffer.getLength())]);
-            for (int i = 0; i < result.length; i++) {
-                result[i] = buffer.get(i) ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
-            }
-
-            return Tensor.create(result, copyOf(shape, shape.length));
-        }
-    }
-
-    @Override
     public BooleanTensor andInPlace(BooleanTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcast(AND, getAsJVMTensor(that));
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(AND, getAsJVMTensor(that));
     }
 
     @Override
@@ -187,7 +129,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
 
     @Override
     public BooleanTensor orInPlace(BooleanTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcast(OR, getAsJVMTensor(that));
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(OR, getAsJVMTensor(that));
     }
 
     @Override
@@ -200,7 +142,7 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
 
     @Override
     public BooleanTensor xorInPlace(BooleanTensor that) {
-        return broadcastableBinaryOpWithAutoBroadcast(XOR, getAsJVMTensor(that));
+        return broadcastableBinaryOpWithAutoBroadcastInPlace(XOR, getAsJVMTensor(that));
     }
 
     @Override
@@ -210,33 +152,33 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    public boolean allTrue() {
+    public BooleanTensor allTrue() {
         for (int i = 0; i < buffer.getLength(); i++) {
             if (!buffer.get(i)) {
-                return false;
+                return new JVMBooleanTensor(false);
             }
         }
-        return true;
+        return new JVMBooleanTensor(true);
     }
 
     @Override
-    public boolean allFalse() {
+    public BooleanTensor allFalse() {
         for (int i = 0; i < buffer.getLength(); i++) {
             if (buffer.get(i)) {
-                return false;
+                return new JVMBooleanTensor(false);
             }
         }
-        return true;
+        return new JVMBooleanTensor(true);
     }
 
     @Override
-    public boolean anyTrue() {
-        return !allFalse();
+    public BooleanTensor anyTrue() {
+        return allFalse().notInPlace();
     }
 
     @Override
-    public boolean anyFalse() {
-        return !allTrue();
+    public BooleanTensor anyFalse() {
+        return allTrue().notInPlace();
     }
 
     @Override
@@ -252,52 +194,13 @@ public class JVMBooleanTensor extends JVMTensor<Boolean, BooleanTensor, BooleanB
     }
 
     @Override
-    public BooleanTensor take(long... index) {
-        return new JVMBooleanTensor(getValue(index));
-    }
-
-    @Override
-    public BooleanTensor duplicate() {
-        return new JVMBooleanTensor(buffer.copy(), copyOf(shape, shape.length), copyOf(stride, stride.length));
-    }
-
-    @Override
     public BooleanTensor elementwiseEquals(Boolean value) {
-        return Tensor.elementwiseEquals(this, BooleanTensor.create(value, this.getShape()));
+        return value ? duplicate() : not();
     }
 
     @Override
-    public FlattenedView<Boolean> getFlattenedView() {
-        return new JVMBooleanFlattenedView();
-    }
-
-
-    private class JVMBooleanFlattenedView implements FlattenedView<Boolean> {
-
-        @Override
-        public long size() {
-            return buffer.getLength();
-        }
-
-        @Override
-        public Boolean get(long index) {
-            return buffer.get(index);
-        }
-
-        @Override
-        public Boolean getOrScalar(long index) {
-            if (buffer.getLength() == 1) {
-                return get(0);
-            } else {
-                return get(index);
-            }
-        }
-
-        @Override
-        public void set(long index, Boolean value) {
-            buffer.set(value, index);
-        }
-
+    public BooleanTensor elementwiseEquals(BooleanTensor that) {
+        return xor(that).notInPlace();
     }
 
     @Override

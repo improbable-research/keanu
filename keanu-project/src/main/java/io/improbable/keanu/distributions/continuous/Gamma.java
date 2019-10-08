@@ -6,8 +6,8 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.K;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.THETA;
@@ -28,7 +28,7 @@ public class Gamma implements ContinuousDistribution {
      * @param k     shape
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor theta, DoubleTensor k) {
+    public static Gamma withParameters(DoubleTensor theta, DoubleTensor k) {
         return new Gamma(theta, k);
     }
 
@@ -39,13 +39,14 @@ public class Gamma implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        Tensor.FlattenedView<Double> thetaWrapped = theta.getFlattenedView();
-        Tensor.FlattenedView<Double> kWrapped = k.getFlattenedView();
+        long[] broadcastedShape = TensorShape.getBroadcastResultShape(shape, theta.getShape(), k.getShape());
+        Tensor.FlattenedView<Double> thetaWrapped = theta.broadcast(broadcastedShape).getFlattenedView();
+        Tensor.FlattenedView<Double> kWrapped = k.broadcast(broadcastedShape).getFlattenedView();
 
-        int length = TensorShape.getLengthAsInt(shape);
+        int length = TensorShape.getLengthAsInt(broadcastedShape);
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
-            samples[i] = sample(thetaWrapped.getOrScalar(i), kWrapped.getOrScalar(i), random);
+            samples[i] = sample(thetaWrapped.get(i), kWrapped.get(i), random);
         }
 
         return DoubleTensor.create(samples, shape);
@@ -120,7 +121,6 @@ public class Gamma implements ContinuousDistribution {
         return kMinus1LogX.minus(lgammaK).minus(xOverTheta).minus(kLnTheta);
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor dLogPdx = k.minus(1.).divInPlace(x).minusInPlace(theta.reciprocal());
         final DoubleTensor dLogPdtheta = theta.times(k).plusInPlace(x.unaryMinus()).divInPlace(theta.pow(2.)).unaryMinusInPlace();

@@ -2,14 +2,15 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorFactories;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorTestHelper;
-import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.jvm.Slicer;
+import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 import org.apache.commons.math3.analysis.function.Sigmoid;
@@ -29,11 +30,13 @@ import org.junit.runners.Parameterized;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
+import static junit.framework.TestCase.assertSame;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
@@ -58,8 +61,6 @@ public class DoubleTensorTest {
     private DoubleTensor matrixA;
     private DoubleTensor matrixB;
     private DoubleTensor scalarA;
-    private DoubleTensor vectorA;
-    private DoubleTensor rankThreeTensor;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -68,11 +69,9 @@ public class DoubleTensorTest {
 
         TensorFactories.doubleTensorFactory = factory;
 
-        matrixA = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        matrixB = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        matrixA = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        matrixB = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
         scalarA = DoubleTensor.scalar(2.0);
-        vectorA = DoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
-        rankThreeTensor = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
     }
 
     @Before
@@ -102,15 +101,39 @@ public class DoubleTensorTest {
     }
 
     @Test
-    public void canAverage() {
-        assertEquals(2.5, matrixA.average(), 1e-6);
+    public void canMeanAllDimensions() {
+        assertEquals(2.5, matrixA.mean().scalar(), 1e-6);
+    }
+
+    @Test
+    public void canMeanOverSpecifiedDimensionOfRank3() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2);
+        DoubleTensor summation = x.mean(2);
+        DoubleTensor expected = DoubleTensor.create(new double[]{3, 7, 11, 15}, 2, 2).div(2);
+        assertThat(summation, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canMeanOverSpecifiedDimensionOfMatrix() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        DoubleTensor summationRow = x.mean(1);
+        DoubleTensor expected = DoubleTensor.create(3, 7).div(2);
+        assertThat(summationRow, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canMeanOverSpecifiedDimensionOfVector() {
+        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4);
+        DoubleTensor summation = x.mean(0);
+        DoubleTensor expected = DoubleTensor.scalar(10).div(4);
+        assertThat(summation, valuesAndShapesMatch(expected));
     }
 
     @Test
     public void canStandardDeviation() {
         DoubleTensor A = DoubleTensor.create(0, 0.1, -0.1, 0.3, 0.4);
 
-        double actual = A.standardDeviation();
+        double actual = A.standardDeviation().scalar();
         double expected = 0.20736;
 
         assertEquals(expected, actual, 1e-3);
@@ -121,8 +144,8 @@ public class DoubleTensorTest {
         KeanuRandom random = new KeanuRandom();
         DoubleTensor A = random.nextGaussian(new long[]{50});
 
-        double actual = A.standardDeviation();
-        double expected = Math.sqrt(A.minus(A.average()).pow(2).sum() / (A.getLength() - 1));
+        double actual = A.standardDeviation().scalar();
+        double expected = Math.sqrt(A.minus(A.mean()).pow(2).sumNumber() / (A.getLength() - 1));
 
         assertEquals(expected, actual, 1e-3);
     }
@@ -174,8 +197,68 @@ public class DoubleTensorTest {
     }
 
     @Test
-    public void canDiagFromMatrix() {
-        DoubleTensor actual = DoubleTensor.create(new double[]{1, 0, 0, 0, 2, 0, 0, 0, 3}, 3, 3).diag();
+    public void canBatchDiagFromMatrix() {
+        DoubleTensor expected = DoubleTensor.create(new double[]{1, 0, 0, 2, 3, 0, 0, 4, 5, 0, 0, 6}, 3, 2, 2);
+        DoubleTensor actual = DoubleTensor.create(1, 2, 3, 4, 5, 6).reshape(3, 2).diag();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canBigBatchDiagFromMatrix() {
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            1, 0, 0, 0,
+            0, 2, 0, 0,
+            0, 0, 3, 0,
+            0, 0, 0, 4,
+            5, 0, 0, 0,
+            0, 6, 0, 0,
+            0, 0, 7, 0,
+            0, 0, 0, 8
+        }, 2, 4, 4);
+
+        DoubleTensor actual = DoubleTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4).diag();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canDiagPartFromWideMatrix() {
+        DoubleTensor actual = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3).diagPart();
+        DoubleTensor expected = DoubleTensor.create(1, 5);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canDiagPartFromNarrowMatrix() {
+        DoubleTensor actual = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 3, 2).diagPart();
+        DoubleTensor expected = DoubleTensor.create(1, 4);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canDiagPartFromSquareMatrix() {
+        DoubleTensor actual = DoubleTensor.create(new double[]{
+            1, 0, 0, 0,
+            0, 2, 0, 0,
+            0, 0, 3, 0,
+            0, 0, 0, 4,
+            5, 0, 0, 0,
+            0, 6, 0, 0,
+            0, 0, 7, 0,
+            0, 0, 0, 8
+        }, 2, 4, 4).diagPart();
+
+        DoubleTensor expected = DoubleTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canBatchDiagPartFromSquareMatrices() {
+        DoubleTensor actual = DoubleTensor.create(new double[]{1, 0, 0, 0, 2, 0, 0, 0, 3}, 3, 3).diagPart();
         DoubleTensor expected = DoubleTensor.create(1, 2, 3);
 
         assertEquals(expected, actual);
@@ -196,7 +279,30 @@ public class DoubleTensorTest {
     public void canInverseMatrix() {
         DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
 
-        DoubleTensor expected = DoubleTensor.create(4, -2, -3, 1).reshape(2, 2).times(1.0 / A.determinant());
+        DoubleTensor expected = DoubleTensor.create(4, -2, -3, 1).reshape(2, 2).times(1.0 / A.matrixDeterminant().scalar());
+
+        DoubleTensor actual = A.matrixInverse();
+
+        assertThat(expected, valuesWithinEpsilonAndShapesMatch(actual, 1e-8));
+    }
+
+    @Test
+    public void canBatchInverseMatrix() {
+        DoubleTensor A = DoubleTensor.create(
+            1, 2,
+            3, 4,
+
+            5, 6,
+            7, 8
+        ).reshape(2, 2, 2);
+
+        DoubleTensor expected = DoubleTensor.create(
+            4, -2,
+            -3, 1,
+
+            8, -6,
+            -7, 5
+        ).reshape(2, 2, 2).div(A.matrixDeterminant());
 
         DoubleTensor actual = A.matrixInverse();
 
@@ -251,17 +357,109 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canBatchMatrixMultiplyTwo2x2s() {
+
+        DoubleTensor left = DoubleTensor.create(new double[]{
+            1, 2, 3, 4,
+            5, 6, 7, 8
+        }, 2, 2, 2);
+
+        DoubleTensor right = DoubleTensor.create(new double[]{
+            5, 6, 7, 8,
+            9, 10, 11, 12
+        }, 2, 2, 2);
+
+        DoubleTensor result = left.matrixMultiply(right);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            19, 22, 43, 50,
+            111, 122, 151, 166
+        }, 2, 2, 2);
+
+        assertThat(result, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canBatchMatrixMultiplyA2AndA2x2() {
+
+        DoubleTensor left = DoubleTensor.create(new double[]{
+            5, 6,
+            7, 8
+        }, 2, 2);
+
+        DoubleTensor right = DoubleTensor.create(new double[]{
+            1, 2, 3, 4,
+            5, 6, 7, 8
+        }, 2, 2, 2);
+
+        DoubleTensor result = left.matrixMultiply(right);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            23, 34, 31, 46,
+            67, 78, 91, 106
+        }, 2, 2, 2);
+
+        assertThat(result, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canBatchMatrixMultiplyA2x2x3AndA2x1x3x2() {
+
+        DoubleTensor left = DoubleTensor.arange(1, 13).reshape(2, 2, 3);
+        DoubleTensor right = DoubleTensor.arange(1, 13).reshape(2, 1, 3, 2);
+        DoubleTensor result = left.matrixMultiply(right);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            22, 28,
+            49, 64,
+
+            76, 100,
+            103, 136,
+
+            58, 64,
+            139, 154,
+
+            220, 244,
+            301, 334
+        }, 2, 2, 2, 2);
+
+        assertThat(result, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canBatchMatrixMultiply3x2x3And3x1x3x2() {
+
+        DoubleTensor left = DoubleTensor.arange(1, 19).reshape(3, 2, 3);
+        DoubleTensor right = DoubleTensor.arange(1, 19).reshape(3, 1, 3, 2);
+        DoubleTensor result = left.matrixMultiply(right);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            22, 28, 49, 64,
+            76, 100, 103, 136,
+            130, 172, 157, 208,
+            58, 64, 139, 154,
+            220, 244, 301, 334,
+            382, 424, 463, 514,
+            94, 100, 229, 244,
+            364, 388, 499, 532,
+            634, 676, 769, 820
+        }, 3, 3, 2, 2);
+
+        assertThat(result, valuesAndShapesMatch(expected));
+    }
+
+    @Test
     public void canFindDeterminantOf2By2Matrix() {
         DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
         double expected = 1 * 4 - 2 * 3;
-        assertEquals(expected, A.determinant(), 1e-10);
+        assertEquals(expected, A.matrixDeterminant().scalar(), 1e-10);
     }
 
     @Test
     public void canFindDeterminantOfSingular3By3Matrix() {
         DoubleTensor A = DoubleTensor.arange(1, 10).reshape(3, 3);
         double expected = 0;
-        assertEquals(expected, A.determinant(), 1e-10);
+        assertEquals(expected, A.matrixDeterminant().scalar(), 1e-10);
     }
 
     @Test
@@ -278,7 +476,34 @@ public class DoubleTensorTest {
             new double[]{10, -3, 5}
         })).getDeterminant();
 
-        assertEquals(expected, A.determinant(), 1e-10);
+        assertEquals(expected, A.matrixDeterminant().scalar(), 1e-10);
+    }
+
+    @Test
+    public void canFindBatchDeterminantOf3By3Matrix() {
+        DoubleTensor A = DoubleTensor.create(
+            -1, 7, 3,
+            -2, -9, 6,
+            10, -3, 5,
+
+            -1, 7, 2,
+            -3, -9, 5,
+            11, -3, 5
+        ).reshape(2, 3, 3);
+
+        double expected1 = new LUDecomposition(new BlockRealMatrix(new double[][]{
+            new double[]{-1, 7, 3},
+            new double[]{-2, -9, 6},
+            new double[]{10, -3, 5}
+        })).getDeterminant();
+
+        double expected2 = new LUDecomposition(new BlockRealMatrix(new double[][]{
+            new double[]{-1, 7, 2},
+            new double[]{-3, -9, 5},
+            new double[]{11, -3, 5}
+        })).getDeterminant();
+
+        assertThat(A.matrixDeterminant(), valuesWithinEpsilonAndShapesMatch(DoubleTensor.create(expected1, expected2), 1e-10));
     }
 
     @Test
@@ -297,6 +522,64 @@ public class DoubleTensorTest {
         }, 3, 3);
 
         DoubleTensor actual = A.choleskyDecomposition();
+
+        assertThat(actual, valuesWithinEpsilonAndShapesMatch(expected, 1e-10));
+    }
+
+    @Test
+    public void canFindBatchCholeskyDecomposition() {
+        //Example from: https://en.wikipedia.org/wiki/Cholesky_decomposition
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            4, 12, -16,
+            12, 37, -43,
+            -16, -43, 98,
+
+            4, 12, -16,
+            12, 37, -43,
+            -16, -43, 98
+        }, 2, 3, 3);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            2, 0, 0,
+            6, 1, 0,
+            -8, 5, 3,
+
+            2, 0, 0,
+            6, 1, 0,
+            -8, 5, 3
+        }, 2, 3, 3);
+
+        DoubleTensor actual = A.choleskyDecomposition();
+
+        assertThat(actual, valuesWithinEpsilonAndShapesMatch(expected, 1e-10));
+    }
+
+    @Test
+    public void canFindInverseFromCholeskyDecomposition() {
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            4, 12, -16,
+            12, 37, -43,
+            -16, -43, 98
+        }, 3, 3);
+
+        DoubleTensor expected = A.matrixInverse().triLower(0);
+
+        DoubleTensor actual = A.choleskyDecomposition().choleskyInverse();
+
+        assertThat(actual, valuesWithinEpsilonAndShapesMatch(expected, 1e-10));
+    }
+
+    @Test
+    public void canFindBatchInverseFromCholeskyDecomposition() {
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            4, 12, -16,
+            12, 37, -43,
+            -16, -43, 98
+        }, 3, 3);
+
+        DoubleTensor expected = A.matrixInverse().triLower(0);
+
+        DoubleTensor actual = A.choleskyDecomposition().choleskyInverse();
 
         assertThat(actual, valuesWithinEpsilonAndShapesMatch(expected, 1e-10));
     }
@@ -444,24 +727,17 @@ public class DoubleTensorTest {
     }
 
     @Test
-    public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
-        DoubleTensor tensor = DoubleTensor.create(new double[]{1., 2., 3., 4.}, new long[]{2, 2});
-        DoubleTensor mask = DoubleTensor.scalar(1.);
-
-        thrown.expect(IllegalArgumentException.class);
-
-        tensor.setWithMaskInPlace(mask, -2.0);
+    public void canBroadcastSetIfMask() {
+        DoubleTensor tensor = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        DoubleTensor mask = DoubleTensor.scalar(1);
+        assertThat(tensor.setWithMask(mask, -2.0), valuesAndShapesMatch(DoubleTensor.create(-2, new long[]{2, 2})));
     }
 
     @Test
     public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
-        DoubleTensor tensor = DoubleTensor.create(3);
-        DoubleTensor mask = DoubleTensor.ones(2, 2);
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
-
-        tensor.setWithMaskInPlace(mask, -2.0);
+        DoubleTensor tensor = DoubleTensor.scalar(3);
+        DoubleTensor mask = DoubleTensor.create(new double[]{1, 1, 0, 1}, 2, 2);
+        assertThat(tensor.setWithMask(mask, -2.0), valuesAndShapesMatch(DoubleTensor.create(new double[]{-2, -2, 3, -2}, 2, 2)));
     }
 
     @Test
@@ -509,7 +785,7 @@ public class DoubleTensorTest {
         DoubleTensor notAllTheSame = allTheSame.duplicate();
         notAllTheSame.setValue(otherValue, 1, 1);
 
-        assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
+        assertThat(allTheSame.elementwiseEquals(value).allTrue().scalar(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
     }
 
@@ -541,10 +817,10 @@ public class DoubleTensorTest {
         DoubleTensor a = DoubleTensor.create(aData, new long[]{2, 2, 2, 2, 2});
         DoubleTensor b = DoubleTensor.create(bData, new long[]{2, 2, 2, 2, 2});
         DoubleTensor c = DoubleTensor.create(cData, new long[]{2, 2, 2, 2, 2});
-        assertTrue("equals with epsilon should be true", a.equalsWithinEpsilon(b, 0.5));
-        assertTrue("equals with epsilon should be true (inverted order)", b.equalsWithinEpsilon(a, 0.5));
-        assertTrue("equals with epsilon should be not true (max delta is 0.4)", !a.equalsWithinEpsilon(b, 0.2));
-        assertTrue("equals with epsilon should be not true (max delta is 1.0)", !a.equalsWithinEpsilon(c, 0.5));
+        assertTrue("equals with epsilon should be true", a.equalsWithinEpsilon(b, 0.5).allTrue().scalar());
+        assertTrue("equals with epsilon should be true (inverted order)", b.equalsWithinEpsilon(a, 0.5).allTrue().scalar());
+        assertTrue("equals with epsilon should be not true (max delta is 0.4)", !a.equalsWithinEpsilon(b, 0.2).allTrue().scalar());
+        assertTrue("equals with epsilon should be not true (max delta is 1.0)", !a.equalsWithinEpsilon(c, 0.5).allTrue().scalar());
     }
 
     @Test
@@ -768,8 +1044,10 @@ public class DoubleTensorTest {
 
     @Test
     public void canCalculateProductOfVector() {
-        double productVectorA = vectorA.product();
-        double productRankThreeTensor = rankThreeTensor.product();
+        DoubleTensor vectorA = DoubleTensor.create(1, 2, 3);
+        DoubleTensor rankThreeTensor = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2);
+        double productVectorA = vectorA.product().scalar();
+        double productRankThreeTensor = rankThreeTensor.product().scalar();
 
         assertEquals(6., productVectorA, 1e-6);
         assertEquals(40320, productRankThreeTensor, 1e-6);
@@ -924,8 +1202,8 @@ public class DoubleTensorTest {
     @Test
     public void canFindScalarMinAndMax() {
         DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(2, 2);
-        double min = a.min();
-        double max = a.max();
+        double min = a.min().scalar();
+        double max = a.max().scalar();
         assertEquals(2., min, 1e-6);
         assertEquals(5., max, 1e-6);
     }
@@ -978,7 +1256,7 @@ public class DoubleTensorTest {
     public void canFindArgMaxOfRowVector() {
         DoubleTensor tensorRow = DoubleTensor.create(1, 3, 4, 5, 2).reshape(1, 5);
 
-        assertEquals(3, tensorRow.argMax());
+        assertThat(tensorRow.argMax().scalar(), equalTo(3));
         assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
         assertThat(tensorRow.argMax(1), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
     }
@@ -987,7 +1265,7 @@ public class DoubleTensorTest {
     public void canFindArgMaxOfColumnVector() {
         DoubleTensor tensorCol = DoubleTensor.create(1, 3, 4, 5, 2).reshape(5, 1);
 
-        assertEquals(3, tensorCol.argMax());
+        assertThat(tensorCol.argMax().scalar(), equalTo(3));
         assertThat(tensorCol.argMax(0), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
         assertThat(tensorCol.argMax(1), valuesAndShapesMatch(IntegerTensor.zeros(5)));
     }
@@ -996,7 +1274,7 @@ public class DoubleTensorTest {
     public void argMaxReturnsIndexOfFirstMax() {
         DoubleTensor tensor = DoubleTensor.create(1, 5, 5, 5, 5);
 
-        assertEquals(tensor.argMax(), 1);
+        assertThat(tensor.argMax().scalar(), equalTo(1));
     }
 
     @Test
@@ -1005,7 +1283,7 @@ public class DoubleTensorTest {
 
         assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 0, 0, 0)));
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(2, 0)));
-        assertEquals(2, tensor.argMax());
+        assertThat(tensor.argMax().scalar(), equalTo(2));
     }
 
     @Test
@@ -1025,7 +1303,7 @@ public class DoubleTensorTest {
 
         DoubleTensor a = DoubleTensor.arange(0, 6).reshape(2, 3).plus(10);
 
-        assertEquals(5, a.argMax());
+        assertThat(a.argMax().scalar(), equalTo(5));
         assertThat(a.argMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 1, 1)));
         assertThat(a.argMax(1), valuesAndShapesMatch(IntegerTensor.create(2, 2)));
     }
@@ -1047,8 +1325,8 @@ public class DoubleTensorTest {
 
         DoubleTensor tensor = DoubleTensor.create(Double.NaN, 4, 2, 3).reshape(2, 2);
 
-        assertEquals(0, tensor.argMax());
-        assertEquals(1, tensor.nanArgMax());
+        assertThat(tensor.argMax().scalar(), equalTo(0));
+        assertThat(tensor.nanArgMax().scalar(), equalTo(1));
         assertThat(tensor.nanArgMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 0)));
         assertThat(tensor.nanArgMax(1), valuesAndShapesMatch(IntegerTensor.create(1, 1)));
     }
@@ -1061,7 +1339,7 @@ public class DoubleTensorTest {
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(7, new long[]{2, 4, 2, 4})));
         assertThat(tensor.argMax(2), valuesAndShapesMatch(IntegerTensor.create(3, new long[]{2, 8, 2, 4})));
         assertThat(tensor.argMax(3), valuesAndShapesMatch(IntegerTensor.ones(2, 8, 4, 4)));
-        assertEquals(511, tensor.argMax());
+        assertThat(tensor.argMax().scalar(), equalTo(511));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1080,7 +1358,7 @@ public class DoubleTensorTest {
     public void canFindArgMinOfRowVector() {
         DoubleTensor tensorRow = DoubleTensor.create(7, 3, 4, 5, 2).reshape(1, 5);
 
-        assertEquals(4, tensorRow.argMin());
+        assertThat(tensorRow.argMin().scalar(), equalTo(4));
         assertThat(tensorRow.argMin(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
         assertThat(tensorRow.argMin(1), valuesAndShapesMatch(IntegerTensor.create(new int[]{4}, 1)));
     }
@@ -1089,7 +1367,7 @@ public class DoubleTensorTest {
     public void canFindArgMinOfColumnVector() {
         DoubleTensor tensorCol = DoubleTensor.create(7, 1, 4, 5, 2).reshape(5, 1);
 
-        assertEquals(1, tensorCol.argMin());
+        assertThat(tensorCol.argMin().scalar(), equalTo(1));
         assertThat(tensorCol.argMin(0), valuesAndShapesMatch(IntegerTensor.create(new int[]{1}, 1)));
         assertThat(tensorCol.argMin(1), valuesAndShapesMatch(IntegerTensor.zeros(5)));
     }
@@ -1098,7 +1376,7 @@ public class DoubleTensorTest {
     public void argMinReturnsIndexOfFirstMin() {
         DoubleTensor tensor = DoubleTensor.create(5, 2, 2, 2, 2);
 
-        assertEquals(1, tensor.argMin());
+        assertThat(tensor.argMin().scalar(), equalTo(1));
     }
 
     @Test
@@ -1107,7 +1385,7 @@ public class DoubleTensorTest {
 
         assertThat(tensor.argMin(0), valuesAndShapesMatch(IntegerTensor.create(0, 1, 1, 1)));
         assertThat(tensor.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, 1)));
-        assertEquals(0, tensor.argMin());
+        assertThat(tensor.argMin().scalar(), equalTo(0));
     }
 
     @Test
@@ -1118,7 +1396,7 @@ public class DoubleTensorTest {
         assertThat(tensor.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, new long[]{2, 4, 2, 4})));
         assertThat(tensor.argMin(2), valuesAndShapesMatch(IntegerTensor.create(0, new long[]{2, 8, 2, 4})));
         assertThat(tensor.argMin(3), valuesAndShapesMatch(IntegerTensor.zeros(2, 8, 4, 4)));
-        assertEquals(0, tensor.argMin());
+        assertThat(tensor.argMin().scalar(), equalTo(0));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1151,7 +1429,7 @@ public class DoubleTensorTest {
 
         DoubleTensor a = DoubleTensor.arange(0, 6).reshape(2, 3).plus(10);
 
-        assertEquals(0, a.argMin());
+        assertThat(a.argMin().scalar(), equalTo(0));
         assertThat(a.argMin(0), valuesAndShapesMatch(IntegerTensor.create(0, 0, 0)));
         assertThat(a.argMin(1), valuesAndShapesMatch(IntegerTensor.create(0, 0)));
     }
@@ -1173,8 +1451,8 @@ public class DoubleTensorTest {
 
         DoubleTensor tensor = DoubleTensor.create(Double.NaN, 4, 2, 3).reshape(2, 2);
 
-        assertEquals(0, tensor.argMin());
-        assertEquals(2, tensor.nanArgMin());
+        assertThat(tensor.argMin().scalar(), equalTo(0));
+        assertThat(tensor.nanArgMin().scalar(), equalTo(2));
         assertThat(tensor.nanArgMin(0), valuesAndShapesMatch(IntegerTensor.create(1, 1)));
         assertThat(tensor.nanArgMin(1), valuesAndShapesMatch(IntegerTensor.create(1, 0)));
     }
@@ -1326,46 +1604,6 @@ public class DoubleTensorTest {
         DoubleTensor zero = DoubleTensor.scalar(0.);
         assertThat(zero.safeLogTimes(zero), hasValue(0.));
         assertThat(zero.log().times(zero), hasValue(Double.NaN));
-    }
-
-    @Test
-    public void logTimesFailsIfYouPassInATensorThatAlreadyContainsNaN() {
-        expectedException.expect(TensorValueException.class);
-        expectedException.expectMessage("Invalid value found");
-
-        DoubleTensor x = DoubleTensor.create(1., 1.);
-        DoubleTensor y = DoubleTensor.create(1., Double.NaN);
-        x.safeLogTimes(y);
-    }
-
-    @Test
-    public void logTimesFailsIfYouPassInATensorThatAlreadyContainsNaNWithScalar() {
-        expectedException.expect(TensorValueException.class);
-        expectedException.expectMessage("Invalid value found");
-
-        DoubleTensor x = DoubleTensor.scalar(1.);
-        DoubleTensor y = DoubleTensor.scalar(Double.NaN);
-        x.safeLogTimes(y);
-    }
-
-    @Test
-    public void logTimesFailsIfYouStartWithATensorThatAlreadyContainsNaN() {
-        expectedException.expect(TensorValueException.class);
-        expectedException.expectMessage("Invalid value found");
-
-        DoubleTensor x = DoubleTensor.create(1., Double.NaN);
-        DoubleTensor y = DoubleTensor.create(1., 1.);
-        x.safeLogTimes(y);
-    }
-
-    @Test
-    public void logTimesFailsIfYouStartWithATensorThatAlreadyContainsNaNWithScalar() {
-        expectedException.expect(TensorValueException.class);
-        expectedException.expectMessage("Invalid value found");
-
-        DoubleTensor x = DoubleTensor.scalar(Double.NaN);
-        DoubleTensor y = DoubleTensor.scalar(1.);
-        x.safeLogTimes(y);
     }
 
     @Test
@@ -1647,6 +1885,8 @@ public class DoubleTensorTest {
         assertUnaryOperation(Math::exp, DoubleTensor::expInPlace, tensorRangeWithNegatives());
         assertUnaryOperation(Math::abs, DoubleTensor::abs, tensorRangeWithNegatives());
         assertUnaryOperation(Math::abs, DoubleTensor::absInPlace, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::signum, DoubleTensor::sign, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::signum, DoubleTensor::signInPlace, tensorRangeWithNegatives());
         assertUnaryOperation(Gamma::digamma, DoubleTensor::digamma, tensorRangeWithNegatives());
         assertUnaryOperation(Gamma::digamma, DoubleTensor::digammaInPlace, tensorRangeWithNegatives());
         assertUnaryOperation(Math::ceil, DoubleTensor::ceil, tensorRangeWithNegatives());
@@ -1738,7 +1978,7 @@ public class DoubleTensorTest {
         DoubleTensor output = tensorOp.apply(input);
         DoubleTensor expected = DoubleTensor.create(expectedBuffer, input.getShape());
 
-        assertTrue(expected.equalsWithinEpsilon(output, 1e-6));
+        assertTrue(expected.equalsWithinEpsilon(output, 1e-6).allTrue().scalar());
     }
 
     @Test
@@ -1793,7 +2033,7 @@ public class DoubleTensorTest {
     public void canArgFindMaxOfScalar() {
         DoubleTensor tensor = DoubleTensor.scalar(1).reshape(1, 1);
 
-        assertEquals(0, tensor.argMax());
+        assertThat(tensor.argMax().scalar(), equalTo(0));
         assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.vector(0)));
         assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.vector(0)));
     }
@@ -1842,7 +2082,7 @@ public class DoubleTensorTest {
     @Test
     public void doesThrowOnMatrixMultiplyWhenRank0() {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Matrix multiply must be used on matrices");
+        expectedException.expectMessage("Cannot matrix multiply with shapes [] and [2, 2]");
 
         DoubleTensor lengthOne = DoubleTensor.scalar(2);
         DoubleTensor matrix = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
@@ -2077,6 +2317,106 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canUseEllipsisInSlice() {
+        DoubleTensor a = DoubleTensor.arange(40).reshape(2, 2, 10);
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .ellipsis()
+            .slice(2)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("...,2");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(2, 12, 22, 32).reshape(2, 2)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(2, 12, 22, 32).reshape(2, 2)));
+    }
+
+    @Test
+    public void canUseNegativeIndicesAndNegativeStep() {
+        DoubleTensor a = DoubleTensor.arange(30).reshape(3, 10);
+
+        if (a instanceof Nd4jTensor) {
+            //TODO: ND4j does not support negative slice steps
+            return;
+        }
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .ellipsis()
+            .slice(-2, -4, -1)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("...,-2:-4:-1");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(8, 7, 18, 17, 28, 27).reshape(3, 2)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(8, 7, 18, 17, 28, 27).reshape(3, 2)));
+    }
+
+    @Test
+    public void canUseNegativeIndicesAndPositiveStep() {
+        DoubleTensor a = DoubleTensor.arange(30).reshape(3, 10);
+
+        DoubleTensor b = a.slice(Slicer.builder()
+            .ellipsis()
+            .slice(-7, -5)
+            .build()
+        );
+
+        DoubleTensor c = a.slice("...,-7:-5");
+
+        assertThat(b, valuesAndShapesMatch(DoubleTensor.create(3, 4, 13, 14, 23, 24).reshape(3, 2)));
+        assertThat(c, valuesAndShapesMatch(DoubleTensor.create(3, 4, 13, 14, 23, 24).reshape(3, 2)));
+    }
+
+    @Test
+    public void canSetAsSliceForMatrix() {
+        DoubleTensor a = DoubleTensor.arange(4).reshape(2, 2);
+
+        DoubleTensor sliced = a.slice(":,1");
+
+        DoubleTensor expected = DoubleTensor.create(0, 1, 0, 3).reshape(2, 2);
+        DoubleTensor actual = sliced.reverseSlice(DoubleTensor.zeros(2, 2), Slicer.fromString(":,1"));
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
+    public void canSetAsSliceForMatrixOfMatrices() {
+        DoubleTensor a = DoubleTensor.arange(16).reshape(2, 2, 2, 2);
+
+        DoubleTensor sliced = a.reshape(4, 2, 2).slice("0:4:3");
+
+        DoubleTensor expectedSliced = DoubleTensor.create(
+            0, 1,
+            2, 3,
+
+            12, 13,
+            14, 15
+        ).reshape(2, 2, 2);
+
+        assertThat(sliced, valuesAndShapesMatch(expectedSliced));
+
+        DoubleTensor expected = DoubleTensor.create(
+            0, 1,
+            2, 3,
+
+            0, 0,
+            0, 0,
+
+            0, 0,
+            0, 0,
+
+            12, 13,
+            14, 15
+        ).reshape(4, 2, 2);
+
+        DoubleTensor actual = sliced.reverseSlice(DoubleTensor.zeros(4, 2, 2), Slicer.fromString("0:4:3"));
+
+        assertThat(actual, valuesAndShapesMatch(expected));
+    }
+
+    @Test
     public void canIsInfinity() {
         DoubleTensor a = DoubleTensor.create(
             Double.NEGATIVE_INFINITY, 1, Double.NaN,
@@ -2121,6 +2461,468 @@ public class DoubleTensorTest {
         DoubleTensor a = DoubleTensor.create(1, 2, 3, 4, 5, 6).reshape(2, 3);
         DoubleTensor result = a.get(a.greaterThan(3.));
         assertThat(result, valuesAndShapesMatch(DoubleTensor.create(4, 5, 6)));
+    }
+
+    @Test
+    public void canFillUpperTriangular() {
+        DoubleTensor a = DoubleTensor.create(1, 2, 3, 4, 5, 6);
+        DoubleTensor result = a.fillTriangular(true, false);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 4, 5,
+            0, 0, 6
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canFillLowerTriangular() {
+        DoubleTensor a = DoubleTensor.create(1, 2, 3, 4, 5, 6);
+        DoubleTensor result = a.fillTriangular(false, true);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            2, 4, 0,
+            3, 5, 6
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canBatchFillUpperTriangular() {
+        DoubleTensor a = DoubleTensor.create(
+            1, 2, 3, 4, 5, 6,
+            7, 8, 9, 10, 11, 12
+        ).reshape(2, 6);
+
+        DoubleTensor result = a.fillTriangular(true, false);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 4, 5,
+            0, 0, 6,
+
+            7, 8, 9,
+            0, 10, 11,
+            0, 0, 12
+        ).reshape(2, 3, 3)));
+    }
+
+    @Test
+    public void canBatchFillLowerTriangular() {
+        DoubleTensor a = DoubleTensor.create(
+            1, 2, 3, 4, 5, 6,
+            7, 8, 9, 10, 11, 12
+        ).reshape(2, 6);
+
+        DoubleTensor result = a.fillTriangular(false, true);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            2, 4, 0,
+            3, 5, 6,
+
+            7, 0, 0,
+            8, 10, 0,
+            9, 11, 12
+        ).reshape(2, 3, 3)));
+    }
+
+    @Test
+    public void canTriUpperAtK0() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triUpper(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 5, 6,
+            0, 0, 9
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canBatchTriUpperAtK0() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(2, 3, 3).triUpper(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 5, 6,
+            0, 0, 9,
+
+            1, 2, 3,
+            0, 5, 6,
+            0, 0, 9
+        ).reshape(2, 3, 3)));
+    }
+
+    @Test
+    public void canTriUpperAtK1of3() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triUpper(1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            0, 2, 3,
+            0, 0, 6,
+            0, 0, 0
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriUpperAtK2o3() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triUpper(2);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            0, 0, 3,
+            0, 0, 0,
+            0, 0, 0
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriUpperWithMoreRowsThanColumns() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12
+        ).reshape(4, 3).triUpper(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            0, 5, 6,
+            0, 0, 9,
+            0, 0, 0
+        ).reshape(4, 3)));
+    }
+
+    @Test
+    public void canTrUpperAtK1WithMoreRowsThanColumns() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12
+        ).reshape(4, 3).triUpper(1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            0, 2, 3,
+            0, 0, 6,
+            0, 0, 0,
+            0, 0, 0
+        ).reshape(4, 3)));
+    }
+
+    @Test
+    public void canTriUpperAtK0WithMoreColumnsThanRows() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3, 4,
+            5, 6, 7, 8,
+            9, 10, 11, 12
+        ).reshape(3, 4).triUpper(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3, 4,
+            0, 6, 7, 8,
+            0, 0, 11, 12
+        ).reshape(3, 4)));
+    }
+
+    @Test
+    public void canTriUpperAtKNeg1() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triUpper(-1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            0, 8, 9
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriLowerAtK0() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triLower(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            4, 5, 0,
+            7, 8, 9
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canBatchTriLowerAtK0() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(2, 3, 3).triLower(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            4, 5, 0,
+            7, 8, 9,
+
+            1, 0, 0,
+            4, 5, 0,
+            7, 8, 9
+        ).reshape(2, 3, 3)));
+    }
+
+    @Test
+    public void canTriLowerAtK1() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triLower(1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            0, 0, 0,
+            4, 0, 0,
+            7, 8, 0
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriLowerAtKNeg1() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).triLower(-1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 0,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3)));
+    }
+
+    @Test
+    public void canTriLowerWithMoreRowsThanColumns() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12
+        ).reshape(4, 3).triLower(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0,
+            4, 5, 0,
+            7, 8, 9,
+            10, 11, 12
+        ).reshape(4, 3)));
+    }
+
+    @Test
+    public void canTriLowerAtK1WithMoreRowsThanColumns() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12
+        ).reshape(4, 3).triLower(1);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            0, 0, 0,
+            4, 0, 0,
+            7, 8, 0,
+            10, 11, 12
+        ).reshape(4, 3)));
+    }
+
+    @Test
+    public void canTriLowerAtK0WithMoreColumnsThanRows() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3, 4,
+            5, 6, 7, 8,
+            9, 10, 11, 12
+        ).reshape(3, 4).triLower(0);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 0, 0, 0,
+            5, 6, 0, 0,
+            9, 10, 11, 0
+        ).reshape(3, 4)));
+    }
+
+    @Test
+    public void canUpperTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).trianglePart(true);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3, 5, 6, 9
+        )));
+    }
+
+    @Test
+    public void canReverseFillTriangularWithUpperTrianglePart() {
+
+        DoubleTensor input = DoubleTensor.create(
+            1, 4, 7, 5, 8, 9
+        );
+
+        DoubleTensor result = input.fillTriangular(true, false).trianglePart(true);
+
+        assertThat(result, valuesAndShapesMatch(input));
+    }
+
+    @Test
+    public void canBatchUpperTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            11, 12, 13,
+            14, 15, 16,
+            17, 18, 19
+        ).reshape(2, 3, 3).trianglePart(true);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 2, 3, 5, 6, 9,
+            11, 12, 13, 15, 16, 19
+        ).reshape(2, 6)));
+    }
+
+    @Test
+    public void canLowerTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(3, 3).trianglePart(false);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 4, 7, 5, 8, 9
+        )));
+    }
+
+    @Test
+    public void canReverseFillTriangularWithLowerTrianglePart() {
+
+        DoubleTensor input = DoubleTensor.create(
+            1, 4, 7, 5, 8, 9
+        );
+
+        DoubleTensor result = input.fillTriangular(false, true).trianglePart(false);
+
+        assertThat(result, valuesAndShapesMatch(input));
+    }
+
+    @Test
+    public void canBatchLowerTrianglePart() {
+
+        DoubleTensor result = DoubleTensor.create(
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9
+        ).reshape(2, 3, 3).trianglePart(false);
+
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(
+            1, 4, 7, 5, 8, 9,
+            1, 4, 7, 5, 8, 9
+        ).reshape(2, 6)));
+    }
+
+    @Test
+    public void canScalarOpInPlace() {
+        canScalarInPlace(NumberTensor::minusInPlace, 10, new double[]{2, 5}, new double[]{8, 5});
+        canScalarInPlace(NumberTensor::reverseMinusInPlace, 10, new double[]{2, 5}, new double[]{-8, -5});
+        canScalarInPlace(NumberTensor::plusInPlace, 10, new double[]{2, 5}, new double[]{12, 15});
+        canScalarInPlace(NumberTensor::timesInPlace, 10, new double[]{2, 5}, new double[]{20, 50});
+        canScalarInPlace(NumberTensor::divInPlace, 10, new double[]{2, 5}, new double[]{5, 2});
+        canScalarInPlace(NumberTensor::reverseDivInPlace, 10, new double[]{2, 5}, new double[]{0.2, 0.5});
+    }
+
+    @Test
+    public void canOpInPlaceScalar() {
+        canOpInPlaceScalar(NumberTensor::minusInPlace, 10, new double[]{2, 5}, new double[]{-8, -5});
+        canOpInPlaceScalar(NumberTensor::reverseMinusInPlace, 10, new double[]{2, 5}, new double[]{8, 5});
+        canOpInPlaceScalar(NumberTensor::plusInPlace, 10, new double[]{2, 5}, new double[]{12, 15});
+        canOpInPlaceScalar(NumberTensor::timesInPlace, 10, new double[]{2, 5}, new double[]{20, 50});
+        canOpInPlaceScalar(NumberTensor::divInPlace, 10, new double[]{2, 5}, new double[]{0.2, 0.5});
+        canOpInPlaceScalar(NumberTensor::reverseDivInPlace, 10, new double[]{2, 5}, new double[]{5, 2});
+    }
+
+    public void canScalarInPlace(BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> inPlaceOp,
+                                 double scalarValue, double[] vectorValues, double[] resultValues) {
+        DoubleTensor scalar = DoubleTensor.scalar(scalarValue);
+        DoubleTensor vector = DoubleTensor.create(vectorValues);
+
+        DoubleTensor result = inPlaceOp.apply(scalar, vector);
+
+        assertSame(result, scalar);
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(resultValues)));
+        assertThat(vector, valuesAndShapesMatch(DoubleTensor.create(vectorValues)));
+    }
+
+    public void canOpInPlaceScalar(BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> inPlaceOp,
+                                   double scalarValue, double[] vectorValues, double[] resultValues) {
+        DoubleTensor vector = DoubleTensor.create(vectorValues);
+        DoubleTensor scalar = DoubleTensor.scalar(scalarValue);
+
+        DoubleTensor result = inPlaceOp.apply(vector, scalar);
+
+        assertSame(result, vector);
+        assertThat(result, valuesAndShapesMatch(DoubleTensor.create(resultValues)));
+        assertThat(scalar, valuesAndShapesMatch(DoubleTensor.scalar(scalarValue)));
     }
 
 }

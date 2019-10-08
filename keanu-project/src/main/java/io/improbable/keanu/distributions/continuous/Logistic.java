@@ -4,8 +4,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
@@ -21,7 +21,7 @@ public class Logistic implements ContinuousDistribution {
      * @param s  scale parameter (b greater than 0)
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor s) {
+    public static Logistic withParameters(DoubleTensor mu, DoubleTensor s) {
         return new Logistic(mu, s);
     }
 
@@ -32,45 +32,35 @@ public class Logistic implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        return random.nextDouble(shape).reciprocalInPlace().minusInPlace(1.0).logInPlace().timesInPlace(mu.minus(s));
+        return random.nextDouble(shape).reciprocalInPlace().minusInPlace(1.0).logInPlace().timesInPlace(s).plusInPlace(mu);
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor xMinusAOverB = x.minus(mu).divInPlace(s);
-        final DoubleTensor ln1OverB = s.reciprocal().logInPlace();
+        final DoubleTensor muMinusXOverS = mu.minus(x).divInPlace(s);
 
-        return xMinusAOverB.plus(ln1OverB).minusInPlace(
-            xMinusAOverB.expInPlace().plusInPlace(1.).logInPlace().timesInPlace(2.)
+        return muMinusXOverS.minus(s.log()).minusInPlace(
+            muMinusXOverS.exp().plusInPlace(1.).logInPlace().timesInPlace(2.)
         );
     }
 
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex mu, DoublePlaceholderVertex s) {
-        final DoubleVertex xMinusAOverB = x.minus(mu).div(s);
-        final DoubleVertex ln1OverB = s.reverseDiv(1.).log();
+        final DoubleVertex xMinusAOverB = mu.minus(x).div(s);
+        final DoubleVertex sLog = s.log();
 
-        return xMinusAOverB.plus(ln1OverB).minus(
-            xMinusAOverB.exp().plus(1.).log().times(2.));
+        return xMinusAOverB.minus(sLog).minus(
+            xMinusAOverB.exp().plus(1.).log().times(2.)
+        );
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor expAOverB = mu.div(s).expInPlace();
-        final DoubleTensor expXOverB = x.div(s).expInPlace();
-        final DoubleTensor expPlus = expAOverB.plus(expXOverB);
-        final DoubleTensor bTimesExpAOverB = expAOverB.times(s);
-        final DoubleTensor bTimesExpXOverB = expXOverB.times(s);
+        final DoubleTensor muMinusXOverS = mu.minus(x).divInPlace(s);
+        final DoubleTensor expMuMinusXOverS = muMinusXOverS.exp();
+        final DoubleTensor A = expMuMinusXOverS.times(2.0).div(expMuMinusXOverS.plus(1));
 
-        final DoubleTensor dLogPdmu = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
-        final DoubleTensor dLogPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
-
-        final DoubleTensor numeratorPartOne = mu.times(expXOverB).plusInPlace(x.times(expAOverB)).plusInPlace(
-            mu.times(expAOverB.unaryMinus())
-        );
-        final DoubleTensor numeratorPartTwo = bTimesExpAOverB.plus(bTimesExpXOverB).minusInPlace(x.times(expXOverB));
-        final DoubleTensor denominator = s.pow(2).timesInPlace(expPlus);
-
-        final DoubleTensor dLogPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
+        final DoubleTensor dLogPdx = A.minus(1).div(s);
+        final DoubleTensor dLogPdmu = dLogPdx.unaryMinus();
+        final DoubleTensor dLogPds = A.times(muMinusXOverS).minus(muMinusXOverS).minus(1.0).div(s);
 
         return new Diffs()
             .put(MU, dLogPdmu)

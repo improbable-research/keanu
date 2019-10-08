@@ -71,7 +71,7 @@ public class GaussianProposalDistribution implements ProposalDistribution {
             throw new IllegalStateException("A sigma was not specified for variable " + variable);
         }
         Gaussian proposalDistribution = (Gaussian) Gaussian.withParameters((DoubleTensor) ofValue, sigmas.get(variable));
-        return proposalDistribution.logProb((DoubleTensor) givenValue).sum();
+        return proposalDistribution.logProb((DoubleTensor) givenValue).sumNumber();
     }
 
     @Override

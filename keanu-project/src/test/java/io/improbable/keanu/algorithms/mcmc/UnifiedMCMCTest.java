@@ -4,8 +4,8 @@ import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -15,7 +15,7 @@ public class UnifiedMCMCTest {
     @Test
     public void checkMHIsRunForNonDifferentiableNetwork() {
         GaussianVertex gaussianA = new GaussianVertex(5., 1.);
-        FloorVertex nonDiffable = new FloorVertex(gaussianA);
+        DoubleVertex nonDiffable = gaussianA.floor();
         GaussianVertex postNonDiffLatent = new GaussianVertex(nonDiffable, 1.);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(postNonDiffLatent.getConnectedGraph());
 

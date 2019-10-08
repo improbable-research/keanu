@@ -15,8 +15,8 @@ public class ModelScoring {
      * @return the coefficient, a value less than 1, where any value above 0 resembles correlation
      */
     public static double coefficientOfDetermination(DoubleTensor predictedOutput, DoubleTensor trueOutput) {
-        double residualSumOfSquares = (trueOutput.minus(predictedOutput).pow(2.)).sum();
-        double totalSumOfSquares = ((trueOutput.minus(trueOutput.average())).pow(2.)).sum();
+        double residualSumOfSquares = (trueOutput.minus(predictedOutput).pow(2.)).sumNumber();
+        double totalSumOfSquares = ((trueOutput.minus(trueOutput.mean())).pow(2.)).sumNumber();
         return 1 - (residualSumOfSquares / totalSumOfSquares);
     }
 
@@ -30,6 +30,6 @@ public class ModelScoring {
      * @return the accuracy
      */
     public static double accuracy(BooleanTensor predictedOutput, BooleanTensor trueOutput) {
-        return predictedOutput.elementwiseEquals(trueOutput).toDoubleMask().sum() / trueOutput.getLength();
+        return predictedOutput.elementwiseEquals(trueOutput).toDoubleMask().sumNumber() / trueOutput.getLength();
     }
 }

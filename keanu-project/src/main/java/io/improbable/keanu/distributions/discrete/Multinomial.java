@@ -16,13 +16,6 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.isBroadcastable;
 
 public class Multinomial implements DiscreteDistribution {
 
-    public static final double DEFAULT_ALLOWED_PROBABILITY_ERROR = 1e-3;
-    private static double allowedProbabilityError = DEFAULT_ALLOWED_PROBABILITY_ERROR;
-
-    public static void setAllowedProbabilityError(double allowedProbabilityError) {
-        Multinomial.allowedProbabilityError = allowedProbabilityError;
-    }
-
     private final IntegerTensor n;
     private final DoubleTensor p;
     private final int k;
@@ -38,7 +31,7 @@ public class Multinomial implements DiscreteDistribution {
 
     /**
      * @param n The number of draws from the variable
-     * @param p The probability of observing each of the k values (which sum to 1)
+     * @param p The probability of observing each of the k values (which will be normalized to sum to 1)
      *          p is a Tensor whose last dimension must be of size k
      * @see <a href="https://en.wikipedia.org/wiki/Multinomial_distribution">Multinomial Distribution</a>
      * Generalisation of the Binomial distribution to variables with more than 2 possible values
@@ -63,23 +56,24 @@ public class Multinomial implements DiscreteDistribution {
             validateXShape(shape, p.getShape());
         }
 
-        long[] sampleBatchShape = TensorShape.selectDimensions(0, shape.length - 1, shape);
+        final long[] sampleBatchShape = TensorShape.selectDimensions(0, shape.length - 1, shape);
 
-        IntegerTensor broadcastedN = n.broadcast(sampleBatchShape);
-        long[] broadcastResultShape = TensorShape.getBroadcastResultShape(
+        final IntegerTensor broadcastedN = n.broadcast(sampleBatchShape);
+        final long[] broadcastResultShape = TensorShape.getBroadcastResultShape(
             TensorShape.concat(broadcastedN.getShape(), new long[]{1}), p.getShape()
         );
 
-        DoubleTensor broadcastedP = p.broadcast(broadcastResultShape);
+        final DoubleTensor pNormalized = p.div(p.sum(-1).expandDims(-1));
+        final DoubleTensor broadcastedP = pNormalized.broadcast(broadcastResultShape);
 
-        double[] flatP = broadcastedP.asFlatDoubleArray();
-        int[] flatN = broadcastedN.asFlatIntegerArray();
+        final double[] flatP = broadcastedP.asFlatDoubleArray();
+        final int[] flatN = broadcastedN.asFlatIntegerArray();
 
-        int sampleCount = flatN.length;
-        int[] samples = new int[k * sampleCount];
+        final int sampleCount = flatN.length;
+        final int[] samples = new int[k * sampleCount];
 
         for (int i = 0; i < sampleCount; i++) {
-            int positionByK = i * k;
+            final int positionByK = i * k;
             drawNTimes(flatN[i], random, samples, positionByK, flatP, positionByK, k);
         }
 
@@ -118,10 +112,23 @@ public class Multinomial implements DiscreteDistribution {
             validateX(x, n, p);
         }
 
-        DoubleTensor gammaN = n.plus(1).toDouble().logGammaInPlace();
-        DoubleTensor xLogP = p.log().timesInPlace(x.toDouble()).sum(-1);
-        DoubleTensor gammaXs = x.plus(1).toDouble().logGammaInPlace().sum(-1);
+        final DoubleTensor pNormalized = p.div(p.sum(-1).expandDims(-1));
+        final DoubleTensor gammaN = n.plus(1).toDouble().logGammaInPlace();
+        final DoubleTensor xLogP = pNormalized.safeLogTimesInPlace(x.toDouble()).sum(-1);
+        final DoubleTensor gammaXs = x.plus(1).toDouble().logGammaInPlace().sum(-1);
         return xLogP.plusInPlace(gammaN).minusInPlace(gammaXs);
+    }
+
+    public DoubleTensor dLogProb(IntegerTensor x) {
+        if (validationEnabled) {
+            validateBroadcastShapes(x.getShape(), n.getShape(), p.getShape());
+            validateX(x, n, p);
+        }
+
+        final DoubleTensor pNormalized = p.div(p.sum(-1).expandDims(-1));
+        final DoubleTensor dLogProbWrtP = x.toDouble().divInPlace(pNormalized);
+
+        return dLogProbWrtP;
     }
 
     private static void validateProbabilities(DoubleTensor p) {
@@ -129,34 +136,24 @@ public class Multinomial implements DiscreteDistribution {
             throw new IllegalArgumentException("Probabilities must be a vector or a tensor with rank >= 1");
         }
 
-        final boolean pRangeValidated = p.greaterThan(0.0).allTrue() && p.lessThan(1.0).allTrue();
+        final boolean pRangeValidated = p.greaterThanOrEqual(0.0).allTrue().scalar();
         if (!pRangeValidated) {
             throw new IllegalArgumentException(
-                "Probabilities must be > 0 < 1 but were " + Arrays.toString(p.asFlatDoubleArray())
-            );
-        }
-
-        final DoubleTensor pSum = p.sum(-1);
-        final boolean pSumValidated = pSum.equalsWithinEpsilon(
-            DoubleTensor.create(1.0, pSum.getShape()), allowedProbabilityError
-        );
-        if (!pSumValidated) {
-            throw new IllegalArgumentException(
-                "Probabilities must sum to 1 but summed to " + Arrays.toString(pSum.asFlatDoubleArray())
+                "Probabilities must be >= 0 but were " + Arrays.toString(p.asFlatDoubleArray())
             );
         }
     }
 
     private static void validateN(IntegerTensor n) {
-        final boolean nRangeValidated = n.greaterThanOrEqual(0).allTrue();
+        final boolean nRangeValidated = n.greaterThanOrEqual(0).allTrue().scalar();
         if (!nRangeValidated) {
             throw new IllegalArgumentException("Number of trials (n) must be non-negative.");
         }
     }
 
     private static void validateX(IntegerTensor x, IntegerTensor n, DoubleTensor p) {
-        final boolean xRangeValidated = x.greaterThanOrEqual(0).allTrue() &&
-            x.lessThanOrEqual(n.reshape(Longs.concat(n.getShape(), new long[]{1}))).allTrue();
+        final boolean xRangeValidated = x.greaterThanOrEqual(0).allTrue().scalar() &&
+            x.lessThanOrEqual(n.reshape(Longs.concat(n.getShape(), new long[]{1}))).allTrue().scalar();
 
         if (!xRangeValidated) {
             throw new IllegalArgumentException("x must be >= 0 and <= n");
@@ -165,7 +162,7 @@ public class Multinomial implements DiscreteDistribution {
         validateXShape(x.getShape(), p.getShape());
 
         final IntegerTensor xSum = x.sum(-1);
-        final boolean xSumValidated = xSum.elementwiseEquals(n).allTrue();
+        final boolean xSumValidated = xSum.elementwiseEquals(n).allTrue().scalar();
         if (!xSumValidated) {
             throw new IllegalArgumentException(
                 "The sum of x " + Arrays.toString(xSum.asFlatArray()) +

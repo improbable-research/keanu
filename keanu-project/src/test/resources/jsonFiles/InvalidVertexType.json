@@ -5,7 +5,7 @@
                 "id": {
                     "id": "[0]"
                 },
-                "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.NonExistentVertexType",
+                "vertexType": "io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.NonExistentVertexType",
                 "parameters": [
                     {
                         "name": "constant",

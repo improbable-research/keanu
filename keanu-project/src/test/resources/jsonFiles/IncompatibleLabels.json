@@ -6,7 +6,7 @@
                     "id": "[0]"
                 },
                 "label": "SomeLabel",
-                "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
+                "vertexType": "io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex",
                 "parameters": [
                     {
                         "name": "constant",
@@ -22,7 +22,7 @@
                 "id": {
                     "id": "[1]"
                 },
-                "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
+                "vertexType": "io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex",
                 "parameters": [
                     {
                         "name": "constant",
@@ -42,7 +42,7 @@
                 "id": {
                     "id": "[2]"
                 },
-                "vertexType": "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex",
+                "vertexType": "io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex",
                 "parameters": [
                     {
                         "name": "mu",

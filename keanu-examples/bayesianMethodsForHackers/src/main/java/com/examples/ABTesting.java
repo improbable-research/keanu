@@ -4,11 +4,11 @@ import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexSamples;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 
 import java.util.Arrays;
 

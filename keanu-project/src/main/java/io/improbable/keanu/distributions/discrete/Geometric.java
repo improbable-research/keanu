@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.intgr.IntegerPlaceholderVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerPlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 /**
  * Implements a Geometric Random Distribution.  More details can be found at:
@@ -18,7 +18,7 @@ public class Geometric implements DiscreteDistribution {
 
     private final DoubleTensor p;
 
-    public static DiscreteDistribution withParameters(DoubleTensor p) {
+    public static Geometric withParameters(DoubleTensor p) {
         return new Geometric(p);
     }
 
@@ -46,8 +46,8 @@ public class Geometric implements DiscreteDistribution {
     public static DoubleVertex logProbOutput(IntegerPlaceholderVertex k, DoublePlaceholderVertex p) {
         DoubleVertex zeroes = ConstantVertex.of(DoubleTensor.zeros(k.getShape()));
         DoubleVertex ones = ConstantVertex.of(DoubleTensor.ones(k.getShape()));
-        DoubleVertex parameterIsInvalidMask = p.toGreaterThanMask(zeroes)
-            .times(p.toLessThanMask(ones))
+        DoubleVertex parameterIsInvalidMask = p.greaterThanMask(zeroes)
+            .times(p.lessThanMask(ones))
             .unaryMinus()
             .plus(ones);
         return calculateLogProb(k, p).setWithMask(parameterIsInvalidMask, Double.NEGATIVE_INFINITY);
@@ -55,8 +55,8 @@ public class Geometric implements DiscreteDistribution {
 
     private DoubleTensor calculateLogProb(IntegerTensor k) {
         DoubleTensor kAsDouble = k.toDouble();
-        DoubleTensor oneMinusP = p.unaryMinus().plusInPlace(1.0);
-        DoubleTensor results = kAsDouble.minusInPlace(1.0).timesInPlace(oneMinusP.logInPlace()).plusInPlace(p.log());
+        DoubleTensor oneMinusP = p.reverseMinus(1.0);
+        DoubleTensor results = oneMinusP.safeLogTimesInPlace(kAsDouble.minusInPlace(1.0)).plusInPlace(p.log());
 
         return setProbToZeroForInvalidK(k, results);
     }
@@ -76,13 +76,24 @@ public class Geometric implements DiscreteDistribution {
     }
 
     private static DoubleVertex setProbToZeroForInvalidK(IntegerVertex k, DoubleVertex results) {
-        DoubleVertex invalidK = k.toDouble().toLessThanMask(1.);
+        DoubleVertex invalidK = k.toDouble().lessThanMask(1.);
 
         return results.setWithMask(invalidK, Double.NEGATIVE_INFINITY);
     }
 
     private boolean checkParameterIsValid() {
-        return p.greaterThan(0.0).allTrue() && p.lessThan(1.0).allTrue();
+        return p.greaterThan(0.0).allTrue().scalar() && p.lessThan(1.0).allTrue().scalar();
+    }
+
+    public DoubleTensor[] dLogProb(IntegerTensor k, boolean wrtP) {
+        DoubleTensor[] result = new DoubleTensor[1];
+
+        if (wrtP) {
+            DoubleTensor diffWhereValid = p.reciprocal().minusInPlace(k.toDouble().minusInPlace(1.0).divInPlace(p.reverseMinus(1.0)));
+            result[0] = diffWhereValid.where(k.greaterThanOrEqual(1), DoubleTensor.scalar(0.0));
+        }
+
+        return result;
     }
 
 }

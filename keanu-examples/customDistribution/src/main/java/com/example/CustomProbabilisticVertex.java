@@ -4,15 +4,16 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Samplable;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
+import io.improbable.keanu.vertices.VertexImpl;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDouble;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class CustomProbabilisticVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, Samplable<DoubleTensor> {
+public class CustomProbabilisticVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, Samplable<DoubleTensor> {
 
     public CustomProbabilisticVertex() {
         //This sets the shape of the output. Looks like it's a vector of length 2.

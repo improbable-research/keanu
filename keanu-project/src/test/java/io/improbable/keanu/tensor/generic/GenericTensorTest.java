@@ -26,7 +26,7 @@ public class GenericTensorTest {
         GenericTensor<String> notAllTheSame = allTheSame.duplicate();
         notAllTheSame.setValue(otherValue, 1, 1);
 
-        assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
+        assertThat(allTheSame.elementwiseEquals(value).allTrue().scalar(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
     }
 
@@ -256,7 +256,7 @@ public class GenericTensorTest {
 
     @Test
     public void canDiagFromMatrix() {
-        GenericTensor<String> actual = GenericTensor.create(new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"}).reshape(3, 3).diag();
+        GenericTensor<String> actual = GenericTensor.create(new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"}).reshape(3, 3).diagPart();
         GenericTensor<String> expected = GenericTensor.create("1", "5", "9");
 
         assertEquals(expected, actual);

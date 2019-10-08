@@ -1,9 +1,9 @@
 package io.improbable.keanu.kotlin
 
 import io.improbable.keanu.DeterministicRule
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test

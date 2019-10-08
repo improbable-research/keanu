@@ -1,7 +1,7 @@
 package io.improbable.keanu.tensor.jvm;
 
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.buffer.JVMBuffer;
+import io.improbable.keanu.tensor.jvm.buffer.JVMBuffer;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;

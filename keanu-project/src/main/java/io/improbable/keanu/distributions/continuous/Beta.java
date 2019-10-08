@@ -5,8 +5,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
@@ -19,7 +19,7 @@ public class Beta implements ContinuousDistribution {
     private final DoubleTensor xMin;
     private final DoubleTensor xMax;
 
-    public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
+    public static Beta withParameters(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
         return new Beta(alpha, beta, xMin, xMax);
     }
 
@@ -32,11 +32,12 @@ public class Beta implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        Preconditions.checkArgument(alpha.greaterThan(0.).allTrue() && beta.greaterThan(0.).allTrue(),
+        Preconditions.checkArgument(alpha.greaterThan(0.).allTrue().scalar() && beta.greaterThan(0.).allTrue().scalar(),
             "alpha and beta must be positive. alpha: " + alpha + " beta: " + beta);
 
-        final DoubleTensor y1 = random.nextGamma(shape, DoubleTensor.scalar(1.0), alpha);
-        final DoubleTensor y2 = random.nextGamma(shape, DoubleTensor.scalar(1.0), beta);
+        final DoubleTensor one = DoubleTensor.scalar(1.0);
+        final DoubleTensor y1 = random.nextGamma(shape, one, alpha);
+        final DoubleTensor y2 = random.nextGamma(shape, one, beta);
 
         final DoubleTensor range = xMax.minus(xMin);
         final DoubleTensor y1PlusY2 = y1.plus(y2);
@@ -75,7 +76,6 @@ public class Beta implements ContinuousDistribution {
         return alphaMinusOneTimesLnX.plus(betaMinusOneTimesOneMinusXLn).minus(betaFunction);
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1.0);
         final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).digammaInPlace();

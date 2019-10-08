@@ -133,7 +133,7 @@ public class TensorMatchers {
             @Override
             protected boolean matchesSafely(NumberTensor item, Description mismatchDescription) {
                 mismatchDescription.appendText("Tensor ").appendValue(item);
-                return item.lessThanOrEqual(other).allTrue();
+                return item.lessThanOrEqual(other).allTrue().scalar();
             }
 
             @Override

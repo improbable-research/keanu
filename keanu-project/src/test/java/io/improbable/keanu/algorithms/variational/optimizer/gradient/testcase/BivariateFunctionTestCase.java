@@ -7,9 +7,9 @@ import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.Differentiator;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.Differentiator;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.diff.PartialsOf;
 import lombok.Value;
 
 import java.util.HashMap;

@@ -6,17 +6,17 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.intgr.IntegerPlaceholderVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerPlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 public class Binomial implements DiscreteDistribution {
 
     private final DoubleTensor p;
     private final IntegerTensor n;
 
-    public static DiscreteDistribution withParameters(DoubleTensor p, IntegerTensor n) {
+    public static Binomial withParameters(DoubleTensor p, IntegerTensor n) {
         return new Binomial(p, n);
     }
 
@@ -27,16 +27,17 @@ public class Binomial implements DiscreteDistribution {
 
     @Override
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
-        Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();
-        Tensor.FlattenedView<Integer> nWrapped = n.getFlattenedView();
+        long[] broadcastedShape = TensorShape.getBroadcastResultShape(shape, p.getShape(), n.getShape());
+        Tensor.FlattenedView<Double> pWrapped = p.broadcast(broadcastedShape).getFlattenedView();
+        Tensor.FlattenedView<Integer> nWrapped = n.broadcast(broadcastedShape).getFlattenedView();
 
         int length = TensorShape.getLengthAsInt(shape);
         int[] samples = new int[length];
         for (int i = 0; i < length; i++) {
-            samples[i] = sample(pWrapped.getOrScalar(i), nWrapped.getOrScalar(i), random);
+            samples[i] = sample(pWrapped.get(i), nWrapped.get(i), random);
         }
 
-        return IntegerTensor.create(samples, shape);
+        return IntegerTensor.create(samples, broadcastedShape);
     }
 
     private static int sample(double p, int n, KeanuRandom random) {
@@ -55,11 +56,21 @@ public class Binomial implements DiscreteDistribution {
 
         DoubleTensor kDouble = k.toDouble();
         DoubleTensor nDouble = n.toDouble();
-        DoubleTensor kLogP = kDouble.times(p.log());
-        DoubleTensor logOneMinusP = p.unaryMinus().plusInPlace(1.0).logInPlace();
-        DoubleTensor nMinusKLogOneMinusP = nDouble.minusInPlace(kDouble).timesInPlace(logOneMinusP);
+        DoubleTensor kLogP = p.safeLogTimes(kDouble);
+        DoubleTensor oneMinusP = p.reverseMinus(1.0);
+        DoubleTensor nMinusKLogOneMinusP = oneMinusP.safeLogTimesInPlace(nDouble.minusInPlace(kDouble));
 
         return logBinomialCoefficient.plusInPlace(kLogP).plusInPlace(nMinusKLogOneMinusP);
+    }
+
+    public DoubleTensor[] dLogProb(IntegerTensor k, boolean wrtP) {
+        DoubleTensor[] result = new DoubleTensor[1];
+
+        if (wrtP) {
+            result[0] = k.toDouble().div(p).minus(n.minus(k).toDouble().div(p.reverseMinus(1.0)));
+        }
+
+        return result;
     }
 
     public static DoubleVertex logProbOutput(IntegerPlaceholderVertex k, DoublePlaceholderVertex p, IntegerPlaceholderVertex n) {

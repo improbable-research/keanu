@@ -10,9 +10,6 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.mir.KeanuSavedBayesNet;
 import io.improbable.mir.SavedBayesNet;
 import org.apache.commons.math3.util.Pair;
@@ -162,11 +159,11 @@ public class ProtobufSaver implements NetworkSaver {
         if (Vertex.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (Vertex) param);
         } else if (DoubleTensor.class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, builder -> builder.setDoubleTensorParam(getTensor((DoubleTensor) param)));
+            return getParam(paramName, builder -> builder.setDoubleTensorParam(getDoubleTensor((DoubleTensor) param)));
         } else if (IntegerTensor.class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, builder -> builder.setIntTensorParam(getTensor((IntegerTensor) param)));
+            return getParam(paramName, builder -> builder.setIntTensorParam(getIntegerTensor((IntegerTensor) param)));
         } else if (BooleanTensor.class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, builder -> builder.setBoolTensorParam(getTensor((BooleanTensor) param)));
+            return getParam(paramName, builder -> builder.setBoolTensorParam(getBooleanTensor((BooleanTensor) param)));
         } else if (Double.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, builder -> builder.setDoubleParam((double) param));
         } else if (Integer.class.isAssignableFrom(param.getClass())) {
@@ -227,55 +224,20 @@ public class ProtobufSaver implements NetworkSaver {
         return getParam(paramName, builder -> builder.setVertexArrayParam(vertexArray.build()));
     }
 
-    private SavedBayesNet.DoubleTensor getTensor(DoubleTensor tensor) {
-        return SavedBayesNet.DoubleTensor.newBuilder()
-            .addAllValues(tensor.asFlatList())
-            .addAllShape(Longs.asList(tensor.getShape()))
-            .build();
-    }
-
-    private SavedBayesNet.IntegerTensor getTensor(IntegerTensor tensor) {
-        return SavedBayesNet.IntegerTensor.newBuilder()
-            .addAllValues(tensor.asFlatList())
-            .addAllShape(Longs.asList(tensor.getShape()))
-            .build();
-    }
-
-    private SavedBayesNet.BooleanTensor getTensor(BooleanTensor tensor) {
-        return SavedBayesNet.BooleanTensor.newBuilder()
-            .addAllValues(tensor.asFlatList())
-            .addAllShape(Longs.asList(tensor.getShape()))
-            .build();
-    }
-
     @Override
     public void saveValue(Vertex vertex) {
         if (vertex.hasValue()) {
-            SavedBayesNet.StoredValue value = getValue(vertex, vertex.getValue().toString());
-            graphBuilder.addDefaultState(value);
-        }
-    }
-
-    @Override
-    public void saveValue(DoubleVertex vertex) {
-        if (vertex.hasValue()) {
-            SavedBayesNet.StoredValue value = getValue(vertex);
-            graphBuilder.addDefaultState(value);
-        }
-    }
-
-    @Override
-    public void saveValue(IntegerVertex vertex) {
-        if (vertex.hasValue()) {
-            SavedBayesNet.StoredValue value = getValue(vertex);
-            graphBuilder.addDefaultState(value);
-        }
-    }
-
-    @Override
-    public void saveValue(BooleanVertex vertex) {
-        if (vertex.hasValue()) {
-            SavedBayesNet.StoredValue value = getValue(vertex);
+            SavedBayesNet.StoredValue value;
+            Class<?> type = vertex.ofType();
+            if (type.isAssignableFrom(DoubleTensor.class)) {
+                value = getDoubleTensorValue(vertex, (DoubleTensor) vertex.getValue());
+            } else if (type.isAssignableFrom(IntegerTensor.class)) {
+                value = getIntegerTensorValue(vertex, (IntegerTensor) vertex.getValue());
+            } else if (type.isAssignableFrom(BooleanTensor.class)) {
+                value = getBooleanTensorValue(vertex, (BooleanTensor) vertex.getValue());
+            } else {
+                value = getValue(vertex, vertex.getValue().toString());
+            }
             graphBuilder.addDefaultState(value);
         }
     }
@@ -294,8 +256,8 @@ public class ProtobufSaver implements NetworkSaver {
 
     }
 
-    private SavedBayesNet.StoredValue getValue(DoubleVertex vertex) {
-        SavedBayesNet.DoubleTensor savedValue = getTensor(vertex.getValue());
+    private SavedBayesNet.StoredValue getDoubleTensorValue(Vertex vertex, DoubleTensor tensor) {
+        SavedBayesNet.DoubleTensor savedValue = getDoubleTensor(tensor);
 
         SavedBayesNet.VertexValue value = SavedBayesNet.VertexValue.newBuilder()
             .setDoubleVal(savedValue)
@@ -304,8 +266,8 @@ public class ProtobufSaver implements NetworkSaver {
         return getStoredValue(vertex, value);
     }
 
-    private SavedBayesNet.StoredValue getValue(IntegerVertex vertex) {
-        SavedBayesNet.IntegerTensor savedValue = getTensor(vertex.getValue());
+    private SavedBayesNet.StoredValue getIntegerTensorValue(Vertex vertex, IntegerTensor tensor) {
+        SavedBayesNet.IntegerTensor savedValue = getIntegerTensor(tensor);
 
         SavedBayesNet.VertexValue value = SavedBayesNet.VertexValue.newBuilder()
             .setIntVal(savedValue)
@@ -314,14 +276,35 @@ public class ProtobufSaver implements NetworkSaver {
         return getStoredValue(vertex, value);
     }
 
-    private SavedBayesNet.StoredValue getValue(BooleanVertex vertex) {
-        SavedBayesNet.BooleanTensor savedValue = getTensor(vertex.getValue());
+    private SavedBayesNet.StoredValue getBooleanTensorValue(Vertex vertex, BooleanTensor tensor) {
+        SavedBayesNet.BooleanTensor savedValue = getBooleanTensor(tensor);
 
         SavedBayesNet.VertexValue value = SavedBayesNet.VertexValue.newBuilder()
             .setBoolVal(savedValue)
             .build();
 
         return getStoredValue(vertex, value);
+    }
+
+    private SavedBayesNet.DoubleTensor getDoubleTensor(DoubleTensor tensor) {
+        return SavedBayesNet.DoubleTensor.newBuilder()
+            .addAllValues(tensor.asFlatList())
+            .addAllShape(Longs.asList(tensor.getShape()))
+            .build();
+    }
+
+    private SavedBayesNet.IntegerTensor getIntegerTensor(IntegerTensor tensor) {
+        return SavedBayesNet.IntegerTensor.newBuilder()
+            .addAllValues(tensor.asFlatList())
+            .addAllShape(Longs.asList(tensor.getShape()))
+            .build();
+    }
+
+    private SavedBayesNet.BooleanTensor getBooleanTensor(BooleanTensor tensor) {
+        return SavedBayesNet.BooleanTensor.newBuilder()
+            .addAllValues(tensor.asFlatList())
+            .addAllShape(Longs.asList(tensor.getShape()))
+            .build();
     }
 
     private SavedBayesNet.StoredValue getStoredValue(Vertex vertex, SavedBayesNet.VertexValue value) {

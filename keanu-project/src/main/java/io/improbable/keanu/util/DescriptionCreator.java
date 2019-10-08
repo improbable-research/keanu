@@ -1,28 +1,25 @@
 package io.improbable.keanu.util;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
+import io.improbable.keanu.vertices.tensor.VertexWrapper;
+import io.improbable.keanu.vertices.tensor.WhereVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.XorBinaryVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.DifferenceVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.MultiplicationVertex;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,21 +38,19 @@ public class DescriptionCreator {
 
     public DescriptionCreator() {
         delimiters = new HashMap<>();
-        delimiters.put(AdditionVertex.class, " + ");
-        delimiters.put(IntegerAdditionVertex.class, " + ");
         delimiters.put(DifferenceVertex.class, " - ");
-        delimiters.put(IntegerDifferenceVertex.class, " - ");
+        delimiters.put(AdditionVertex.class, " + ");
         delimiters.put(MultiplicationVertex.class, " * ");
-        delimiters.put(IntegerMultiplicationVertex.class, " * ");
         delimiters.put(DivisionVertex.class, " / ");
         delimiters.put(AndBinaryVertex.class, " && ");
+        delimiters.put(OrBinaryVertex.class, " || ");
+        delimiters.put(XorBinaryVertex.class, " ^ ");
         delimiters.put(EqualsVertex.class, " == ");
         delimiters.put(GreaterThanOrEqualVertex.class, " >= ");
         delimiters.put(GreaterThanVertex.class, " > ");
         delimiters.put(LessThanOrEqualVertex.class, " <= ");
         delimiters.put(LessThanVertex.class, " < ");
         delimiters.put(NotEqualsVertex.class, " != ");
-        delimiters.put(OrBinaryVertex.class, " || ");
     }
 
     /**
@@ -70,17 +65,17 @@ public class DescriptionCreator {
      * @return An String equation describing how this vertex is calculated.<br>
      * E.g. "This Vertex = that + (three * Const(4))"
      */
-    public String createDescription(Vertex<?> vertex) {
+    public String createDescription(Vertex<?, ?> vertex) {
         if (vertex == null) {
             return thisVertex + " = " + nullString;
+        } else {
+            vertex = vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).unwrap() : vertex;
         }
+
         Collection<Vertex> parents = vertex.getParents();
 
         if (parents.size() == 0) {
-            StringBuilder builder = new StringBuilder(thisVertex);
-            builder.append(" = ");
-            builder.append(getLeafDescription(vertex));
-            return builder.toString();
+            return thisVertex + " = " + getLeafDescription(vertex);
         }
 
         String thisLabel = vertex.getLabel() != null ? vertex.getLabel().toString() : thisVertex;
@@ -88,10 +83,16 @@ public class DescriptionCreator {
         return thisLabel + " = " + generateDescription(vertex, false, false);
     }
 
-    private String generateDescription(Vertex<?> vertex, boolean allowLabels, boolean includeBrackets) {
+    private String generateDescription(Vertex<?, ?> vertex, boolean allowLabels, boolean includeBrackets) {
         if (vertex == null) {
             return nullString;
         }
+
+        final Vertex<?, ?> unwrappedVertex = vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).unwrap() : vertex;
+        return generateDescriptionOfUnwrapped(unwrappedVertex, allowLabels, includeBrackets);
+    }
+
+    private String generateDescriptionOfUnwrapped(Vertex<?, ?> vertex, boolean allowLabels, boolean includeBrackets) {
         if (allowLabels && vertex.getLabel() != null) {
             return vertex.getLabel().toString();
         }
@@ -117,10 +118,9 @@ public class DescriptionCreator {
 
     }
 
-    private String getDelimiterVertexDescription(Vertex<?> vertex, CharSequence delimiter, boolean includeBrackets) {
+    private String getDelimiterVertexDescription(Vertex<?, ?> vertex, CharSequence delimiter, boolean includeBrackets) {
         Stream<String> parentStream = vertex
-            .getParents()
-            .stream()
+            .getParents().stream()
             .map(parent -> generateDescription(parent, true, true));
 
         String[] parentStrings = parentStream.toArray(String[]::new);
@@ -137,7 +137,7 @@ public class DescriptionCreator {
         return builder.toString();
     }
 
-    private static String getLeafDescription(Vertex<?> vertex) {
+    private static String getLeafDescription(Vertex<?, ?> vertex) {
         if (vertex.getLabel() != null) {
             return vertex.getLabel().toString();
         }
@@ -156,7 +156,7 @@ public class DescriptionCreator {
             .toString();
     }
 
-    private static Optional<String> tryGetScalarValue(Vertex<?> vertex) {
+    private static Optional<String> tryGetScalarValue(Vertex<?, ?> vertex) {
         Tensor tensor = (Tensor) vertex.getValue();
         if (tensor.isScalar()) {
             return Optional.of(tensor.scalar().toString());
@@ -164,12 +164,9 @@ public class DescriptionCreator {
         return Optional.empty();
     }
 
-    private Optional<String> checkForIrregularExpressions(Vertex<?> vertex, boolean includeBrackets) {
-        if (vertex instanceof BooleanIfVertex || vertex instanceof DoubleIfVertex || vertex instanceof IntegerIfVertex) {
-            Optional<String> description = createIfStringDescription(vertex, includeBrackets);
-            if (description.isPresent()) {
-                return Optional.of(description.get());
-            }
+    private Optional<String> checkForIrregularExpressions(Vertex<?, ?> vertex, boolean includeBrackets) {
+        if (vertex instanceof WhereVertex) {
+            return createIfStringDescription((WhereVertex<?, ?, ?>) vertex, includeBrackets);
         } else if (vertex instanceof BooleanBinaryOpVertex) {
             String booleanBinaryDescription = createBooleanBinaryOpDescription(
                 (BooleanBinaryOpVertex) vertex,
@@ -181,26 +178,10 @@ public class DescriptionCreator {
         return Optional.empty();
     }
 
-    private Optional<String> createIfStringDescription(Vertex<?> vertex, boolean includeBrackets) {
-        BooleanVertex predicate;
-        Vertex<?> thn;
-        Vertex<?> els;
-
-        if (vertex instanceof IntegerIfVertex) {
-            predicate = ((IntegerIfVertex) vertex).getPredicate();
-            thn = ((IntegerIfVertex) vertex).getThn();
-            els = ((IntegerIfVertex) vertex).getEls();
-        } else if (vertex instanceof BooleanIfVertex) {
-            predicate = ((BooleanIfVertex) vertex).getPredicate();
-            thn = ((BooleanIfVertex) vertex).getThn();
-            els = ((BooleanIfVertex) vertex).getEls();
-        } else if (vertex instanceof DoubleIfVertex) {
-            predicate = ((DoubleIfVertex) vertex).getPredicate();
-            thn = ((DoubleIfVertex) vertex).getThn();
-            els = ((DoubleIfVertex) vertex).getEls();
-        } else {
-            return Optional.empty();
-        }
+    private Optional<String> createIfStringDescription(WhereVertex<?, ?, ?> vertex, boolean includeBrackets) {
+        Vertex<BooleanTensor, ?> predicate = vertex.getPredicate();
+        Vertex<?, ?> thn = vertex.getThn();
+        Vertex<?, ?> els = vertex.getEls();
 
         StringBuilder builder = new StringBuilder();
 
@@ -250,7 +231,7 @@ public class DescriptionCreator {
             .toString());
     }
 
-    private void appendParamToBuilder(String paramName, Vertex<?> paramVertex, StringBuilder builder) {
+    private void appendParamToBuilder(String paramName, Vertex<?, ?> paramVertex, StringBuilder builder) {
         builder.append(paramName).append("=");
         builder.append(generateDescription(paramVertex, true, true));
         builder.append(", ");

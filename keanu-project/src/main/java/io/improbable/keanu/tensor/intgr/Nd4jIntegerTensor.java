@@ -2,17 +2,23 @@ package io.improbable.keanu.tensor.intgr;
 
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.JVMDoubleTensorFactory;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.ndj4.INDArrayShim;
 import io.improbable.keanu.tensor.ndj4.Nd4jFixedPointTensor;
 import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
 import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
+import static java.util.Arrays.copyOf;
 
 /**
  * Class for representing n-dimensional arrays of integers. This is
@@ -39,11 +45,21 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
         return getAsINDArray(tensor);
     }
 
+    @Override
+    protected IntegerTensor toJVM() {
+        return JVMIntegerTensorFactory.INSTANCE.create(asFlatIntegerArray(), getShape());
+    }
+
+    @Override
+    protected IntegerTensor fromJVM(IntegerTensor jvmTensor) {
+        return new Nd4jIntegerTensor(jvmTensor.asFlatIntegerArray(), jvmTensor.getShape());
+    }
+
     public static Nd4jIntegerTensor scalar(int scalarValue) {
         return new Nd4jIntegerTensor(Nd4j.scalar(scalarValue));
     }
 
-    public static Nd4jIntegerTensor create(int[] values, long[] shape) {
+    public static Nd4jIntegerTensor create(int[] values, long... shape) {
         return new Nd4jIntegerTensor(values, shape);
     }
 
@@ -67,13 +83,13 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
         return new Nd4jIntegerTensor(TypedINDArrayFactory.arange(start, end));
     }
 
-    public static Nd4jDoubleTensor arange(int start, int end, int stepSize) {
+    public static Nd4jIntegerTensor arange(int start, int end, int stepSize) {
         int stepCount = (end - start) / stepSize;
         INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount).muli(stepSize).addi(start);
-        return new Nd4jDoubleTensor(arangeWithStep);
+        return new Nd4jIntegerTensor(arangeWithStep);
     }
 
-    static INDArray getAsINDArray(Tensor<Integer, ?> that) {
+    static INDArray getAsINDArray(Tensor that) {
 
         if (that instanceof Nd4jTensor) {
             INDArray array = ((Nd4jTensor) that).getTensor();
@@ -89,19 +105,63 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
         }
     }
 
+    /**
+     * Nd4j DiagPart doesnt support non-square matrix diag. In the case where this is non-square
+     * the JVMDoubleTensor implementation is used. For square matrices, the nd4j implementation is used.
+     *
+     * @return matrices with their diagonals equal to the batched vectors from this.
+     */
     @Override
-    public boolean equalsWithinEpsilon(IntegerTensor o, Integer epsilon) {
-        if (this == o) return true;
-
-        if (o instanceof Nd4jTensor) {
-            return tensor.equalsWithEps(((Nd4jTensor) o).getTensor(), epsilon);
+    public IntegerTensor diag() {
+        if (getRank() > 1) {
+            return toDouble().diag().toInteger();
         } else {
-            if (this.hasSameShapeAs(o)) {
-                IntegerTensor difference = o.minus(this);
-                return difference.abs().lessThan(epsilon).allTrue();
-            }
+            return super.diag();
         }
-        return false;
+    }
+
+    /**
+     * Nd4j DiagPart doesnt support non-square matrix diag. In the case where this is non-square
+     * the JVMDoubleTensor implementation is used. For square matrices, the nd4j implementation is used.
+     *
+     * @return The elements from the diagonal of this matrix.
+     */
+    @Override
+    public IntegerTensor diagPart() {
+        if (tensor.size(0) != tensor.size(1)) {
+            return toDouble().diagPart().toInteger();
+        } else {
+            return super.diagPart();
+        }
+    }
+
+    @Override
+    public IntegerTensor matrixMultiply(IntegerTensor value, boolean transposeLeft, boolean transposeRight) {
+        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape(), transposeLeft, transposeRight);
+        if (tensor.shape().length > 2 || value.getShape().length > 2) {
+            return asJVMDoubleTensor().matrixMultiply(value.toDouble(), transposeLeft, transposeRight).toInteger();
+        }
+        INDArray mmulResult = tensor.castTo(DataType.DOUBLE).mmul(getTensor(value).castTo(DataType.DOUBLE)).castTo(DataType.INT);
+        return create(mmulResult);
+    }
+
+    @Override
+    public IntegerTensor fillTriangular(boolean fillUpper, boolean fillLower) {
+        return fromJVM(asJVMDoubleTensor().fillTriangular(fillUpper, fillLower).toInteger());
+    }
+
+    @Override
+    public IntegerTensor triUpper(int k) {
+        return fromJVM(asJVMDoubleTensor().triUpper(k).toInteger());
+    }
+
+    @Override
+    public IntegerTensor triLower(int k) {
+        return fromJVM(asJVMDoubleTensor().triLower(k).toInteger());
+    }
+
+    private DoubleTensor asJVMDoubleTensor() {
+        return JVMDoubleTensorFactory.INSTANCE.create(asFlatDoubleArray(), getShape());
     }
 
     @Override
@@ -113,11 +173,6 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
     public IntegerTensor setAllInPlace(Integer value) {
         tensor = Nd4j.valueArrayOf(getShape(), value);
         return this;
-    }
-
-    @Override
-    public IntegerTensor safeLogTimesInPlace(IntegerTensor y) {
-        throw new NotImplementedException("");
     }
 
     @Override
@@ -167,13 +222,22 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
     }
 
     @Override
-    public double[] asFlatDoubleArray() {
-        return tensor.dup().data().asDouble();
-    }
+    public IntegerTensor where(BooleanTensor predicate, IntegerTensor els) {
+        final long[] resultShape = getBroadcastResultShape(getBroadcastResultShape(getShape(), predicate.getShape()), els.getShape());
+        final IntegerTensor broadcastedTrue = this.hasShape(resultShape) ? this : this.broadcast(resultShape);
+        final IntegerTensor broadcastedFalse = els.hasShape(resultShape) ? els : els.broadcast(resultShape);
+        final BooleanTensor broadcastedPredicate = predicate.hasShape(resultShape) ? predicate : predicate.broadcast(resultShape);
 
-    @Override
-    public int[] asFlatIntegerArray() {
-        return tensor.dup().data().asInt();
+        FlattenedView<Integer> trueValuesFlattened = broadcastedTrue.getFlattenedView();
+        FlattenedView<Integer> falseValuesFlattened = broadcastedFalse.getFlattenedView();
+        FlattenedView<Boolean> predicateValuesFlattened = broadcastedPredicate.getFlattenedView();
+
+        int[] result = new int[TensorShape.getLengthAsInt(resultShape)];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = predicateValuesFlattened.get(i) ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
+        }
+
+        return IntegerTensor.create(result, copyOf(resultShape, resultShape.length));
     }
 
     @Override

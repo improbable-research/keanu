@@ -4,9 +4,9 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpLambda;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.generic.nonprobabilistic.operators.binary.BinaryOpLambda;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public class BinaryOpVertexTest {
         BinaryOpLambda<BooleanTensor, DoubleTensor, DoubleTensor> custom = new BinaryOpLambda<>(
             bernoulliVertex, gaussianVertex,
             (BooleanTensor f, DoubleTensor g) ->
-                f.doubleWhere(g, DoubleTensor.scalar(0.0))
+                g.where(f, DoubleTensor.scalar(0.0))
         );
 
         int N = 1000000;

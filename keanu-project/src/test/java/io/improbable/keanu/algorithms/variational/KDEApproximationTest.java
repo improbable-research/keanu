@@ -3,13 +3,12 @@ package io.improbable.keanu.algorithms.variational;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.continuous.Gaussian;
-import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.KDEVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexSamples;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.KDEVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.ProbabilisticDoubleTensorContract;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -89,13 +88,13 @@ public class KDEApproximationTest {
         KDEVertex KDE = GaussianKDE.approximate(samples);
 
         DoubleTensor xTensor = DoubleTensor.linspace(-1. + mu, 1. + mu, 10);
-        Diffs diffLog = Gaussian.withParameters(
+        DoubleTensor[] diffLog = Gaussian.withParameters(
             DoubleTensor.scalar(mu),
             DoubleTensor.scalar(sigma)
-        ).dLogProb(xTensor);
+        ).dLogProb(xTensor, true, false, false);
 
         DoubleTensor approximateDerivative = KDE.dLogPdf(xTensor, KDE).get(KDE);
-        DoubleTensor expectedDerivative = diffLog.get(Diffs.X).getValue();
+        DoubleTensor expectedDerivative = diffLog[0];
         isCloseMostOfTheTime(expectedDerivative, approximateDerivative, correctPercentage, DELTA);
     }
 

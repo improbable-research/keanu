@@ -12,6 +12,8 @@ import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.tensor.VertexWrapper;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -216,7 +218,7 @@ public class BayesianNetwork {
     }
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices, KeanuRandom random) {
-        for (Vertex<?> vertex : vertices) {
+        for (Vertex<?, ?> vertex : vertices) {
             if (!(vertex instanceof Probabilistic)) {
                 throw new IllegalArgumentException("Cannot sample from a non-probabilistic vertex. Vertex is: " + vertex);
             }
@@ -225,14 +227,14 @@ public class BayesianNetwork {
         VertexValuePropagation.cascadeUpdate(vertices);
     }
 
-    private static <T> void setValueFromSample(Vertex<T> vertex, KeanuRandom random) {
+    private static <T> void setValueFromSample(Vertex<T, ?> vertex, KeanuRandom random) {
         vertex.setValue(((Probabilistic<T>) vertex).sample(random));
     }
 
-    public List<Vertex<DoubleTensor>> getContinuousLatentVertices() {
+    public List<DoubleVertex> getContinuousLatentVertices() {
         return getLatentVertices().stream()
-            .filter(v -> v.getValue() instanceof DoubleTensor)
-            .map(v -> (Vertex<DoubleTensor>) v)
+            .filter(v -> v instanceof DoubleVertex)
+            .map(v -> (DoubleVertex) v)
             .collect(Collectors.toList());
     }
 
@@ -251,23 +253,27 @@ public class BayesianNetwork {
     }
 
     public void save(NetworkSaver networkSaver) {
-        if (isSaveable()) {
+        if (isAllSavable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
-                vertex.save(networkSaver);
+                networkSaver.save(unwrapIfNeeded(vertex));
             }
         } else {
             throw new IllegalArgumentException("Trying to save a BayesianNetwork that isn't Saveable");
         }
     }
 
-    private boolean isSaveable() {
-        return vertices.stream().filter(v -> v instanceof NonSaveableVertex).count() == 0;
+    private boolean isAllSavable() {
+        return vertices.stream().noneMatch(v -> unwrapIfNeeded(v) instanceof NonSaveableVertex);
     }
 
     public void saveValues(NetworkSaver networkSaver) {
         for (Vertex vertex : TopologicalSort.sort(vertices)) {
-            vertex.saveValue(networkSaver);
+            networkSaver.saveValue(unwrapIfNeeded(vertex));
         }
+    }
+
+    private Vertex unwrapIfNeeded(Vertex vertex) {
+        return vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).unwrap() : vertex;
     }
 
     /**

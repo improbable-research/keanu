@@ -8,9 +8,9 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Ignore;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -69,7 +69,7 @@ public class Tensors {
         tensor.times(2.0);          // [4, 6, 8, 10]
         tensor.pow(2);              // [16, 36, 64, 100]
         tensor.sin();               // [-0.2879, -0.9918, 0.9200, -0.5064]
-        double sum = tensor.sum();  // -0.86602...
+        double sum = tensor.sumNumber();  // -0.86602...
         //%%SNIPPET_END%% TensorOps
     }
 

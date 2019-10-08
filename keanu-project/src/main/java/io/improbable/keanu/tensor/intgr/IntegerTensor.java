@@ -3,10 +3,8 @@ package io.improbable.keanu.tensor.intgr;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.FixedPointTensor;
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorFactories;
 import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.Arrays;
 
@@ -14,20 +12,12 @@ import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 public interface IntegerTensor extends FixedPointTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
-    static IntegerTensor create(int value, long[] shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarIntegerTensor(value);
-        } else {
-            return Nd4jIntegerTensor.create(value, shape);
-        }
+    static IntegerTensor create(long value, long[] shape) {
+        return TensorFactories.integerTensorFactory.create(value, shape);
     }
 
     static IntegerTensor create(int[] values, long... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
-            return new ScalarIntegerTensor(values[0]);
-        } else {
-            return Nd4jIntegerTensor.create(values, shape);
-        }
+        return TensorFactories.integerTensorFactory.create(values, shape);
     }
 
     static IntegerTensor create(int... values) {
@@ -57,31 +47,19 @@ public interface IntegerTensor extends FixedPointTensor<Integer, IntegerTensor>,
     }
 
     static IntegerTensor ones(long... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarIntegerTensor(1);
-        } else {
-            return Nd4jIntegerTensor.ones(shape);
-        }
+        return TensorFactories.integerTensorFactory.ones(shape);
     }
 
     static IntegerTensor eye(int n) {
-        if (n == 1) {
-            return new ScalarIntegerTensor(1);
-        } else {
-            return Nd4jIntegerTensor.eye(n);
-        }
+        return TensorFactories.integerTensorFactory.eye(n);
     }
 
     static IntegerTensor zeros(long... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarIntegerTensor(0);
-        } else {
-            return Nd4jIntegerTensor.zeros(shape);
-        }
+        return TensorFactories.integerTensorFactory.zeros(shape);
     }
 
-    static IntegerTensor scalar(int scalarValue) {
-        return new ScalarIntegerTensor(scalarValue);
+    static IntegerTensor scalar(long scalarValue) {
+        return TensorFactories.integerTensorFactory.scalar(scalarValue);
     }
 
     static IntegerTensor vector(int... values) {
@@ -89,20 +67,28 @@ public interface IntegerTensor extends FixedPointTensor<Integer, IntegerTensor>,
     }
 
     /**
-     * @param dimension the dimension along which toStack are stacked
-     * @param toStack   an array of IntegerTensor
-     * @return an IntegerTensor with toStack joined along a new dimension
-     * <p>
-     * e.g. A, B, C = IntegerTensor.ones(4, 2)
-     * <p>
-     * IntegerTensor.stack(0, A, B, C) gives IntegerTensor.ones(3, 4, 2)
-     * <p>
-     * IntegerTensor.stack(1, A, B, C) gives IntegerTensor.ones(4, 3, 2)
-     * <p>
-     * IntegerTensor.stack(2, A, B, C) gives IntegerTensor.ones(4, 2, 3)
-     * <p>
-     * IntegerTensor.stack(-1, A, B, C) gives IntegerTensor.ones(4, 2, 3)
+     * @param start start of range
+     * @param end   end of range (exclusive)
+     * @return a vector of numbers from start incrementing by one to end (exclusively)
      */
+    static IntegerTensor arange(int start, int end) {
+        return TensorFactories.integerTensorFactory.arange(start, end);
+    }
+
+    static IntegerTensor arange(int end) {
+        return TensorFactories.integerTensorFactory.arange(0, end);
+    }
+
+    /**
+     * @param start    start of range
+     * @param end      end of range (exclusive)
+     * @param stepSize size of step from start to end
+     * @return a vector of numbers starting at start and stepping to end (exclusively)
+     */
+    static IntegerTensor arange(int start, int end, int stepSize) {
+        return TensorFactories.integerTensorFactory.arange(start, end, stepSize);
+    }
+
     static IntegerTensor stack(int dimension, IntegerTensor... toStack) {
         long[] shape = toStack[0].getShape();
         int absoluteDimension = getAbsoluteDimension(dimension, shape.length + 1);
@@ -120,25 +106,8 @@ public interface IntegerTensor extends FixedPointTensor<Integer, IntegerTensor>,
         return concat(0, toConcat);
     }
 
-    /**
-     * @param dimension the dimension along which the tensors will be joined
-     * @param toConcat  an array of IntegerTensor
-     * @return an IntegerTensor with toConcat joined along existing dimension
-     * <p>
-     * e.g. A, B, C = IntegerTensor.ones(4, 2)
-     * <p>
-     * IntegerTensor.concat(0, A, B, C) gives IntegerTensor.ones(12, 2)
-     */
     static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
-        INDArray[] concatAsINDArray = new INDArray[toConcat.length];
-        for (int i = 0; i < toConcat.length; i++) {
-            concatAsINDArray[i] = Nd4jIntegerTensor.getAsINDArray(toConcat[i]).dup();
-            if (concatAsINDArray[i].shape().length == 0) {
-                concatAsINDArray[i] = concatAsINDArray[i].reshape(1);
-            }
-        }
-        INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
-        return new Nd4jIntegerTensor(concat);
+        return TensorFactories.integerTensorFactory.concat(dimension, toConcat);
     }
 
     static IntegerTensor min(IntegerTensor a, IntegerTensor b) {

@@ -1,3 +1,45 @@
+## Version 0.0.27
+
+### Java
+
+#### Breaking changes
+- Moved `io.improbable.keanu.vertices.dbl` classes to `io.improbable.keanu.vertices.tensor.number.floating.dbl`
+- Moved `io.improbable.keanu.vertices.int` classes to `io.improbable.keanu.vertices.tensor.number.fixed.int`
+- Moved `io.improbable.keanu.vertices.bool` classes to `io.improbable.keanu.vertices.tensor.bool`
+- renamed DoubleTensor `determinant()` method `matrixDeterminant()`
+- renamed DoubleTensor `average()` to `mean()` and allowed it to be done on a given dimension
+
+### Common
+
+- Previously some operations were available on the tensor classes but not the vertex classes. All operations
+on the tensor classes have been implemented with vertex operations now. A few operations have been added in order
+to accommodate autodiff for the new vertex operations.
+
+- All Tensor operations now have a corresponding Vertex. This brings the DoubleTensor, IntegerTensor and BooleanTensor
+  in line with the DoubleVertex, IntegerVertex and BooleanVertex.   
+
+- Along with this change, the vertices package has been changed:
+io.improbable.keanu.vertices.* -> io.improbable.keanu.vertices.tensor.*
+
+- There is now an experimental LongTensor implementation.
+- There is now a native JVM implementation of the IntegerTensor. This will bring a significant performance increase 
+to models with lots of small integer operations.
+
+#### New operations
+
+- sign
+- strided slice
+- trigamma
+- triLower
+- triUpper
+- fillTriangular
+- batch matrix multiply
+- batch matrix inverse
+- batch matrix determinant
+- batch cholesky decomposition
+- cholesky inverse (with batch)
+
+
 ## Version 0.0.26
 
 ### Common

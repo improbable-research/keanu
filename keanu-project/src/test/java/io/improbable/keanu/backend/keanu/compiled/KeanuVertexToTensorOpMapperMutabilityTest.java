@@ -1,9 +1,11 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.tensor.VertexWrapper;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.operators.binary.MultiplicationVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,7 +50,7 @@ public class KeanuVertexToTensorOpMapperMutabilityTest {
         lookup.put(A.getReference(), new KeanuCompiledVariable("A", aMutable));
         lookup.put(B.getReference(), new KeanuCompiledVariable("B", bMutable));
 
-        String result = opMapper.apply(C, lookup);
+        String result = opMapper.apply(((VertexWrapper<DoubleTensor, DoubleVertex>)C).unwrap(), lookup);
 
         assertEquals(result.contains("InPlace"), shouldInPlace);
     }

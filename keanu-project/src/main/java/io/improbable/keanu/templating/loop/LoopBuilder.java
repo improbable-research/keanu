@@ -8,10 +8,10 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.tensor.If;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.DoubleProxyVertex;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -25,7 +25,7 @@ public class LoopBuilder {
     private int maxLoopCount = Loop.DEFAULT_MAX_COUNT;
     private boolean throwWhenMaxCountIsReached = true;
 
-    <V extends Vertex<?>> LoopBuilder(VertexDictionary initialState) {
+    LoopBuilder(VertexDictionary initialState) {
         this.initialState = initialState;
     }
 
@@ -105,7 +105,7 @@ public class LoopBuilder {
             Vertex valueOutWhenAlwaysTrue;
 
             try {
-                Vertex<?> outputVertex = initialState.get(Loop.VALUE_OUT_LABEL);
+                Vertex<?, ?> outputVertex = initialState.get(Loop.VALUE_OUT_LABEL);
                 valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL.withExtraNamespace("Loop_" + this.hashCode()));
                 valueOutWhenAlwaysTrue.setParents(outputVertex);
             } catch (NoSuchElementException e) {

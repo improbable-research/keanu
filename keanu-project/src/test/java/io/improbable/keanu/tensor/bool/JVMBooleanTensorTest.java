@@ -86,7 +86,7 @@ public class JVMBooleanTensorTest {
         DoubleTensor trueCase = DoubleTensor.create(new double[]{1.5, 2.0, 3.3, 4.65}, new long[]{2, 2});
         DoubleTensor falseCase = DoubleTensor.create(new double[]{5.1, 7.2, 11.4, 23.22}, new long[]{2, 2});
 
-        DoubleTensor result = matrixA.doubleWhere(trueCase, falseCase);
+        DoubleTensor result = trueCase.where(matrixA, falseCase);
         assertArrayEquals(new double[]{1.5, 7.2, 3.3, 23.22}, result.asFlatDoubleArray(), 0.0);
     }
 
@@ -96,7 +96,7 @@ public class JVMBooleanTensorTest {
         IntegerTensor trueCase = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor falseCase = IntegerTensor.create(new int[]{5, 7, 11, 23}, new long[]{2, 2});
 
-        IntegerTensor result = matrixA.integerWhere(trueCase, falseCase);
+        IntegerTensor result = trueCase.where(matrixA, falseCase);
         assertArrayEquals(new int[]{1, 7, 3, 23}, result.asFlatIntegerArray());
     }
 
@@ -105,7 +105,7 @@ public class JVMBooleanTensorTest {
         BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
         BooleanTensor matrixB = BooleanTensor.create(new boolean[]{false, false, true, true}, new long[]{2, 2});
         BooleanTensor matrixC = BooleanTensor.create(new boolean[]{true, true, true, false}, new long[]{2, 2});
-        BooleanTensor result = matrixA.booleanWhere(matrixB, matrixC);
+        BooleanTensor result = matrixB.where(matrixA, matrixC);
         assertArrayEquals(new Boolean[]{false, true, true, false}, result.asFlatArray());
     }
 
@@ -127,7 +127,7 @@ public class JVMBooleanTensorTest {
         );
 
         BooleanTensor matrixA = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
-        GenericTensor<Something> result = matrixA.where(trueCase, falseCase);
+        GenericTensor<Something> result = trueCase.where(matrixA, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.C, Something.A},
             result.asFlatArray()
@@ -142,7 +142,7 @@ public class JVMBooleanTensorTest {
         GenericTensor<Something> trueCase = GenericTensor.scalar(Something.A);
         GenericTensor<Something> falseCase = GenericTensor.scalar(Something.C);
 
-        GenericTensor<Something> result = matrixA.where(trueCase, falseCase);
+        GenericTensor<Something> result = trueCase.where(matrixA, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.A, Something.C},
             result.asFlatArray()
@@ -151,26 +151,26 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void doesAllTrue() {
-        assertFalse(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).allTrue());
-        assertTrue(BooleanTensor.create(new boolean[]{true, true, true, true}, new long[]{2, 2}).allTrue());
+        assertFalse(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).allTrue().scalar());
+        assertTrue(BooleanTensor.create(new boolean[]{true, true, true, true}, new long[]{2, 2}).allTrue().scalar());
     }
 
     @Test
     public void doesAllFalse() {
-        assertFalse(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).allFalse());
-        assertTrue(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse());
+        assertFalse(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).allFalse().scalar());
+        assertTrue(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse().scalar());
     }
 
     @Test
     public void doesAnyTrue() {
-        assertTrue(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).anyTrue());
-        assertFalse(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).anyTrue());
+        assertTrue(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).anyTrue().scalar());
+        assertFalse(BooleanTensor.create(new boolean[]{false, false, false, false}, new long[]{2, 2}).anyTrue().scalar());
     }
 
     @Test
     public void doesAnyFalse() {
-        assertTrue(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).anyTrue());
-        assertFalse(BooleanTensor.create(new boolean[]{true, true, true, true}, new long[]{2, 2}).anyFalse());
+        assertTrue(BooleanTensor.create(new boolean[]{false, true, false, false}, new long[]{2, 2}).anyTrue().scalar());
+        assertFalse(BooleanTensor.create(new boolean[]{true, true, true, true}, new long[]{2, 2}).anyFalse().scalar());
     }
 
     @Test
@@ -180,7 +180,7 @@ public class JVMBooleanTensorTest {
         BooleanTensor notAllTheSame = allTheSame.duplicate();
         notAllTheSame.setValue(!value, 1, 1);
 
-        assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
+        assertThat(allTheSame.elementwiseEquals(value).allTrue().scalar(), equalTo(true));
         assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
     }
 
@@ -439,7 +439,7 @@ public class JVMBooleanTensorTest {
 
     @Test
     public void canDiagFromMatrix() {
-        BooleanTensor actual = BooleanTensor.create(new boolean[]{true, false, false, false, true, false, false, false, false}, 3, 3).diag();
+        BooleanTensor actual = BooleanTensor.create(new boolean[]{true, false, false, false, true, false, false, false, false}, 3, 3).diagPart();
         BooleanTensor expected = BooleanTensor.create(true, true, false);
 
         Assert.assertEquals(expected, actual);
