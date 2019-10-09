@@ -144,6 +144,8 @@ nexusPublishing {
             password = nexusPassword
         }
     }
+    clientTimeout = Duration.ofMinutes(5)
+    connectTimeout = Duration.ofMinutes(5)
 }
 
 compileKotlin {
