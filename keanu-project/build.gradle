@@ -138,10 +138,14 @@ publishing {
 }
 
 nexusPublishing {
-    serverUrl = uri("https://oss.sonatype.org/service/local/")
-    snapshotRepositoryUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-    username = nexusUser
-    password = nexusPassword
+    repositories {
+        sonatype {
+            username = nexusUser
+            password = nexusPassword
+        }
+    }
+    clientTimeout = Duration.ofMinutes(5)
+    connectTimeout = Duration.ofMinutes(5)
 }
 
 compileKotlin {
