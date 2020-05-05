@@ -14,8 +14,7 @@ RUN apt-get -qq update && \
 # Add new repositories and their signing keys here.
 RUN add-apt-repository ppa:git-core/ppa \
     && add-apt-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main" \
-    && curl -LSs "https://dl-ssl.google.com/linux/linux_signing_key.pub" | apt-key add - \
-    && curl -LSs "https://apt.llvm.org/llvm-snapshot.gpg.key" | apt-key add -
+    && curl -LSs "https://dl-ssl.google.com/linux/linux_signing_key.pub" | apt-key add -
 
 # Install build dependency packages.
 # Keep these alpha-sorted.
@@ -25,13 +24,9 @@ RUN apt-get -qq update && \
     bash-completion=1:2.1-4.2ubuntu1.1 \
     build-essential=12.1ubuntu2 \
     ca-certificates=20170717~16.04.2 \
-    clang=1:3.8-33ubuntu3.1 \
-    clang-format-3.8=1:3.8-2ubuntu4 \
-    clang-format-7=1:7.1.0~svn353565-1~exp1~20190408084827.60 \
     curl=7.47.0-1ubuntu2.14 \
     g++=4:5.3.1-1ubuntu1 \
     git \
-    make=4.1-6 \
     openjdk-8-jdk \
     shellcheck=0.3.7-5 \
     ssh=1:7.2p2-4ubuntu2.8 \
@@ -41,11 +36,11 @@ RUN apt-get -qq update && \
     python3-pip=8.1.1-2ubuntu0.4 \
     python3-setuptools=20.7.0-1
 
-# Be on latest python package manager && install prometheus client
 RUN pip3 install --upgrade pip
 RUN pip3 install pipenv
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
+RUN pipenv --version
 
 # Download and install gosu, so we can drop privs after the container starts.
 RUN curl -LSs -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.4/gosu-$(dpkg --print-architecture)" \

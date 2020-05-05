@@ -4,7 +4,7 @@
 # i.e. getImageName ubuntu_16.04
 function getImageName() {
     DOCKERFILE_DIRECTORY="$1"
-    echo "eu.gcr.io/windy-oxide-102215/wtkb-${DOCKERFILE_DIRECTORY}"
+    echo "eu.gcr.io/windy-oxide-102215/keanu-${DOCKERFILE_DIRECTORY}"
 }
 
 function isBuildKite() {
@@ -26,7 +26,7 @@ function buildDockerImage() {
   local IMAGE_NAME="$(getImageName ${DOCKERFILE_DIRECTORY})"
   # We're using the sha of the context as the version of the docker container.
   local CONTEXT_SHA="$(getContextSha)"
-  # i.e. tigger-bazel-0.23.1-ubuntu_16.04:87a364fbcbe476252a667d2141d77dba123b15dea51385ca969aeebe0a843358
+  # i.e. keanu-ubuntu_16.04:87a364fbcbe476252a667d2141d77dba123b15dea51385ca969aeebe0a843358
   export IMAGE_IDENTIFIER="${IMAGE_NAME}:${CONTEXT_SHA}"
 
   IMAGE_PRESENT=false
@@ -36,8 +36,6 @@ function buildDockerImage() {
     echo "Image present locally"
     IMAGE_PRESENT=true
 
-  # Checking the remote on all machines but TeamCity agents.
-  # Pull the image from the remote, if it exists, this command will succeed.
   elif docker pull "${IMAGE_IDENTIFIER}"; then
     echo "Image present remotely"
     IMAGE_PRESENT=true

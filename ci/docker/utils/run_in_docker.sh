@@ -50,14 +50,11 @@ docker run \
   --rm `# Removes the image when container is shut down` \
   --privileged \
   --volume "${MOUNT_PATH}:${MOUNT_PATH}" \
-  --volume "${CACHE_PATH}:/tmp/build_output" \
-  --volume "/var/node-metrics/text-files:/nfr-metrics" \
   \
   `# Needed to pass through the ssh-agent` \
   --volume "${SSH_AUTH_SOCK}:/tmp/ssh.sock" \
   --env "SSH_AUTH_SOCK=/tmp/ssh.sock" \
   --env "CI_ENVIRONMENT=${CI_ENVIRONMENT:-production}" \
-  --env "AUTH_TOKEN=$(gcloud auth application-default print-access-token)" \
   \
   --env "USER_ID=${USER_ID}" \
   --env "GROUP_ID=${GROUP_ID}" \
