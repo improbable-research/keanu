@@ -21,15 +21,8 @@ linux: &linux
     - "environment=production"
     - "permission_set=builder"
     - "platform=linux"
-    - "queue=${CI_LINUX_BUILDER_QUEUE:-v2-1550668667-a9410887d4b815dd-------z}"
-
-windows: &windows
-  agents:
-    - "capable_of_building=graphos-eng"
-    - "environment=production"
-    - "permission_set=builder"
-    - "platform=windows"
-    - "queue=${CI_WINDOWS_BUILDER_QUEUE:-v2-1550748015-b6a7d7f9ae5dbf04-------z}"
+    - "scaler_version=2"
+    - "queue=${CI_LINUX_BUILDER_QUEUE:-v4-20-05-05-134804-bk11066-7dbdc1c6}"
 
 # NOTE: step labels turn into commit-status names like {org}/{repo}/{pipeline}/{step-label}, lower-case and hyphenated.
 # These are then relied on to have stable names by other things, so once named, please beware renaming has consequences.
@@ -39,8 +32,3 @@ steps:
     command: "bash ci/build.sh"
     <<: *common
     <<: *linux
-
-  - label: "Build Keanu on Windows"
-    command: "bash ci/build.sh"
-    <<: *common
-    <<: *windows
