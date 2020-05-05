@@ -21,7 +21,6 @@ RUN add-apt-repository ppa:git-core/ppa \
 # Keep these alpha-sorted.
 RUN apt-get -qq update && \
     apt-get -qq install -y  --no-install-recommends \
-    # YACC needed for SWIG.
     bison=2:3.0.4.dfsg-1 \
     bash-completion=1:2.1-4.2ubuntu1.1 \
     build-essential=12.1ubuntu2 \
@@ -44,7 +43,9 @@ RUN apt-get -qq update && \
 
 # Be on latest python package manager && install prometheus client
 RUN pip3 install --upgrade pip
-RUN pip3 install prometheus_client==0.7.1
+RUN pip3 install pipenv
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
 
 # Download and install gosu, so we can drop privs after the container starts.
 RUN curl -LSs -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.4/gosu-$(dpkg --print-architecture)" \
