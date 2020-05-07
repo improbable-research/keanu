@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 # Set environment variables - keep these alpha-sorted
 
@@ -11,32 +11,28 @@ RUN apt-get -qq update && \
     curl \
     apt-transport-https
 
-# Add new repositories and their signing keys here.
-RUN add-apt-repository ppa:git-core/ppa \
-    && add-apt-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main" \
-    && curl -LSs "https://dl-ssl.google.com/linux/linux_signing_key.pub" | apt-key add -
-
 # Install build dependency packages.
 # Keep these alpha-sorted.
 RUN apt-get -qq update && \
     apt-get -qq install -y  --no-install-recommends \
-    bison=2:3.0.4.dfsg-1 \
-    bash-completion=1:2.1-4.2ubuntu1.1 \
-    build-essential=12.1ubuntu2 \
-    ca-certificates=20170717~16.04.2 \
-    curl=7.47.0-1ubuntu2.14 \
-    g++=4:5.3.1-1ubuntu1 \
+    bison \
+    bash-completion \
+    build-essential \
+    ca-certificates \
+    curl \
+    g++ \
     git \
     openjdk-8-jdk \
-    shellcheck=0.3.7-5 \
-    ssh=1:7.2p2-4ubuntu2.8 \
-    unzip=6.0-20ubuntu1 \
-    zip=3.0-11 \
+    shellcheck \
+    ssh \
+    unzip \
+    zip \
     zlib1g-dev \
-    python3-pip=8.1.1-2ubuntu0.4 \
-    python3-setuptools=20.7.0-1
+    python3-pip \
+    python3-setuptools
 
 RUN pip3 install --upgrade pip
+RUN pip3 install wheel
 RUN pip3 install pipenv
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
