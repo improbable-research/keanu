@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 
-public interface SamplableWithShape<T extends Tensor<?>> {
+public interface SamplableWithShape<T extends Tensor<?, T>> {
 
     T sampleWithShape(long[] shape, KeanuRandom random);
 

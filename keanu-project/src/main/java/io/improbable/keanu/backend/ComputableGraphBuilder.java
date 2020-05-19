@@ -37,7 +37,7 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
      *                    to another vertex. This is used to hook up proxy vertices that aren't actually connected to
      *                    parents until they are being added to a graph with this builder.
      */
-    void connect(Map<? extends Vertex<?>, ? extends Vertex<?>> connections);
+    void connect(Map<? extends Vertex<?, ?>, ? extends Vertex<?, ?>> connections);
 
     /**
      * @param output a variable reference to a variable that should be used as an output. This lets the builder know that

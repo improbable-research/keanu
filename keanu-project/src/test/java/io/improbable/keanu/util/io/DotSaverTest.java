@@ -6,12 +6,12 @@ import com.google.common.io.Resources;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GammaVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 
 @Slf4j
 public class DotSaverTest {
@@ -47,11 +47,9 @@ public class DotSaverTest {
     @BeforeClass
     public static void setUpComplexNet() {
         VertexId.resetIdGenerator();
-        complexResultVertex = ((new GammaVertex(0, 1))
-            .lessThan(new ConstantIntegerVertex(-1)))
-            .or((new GaussianVertex(0, 1))
-            .plus(new ConstantDoubleVertex(5))
-            .equalTo(new ConstantDoubleVertex(10)));
+        complexResultVertex = new GammaVertex(0, 1).lessThan(-1.0)
+            .or(new GaussianVertex(0, 1).plus(5.0).elementwiseEquals(10.0));
+
         BayesianNetwork complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
         complexNetDotSaver = new DotSaver(complexNet);
     }
@@ -83,10 +81,10 @@ public class DotSaverTest {
 
     @Test
     public void dotVertexLabelsAreSetCorrectly() throws IOException {
-        int[] intValues = new int[] {1,2,3};
+        int[] intValues = new int[]{1, 2, 3};
         ConstantIntegerVertex constantIntVertex = new ConstantIntegerVertex(intValues);
         ConstantIntegerVertex constantIntVertex2 = new ConstantIntegerVertex(2);
-        IntegerMultiplicationVertex multiplicationVertex = new IntegerMultiplicationVertex(constantIntVertex, constantIntVertex2);
+        IntegerVertex multiplicationVertex = constantIntVertex.times(constantIntVertex2);
         BayesianNetwork constantIntNet = new BayesianNetwork(multiplicationVertex.getConnectedGraph());
 
         DotSaver dotSaver = new DotSaver(constantIntNet);
@@ -118,7 +116,7 @@ public class DotSaverTest {
         DoubleVertex observedGammaVertex = new GammaVertex(2, 3);
         observedGammaVertex.observe(2.5);
         DoubleVertex gammaMultipliedVertex = observedGammaVertex.times(new ConstantDoubleVertex(4));
-        Vertex resultVertex = gammaMultipliedVertex.plus(unobservedGaussianVertex);
+        DoubleVertex resultVertex = gammaMultipliedVertex.plus(unobservedGaussianVertex);
         gammaMultipliedVertex.setLabel("Gamma Multiplied");
         DotSaver dotSaver = new DotSaver(new BayesianNetwork(resultVertex.getConnectedGraph()));
         dotSaver.save(outputWriter, true);
@@ -152,23 +150,25 @@ public class DotSaverTest {
 
         BayesianNetwork disconnectedBayesNet = new BayesianNetwork(Arrays.asList(v1, v2, gamma1, gaussian1, v3, v4, gamma2, gaussian2));
         DotSaver dotSaver = new DotSaver(disconnectedBayesNet);
-        dotSaver.save(outputWriter,true);
+        dotSaver.save(outputWriter, true);
         String expectedOutputWithValues = readFileToString(OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
     }
 
     // Need to compare the outputs line by line, as the labels and edges are not written out in a fixed order.
-    private void checkDotFilesMatch(String output1, String output2) {
+    private void checkDotFilesMatch(String actual, String expected) {
 
-        List<String> output1Lines = Arrays.stream(output1.split("\n"))
+        List<String> actualLines = Arrays.stream(actual.split("\n"))
             .map(s -> s.replace("\r", ""))
+            .sorted()
             .collect(Collectors.toList());
 
-        String[] output2Lines = Arrays.stream(output2.split("\n"))
+        List<String> expectedLines = Arrays.stream(expected.split("\n"))
             .map(s -> s.replace("\r", ""))
-            .toArray(String[]::new);
+            .sorted()
+            .collect(Collectors.toList());
 
-        assertThat(output1Lines, containsInAnyOrder(output2Lines));
+        assertThat(actualLines, equalTo(expectedLines));
     }
 
     private static String readFileToString(String fileOnClassPath) throws IOException {

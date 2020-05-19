@@ -4,8 +4,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -19,13 +19,14 @@ public class Uniform implements ContinuousDistribution {
     private final DoubleTensor xMax;
 
     /**
-     * @param xMin   minimum x value
-     * @param xMax   maximum x value
-     * @return       a new ContinuousDistribution object
+     * @param xMin minimum x value
+     * @param xMax maximum x value
+     * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax) {
+    public static Uniform withParameters(DoubleTensor xMin, DoubleTensor xMax) {
         return new Uniform(xMin, xMax);
     }
+
     private Uniform(DoubleTensor xMin, DoubleTensor xMax) {
         this.xMin = xMin;
         this.xMax = xMax;
@@ -40,8 +41,8 @@ public class Uniform implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
 
         DoubleTensor logOfWithinBounds = xMax.minus(xMin).logInPlace().unaryMinusInPlace();
-        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getGreaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
-        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getLessThanMask(xMin), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.greaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.lessThanMask(xMin), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
     }
@@ -49,13 +50,12 @@ public class Uniform implements ContinuousDistribution {
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex xMin, DoublePlaceholderVertex xMax) {
 
         DoubleVertex logOfWithinBounds = xMax.minus(xMin).log().unaryMinus();
-        logOfWithinBounds = logOfWithinBounds.setWithMask(x.toGreaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
-        logOfWithinBounds = logOfWithinBounds.setWithMask(x.toLessThanMask(xMin), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMask(x.greaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMask(x.lessThanMask(xMin), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }

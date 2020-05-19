@@ -5,8 +5,8 @@ import io.improbable.keanu.Keanu.Optimizer
 import io.improbable.keanu.kotlin.times
 import io.improbable.keanu.network.BayesianNetwork
 import io.improbable.keanu.randomfactory.DoubleVertexFactory
-import io.improbable.keanu.vertices.dbl.DoubleVertex
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex
 
 //%%SNIPPET_START%% LorenzFull
 private val windowSize = 10

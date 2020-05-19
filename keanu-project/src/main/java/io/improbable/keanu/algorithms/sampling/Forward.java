@@ -36,12 +36,12 @@ public class Forward implements PosteriorSamplingAlgorithm {
 
     /**
      * Samples from the prior of a Probabilistic Model.
-     *
+     * <p>
      * Samples are taken by sampling from the prior of the desired variables in topological order.
      *
-     * @param model the model to sample from
+     * @param model                 the model to sample from
      * @param variablesToSampleFrom the variables to sample from
-     * @param sampleCount the number of samples to take
+     * @param sampleCount           the number of samples to take
      * @return sampling samples of a computable graph
      */
     @Override

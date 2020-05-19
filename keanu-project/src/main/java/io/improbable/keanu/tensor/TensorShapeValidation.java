@@ -1,8 +1,7 @@
 package io.improbable.keanu.tensor;
 
-
 import com.google.common.base.Preconditions;
-import org.nd4j.linalg.api.shape.Shape;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +14,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.ArrayUtils.removeAll;
 
 public class TensorShapeValidation {
 
@@ -104,8 +102,22 @@ public class TensorShapeValidation {
         );
     }
 
-    public static long[] checkIsBroadcastable(long[] left, long[] right) {
-        return Shape.broadcastOutputShape(left, right);
+    public static boolean isBroadcastable(long[] left, long[] right) {
+        try {
+            TensorShape.getBroadcastResultShape(left, right);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public static boolean isBroadcastable(long[] a, long[]... b) {
+        try {
+            TensorShape.getBroadcastResultShape(a, b);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     /**
@@ -124,11 +136,11 @@ public class TensorShapeValidation {
     }
 
     public static void checkShapeIsSquareMatrix(long[] shape) {
-        if (shape.length != 2) {
+        if (shape.length < 2) {
             throw new IllegalArgumentException("Input tensor must be a matrix");
         }
 
-        if (shape[0] != shape[1]) {
+        if (shape[shape.length - 1] != shape[shape.length - 2]) {
             throw new IllegalArgumentException("Input matrix must be square");
         }
     }
@@ -239,53 +251,37 @@ public class TensorShapeValidation {
         }
     }
 
-    public static long[] getTensorMultiplyResultShape(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
-
-        if (dimsLeft.length != dimsRight.length) {
-            throw new IllegalArgumentException("Tensor multiply must match dimension lengths " +
-                toStringArgs(leftShape, rightShape, dimsLeft, dimsRight)
-            );
+    public static long[] getMatrixMultiplicationResultingShape(long[] left, long[] right, boolean transposeLeft, boolean transposeRight) {
+        if (left.length < 2 || right.length < 2) {
+            throwMatrixMultiplyShapeException(left, right, transposeLeft, transposeRight);
         }
 
+        //(M, N) = (M, K)(K, N)
+        final long KLeft = transposeLeft ? left[left.length - 2] : left[left.length - 1];
+        final long KRight = transposeRight ? right[right.length - 1] : right[right.length - 2];
 
-        for (int i = 0; i < dimsLeft.length; i++) {
-
-            if (dimsLeft[i] >= leftShape.length || dimsLeft[i] < 0) {
-                throw new IllegalArgumentException("Left dimensions " + Arrays.toString(dimsLeft) +
-                    " is invalid for left shape " + Arrays.toString(leftShape)
-                );
-            }
-
-            if (dimsRight[i] >= rightShape.length || dimsRight[i] < 0) {
-                throw new IllegalArgumentException("Right dimensions " + Arrays.toString(dimsRight) +
-                    " is invalid for right shape " + Arrays.toString(rightShape)
-                );
-            }
-
-            if (leftShape[dimsLeft[i]] != rightShape[dimsRight[i]]) {
-                throw new IllegalArgumentException("Cannot tensor multiply dimension " + i + " for " +
-                    toStringArgs(leftShape, rightShape, dimsLeft, dimsRight)
-                );
-            }
+        if (KLeft != KRight) {
+            throwMatrixMultiplyShapeException(left, right, transposeLeft, transposeRight);
         }
 
-        return TensorShape.concat(removeAll(leftShape, dimsLeft), removeAll(rightShape, dimsRight));
+        final long M = transposeLeft ? left[left.length - 1] : left[left.length - 2];
+        final long N = transposeRight ? right[right.length - 2] : right[right.length - 1];
+        if (left.length == 2 && right.length == 2) {
+            return new long[]{M, N};
+        } else {
+            final long[] leftBatchShape = ArrayUtils.subarray(left, 0, left.length - 2);
+            final long[] rightBatchShape = ArrayUtils.subarray(right, 0, right.length - 2);
+            final long[] batchShape = TensorShape.getBroadcastResultShape(leftBatchShape, rightBatchShape);
+            return TensorShape.concat(batchShape, new long[]{M, N});
+        }
     }
 
-    private static String toStringArgs(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
-        return "left shape: " + Arrays.toString(leftShape) + " right shape: " + Arrays.toString(rightShape) + " on left dimensions " +
-            Arrays.toString(dimsLeft) + " and right dimensions " + Arrays.toString(dimsRight);
-    }
-
-    public static long[] getMatrixMultiplicationResultingShape(long[] left, long[] right) {
-        if (left.length != 2 || right.length != 2) {
-            throw new IllegalArgumentException("Matrix multiply must be used on matrices");
-        }
-
-        if (left[1] != right[0]) {
-            throw new IllegalArgumentException("Can not multiply matrices of shapes " + Arrays.toString(left) + " X " + Arrays.toString(right));
-        }
-
-        return new long[]{left[0], right[1]};
+    private static void throwMatrixMultiplyShapeException(long[] left, long[] right, boolean transposeLeft, boolean transposeRight) {
+        throw new IllegalArgumentException(
+            "Cannot matrix multiply with shapes " +
+                Arrays.toString(left) + (transposeLeft ? " transposed " : "") +
+                " and " +
+                Arrays.toString(right) + (transposeRight ? " transposed " : "")
+        );
     }
 }

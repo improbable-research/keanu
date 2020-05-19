@@ -29,7 +29,7 @@ compileTestKotlin {
     }
 }
 task writeSnippets(type:Exec) {
-    commandLine 'python', 'bin/snippet_writer.py'
+    commandLine 'python3', 'bin/snippet_writer.py'
 }
 
 task installDependencies {

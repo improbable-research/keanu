@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.particlefiltering;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,19 +31,19 @@ public class Particle {
         return sumLogPOfSubgraph;
     }
 
-    public double getScalarValueOfVertex(Vertex<DoubleTensor> vertex) {
+    public double getScalarValueOfVertex(DoubleVertex vertex) {
         return ((DoubleTensor) latentVertices.get(vertex)).scalar();
     }
 
-    public <T> T getValueOfVertex(Vertex<T> vertex){
+    public <T> T getValueOfVertex(Vertex<T, ?> vertex) {
         return (T) latentVertices.get(vertex);
     }
 
-    <T> void addLatentVertex(Vertex<T> vertex, T value) {
+    <T> void addLatentVertex(Vertex<T, ?> vertex, T value) {
         latentVertices.put(vertex, value);
     }
 
-    <T> void addObservedVertex(Vertex<T> vertex) {
+    <T> void addObservedVertex(Vertex<T, ?> vertex) {
         observedVertices.add(vertex);
     }
 
@@ -69,7 +70,7 @@ public class Particle {
         latentVertices.keySet().forEach(this::applyLatentVertexValue);
     }
 
-    private <T> void applyLatentVertexValue(Vertex<T> vertex) {
+    private <T> void applyLatentVertexValue(Vertex<T, ?> vertex) {
         if (latentVertices.containsKey(vertex)) {
             T value = (T) latentVertices.get(vertex);
             vertex.setAndCascade(value);

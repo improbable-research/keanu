@@ -19,6 +19,7 @@ from .vertex_casting import (
     cast_to_integer,
     cast_to_boolean,
     cast_to_long_array,
+    cast_to_boolean_array,
     cast_to_int_array,
     cast_to_vertex_array,
 )

@@ -10,7 +10,7 @@ public interface ConvergenceChecker {
             double calculate(DoubleTensor[] a) {
                 double magPow2 = 0;
                 for (int i = 0; i < a.length; i++) {
-                    magPow2 += a[i].pow(2).sum();
+                    magPow2 += a[i].pow(2).sumNumber();
                 }
 
                 return Math.sqrt(magPow2);
@@ -22,7 +22,7 @@ public interface ConvergenceChecker {
             double calculate(DoubleTensor[] a) {
                 double max = -Double.MAX_VALUE;
                 for (int i = 0; i < a.length; i++) {
-                    max = Math.max(max, a[i].max());
+                    max = Math.max(max, a[i].max().scalar());
                 }
 
                 return max;

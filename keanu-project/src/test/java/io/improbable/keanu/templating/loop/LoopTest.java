@@ -1,6 +1,5 @@
 package io.improbable.keanu.templating.loop;
 
-
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.testcategory.Slow;
@@ -8,10 +7,10 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexMatchers;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.DoubleProxyVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -41,12 +40,12 @@ public class LoopTest {
             .withInitialConditions(startValue)
             .iterateWhile(flip)
             .apply(increment);
-        Vertex<?> output = loop.getOutput();
+        Vertex<?, ?> output = loop.getOutput();
         assertThat(output, instanceOf(DoubleVertex.class));
     }
 
     @Test
-    public void thereIsADefaultMaxLength(){
+    public void thereIsADefaultMaxLength() {
         Loop loop = Loop
             .withInitialConditions(startValue)
             .iterateWhile(alwaysTrue)
@@ -77,7 +76,7 @@ public class LoopTest {
     }
 
     @Test
-    public void youCanOverrideTheDefaultMaxLength(){
+    public void youCanOverrideTheDefaultMaxLength() {
         int customMaxCount = 5;
         Loop loop = Loop
             .withInitialConditions(startValue)
@@ -88,7 +87,7 @@ public class LoopTest {
     }
 
     @Test
-    public void itThrowsIfYouPassInMultipleOutputVertices(){
+    public void itThrowsIfYouPassInMultipleOutputVertices() {
         expectedException.expect(LoopConstructionException.class);
         expectedException.expectMessage("Duplicate label found in base case");
         Loop.withInitialConditions(ConstantVertex.of(0.).setLabel(Loop.VALUE_OUT_LABEL), ConstantVertex.of(1.).setLabel(Loop.VALUE_OUT_LABEL))
@@ -126,15 +125,15 @@ public class LoopTest {
             .iterateWhile(alwaysTrue)
             .apply(increment);
 
-        Vertex<?> outputFromFirstLoop = loop.getOutput();
+        Vertex<?, ?> outputFromFirstLoop = loop.getOutput();
 
         Loop loop2 = Loop
-            .withInitialConditions((Vertex<?>) loop.getOutput())
+            .withInitialConditions((Vertex<?, ?>) loop.getOutput())
             .doNotThrowWhenMaxCountIsReached()
             .iterateWhile(alwaysTrue)
             .apply(increment);
 
-        Vertex<?> output = loop2.getOutput();
+        Vertex<?, ?> output = loop2.getOutput();
 
         new BayesianNetwork(output.getConnectedGraph());
     }

@@ -1,6 +1,5 @@
 package io.improbable.keanu.e2e.foodpoisoning;
 
-
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
@@ -11,10 +10,10 @@ import io.improbable.keanu.templating.SequenceBuilder;
 import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.tensor.If;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

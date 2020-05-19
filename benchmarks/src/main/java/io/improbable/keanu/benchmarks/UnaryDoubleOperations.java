@@ -1,14 +1,23 @@
 package io.improbable.keanu.benchmarks;
 
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.TensorFactories;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Warmup;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @State(Scope.Benchmark)
+@Warmup(iterations = 3, time = 1000, timeUnit = MILLISECONDS)
+@Measurement(iterations = 5, time = 1000, timeUnit = MILLISECONDS)
+@Fork(3)
 public class UnaryDoubleOperations {
 
     private static final int NUM_OPERATIONS = 100;
@@ -26,7 +35,7 @@ public class UnaryDoubleOperations {
 
     @Setup
     public void setup() {
-        DoubleTensor.setFactory(impl.getFactory());
+        TensorFactories.doubleTensorFactory = impl.getFactory();
         KeanuRandom random = new KeanuRandom(1);
         DoubleTensor A = random.nextDouble(new long[]{dimLength, dimLength});
 

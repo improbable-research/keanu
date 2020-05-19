@@ -1,6 +1,5 @@
 package io.improbable.keanu.distributions.hyperparam;
 
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.jetbrains.annotations.NotNull;
 

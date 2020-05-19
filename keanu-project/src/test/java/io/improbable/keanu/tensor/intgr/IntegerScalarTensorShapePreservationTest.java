@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,17 +12,16 @@ import static org.junit.Assert.assertArrayEquals;
 
 public class IntegerScalarTensorShapePreservationTest {
 
-    private static Nd4jIntegerTensor intTensor;
-    private static Nd4jIntegerTensor lengthOneTensor;
-    private static ScalarIntegerTensor scalarIntTensor;
+    private static IntegerTensor intTensor;
+    private static IntegerTensor lengthOneTensor;
+    private static IntegerTensor scalarIntTensor;
     private static IntegerTensor[] tensors;
-
 
     @Before
     public void setup() {
-        intTensor = new Nd4jIntegerTensor(new int[]{5, 6, 7, 8, 9, 10}, new long[]{3, 2});
-        lengthOneTensor = new Nd4jIntegerTensor(new int[]{1}, new long[]{1, 1, 1});
-        scalarIntTensor = new ScalarIntegerTensor(1);
+        intTensor = IntegerTensor.create(new int[]{5, 6, 7, 8, 9, 10}, new long[]{3, 2});
+        lengthOneTensor = IntegerTensor.create(new int[]{1}, new long[]{1, 1, 1});
+        scalarIntTensor = IntegerTensor.scalar(1);
         tensors = new IntegerTensor[]{intTensor, lengthOneTensor, scalarIntTensor};
     }
 
@@ -66,41 +66,42 @@ public class IntegerScalarTensorShapePreservationTest {
             resultShapeMatchesBroadcastShape(result, t1, t2);
         }
     }
+
     @Test
     public void tensorGetGreaterThanMaskPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::getGreaterThanMask);
+        checkOperationPreservesShape(IntegerTensor::greaterThanMask);
 
     }
 
     @Test
     public void tensorGetGreaterThanOrEqualToMaskPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::getGreaterThanOrEqualToMask);
+        checkOperationPreservesShape(IntegerTensor::greaterThanOrEqualToMask);
 
     }
 
     @Test
     public void tensorGetLessThanMaskPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::getLessThanMask);
+        checkOperationPreservesShape(IntegerTensor::lessThanMask);
 
     }
 
     @Test
     public void tensorGetLessThanOrEqualToMaskPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::getLessThanOrEqualToMask);
+        checkOperationPreservesShape(IntegerTensor::lessThanOrEqualToMask);
 
     }
 
     @Test
     public void tensorMaxPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::max);
-        checkOperationPreservesShape(IntegerTensor::maxInPlace);
+        checkOperationPreservesShape(NumberTensor::max);
+        checkOperationPreservesShape(NumberTensor::maxInPlace);
 
     }
 
     @Test
     public void tensorMinPreservesShape() {
-        checkOperationPreservesShape(IntegerTensor::min);
-        checkOperationPreservesShape(IntegerTensor::minInPlace);
+        checkOperationPreservesShape(NumberTensor::min);
+        checkOperationPreservesShape(NumberTensor::minInPlace);
 
     }
 
@@ -141,6 +142,7 @@ public class IntegerScalarTensorShapePreservationTest {
             }
         }
     }
+
     private static void resultShapeMatchesBroadcastShape(Tensor result, Tensor input1, Tensor input2) {
         long[] broadcastShape = Shape.broadcastOutputShape(input1.getShape(), input2.getShape());
         long[] resultShape = result.getShape();

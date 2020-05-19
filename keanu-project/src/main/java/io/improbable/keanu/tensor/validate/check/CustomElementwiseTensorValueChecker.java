@@ -6,7 +6,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 import java.util.function.Function;
 
-public class CustomElementwiseTensorValueChecker<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValueChecker<TENSOR> {
+public class CustomElementwiseTensorValueChecker<DATATYPE, TENSOR extends Tensor<DATATYPE, TENSOR>> implements TensorValueChecker<DATATYPE, TENSOR> {
 
     private final Function<DATATYPE, Boolean> checkFunction;
 

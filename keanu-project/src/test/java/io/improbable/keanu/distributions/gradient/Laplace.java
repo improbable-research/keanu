@@ -1,6 +1,5 @@
 package io.improbable.keanu.distributions.gradient;
 
-
 /**
  * Computer Generation of Statistical Distributions
  * by Richard Saucier

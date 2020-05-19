@@ -21,7 +21,7 @@ public class NetworkSample implements NetworkState {
 
     /**
      * @param variable the variable to get the values of
-     * @param <T>    the type of the values that the vertex contains
+     * @param <T>      the type of the values that the vertex contains
      * @return the values of the specified variable
      */
     @Override
@@ -31,7 +31,7 @@ public class NetworkSample implements NetworkState {
 
     /**
      * @param variableReference the reference to the variable to get the values of
-     * @param <T>      the type of the values that the variable contains
+     * @param <T>               the type of the values that the variable contains
      * @return the values of the specified variable
      */
     @Override

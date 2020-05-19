@@ -1,8 +1,8 @@
 package io.improbable.snippet;
 
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
+import io.improbable.keanu.vertices.tensor.generic.probabilistic.discrete.CategoricalVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.LinkedHashMap;
 

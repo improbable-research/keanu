@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.bool.BooleanPlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.tensor.If;
+import io.improbable.keanu.vertices.tensor.bool.BooleanPlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 public class Bernoulli implements Distribution<BooleanTensor> {
 
@@ -32,10 +32,7 @@ public class Bernoulli implements Distribution<BooleanTensor> {
     public DoubleTensor logProb(BooleanTensor x) {
         DoubleTensor probTrueClamped = probTrue.clamp(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));
 
-        DoubleTensor probability = x.doubleWhere(
-            probTrueClamped,
-            probTrueClamped.unaryMinus().plusInPlace(1.0)
-        );
+        DoubleTensor probability = probTrueClamped.where(x, probTrueClamped.unaryMinus().plusInPlace(1.0));
 
         return probability.logInPlace();
     }
@@ -54,10 +51,10 @@ public class Bernoulli implements Distribution<BooleanTensor> {
 
     public DoubleTensor dLogProb(BooleanTensor x) {
         DoubleTensor greaterThanMask = probTrue
-            .getGreaterThanMask(DoubleTensor.scalar(1.0));
+            .greaterThanMask(DoubleTensor.scalar(1.0));
 
         DoubleTensor lessThanOrEqualToMask = probTrue
-            .getLessThanOrEqualToMask(DoubleTensor.scalar(0.0));
+            .lessThanOrEqualToMask(DoubleTensor.scalar(0.0));
 
         DoubleTensor greaterThanOneOrLessThanZero = greaterThanMask.plusInPlace(lessThanOrEqualToMask);
 
@@ -67,10 +64,7 @@ public class Bernoulli implements Distribution<BooleanTensor> {
         DoubleTensor dlogProbdxForFalse = probTrue.minus(1.0).reciprocalInPlace();
         dlogProbdxForFalse = dlogProbdxForFalse.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
 
-        DoubleTensor dLogPdp = x.doubleWhere(
-            dlogProbdxForTrue,
-            dlogProbdxForFalse
-        );
+        DoubleTensor dLogPdp =dlogProbdxForTrue.where(x, dlogProbdxForFalse);
 
         return dLogPdp;
     }

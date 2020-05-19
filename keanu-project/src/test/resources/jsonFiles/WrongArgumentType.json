@@ -1,16 +1,22 @@
 {
     "graph": {
-        "vertices": [{
-            "id": {
-                "id": "1"
-            },
-            "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
-            "parameters": [{
-                "name": "constant",
-                "intTensorParam": {
-                    "values": [1]
-                }
-            }]
-        }]
+        "vertices": [
+            {
+                "id": {
+                    "id": "1"
+                },
+                "vertexType": "io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex",
+                "parameters": [
+                    {
+                        "name": "constant",
+                        "intTensorParam": {
+                            "values": [
+                                1
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
     }
 }

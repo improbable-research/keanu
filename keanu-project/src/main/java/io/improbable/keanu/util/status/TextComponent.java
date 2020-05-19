@@ -8,6 +8,7 @@ public class TextComponent implements StatusBarComponent {
 
     /**
      * Sets the text to be displayed by the component.
+     *
      * @param text the text to display.
      */
     public void setText(String text) {

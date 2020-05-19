@@ -6,9 +6,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.VertexWrapper;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,6 +17,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -45,7 +44,9 @@ public class DotSaver implements NetworkSaver {
     }
 
     public DotSaver(Set<Vertex> vertices) {
-        this.vertices = vertices;
+        this.vertices = vertices.stream()
+            .map(this::unwrapIfNeeded)
+            .collect(Collectors.toSet());
     }
 
     /**
@@ -77,9 +78,9 @@ public class DotSaver implements NetworkSaver {
 
         for (Vertex v : vertices) {
             if (saveValues) {
-                v.saveValue(this);
+                saveValue(v);
             } else {
-                v.save(this);
+                save(v);
             }
         }
 
@@ -89,6 +90,10 @@ public class DotSaver implements NetworkSaver {
         outputLabels(dotLabels, outputWriter);
         outputWriter.write(DOT_ENDING);
         outputWriter.close();
+    }
+
+    private Vertex unwrapIfNeeded(Vertex vertex) {
+        return vertex instanceof VertexWrapper ? ((VertexWrapper) vertex).unwrap() : vertex;
     }
 
     private static void outputMetadata(Map<String, String> metadata, Writer outputWriter) throws IOException {
@@ -116,13 +121,12 @@ public class DotSaver implements NetworkSaver {
 
     @Override
     public void save(Vertex vertex) {
-        dotLabels.add(new VertexDotLabel(vertex));
-        graphEdges.addAll(getParentEdges(vertex));
-    }
-
-    @Override
-    public void save(ConstantVertex vertex) {
-        saveValue((Vertex) vertex);
+        if (vertex instanceof ConstantVertex) {
+            saveValue(vertex);
+        } else {
+            dotLabels.add(new VertexDotLabel(vertex));
+            graphEdges.addAll(getParentEdges(vertex));
+        }
     }
 
     @Override
@@ -132,27 +136,10 @@ public class DotSaver implements NetworkSaver {
         } else {
             dotLabels.add(new VertexDotLabel(vertex));
         }
-    }
-
-    @Override
-    public void saveValue(DoubleVertex vertex) {
-        setDotLabelWithValue(vertex);
         graphEdges.addAll(getParentEdges(vertex));
     }
 
-    @Override
-    public void saveValue(IntegerVertex vertex) {
-        setDotLabelWithValue(vertex);
-        graphEdges.addAll(getParentEdges(vertex));
-    }
-
-    @Override
-    public void saveValue(BooleanVertex vertex) {
-        setDotLabelWithValue(vertex);
-        graphEdges.addAll(getParentEdges(vertex));
-    }
-
-    private void setDotLabelWithValue(Vertex<? extends Tensor> vertex) {
+    private void setDotLabelWithValue(Vertex<? extends Tensor, ?> vertex) {
         VertexDotLabel vertexDotLabel = new VertexDotLabel(vertex);
         if (vertex.hasValue() && vertex.getValue().isScalar()) {
             vertexDotLabel.setValue("" + vertex.getValue().scalar());

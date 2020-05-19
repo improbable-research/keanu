@@ -96,7 +96,7 @@ tensor.plus(1.0);           // [2, 3, 4, 5]
 tensor.times(2.0);          // [4, 6, 8, 10]
 tensor.pow(2);              // [16, 36, 64, 100]
 tensor.sin();               // [-0.2879, -0.9918, 0.9200, -0.5064]
-double sum = tensor.sum();  // -0.86602...
+double sum = tensor.sumNumber();  // -0.86602...
 ```
 
 A complete list of tensor operations is available here:

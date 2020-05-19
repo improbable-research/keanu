@@ -1,108 +1,231 @@
 package io.improbable.keanu.tensor;
 
+import io.improbable.keanu.BaseNumberTensor;
 import io.improbable.keanu.kotlin.NumberOperators;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.lng.LongTensor;
 
 import java.util.function.Function;
 
-public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> extends Tensor<N>, NumberOperators<T> {
+public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>>
+    extends Tensor<N, T>, BaseNumberTensor<BooleanTensor, IntegerTensor, DoubleTensor, N, T>, NumberOperators<T> {
 
-    N sum();
+    @Override
+    BooleanTensor toBoolean();
 
+    @Override
     DoubleTensor toDouble();
 
+    @Override
     IntegerTensor toInteger();
 
-    T diag();
+    LongTensor toLong();
 
-    T transpose();
+    double[] asFlatDoubleArray();
 
-    T sum(int... overDimensions);
-    
-    // New tensor Ops and transforms
-    
-    T matrixMultiply(T value);
+    int[] asFlatIntegerArray();
 
-    T tensorMultiply(T value, int[] dimLeft, int[] dimsRight);
-    
-    T abs();
+    long[] asFlatLongArray();
 
-    /**
-     * Find the index into the flattened array of the tensor of the largest value, e.g.
-     * <pre>
-     * DoubleTensor tensor = DoubleTensor.arange(0, 6).reshape(2, 3);
-     * // [[0., 1., 2.],
-     * //  [3., 4., 5.]]
-     * IntegerTensor max = tensor.argMax();
-     * // [[5]]
-     * </pre>
-     *
-     * @return A scalar tensor with the index of the largest value. If there are multiple largest values, it will be
-     *         the first index.
-     */
-    int argMax();
+    @Override
+    default T cumSum(int requestedDimension) {
+        return duplicate().cumSumInPlace(requestedDimension);
+    }
 
-    /**
-     * Find the indices into the tensor of the largest values in a specified axis (dimension), e.g.
-     * <pre>
-     * DoubleTensor tensor = DoubleTensor.arange(0, 6).reshape(2, 3);
-     * // [[0., 1., 2.],
-     * //  [3., 4., 5.]]
-     * IntegerTensor maxesFor0 = tensor.argMax(0);
-     * // [[1, 1, 1]]
-     * IntegerTensor maxFor1 = tensor.argMax(1);
-     * // [[2, 2]]
-     * </pre>
-     *
-     * @param axis The axis (dimension) to find the largest values in
-     * @return A tensor where each value is the location of the maximum value in the vector at that location in the
-     *         specified dimension in the original tensor. If there are multiple largest values in this vector, it will
-     *         be the first index.
-     * @see <a href="https://www.geeksforgeeks.org/numpy-argmax-python/">An article about argmax over an axis in numpy</a>
-     */
-    IntegerTensor argMax(int axis);
+    T cumSumInPlace(int dimension);
 
-    T getGreaterThanMask(T greaterThanThis);
+    @Override
+    default T cumProd(int requestedDimension) {
+        return duplicate().cumProdInPlace(requestedDimension);
+    }
 
-    T getGreaterThanOrEqualToMask(T greaterThanThis);
+    T cumProdInPlace(int dimension);
 
-    T getLessThanMask(T lessThanThis);
+    @Override
+    default T max(T max) {
+        return duplicate().maxInPlace(max);
+    }
 
-    T getLessThanOrEqualToMask(T lessThanThis);
+    T maxInPlace(T max);
 
-    T setWithMaskInPlace(T mask, N value);
+    @Override
+    default T min(T min) {
+        return duplicate().minInPlace(min);
+    }
 
-    T setWithMask(T mask, N value);
+    T minInPlace(T min);
 
-    T apply(Function<N, N> function);
+    @Override
+    default T clamp(T min, T max) {
+        return duplicate().clampInPlace(min, max);
+    }
 
-    // In Place
+    T clampInPlace(T min, T max);
 
-    T minusInPlace(T that);
+    @Override
+    default T sign() {
+        return duplicate().signInPlace();
+    }
 
-    T plusInPlace(T that);
+    T signInPlace();
 
-    T timesInPlace(T that);
-
-    T divInPlace(T that);
-
-    T powInPlace(T exponent);
-
-    T unaryMinusInPlace();
+    @Override
+    default T abs() {
+        return duplicate().absInPlace();
+    }
 
     T absInPlace();
 
+    @Override
+    default T minus(N value) {
+        return duplicate().minusInPlace(value);
+    }
+
+    T minusInPlace(N value);
+
+    @Override
+    default T minus(T that) {
+        return duplicate().minusInPlace(that);
+    }
+
+    T minusInPlace(T that);
+
+    @Override
+    default T reverseMinus(T value) {
+        return duplicate().reverseMinusInPlace(value);
+    }
+
+    T reverseMinusInPlace(T value);
+
+    @Override
+    default T reverseMinus(N value) {
+        return duplicate().reverseMinusInPlace(value);
+    }
+
+    T reverseMinusInPlace(N value);
+
+    @Override
+    default T plus(N value) {
+        return duplicate().plusInPlace(value);
+    }
+
+    T plusInPlace(N value);
+
+    @Override
+    default T plus(T that) {
+        return duplicate().plusInPlace(that);
+    }
+
+    T plusInPlace(T that);
+
+    @Override
+    default T unaryMinus() {
+        return duplicate().unaryMinusInPlace();
+    }
+
+    T unaryMinusInPlace();
+
+    @Override
+    default T times(N value) {
+        return duplicate().timesInPlace(value);
+    }
+
+    T timesInPlace(N value);
+
+    @Override
+    default T times(T that) {
+        return duplicate().timesInPlace(that);
+    }
+
+    T timesInPlace(T that);
+
+    @Override
+    default T div(N value) {
+        return duplicate().divInPlace(value);
+    }
+
+    T divInPlace(N value);
+
+    @Override
+    default T div(T value) {
+        return duplicate().divInPlace(value);
+    }
+
+    T divInPlace(T that);
+
+    @Override
+    default T reverseDiv(N value) {
+        return duplicate().reverseDivInPlace(value);
+    }
+
+    T reverseDivInPlace(N value);
+
+    @Override
+    default T reverseDiv(T value) {
+        return duplicate().reverseDivInPlace(value);
+    }
+
+    T reverseDivInPlace(T value);
+
+    @Override
+    default T pow(T exponent) {
+        return duplicate().powInPlace(exponent);
+    }
+
+    T powInPlace(T exponent);
+
+    @Override
+    default T pow(N exponent) {
+        return duplicate().powInPlace(exponent);
+    }
+
+    T powInPlace(N exponent);
+
+    @Override
+    default T setWithMask(T mask, N value) {
+        return duplicate().setWithMaskInPlace(mask, value);
+    }
+
+    T setWithMaskInPlace(T mask, N value);
+
+    @Override
+    default T apply(Function<N, N> function) {
+        return duplicate().applyInPlace(function);
+    }
+
     T applyInPlace(Function<N, N> function);
 
-    // Comparisons
+    T setAllInPlace(N value);
 
+    @Override
+    BooleanTensor equalsWithinEpsilon(T other, N epsilon);
+
+    @Override
     BooleanTensor lessThan(T value);
 
+    @Override
     BooleanTensor lessThanOrEqual(T value);
 
+    @Override
     BooleanTensor greaterThan(T value);
 
+    @Override
     BooleanTensor greaterThanOrEqual(T value);
+
+    @Override
+    BooleanTensor lessThan(N value);
+
+    @Override
+    BooleanTensor lessThanOrEqual(N value);
+
+    @Override
+    BooleanTensor greaterThan(N value);
+
+    @Override
+    BooleanTensor greaterThanOrEqual(N value);
+
+    N sumNumber();
+
 }

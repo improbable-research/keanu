@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,8 +17,8 @@ import static junit.framework.TestCase.assertEquals;
 
 public class KeanuComputableGraphTest {
 
-    private GaussianVertex A;
-    private GaussianVertex B;
+    private DoubleVertex A;
+    private DoubleVertex B;
 
     private static final String A_LABEL = "A";
     private static final String B_LABEL = "B";

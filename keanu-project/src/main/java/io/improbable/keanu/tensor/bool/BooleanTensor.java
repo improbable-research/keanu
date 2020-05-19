@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.bool;
 
+import io.improbable.keanu.BaseBooleanTensor;
 import io.improbable.keanu.kotlin.BooleanOperators;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -8,14 +9,17 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
-public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<BooleanTensor> {
+public interface BooleanTensor extends
+    Tensor<Boolean, BooleanTensor>,
+    BooleanOperators<BooleanTensor>,
+    BaseBooleanTensor<BooleanTensor, IntegerTensor, DoubleTensor> {
 
     static BooleanTensor create(boolean value, long[] shape) {
-        return new SimpleBooleanTensor(value, shape);
+        return JVMBooleanTensor.create(value, shape);
     }
 
     static BooleanTensor create(boolean[] values, long... shape) {
-        return new SimpleBooleanTensor(values, shape);
+        return JVMBooleanTensor.create(values, shape);
     }
 
     static BooleanTensor create(boolean... values) {
@@ -23,7 +27,7 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
     }
 
     static BooleanTensor scalar(boolean scalarValue) {
-        return new SimpleBooleanTensor(scalarValue);
+        return JVMBooleanTensor.scalar(scalarValue);
     }
 
     static BooleanTensor vector(boolean... values) {
@@ -31,11 +35,11 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
     }
 
     static BooleanTensor trues(long... shape) {
-        return new SimpleBooleanTensor(true, shape);
+        return JVMBooleanTensor.create(true, shape);
     }
 
     static BooleanTensor falses(long... shape) {
-        return new SimpleBooleanTensor(false, shape);
+        return JVMBooleanTensor.create(false, shape);
     }
 
     /**
@@ -68,77 +72,72 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
     }
 
     static BooleanTensor concat(int dimension, BooleanTensor... toConcat) {
-        DoubleTensor[] toDoubles = new DoubleTensor[toConcat.length];
-
-        for (int i = 0; i < toConcat.length; i++) {
-            toDoubles[i] = toConcat[i].toDoubleMask();
-        }
-
-        DoubleTensor concat = DoubleTensor.concat(dimension, toDoubles);
-        double[] concatFlat = concat.asFlatDoubleArray();
-        boolean[] data = new boolean[concat.asFlatDoubleArray().length];
-
-        for (int i = 0; i < data.length; i++) {
-            data[i] = concatFlat[i] == 1.0;
-        }
-
-        return new SimpleBooleanTensor(data, concat.getShape());
+        return JVMBooleanTensor.concat(dimension, toConcat);
     }
 
     @Override
-    BooleanTensor reshape(long... newShape);
-
-    @Override
-    BooleanTensor permute(int... rearrange);
-
-    @Override
-    BooleanTensor duplicate();
-
-    BooleanTensor and(BooleanTensor that);
-
-    default BooleanTensor and(boolean that) {
-        return this.and(BooleanTensor.scalar(that));
+    default BooleanTensor and(BooleanTensor that) {
+        return duplicate().andInPlace(that);
     }
-
-    BooleanTensor or(BooleanTensor that);
-
-    default BooleanTensor or(boolean that) {
-        return this.or(BooleanTensor.scalar(that));
-    }
-
-    BooleanTensor xor(BooleanTensor that);
-
-    BooleanTensor not();
-
-    DoubleTensor doubleWhere(DoubleTensor trueValue, DoubleTensor falseValue);
-
-    IntegerTensor integerWhere(IntegerTensor trueValue, IntegerTensor falseValue);
-
-    BooleanTensor booleanWhere(BooleanTensor trueValue, BooleanTensor falseValue);
-
-    <T, TENSOR extends Tensor<T>> TENSOR where(TENSOR trueValue, TENSOR falseValue);
 
     BooleanTensor andInPlace(BooleanTensor that);
 
+    @Override
+    default BooleanTensor and(boolean that) {
+        return duplicate().andInPlace(that);
+    }
+
+    BooleanTensor andInPlace(boolean that);
+
+    @Override
+    default BooleanTensor or(BooleanTensor that) {
+        return duplicate().orInPlace(that);
+    }
+
     BooleanTensor orInPlace(BooleanTensor that);
+
+    @Override
+    default BooleanTensor or(boolean that) {
+        return duplicate().orInPlace(that);
+    }
+
+    BooleanTensor orInPlace(boolean that);
+
+    @Override
+    default BooleanTensor xor(BooleanTensor that) {
+        return duplicate().xorInPlace(that);
+    }
 
     BooleanTensor xorInPlace(BooleanTensor that);
 
+    @Override
+    default BooleanTensor not() {
+        return duplicate().notInPlace();
+    }
+
     BooleanTensor notInPlace();
 
-    boolean allTrue();
+    @Override
+    BooleanTensor allTrue();
 
-    boolean allFalse();
+    @Override
+    BooleanTensor allFalse();
 
+    @Override
+    BooleanTensor anyTrue();
+
+    @Override
+    BooleanTensor anyFalse();
+
+    @Override
     DoubleTensor toDoubleMask();
 
+    @Override
     IntegerTensor toIntegerMask();
 
-    @Override
-    BooleanTensor slice(int dimension, long index);
+    double[] asFlatDoubleArray();
 
-    @Override
-    BooleanTensor take(long... index);
+    int[] asFlatIntegerArray();
 
     boolean[] asFlatBooleanArray();
 

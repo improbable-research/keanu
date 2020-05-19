@@ -3,11 +3,11 @@ package io.improbable.keanu.backend.keanu.compiled;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.UniformIntVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
 import java.util.Map;
@@ -29,7 +29,7 @@ public class KeanuCompiledProbabilisticGraphTest {
         GaussianVertex A = new GaussianVertex(0, 1);
         GaussianVertex B = new GaussianVertex(0, 1);
 
-        AdditionVertex C = A.plus(B);
+        DoubleVertex C = A.plus(B);
 
         matchesLogProb(new BayesianNetwork(C.getConnectedGraph()));
     }
