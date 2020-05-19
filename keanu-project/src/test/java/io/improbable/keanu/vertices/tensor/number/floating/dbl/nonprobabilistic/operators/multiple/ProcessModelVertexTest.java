@@ -64,7 +64,7 @@ public class ProcessModelVertexTest {
         Map<VertexLabel, Vertex<? extends Tensor, ?>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         // An example of what running a real Python model would look like
-        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
+        String command = formatCommandForExecution(inputs, "python3 ./src/test/resources/model.py {Temperature}");
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
 
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));

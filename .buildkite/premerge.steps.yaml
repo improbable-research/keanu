@@ -8,27 +8,30 @@
 #  note that the setup is already done, so you should not manually adjust anything through the BuildKite interface.
 #
 common: &common
-  timeout_in_minutes: 60 # TODO(ENG-548): reduce timeout once agent-cold-start is optimised.
+  timeout_in_minutes: 60
   retry:
     automatic:
-        # This is designed to trap and retry failures because agent lost connection. Agent exits with -1 in this case.
+      # This is designed to trap and retry failures because agent lost connection. Agent exits with -1 in this case.
       - exit_status: -1
         limit: 3
 
-linux: &linux
+common_builder: &common_builder
+  <<: *common
   agents:
-    - "capable_of_building=graphos-eng"
+    - "agent_count=8"
+    - "capable_of_building=platform"
     - "environment=production"
+    - "machine_type=octa"
     - "permission_set=builder"
     - "platform=linux"
+    - "queue=${CI_BUILDER_QUEUE:-v4-2019-12-12-bk5225-daecba805768d787}"
     - "scaler_version=2"
-    - "queue=${CI_LINUX_BUILDER_QUEUE:-v4-20-05-05-134804-bk11066-7dbdc1c6}"
 
 # NOTE: step labels turn into commit-status names like {org}/{repo}/{pipeline}/{step-label}, lower-case and hyphenated.
 # These are then relied on to have stable names by other things, so once named, please beware renaming has consequences.
 
 steps:
   - label: "Build Keanu on Linux"
-    command: "bash ci/build.sh"
-    <<: *common
-    <<: *linux
+    command: "ci/docker/ubuntu_16.04/run_in_docker.sh ./ci/build.sh"
+    <<: *common_builder
+
