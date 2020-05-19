@@ -4,26 +4,25 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.jvm.Slicer;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.MultiplexerVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
-import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
+import io.improbable.keanu.vertices.tensor.If;
+import io.improbable.keanu.vertices.tensor.TensorVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.ConstantBooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.operators.binary.compare.NumericalEqualsVertex;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.generic.GenericTensorVertex;
+import io.improbable.keanu.vertices.tensor.generic.nonprobabilistic.MultiplexerVertex;
+import io.improbable.keanu.vertices.tensor.generic.probabilistic.discrete.CategoricalVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.UniformIntVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.HalfGaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.utility.AssertVertex;
 import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.junit.Test;
@@ -81,8 +80,21 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void compilesSafeLogTimes() {
+        assertBinaryDoubleMatches(DoubleVertex::safeLogTimes);
+    }
+
+    @Test
     public void compilesMatrixMultiply() {
         assertBinaryDoubleMatches(new long[]{2, 3}, new long[]{3, 2}, DoubleVertex::matrixMultiply);
+        assertBinaryDoubleMatches(new long[]{2, 3}, new long[]{2, 3}, (left, right) -> left.matrixMultiply(right, false, true));
+        assertBinaryDoubleMatches(new long[]{3, 2}, new long[]{3, 2}, (left, right) -> left.matrixMultiply(right, true, false));
+        assertBinaryDoubleMatches(new long[]{2, 3}, new long[]{4, 2}, (left, right) -> left.matrixMultiply(right, true, true));
+    }
+
+    @Test
+    public void compilesTensorMultiply() {
+        assertBinaryDoubleMatches(new long[]{2, 3, 4}, new long[]{3, 2, 4}, (a, b) -> a.tensorMultiply(b, new int[]{1}, new int[]{0}));
     }
 
     @Test
@@ -139,6 +151,17 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canSliceWithSlicer() {
+        assertUnaryDoubleMatches(new long[]{3, 4, 10}, (a) -> a.slice(
+            Slicer.builder()
+                .all()
+                .slice(2)
+                .slice(2, 8, 2).build()
+            )
+        );
+    }
+
+    @Test
     public void canConcatDouble() {
         assertBinaryDoubleMatches(new long[]{3, 4}, new long[]{3, 4}, (a, b) -> DoubleVertex.concat(1, a, b));
     }
@@ -156,13 +179,23 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void compilesMean() {
+        assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::mean);
+        assertUnaryDoubleMatches(new long[]{2, 2}, (a) -> a.mean(0));
+        assertUnaryDoubleMatches(new long[]{2, 2}, (a) -> a.mean(1));
+    }
+
+    @Test
     public void compilesSimpleUnaryOps() {
         assertUnaryDoubleMatches(DoubleVertex::abs);
+        assertUnaryDoubleMatches(DoubleVertex::sign);
         assertUnaryDoubleMatches(DoubleVertex::cos);
         assertUnaryDoubleMatches(DoubleVertex::acos);
         assertUnaryDoubleMatches(DoubleVertex::exp);
         assertUnaryDoubleMatches(DoubleVertex::log);
         assertUnaryDoubleMatches(DoubleVertex::logGamma);
+        assertUnaryDoubleMatches(DoubleVertex::digamma);
+        assertUnaryDoubleMatches(DoubleVertex::trigamma);
         assertUnaryDoubleMatches(DoubleVertex::sin);
         assertUnaryDoubleMatches(DoubleVertex::asin);
         assertUnaryDoubleMatches(DoubleVertex::tan);
@@ -174,9 +207,13 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
-    public void compilesSquareMatrices() {
-        assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::matrixDeterminant);
+    public void compilesInverseMatrices() {
         assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::matrixInverse);
+    }
+
+    @Test
+    public void compilesDeterminant() {
+        assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::matrixDeterminant);
     }
 
     private void assertUnaryDoubleMatches(Function<DoubleVertex, DoubleVertex> op) {
@@ -199,7 +236,7 @@ public class KeanuCompiledGraphTest {
         GaussianVertex A = new GaussianVertex(shape, 0, 1);
         GaussianVertex B = new GaussianVertex(shape, 0, 1);
 
-        DoubleIfVertex D = If.isTrue(predicate)
+        DoubleVertex D = If.isTrue(predicate)
             .then(A)
             .orElse(B);
 
@@ -251,6 +288,20 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canCompileIntegerBroadcast() {
+        assertUnaryIntegerMatches(new long[]{2}, v -> v.broadcast(new long[]{2, 2}));
+    }
+
+    @Test
+    public void canCompileIntegerBooleanIndex() {
+        UniformIntVertex A = new UniformIntVertex(new long[]{4}, 0, 1);
+        BooleanVertex indices = new ConstantBooleanVertex(new boolean[]{true, true, false, false});
+        IntegerVertex result = A.get(indices);
+
+        assertCompiledIsSameAsVertexEvaluation(A, indices, result);
+    }
+
+    @Test
     public void canCompileIntegerIf() {
         long[] shape = new long[]{4};
         BernoulliVertex predicate = new BernoulliVertex(shape, 0.5);
@@ -285,8 +336,52 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canTriUpper() {
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(-2));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(-1));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(0));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(1));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(2));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triUpper(3));
+    }
+
+    @Test
+    public void canTriLower() {
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(-2));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(-1));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(0));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(1));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(2));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.triLower(3));
+    }
+
+    @Test
+    public void canFillTriangular() {
+        assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(false, false));
+        assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(true, false));
+        assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(false, true));
+        assertUnaryBooleanMatches(new long[]{6}, a -> a.fillTriangular(true, true));
+    }
+
+    @Test
+    public void canTrianglePart() {
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.trianglePart(true));
+        assertUnaryBooleanMatches(new long[]{4, 4}, a -> a.trianglePart(false));
+    }
+
+    @Test
+    public void canDiag() {
+        assertUnaryBooleanMatches(new long[]{4}, TensorVertex::diag);
+    }
+
+    @Test
+    public void canDiagParT() {
+        assertUnaryBooleanMatches(new long[]{4, 4}, TensorVertex::diagPart);
+    }
+
+    @Test
     public void compilesEqualTo() {
-        assertBinaryBooleanMatches(BooleanVertex::equalTo);
+        assertBinaryBooleanMatches(BooleanVertex::elementwiseEquals);
     }
 
     @Test
@@ -349,7 +444,7 @@ public class KeanuCompiledGraphTest {
         GaussianVertex A = new GaussianVertex(shape, 0, 1);
         GaussianVertex B = new GaussianVertex(shape, 0, 1);
 
-        assertCompiledIsSameAsVertexEvaluation(A, B, new NumericalEqualsVertex(A, B, ConstantVertex.of(0.5)));
+        assertCompiledIsSameAsVertexEvaluation(A, B, new NumericalEqualsVertex<>(A, B, 0.5));
     }
 
     @Test
@@ -358,16 +453,16 @@ public class KeanuCompiledGraphTest {
         GaussianVertex A = new GaussianVertex(shape, 0, 1);
         PoissonVertex B = new PoissonVertex(shape, 1);
 
-        assertCompiledIsSameAsVertexEvaluation(A, B, new NumericalEqualsVertex(A, B, ConstantVertex.of(IntegerTensor.create(1, shape))));
+        assertCompiledIsSameAsVertexEvaluation(A, B, new NumericalEqualsVertex<>(A, B.toDouble(), 1.0));
     }
 
     @Test
     public void canCompileDoubleCompare() {
         long[] shape = new long[]{10, 10};
         assertDoubleCompareMatches(shape, shape, DoubleVertex::greaterThan);
-        assertDoubleCompareMatches(shape, shape, DoubleVertex::greaterThanOrEqualTo);
+        assertDoubleCompareMatches(shape, shape, DoubleVertex::greaterThanOrEqual);
         assertDoubleCompareMatches(shape, shape, DoubleVertex::lessThan);
-        assertDoubleCompareMatches(shape, shape, DoubleVertex::lessThanOrEqualTo);
+        assertDoubleCompareMatches(shape, shape, DoubleVertex::lessThanOrEqual);
     }
 
     private void assertDoubleCompareMatches(long[] shapeA, long[] shapeB, BiFunction<DoubleVertex, DoubleVertex, BooleanVertex> op) {
@@ -391,7 +486,7 @@ public class KeanuCompiledGraphTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
 
         CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
-        GenericTakeVertex<TestEnum> C = A.take(1);
+        GenericTensorVertex<TestEnum> C = A.take(1);
 
         assertCompiledIsSameAsVertexEvaluation(A, C);
     }
@@ -404,7 +499,7 @@ public class KeanuCompiledGraphTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
 
         CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
-        GenericSliceVertex<TestEnum> C = A.slice(0, 1);
+        GenericTensorVertex<TestEnum> C = A.slice(0, 1);
 
         assertCompiledIsSameAsVertexEvaluation(A, C);
     }
@@ -420,7 +515,9 @@ public class KeanuCompiledGraphTest {
         CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
         CategoricalVertex<TestEnum> B = new CategoricalVertex<>(selectableValues);
 
-        IfVertex<TestEnum> D = new IfVertex<>(predicate, A, B);
+        GenericTensorVertex<TestEnum> D = If.isTrue(predicate)
+            .then(A)
+            .orElse(B);
 
         assertCompiledIsSameAsVertexEvaluation(A, B, predicate, D);
     }
@@ -451,7 +548,7 @@ public class KeanuCompiledGraphTest {
     @Test(expected = GraphAssertionException.class)
     public void canCompileAssertVertexWithLabel() {
         DoubleVertex A = new HalfGaussianVertex(new long[]{2, 2}, 1);
-        AssertVertex assertVertex = A.lessThan(ConstantVertex.of(0.0)).assertTrue().setLabel("test label\n");
+        BooleanVertex assertVertex = A.lessThan(ConstantVertex.of(0.0)).assertTrue().setLabel("test label\n");
         assertCompiledIsSameAsVertexEvaluation(A, assertVertex);
     }
 
@@ -467,7 +564,7 @@ public class KeanuCompiledGraphTest {
         assertCompiledIsSameAsVertexEvaluation(A, B, select, mux);
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C, Vertex<?> D) {
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?, ?> A, Vertex<?, ?> B, Vertex<?, ?> C, Vertex<?, ?> D) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(D.getConnectedGraph(), ImmutableList.of(D));
 
@@ -483,7 +580,7 @@ public class KeanuCompiledGraphTest {
         assertEquals(D.getValue(), result.get(D.getReference()));
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C) {
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?, ?> A, Vertex<?, ?> B, Vertex<?, ?> C) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
 
@@ -498,7 +595,7 @@ public class KeanuCompiledGraphTest {
         assertEquals(C.getValue(), result.get(C.getReference()));
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B) {
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?, ?> A, Vertex<?, ?> B) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(B.getConnectedGraph(), ImmutableList.of(B));
 

@@ -3,8 +3,8 @@ package io.improbable.keanu.e2e.regression;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public class LinearModelScoreTest {
     public void coefficientOfDeterminationIs1ForSameData() {
         UniformVertex generator = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
         DoubleTensor sample = generator.sample();
-        assertThat( ModelScoring.coefficientOfDetermination(sample, sample), closeTo(1, 1e-8));
+        assertThat(ModelScoring.coefficientOfDetermination(sample, sample), closeTo(1, 1e-8));
     }
 
     @Test

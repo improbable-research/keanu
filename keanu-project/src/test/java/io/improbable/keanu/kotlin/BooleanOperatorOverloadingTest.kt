@@ -3,7 +3,7 @@ package io.improbable.keanu.kotlin
 import io.improbable.keanu.DeterministicRule
 import io.improbable.keanu.vertices.ConstantVertex
 import io.improbable.keanu.vertices.VertexMatchers.hasValue
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.ConstantBooleanVertex
 import junit.framework.TestCase
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals

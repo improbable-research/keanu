@@ -10,15 +10,23 @@ import io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.util.status.StatusBar;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @State(Scope.Benchmark)
+@Warmup(iterations = 3, time = 1000, timeUnit = MILLISECONDS)
+@Measurement(iterations = 5, time = 1000, timeUnit = MILLISECONDS)
+@Fork(3)
 public class OptimizerBenchmark {
 
     public enum OptimizerType {

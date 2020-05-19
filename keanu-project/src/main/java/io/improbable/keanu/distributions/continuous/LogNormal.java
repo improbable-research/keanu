@@ -4,8 +4,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.continuous.Gaussian.LN_SQRT_2PI;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
@@ -18,11 +18,11 @@ public class LogNormal implements ContinuousDistribution {
     private final DoubleTensor sigma;
 
     /**
-     * @param mu     location parameter (any real number)
-     * @param sigma  square root of variance (greater than 0)
-     * @return       a new ContinuousDistribution object
+     * @param mu    location parameter (any real number)
+     * @param sigma square root of variance (greater than 0)
+     * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
+    public static LogNormal withParameters(DoubleTensor mu, DoubleTensor sigma) {
         return new LogNormal(mu, sigma);
     }
 
@@ -51,14 +51,13 @@ public class LogNormal implements ContinuousDistribution {
         return lnXMinusMuSquaredOver2Variance.plus(lnSigmaX).plus(LN_SQRT_2PI).unaryMinus();
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor lnXMinusMu = x.log().minusInPlace(mu);
 
         final DoubleTensor dLogPdmu = lnXMinusMu.div(variance);
         final DoubleTensor dLogPdx = dLogPdmu.plus(1.0).unaryMinus().divInPlace(x);
-        final DoubleTensor dLogPdsigma = lnXMinusMu.powInPlace(2)
+        final DoubleTensor dLogPdsigma = lnXMinusMu.powInPlace(2.0)
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 

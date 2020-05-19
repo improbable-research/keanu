@@ -98,7 +98,7 @@ public class LinearLassoRegressionTest {
 
         linearRegressionModelNarrow.fit();
 
-        assertThat(linearRegressionModelNarrow.getWeightVertex().getValue().abs().sum(), lessThan(linearRegressionModelWide.getWeightVertex().getValue().abs().sum()));
+        assertThat(linearRegressionModelNarrow.getWeightVertex().getValue().abs().sumNumber(), lessThan(linearRegressionModelWide.getWeightVertex().getValue().abs().sumNumber()));
 
     }
 

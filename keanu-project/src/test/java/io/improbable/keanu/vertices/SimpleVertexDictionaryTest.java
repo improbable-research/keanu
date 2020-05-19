@@ -18,7 +18,7 @@ public class SimpleVertexDictionaryTest {
     VertexLabel label1 = new VertexLabel("label 1");
     VertexLabel label2 = new VertexLabel("label 2");
 
-    Map<VertexLabel, Vertex<?>> map;
+    Map<VertexLabel, Vertex<?, ?>> map;
     SimpleVertexDictionary dictionary;
 
     @Before
@@ -33,7 +33,7 @@ public class SimpleVertexDictionaryTest {
     @Test
     public void ifYouChangeTheUnderlyingMapItChangesTheDictionary() {
         VertexLabel label3 = new VertexLabel("label3");
-        Vertex<?> vertex3 = mock(Vertex.class);
+        Vertex<?, ?> vertex3 = mock(Vertex.class);
         map.put(label3, vertex3);
         assertThat(dictionary.get(label3), sameInstance(vertex3));
     }
@@ -41,7 +41,7 @@ public class SimpleVertexDictionaryTest {
     @Test
     public void youCanCombineTwoVertexDictionaries() {
         VertexLabel label3 = new VertexLabel("label3");
-        Vertex<?> vertex3 = mock(Vertex.class);
+        Vertex<?, ?> vertex3 = mock(Vertex.class);
         SimpleVertexDictionary dictionary2 = SimpleVertexDictionary.backedBy(ImmutableMap.of(label3, vertex3));
 
         VertexDictionary combinedDictionary = SimpleVertexDictionary.combine(dictionary, dictionary2);
@@ -53,7 +53,7 @@ public class SimpleVertexDictionaryTest {
     @Test
     public void youCanAddExtraEntriesAndGetANewDictionary() {
         VertexLabel label3 = new VertexLabel("label3");
-        Vertex<?> vertex3 = mock(Vertex.class);
+        Vertex<?, ?> vertex3 = mock(Vertex.class);
         VertexDictionary newDictionary = dictionary.withExtraEntries(ImmutableMap.of(label3, vertex3));
 
         assertThat(newDictionary.get(label1), sameInstance(vertex1));

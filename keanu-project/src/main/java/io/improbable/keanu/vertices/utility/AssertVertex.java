@@ -5,17 +5,17 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
 
 
-public class AssertVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
+public class AssertVertex extends VertexImpl<BooleanTensor, BooleanVertex> implements BooleanVertex, NonProbabilistic<BooleanTensor> {
 
     private static final String PREDICATE_NAME = "predicate";
     private static final String ERROR_MESSAGE_NAME = "error";
 
-    private final Vertex<? extends BooleanTensor> predicate;
+    private final BooleanVertex predicate;
     private final String errorMessage;
 
     /**
@@ -26,7 +26,7 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
      * @throws AssertionError if any element of the predicate is false when calculated.
      */
     @ExportVertexToPythonBindings
-    public AssertVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
+    public AssertVertex(@LoadVertexParam(PREDICATE_NAME) BooleanVertex predicate,
                         @LoadVertexParam(ERROR_MESSAGE_NAME) String errorMessage) {
         super(predicate.getShape());
         this.predicate = predicate;
@@ -34,7 +34,7 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
         setParents(predicate);
     }
 
-    public AssertVertex(Vertex<? extends BooleanTensor> predicate) {
+    public AssertVertex(BooleanVertex predicate) {
         this(predicate, "");
     }
 
@@ -45,7 +45,7 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
     }
 
     public static BooleanTensor assertion(BooleanTensor predicateValue, String errorMessage, String labelQualifiedName) {
-        if (!predicateValue.allTrue()) {
+        if (!predicateValue.allTrue().scalar()) {
             throw new GraphAssertionException(buildAssertMessage(errorMessage, labelQualifiedName));
         }
         return predicateValue;
@@ -64,7 +64,7 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
     }
 
     @SaveVertexParam(PREDICATE_NAME)
-    public Vertex<? extends BooleanTensor> getPredicate() {
+    public BooleanVertex getPredicate() {
         return predicate;
     }
 

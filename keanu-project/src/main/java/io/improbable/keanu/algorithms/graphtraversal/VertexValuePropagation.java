@@ -43,11 +43,11 @@ public class VertexValuePropagation {
         HashSet<Vertex> alreadyQueued = new HashSet<>(cascadeFrom);
 
         while (!priorityQueue.isEmpty()) {
-            Vertex<?> visiting = priorityQueue.poll();
+            Vertex<?, ?> visiting = priorityQueue.poll();
 
             updateVertexValue(visiting);
 
-            for (Vertex<?> child : visiting.getChildren()) {
+            for (Vertex<?, ?> child : visiting.getChildren()) {
 
                 if (!child.isProbabilistic() && !alreadyQueued.contains(child)) {
                     priorityQueue.offer(child);
@@ -64,22 +64,22 @@ public class VertexValuePropagation {
     public static void eval(Collection<? extends Vertex> vertices) {
         Deque<Vertex> stack = asDeque(vertices);
 
-        Set<Vertex<?>> hasCalculated = new HashSet<>();
+        Set<Vertex<?, ?>> hasCalculated = new HashSet<>();
 
         while (!stack.isEmpty()) {
 
-            Vertex<?> head = stack.peek();
-            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
+            Vertex<?, ?> head = stack.peek();
+            Set<Vertex<?, ?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
 
             if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
-                Vertex<?> top = stack.pop();
+                Vertex<?, ?> top = stack.pop();
                 updateVertexValue(top);
                 hasCalculated.add(top);
 
             } else {
 
-                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                for (Vertex<?, ?> vertex : parentsThatAreNotYetCalculated) {
                     stack.push(vertex);
                 }
 
@@ -88,9 +88,9 @@ public class VertexValuePropagation {
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Collection<Vertex> parents) {
-        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
-        for (Vertex<?> next : parents) {
+    private static Set<Vertex<?, ?>> parentsThatAreNotCalculated(Set<Vertex<?, ?>> calculated, Collection<Vertex> parents) {
+        Set<Vertex<?, ?>> notCalculatedParents = new HashSet<>();
+        for (Vertex<?, ?> next : parents) {
             if (!calculated.contains(next)) {
                 notCalculatedParents.add(next);
             }
@@ -107,17 +107,17 @@ public class VertexValuePropagation {
 
         while (!stack.isEmpty()) {
 
-            Vertex<?> head = stack.peek();
-            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(head.getParents());
+            Vertex<?, ?> head = stack.peek();
+            Set<Vertex<?, ?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(head.getParents());
 
             if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
-                Vertex<?> top = stack.pop();
+                Vertex<?, ?> top = stack.pop();
                 updateVertexValue(top);
 
             } else {
 
-                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                for (Vertex<?, ?> vertex : parentsThatAreNotYetCalculated) {
                     stack.push(vertex);
                 }
 
@@ -126,9 +126,9 @@ public class VertexValuePropagation {
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Collection<Vertex> parents) {
-        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
-        for (Vertex<?> next : parents) {
+    private static Set<Vertex<?, ?>> parentsThatAreNotCalculated(Collection<Vertex> parents) {
+        Set<Vertex<?, ?>> notCalculatedParents = new HashSet<>();
+        for (Vertex<?, ?> next : parents) {
             if (!next.hasValue()) {
                 notCalculatedParents.add(next);
             }
@@ -138,13 +138,13 @@ public class VertexValuePropagation {
 
     private static Deque<Vertex> asDeque(Iterable<? extends Vertex> vertices) {
         Deque<Vertex> stack = new ArrayDeque<>();
-        for (Vertex<?> v : vertices) {
+        for (Vertex<?, ?> v : vertices) {
             stack.push(v);
         }
         return stack;
     }
 
-    private static <T> void updateVertexValue(Vertex<T> vertex) {
+    private static <T> void updateVertexValue(Vertex<T, ?> vertex) {
         if (vertex.isProbabilistic()) {
             if (!vertex.hasValue()) {
                 vertex.setValue(((Probabilistic<T>) vertex).sample());

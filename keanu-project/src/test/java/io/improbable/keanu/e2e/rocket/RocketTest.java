@@ -5,10 +5,10 @@ import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.generic.nonprobabilistic.ConditionalProbabilityTable;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -54,7 +54,7 @@ public class RocketTest {
         net.probeForNonZeroProbability(1000);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
-        Stream<NetworkSample> networkSamples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
+        Stream<NetworkSample> networkSamples = MetropolisHastings.withDefaultConfig(random).generatePosteriorSamples(
             model,
             Arrays.asList(oRingFailure, residualFuel, alarm1FalsePositive)
         ).stream();

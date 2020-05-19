@@ -1,9 +1,9 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase;
 
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 
 import static junit.framework.TestCase.assertEquals;
 

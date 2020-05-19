@@ -13,10 +13,10 @@ import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,7 +63,7 @@ public class SequenceExample {
             .fromIterator(allMyData.iterator())
             .withFactory((item, csvMyData) -> {
 
-                ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x).setLabel(xLabel);
+                DoubleVertex x = new ConstantDoubleVertex(csvMyData.x).setLabel(xLabel);
                 DoubleVertex y = m.multiply(x).plus(b).setLabel(yLabel);
 
                 DoubleVertex yObserved = new GaussianVertex(y, 1);

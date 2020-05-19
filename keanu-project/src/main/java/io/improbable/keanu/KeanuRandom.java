@@ -3,28 +3,21 @@ package io.improbable.keanu;
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.discrete.Poisson;
-import io.improbable.keanu.tensor.INDArrayShim;
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.rng.DefaultRandom;
-import org.nd4j.linalg.api.rng.Random;
-import org.nd4j.linalg.factory.Nd4j;
+import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.math3.random.SynchronizedRandomGenerator;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static io.improbable.keanu.tensor.TensorShape.getLengthAsInt;
 
 public class KeanuRandom {
 
     private static final AtomicReference<KeanuRandom> DEFAULT_RANDOM = new AtomicReference<>();
 
     static {
-        INDArrayShim.startNewThreadForNd4j();
 
         String randomSeed = System.getProperty("io.improbable.keanu.defaultRandom.seed");
 
@@ -44,33 +37,31 @@ public class KeanuRandom {
         DEFAULT_RANDOM.set(new KeanuRandom(seed));
     }
 
-    private final Random nd4jRandom;
-    private final DataBuffer.Type bufferType;
+    private final RandomGenerator random;
 
     public KeanuRandom() {
-        nd4jRandom = new DefaultRandom();
-        bufferType = DataBuffer.Type.DOUBLE;
+        this(System.currentTimeMillis());
     }
 
     public KeanuRandom(long seed) {
-        nd4jRandom = new DefaultRandom(seed);
-        bufferType = DataBuffer.Type.DOUBLE;
+        random = new SynchronizedRandomGenerator(new MersenneTwister(seed));
     }
 
     public DoubleTensor nextDouble(long[] shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarDoubleTensor(nextDouble());
+        final int length = getLengthAsInt(shape);
+        if (length > 1) {
+            return DoubleTensor.create(nextDoubleBuffer(length), shape);
         } else {
-            return DoubleTensor.create(doubleNextDouble(shape), shape);
+            return DoubleTensor.create(nextDouble(), shape);
         }
     }
 
     public double nextDouble() {
-        return nd4jRandom.nextDouble();
+        return random.nextDouble();
     }
 
     public double nextDouble(double min, double max) {
-        return nd4jRandom.nextDouble() * (max - min) + min;
+        return random.nextDouble() * (max - min) + min;
     }
 
     public double nextDoubleNonZero() {
@@ -82,10 +73,11 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGaussian(long[] shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarDoubleTensor(nextGaussian());
+        final int length = getLengthAsInt(shape);
+        if (length > 1) {
+            return DoubleTensor.create(nextGaussianBuffer(length), shape);
         } else {
-            return DoubleTensor.create(doubleNextGaussian(shape), shape);
+            return DoubleTensor.create(nextGaussian(), shape);
         }
     }
 
@@ -102,37 +94,48 @@ public class KeanuRandom {
     }
 
     public double nextGaussian() {
-        return nd4jRandom.nextGaussian();
+        return random.nextGaussian();
     }
 
     public double nextGaussian(double mu, double sigma) {
-        return nd4jRandom.nextGaussian() * sigma + mu;
+        return random.nextGaussian() * sigma + mu;
     }
 
     public boolean nextBoolean() {
-        return nd4jRandom.nextBoolean();
+        return random.nextBoolean();
     }
 
     public IntegerTensor nextInt(long[] shape) {
-        return new Nd4jIntegerTensor(doubleNextInt(shape));
+        final int length = getLengthAsInt(shape);
+        if (length > 1) {
+            return IntegerTensor.create(nextIntBuffer(length), shape);
+        } else {
+            return IntegerTensor.create(nextInt(), shape);
+        }
     }
 
     public IntegerTensor nextPoisson(long[] shape, DoubleTensor mu) {
         return Poisson.withParameters(mu).sample(shape, this);
-
     }
 
     public int nextInt(int maxExclusive) {
-        return nd4jRandom.nextInt(maxExclusive);
+        return random.nextInt(maxExclusive);
     }
 
-    private INDArray doubleNextInt(long[] shape) {
-        Nd4j.setDataType(bufferType);
-        return nd4jRandom.nextInt(shape);
+    public int nextInt() {
+        return random.nextInt();
     }
 
-    private double[] doubleNextDouble(long[] shape) {
-        int length = TensorShape.getLengthAsInt(shape);
+    private int[] nextIntBuffer(int length) {
+        int[] buffer = new int[length];
+        for (int i = 0; i < length; i++) {
+            buffer[i] = nextInt();
+        }
+
+        return buffer;
+    }
+
+    private double[] nextDoubleBuffer(int length) {
         double[] buffer = new double[length];
         for (int i = 0; i < length; i++) {
             buffer[i] = nextDouble();
@@ -141,9 +144,7 @@ public class KeanuRandom {
         return buffer;
     }
 
-    private double[] doubleNextGaussian(long[] shape) {
-
-        int length = TensorShape.getLengthAsInt(shape);
+    private double[] nextGaussianBuffer(int length) {
         double[] buffer = new double[length];
         for (int i = 0; i < length; i++) {
             buffer[i] = nextGaussian();

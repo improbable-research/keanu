@@ -1,13 +1,13 @@
 package io.improbable.keanu.util;
 
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
+import io.improbable.keanu.vertices.tensor.If;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.nonprobabilistic.ConstantBooleanVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.BinomialVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.nonprobabilistic.ConstantDoubleVertex;
 import org.hamcrest.core.AnyOf;
 import org.junit.Test;
 
@@ -117,9 +117,9 @@ public class DescriptionGeneratorTest {
 
         BooleanVertex falze = new ConstantBooleanVertex(false);
 
-        BooleanVertex predicate1 = two.greaterThanOrEqualTo(three);
+        BooleanVertex predicate1 = two.greaterThanOrEqual(three);
         BooleanVertex predicate2 = two.greaterThan(three);
-        BooleanVertex predicate3 = two.lessThanOrEqualTo(three);
+        BooleanVertex predicate3 = two.lessThanOrEqual(three);
         BooleanVertex predicate4 = two.lessThan(three);
 
         BooleanVertex predicate5 = falze.or(falze);

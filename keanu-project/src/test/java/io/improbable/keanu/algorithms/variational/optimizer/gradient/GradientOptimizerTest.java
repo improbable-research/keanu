@@ -4,10 +4,10 @@ import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.HalfGaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -40,7 +40,7 @@ public class GradientOptimizerTest {
     @Test(expected = UnsupportedOperationException.class)
     public void errorOnDiscreteLatents() {
         PoissonVertex v1 = new PoissonVertex(15);
-        PoissonVertex v2 = new PoissonVertex(v1);
+        PoissonVertex v2 = new PoissonVertex(v1.toDouble());
 
         GradientOptimizer optimizer = Keanu.Optimizer.Gradient.ofConnectedGraph(v1);
     }

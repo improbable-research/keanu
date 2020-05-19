@@ -6,9 +6,9 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.OptimizerBounds;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

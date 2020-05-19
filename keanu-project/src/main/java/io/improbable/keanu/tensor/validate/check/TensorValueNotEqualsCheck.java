@@ -3,7 +3,7 @@ package io.improbable.keanu.tensor.validate.check;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
-public class TensorValueNotEqualsCheck<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValueChecker<TENSOR> {
+public class TensorValueNotEqualsCheck<DATATYPE, TENSOR extends Tensor<DATATYPE, TENSOR>> implements TensorValueChecker<DATATYPE, TENSOR> {
 
     private final DATATYPE value;
 

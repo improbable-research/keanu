@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 from keanu.vartypes import numpy_types
-from keanu.vertex import UniformInt, Exponential, DoubleIf, Poisson
+from keanu.vertex import UniformInt, Exponential, If, Poisson
 from keanu import Model
 
 
@@ -22,7 +22,7 @@ class CoalMining():
             m.late_rate = Exponential(1.0)
 
             m.years = np.array(self._data.index)
-            m.rates = DoubleIf(m.switchpoint > m.years, m.early_rate, m.late_rate)
+            m.rates = If(m.switchpoint > m.years, m.early_rate, m.late_rate)
             m.disasters = Poisson(m.rates)
 
         return m

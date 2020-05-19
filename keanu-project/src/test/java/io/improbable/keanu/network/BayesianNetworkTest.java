@@ -1,11 +1,13 @@
 package io.improbable.keanu.network;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexImpl;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.bool.BooleanVertex;
+import io.improbable.keanu.vertices.tensor.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,7 +107,7 @@ public class BayesianNetworkTest {
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
     }
 
-    private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {
+    private class TestNonSaveableVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, NonSaveableVertex {
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});
         }
@@ -164,10 +166,10 @@ public class BayesianNetworkTest {
 
     @Test
     public void throwsIfVertexWithLabelIsNotInBayesianNetwork() {
-        BernoulliVertex vertexInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_A);
+        BooleanVertex vertexInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_A);
         BayesianNetwork network = new BayesianNetwork(vertexInNetwork.getConnectedGraph());
 
-        BernoulliVertex vertexNotInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_B);
+        BooleanVertex vertexNotInNetwork = new BernoulliVertex(0.5).setLabel(LABEL_B);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(String.format("Vertex with label %s was not found in BayesianNetwork", LABEL_B));

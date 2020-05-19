@@ -1,69 +1,84 @@
 package io.improbable.keanu.tensor.dbl;
 
-import io.improbable.keanu.tensor.INDArrayExtensions;
-import io.improbable.keanu.tensor.INDArrayShim;
+import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
-import io.improbable.keanu.tensor.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
-import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.ndj4.INDArrayShim;
+import io.improbable.keanu.tensor.ndj4.Nd4jFloatingPointTensor;
+import io.improbable.keanu.tensor.ndj4.Nd4jTensor;
+import io.improbable.keanu.tensor.ndj4.TypedINDArrayFactory;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.LUDecomposition;
-import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
-import org.nd4j.linalg.api.buffer.DataBuffer;
+import org.bytedeco.javacpp.DoublePointer;
+import org.nd4j.linalg.api.blas.params.MMulTranspose;
+import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.transforms.ReplaceNans;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.scalar.ReplaceNans;
+import org.nd4j.linalg.api.ops.impl.transforms.bool.MatchConditionTransform;
+import org.nd4j.linalg.api.ops.impl.transforms.same.Sign;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.INDArrayIndex;
-import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.indexing.conditions.Conditions;
-import org.nd4j.linalg.inverse.InvertMatrix;
-import org.nd4j.linalg.ops.transforms.Transforms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
 
-import static com.google.common.primitives.Ints.checkedCast;
-import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
-import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
+import static io.improbable.keanu.tensor.TensorShape.getBroadcastResultShape;
+import static io.improbable.keanu.tensor.ndj4.INDArrayExtensions.asBoolean;
 import static java.util.Arrays.copyOf;
+import static org.bytedeco.openblas.global.openblas.LAPACKE_dpotri;
+import static org.bytedeco.openblas.global.openblas.LAPACK_ROW_MAJOR;
 
 /**
  * Class for representing n-dimensional arrays of doubles. This is
  * backed by Nd4j.
  */
-public class Nd4jDoubleTensor extends DoubleTensor {
+public class Nd4jDoubleTensor extends Nd4jFloatingPointTensor<Double, DoubleTensor> implements DoubleTensor {
 
     static {
         INDArrayShim.startNewThreadForNd4j();
     }
 
-    private static final DataBuffer.Type BUFFER_TYPE = DataBuffer.Type.DOUBLE;
-    private INDArray tensor;
+    private static final DataType BUFFER_TYPE = DataType.DOUBLE;
 
     public Nd4jDoubleTensor(double[] data, long[] shape) {
-        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
+        this(TypedINDArrayFactory.create(data, shape));
     }
 
     public Nd4jDoubleTensor(INDArray tensor) {
-        this.tensor = tensor;
+        super(tensor);
+    }
+
+    public Nd4jDoubleTensor(DoubleTensor from) {
+        this(TypedINDArrayFactory.create(from.asFlatDoubleArray(), from.getShape()));
+    }
+
+    @Override
+    protected INDArray getTensor(Tensor tensor) {
+        return getAsINDArray(tensor);
+    }
+
+    @Override
+    protected DoubleTensor create(INDArray tensor) {
+        return new Nd4jDoubleTensor(tensor);
+    }
+
+    @Override
+    protected DoubleTensor set(INDArray tensor) {
+        this.tensor = tensor.dataType() == DataType.DOUBLE ? tensor : tensor.castTo(DataType.DOUBLE);
+        return this;
+    }
+
+    @Override
+    protected DoubleTensor getThis() {
+        return this;
     }
 
     public static Nd4jDoubleTensor scalar(double scalarValue) {
-        return new Nd4jDoubleTensor(TypedINDArrayFactory.scalar(scalarValue, BUFFER_TYPE));
+        return new Nd4jDoubleTensor(Nd4j.scalar(scalarValue));
     }
 
     public static Nd4jDoubleTensor create(double[] values, long... shape) {
@@ -75,7 +90,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     public static Nd4jDoubleTensor create(double value, long... shape) {
-        return new Nd4jDoubleTensor(valueArrayOf(shape, value, BUFFER_TYPE));
+        return new Nd4jDoubleTensor(Nd4j.valueArrayOf(shape, value));
     }
 
     public static Nd4jDoubleTensor create(double[] values) {
@@ -99,132 +114,125 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     public static Nd4jDoubleTensor arange(double start, double end) {
-        return new Nd4jDoubleTensor(TypedINDArrayFactory.arange(start, end, BUFFER_TYPE));
+        return new Nd4jDoubleTensor(TypedINDArrayFactory.arange(start, end));
     }
 
     public static Nd4jDoubleTensor arange(double start, double end, double stepSize) {
         double stepCount = Math.ceil((end - start) / stepSize);
-        INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount, BUFFER_TYPE).muli(stepSize).addi(start);
+        INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount).muli(stepSize).addi(start);
         return new Nd4jDoubleTensor(arangeWithStep);
     }
 
-    static INDArray unsafeGetNd4J(DoubleTensor that) {
-        if (that.isLengthOne()) {
-            return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
-        }
+    static INDArray getAsINDArray(Tensor that) {
 
-        if (that instanceof Nd4jDoubleTensor) {
-            return ((Nd4jDoubleTensor) that).tensor;
+        if (that instanceof Nd4jTensor) {
+            INDArray array = ((Nd4jTensor) that).getTensor();
+            if (array.dataType() == DataType.DOUBLE) {
+                return array;
+            } else {
+                return array.castTo(DataType.DOUBLE);
+            }
+        } else if (that instanceof NumberTensor) {
+            return TypedINDArrayFactory.create(((NumberTensor) that).toDouble().asFlatDoubleArray(), that.getShape());
         } else {
-            return TypedINDArrayFactory.create(that.asFlatDoubleArray(), that.getShape(), BUFFER_TYPE);
+            throw new IllegalArgumentException("Cannot convert " + that.getClass().getSimpleName() + " to double INDArray/");
         }
     }
 
-    @Override
-    public int getRank() {
-        return tensor.rank();
-    }
-
-    @Override
-    public long[] getShape() {
-        return tensor.shape();
-    }
-
-    @Override
-    public long[] getStride() {
-        return tensor.stride();
-    }
-
-    @Override
-    public long getLength() {
-        return tensor.lengthLong();
-    }
-
-    public Double getValue(long... index) {
-        if (index.length == 1) {
-            return tensor.getDouble(index[0]);
-        } else {
-            return tensor.getDouble(index);
-        }
-    }
-
-    public DoubleTensor setValue(Double value, long... index) {
-
-        tensor.putScalar(index, value);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor reshape(long... newShape) {
-        return new Nd4jDoubleTensor(tensor.reshape(newShape));
-    }
-
-    @Override
-    public DoubleTensor permute(int... rearrange) {
-        return new Nd4jDoubleTensor(tensor.permute(rearrange));
-    }
-
+    /**
+     * Nd4j DiagPart doesnt support non-square matrix diag. In the case where this is non-square
+     * the JVMDoubleTensor implementation is used. For square matrices, the nd4j implementation is used.
+     *
+     * @return matrices with their diagonals equal to the batched vectors from this.
+     */
     @Override
     public DoubleTensor diag() {
-        return new Nd4jDoubleTensor(Nd4j.diag(tensor));
-    }
-
-    @Override
-    public DoubleTensor transpose() {
-        if (this.getRank() != 2) {
-            throw new IllegalArgumentException("Cannot transpose rank " + this.getRank() + " tensor. Try permute instead.");
+        if (getRank() > 1) {
+            //TODO: use nd4j if they support this at later versions
+            return new Nd4jDoubleTensor(toJVM().diag());
+        } else {
+            return super.diag();
         }
-        return new Nd4jDoubleTensor(tensor.transpose());
     }
 
+    /**
+     * Nd4j DiagPart doesnt support non-square matrix diag. In the case where this is non-square
+     * the JVMDoubleTensor implementation is used. For square matrices, the nd4j implementation is used.
+     *
+     * @return The elements from the diagonal of this matrix.
+     */
     @Override
-    public DoubleTensor sum(int... overDimensions) {
-        if (overDimensions.length == 0) {
-            return duplicate();
+    public DoubleTensor diagPart() {
+        if (tensor.size(0) != tensor.size(1)) {
+            //TODO: use nd4j if they support this at later versions
+            return new Nd4jDoubleTensor(toJVM().diagPart());
+        } else {
+            return super.diagPart();
         }
-        return new Nd4jDoubleTensor(INDArrayShim.sum(tensor, overDimensions));
-    }
-
-    public Double sum() {
-        return tensor.sumNumber().doubleValue();
     }
 
     @Override
-    public DoubleTensor duplicate() {
-        return new Nd4jDoubleTensor(tensor.dup());
-    }
-
-    @Override
-    public DoubleTensor apply(Function<Double, Double> function) {
-        DataBuffer data = tensor.data().dup();
-        for (int i = 0; i < data.length(); i++) {
-            data.put(i, function.apply(data.getDouble(i)));
+    public DoubleTensor matrixMultiply(DoubleTensor value, boolean transposeLeft, boolean transposeRight) {
+        TensorShapeValidation.getMatrixMultiplicationResultingShape(tensor.shape(), value.getShape(), transposeLeft, transposeRight);
+        if (tensor.shape().length > 2 || value.getShape().length > 2) {
+            return fromJVM(toJVM().matrixMultiply(value, transposeLeft, transposeRight));
         }
-        return new Nd4jDoubleTensor(data.asDouble(), this.getShape());
+
+        INDArray mmulResult = tensor.mmul(getTensor(value), MMulTranspose.builder()
+            .transposeA(transposeLeft)
+            .transposeB(transposeRight)
+            .transposeResult(false)
+            .build()
+        );
+
+        return create(mmulResult);
     }
 
     @Override
-    public DoubleTensor matrixInverse() {
-        return new Nd4jDoubleTensor(InvertMatrix.invert(tensor, false));
+    public DoubleTensor choleskyInverse() {
+        INDArray newBuffer = tensor.dup();
+
+        int N = Ints.checkedCast(getShape()[getRank() - 1]);
+
+        int inverseResult = LAPACKE_dpotri(
+            LAPACK_ROW_MAJOR,
+            (byte) 'L',
+            N,
+            (DoublePointer) newBuffer.data().pointer(),
+            N
+        );
+
+        if (inverseResult != 0) {
+            throw new IllegalStateException("Cholesky inverse failed");
+        }
+
+        return create(newBuffer);
     }
 
     @Override
-    public double max() {
-        return tensor.maxNumber().doubleValue();
+    protected DoubleTensor toJVM() {
+        return JVMDoubleTensorFactory.INSTANCE.create(asFlatDoubleArray(), getShape());
     }
 
     @Override
-    public double min() {
-        return tensor.minNumber().doubleValue();
+    protected DoubleTensor fromJVM(DoubleTensor jvmTensor) {
+        return new Nd4jDoubleTensor(jvmTensor);
     }
 
     @Override
-    public int argMax() {
-        return tensor.argMax().getInt(0);
+    public IntegerTensor nanArgMax() {
+        return IntegerTensor.scalar(tensor.argMax().getInt(0));
     }
 
     @Override
-    public IntegerTensor argMax(int axis) {
+    public IntegerTensor argMax() {
+        return duplicate()
+            .replaceNaNInPlace(Double.MAX_VALUE)
+            .nanArgMax();
+    }
+
+    @Override
+    public IntegerTensor nanArgMax(int axis) {
         long[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
         INDArray max = tensor.argMax(axis).reshape(TensorShape.removeDimension(axis, shape));
@@ -232,328 +240,68 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double average() {
-        return tensor.sumNumber().doubleValue() / tensor.length();
+    public IntegerTensor argMax(int axis) {
+        return duplicate()
+            .replaceNaNInPlace(Double.MAX_VALUE)
+            .nanArgMax(axis);
     }
 
     @Override
-    public double standardDeviation() {
-        return tensor.stdNumber().doubleValue();
+    public IntegerTensor nanArgMin() {
+        return IntegerTensor.scalar(Nd4j.argMin(tensor).getInt(0));
     }
 
     @Override
-    public boolean equalsWithinEpsilon(DoubleTensor o, double epsilon) {
-        if (this == o) return true;
-
-        if (o instanceof Nd4jDoubleTensor) {
-            return tensor.equalsWithEps(((Nd4jDoubleTensor) o).tensor, epsilon);
-        } else {
-            if (this.hasSameShapeAs(o)) {
-                DoubleTensor difference = o.minus(this);
-                return difference.abs().lessThan(epsilon).allTrue();
-            }
-        }
-        return false;
+    public IntegerTensor argMin() {
+        return duplicate()
+            .replaceNaNInPlace(-Double.MAX_VALUE)
+            .nanArgMin();
     }
 
     @Override
-    public DoubleTensor clamp(DoubleTensor min, DoubleTensor max) {
-        return duplicate().clampInPlace(min, max);
+    public IntegerTensor nanArgMin(int axis) {
+        long[] shape = this.getShape();
+        TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
+        return new Nd4jIntegerTensor(Nd4j.argMin(tensor, axis).reshape(TensorShape.removeDimension(axis, shape)));
     }
 
     @Override
-    public DoubleTensor ceil() {
-        return duplicate().ceilInPlace();
+    public IntegerTensor argMin(int axis) {
+        return duplicate()
+            .replaceNaNInPlace(-Double.MAX_VALUE)
+            .nanArgMin(axis);
     }
 
     @Override
-    public DoubleTensor floor() {
-        return duplicate().floorInPlace();
+    protected Double getNumber(Number number) {
+        return number.doubleValue();
     }
 
     @Override
-    public DoubleTensor round() {
-        return duplicate().roundInPlace();
+    public DoubleTensor greaterThanMask(DoubleTensor greaterThanThis) {
+        return greaterThan(greaterThanThis).toDoubleMask();
     }
 
     @Override
-    public DoubleTensor standardize() {
-        return duplicate().standardizeInPlace();
+    public DoubleTensor greaterThanOrEqualToMask(DoubleTensor greaterThanOrEqualToThis) {
+        return greaterThanOrEqual(greaterThanOrEqualToThis).toDoubleMask();
     }
 
     @Override
-    public DoubleTensor replaceNaN(double value) {
-        return duplicate().replaceNaNInPlace(value);
+    public DoubleTensor lessThanMask(DoubleTensor lessThanThis) {
+        return lessThan(lessThanThis).toDoubleMask();
     }
 
     @Override
-    public DoubleTensor sigmoid() {
-        return duplicate().sigmoidInPlace();
+    public DoubleTensor lessThanOrEqualToMask(DoubleTensor lessThanOrEqualToThis) {
+        return lessThanOrEqual(lessThanOrEqualToThis).toDoubleMask();
     }
 
-    @Override
-    public DoubleTensor choleskyDecomposition() {
-        INDArray dup = tensor.dup();
-        Nd4j.getBlasWrapper().lapack().potrf(dup, true);
-        return new Nd4jDoubleTensor(dup);
-    }
-
-    @Override
-    public Double scalar() {
-        if (this.getLength() > 1) {
-            throw new IllegalArgumentException("Not a scalar");
-        }
-        return tensor.getDouble(0);
-    }
-
-    @Override
-    public DoubleTensor reciprocal() {
-        return duplicate().reciprocalInPlace();
-    }
-
-    @Override
-    public DoubleTensor minus(double value) {
-        return duplicate().minusInPlace(value);
-    }
-
-    @Override
-    public DoubleTensor plus(double value) {
-        return duplicate().plusInPlace(value);
-    }
-
-    @Override
-    public DoubleTensor times(double value) {
-        return duplicate().timesInPlace(value);
-    }
-
-    @Override
-    public DoubleTensor matrixMultiply(DoubleTensor value) {
-        INDArray mmulResult = tensor.mmul(unsafeGetNd4J(value));
-        return new Nd4jDoubleTensor(mmulResult);
-    }
-
-    @Override
-    public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
-        return TensorMulByMatrixMul.tensorMmul(this, value, dimsLeft, dimsRight);
-    }
-
-    @Override
-    public DoubleTensor div(double value) {
-        return duplicate().divInPlace(value);
-    }
-
-    @Override
-    public DoubleTensor pow(DoubleTensor exponent) {
-        return duplicate().powInPlace(exponent);
-    }
-
-    @Override
-    public DoubleTensor pow(double exponent) {
-        return duplicate().powInPlace(exponent);
-    }
-
-    @Override
-    public DoubleTensor sqrt() {
-        return duplicate().sqrtInPlace();
-    }
-
-    @Override
-    public DoubleTensor log() {
-        return duplicate().logInPlace();
-    }
-
-    @Override
-    public DoubleTensor safeLogTimes(DoubleTensor y) {
-        return duplicate().safeLogTimesInPlace(y);
-    }
-
-    @Override
-    public DoubleTensor logGamma() {
-        return duplicate().logGammaInPlace();
-    }
-
-    @Override
-    public DoubleTensor digamma() {
-        return duplicate().digammaInPlace();
-    }
-
-    @Override
-    public DoubleTensor sin() {
-        return duplicate().sinInPlace();
-    }
-
-    @Override
-    public DoubleTensor cos() {
-        return duplicate().cosInPlace();
-    }
-
-    @Override
-    public DoubleTensor tan() {
-        return duplicate().tanInPlace();
-    }
-
-    @Override
-    public DoubleTensor atan() {
-        return duplicate().atanInPlace();
-    }
-
-    @Override
-    public DoubleTensor atan2(double y) {
-        return duplicate().atan2InPlace(y);
-    }
-
-    @Override
-    public DoubleTensor atan2(DoubleTensor y) {
-        return duplicate().atan2InPlace(y);
-    }
-
-    @Override
-    public DoubleTensor asin() {
-        return duplicate().asinInPlace();
-    }
-
-    @Override
-    public DoubleTensor acos() {
-        return duplicate().acosInPlace();
-    }
-
-    @Override
-    public DoubleTensor exp() {
-        return duplicate().expInPlace();
-    }
-
-    @Override
-    public DoubleTensor minus(DoubleTensor that) {
-        if (that.isScalar()) {
-            return this.minus(that.scalar());
-        } else if (this.isScalar()) {
-            return that.unaryMinus().plusInPlace(this);
-        } else {
-            return this.duplicate().minusInPlace(that);
-        }
-    }
-
-    @Override
-    public DoubleTensor plus(DoubleTensor that) {
-        if (that.isScalar()) {
-            return this.plus(that.scalar());
-        } else if (this.isScalar()) {
-            return that.plus(this.scalar());
-        } else {
-            return this.duplicate().plusInPlace(that);
-        }
-    }
-
-    @Override
-    public DoubleTensor times(DoubleTensor that) {
-        if (that.isScalar()) {
-            return this.times(that.scalar());
-        } else if (this.isScalar()) {
-            return that.times(this.scalar());
-        } else {
-            return this.duplicate().timesInPlace(that);
-        }
-    }
-
-    @Override
-    public DoubleTensor div(DoubleTensor that) {
-        if (that.isScalar()) {
-            return this.div(that.scalar());
-        } else if (this.isScalar()) {
-            return that.reciprocal().timesInPlace(this);
-        } else {
-            return this.duplicate().divInPlace(that);
-        }
-    }
-
-    @Override
-    public DoubleTensor abs() {
-        return duplicate().absInPlace();
-    }
-
-    @Override
-    public DoubleTensor unaryMinus() {
-        return duplicate().unaryMinusInPlace();
-    }
-
-    @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
-        return duplicate().setWithMaskInPlace(mask, value);
-    }
-
-    @Override
-    public DoubleTensor reciprocalInPlace() {
-        tensor.rdivi(1.0);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor minusInPlace(double value) {
-        tensor.subi(value);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor plusInPlace(double value) {
-        tensor.addi(value);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor timesInPlace(double value) {
-        tensor.muli(value);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor divInPlace(double value) {
-        tensor.divi(value);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor powInPlace(DoubleTensor exponent) {
-        if (exponent.isScalar()) {
-            Transforms.pow(tensor, exponent.scalar(), false);
-        } else {
-            INDArray exponentArray = unsafeGetNd4J(exponent);
-            tensor = INDArrayShim.pow(tensor, exponentArray);
-        }
-        return this;
-    }
-
-    @Override
-    public DoubleTensor powInPlace(double exponent) {
-        Transforms.pow(tensor, exponent, false);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor sqrtInPlace() {
-        Transforms.sqrt(tensor, false);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor logInPlace() {
-        Transforms.log(tensor, false);
-        return this;
-    }
-
-    /**
-     * This is identical to log().times(y), except that it changes NaN results to 0.
-     * This is important when calculating 0log0, which should return 0
-     * See https://arcsecond.wordpress.com/2009/03/19/0log0-0-for-real/ for some mathematical justification
-     *
-     * @param y The tensor value to multiply by
-     * @return the log of this tensor multiplied by y
-     */
     @Override
     public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
-        TensorValidator.NAN_CATCHER.validate(this);
-        TensorValidator.NAN_CATCHER.validate(y);
-        DoubleTensor result = this.logInPlace().timesInPlace(y);
-        return TensorValidator.NAN_FIXER.validate(result);
+        BooleanTensor yNotZeroMask = y.elementwiseEquals(0.0);
+        DoubleTensor result = logInPlace().timesInPlace(y);
+        return DoubleTensor.scalar(0.0).where(yNotZeroMask, result);
     }
 
     @Override
@@ -567,592 +315,85 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor sinInPlace() {
-        Transforms.sin(tensor, false);
-        return this;
+    public DoubleTensor trigammaInPlace() {
+        return applyInPlace(Gamma::trigamma);
     }
 
     @Override
-    public DoubleTensor cosInPlace() {
-        Transforms.cos(tensor, false);
-        return this;
+    public DoubleTensor logAddExp2InPlace(DoubleTensor that) {
+        //TODO: actually use Nd4j when logsumexp is fixed in next version
+        JVMDoubleTensor asJVM = JVMDoubleTensorFactory.INSTANCE.create(tensor.toDoubleVector(), tensor.shape());
+        DoubleTensor result = asJVM.logAddExp2InPlace(that);
+        return Nd4jDoubleTensor.create(result.asFlatDoubleArray(), result.getShape());
     }
 
     @Override
-    public DoubleTensor tanInPlace() {
-        INDArray sin = Transforms.sin(tensor, true);
-        INDArray cos = Transforms.cos(tensor, true);
-        tensor = sin.divi(cos);
-        return this;
+    public DoubleTensor logAddExpInPlace(DoubleTensor that) {
+        //TODO: actually use Nd4j when logsumexp is fixed in next version
+        JVMDoubleTensor asJVM = JVMDoubleTensorFactory.INSTANCE.create(tensor.toDoubleVector(), tensor.shape());
+        DoubleTensor result = asJVM.logAddExpInPlace(that);
+        return Nd4jDoubleTensor.create(result.asFlatDoubleArray(), result.getShape());
     }
 
     @Override
-    public DoubleTensor atanInPlace() {
-        Transforms.atan(tensor, false);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor atan2InPlace(double y) {
-        return atan2InPlace(DoubleTensor.create(y, this.tensor.shape()));
-    }
-
-    @Override
-    public DoubleTensor atan2InPlace(DoubleTensor y) {
-        if (y.isScalar()) {
-            tensor = Transforms.atan2(tensor, valueArrayOf(this.tensor.shape(), y.scalar(), BUFFER_TYPE));
-        } else {
-            tensor = INDArrayShim.atan2(tensor, unsafeGetNd4J(y));
-        }
-        return this;
-    }
-
-    @Override
-    public DoubleTensor asinInPlace() {
-        Transforms.asin(tensor, false);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor acosInPlace() {
-        Transforms.acos(tensor, false);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor expInPlace() {
-        Transforms.exp(tensor, false);
-        return this;
-    }
-
-    /**
-     * @param that Right operand.
-     * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
-     * Otherwise return <i>this</i>.
-     */
-    @Override
-    public DoubleTensor minusInPlace(DoubleTensor that) {
-        if (that.isScalar()) {
-            tensor.subi(that.scalar());
-        } else if (this.isScalar()) {
-            return this.minus(that);
-        } else {
-            INDArray result = INDArrayShim.subi(tensor, unsafeGetNd4J(that).dup());
-            if (result != tensor) {
-                return new Nd4jDoubleTensor(result);
-            }
-        }
-        return this;
-    }
-
-    /**
-     * @param that Right operand.
-     * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
-     * Otherwise return <i>this</i>.
-     */
-    @Override
-    public DoubleTensor plusInPlace(DoubleTensor that) {
-        if (that.isScalar()) {
-            tensor.addi(that.scalar());
-        } else if (this.isScalar()) {
-            return this.plus(that);
-        } else {
-            INDArray result = INDArrayShim.addi(tensor, unsafeGetNd4J(that).dup());
-            if (result != tensor) {
-                return new Nd4jDoubleTensor(result);
-            }
-        }
-        return this;
-    }
-
-    /**
-     * @param that Right operand.
-     * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
-     * Otherwise return <i>this</i>.
-     */
-    @Override
-    public DoubleTensor timesInPlace(DoubleTensor that) {
-        if (that.isScalar()) {
-            tensor.muli(that.scalar());
-        } else if (this.isScalar()) {
-            return this.times(that);
-        } else {
-            INDArray result = INDArrayShim.muli(tensor, unsafeGetNd4J(that).dup());
-            if (result != tensor) {
-                return new Nd4jDoubleTensor(result);
-            }
-        }
-        return this;
-    }
-
-    /**
-     * @param that Right operand.
-     * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
-     * Otherwise return <i>this</i>.
-     */
-    @Override
-    public DoubleTensor divInPlace(DoubleTensor that) {
-        if (that.isScalar()) {
-            tensor.divi(that.scalar());
-        } else if (this.isScalar()) {
-            return this.div(that);
-        } else {
-            INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that).dup());
-            if (result != tensor) {
-                return new Nd4jDoubleTensor(result);
-            }
-        }
-        return this;
-    }
-
-    @Override
-    public DoubleTensor unaryMinusInPlace() {
-        tensor.negi();
-        return this;
-    }
-
-    @Override
-    public DoubleTensor absInPlace() {
-        Transforms.abs(tensor, false);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
-
-        INDArray mask = tensor.dup();
-
-        if (greaterThanThis.isScalar()) {
-            Nd4j.getExecutioner().exec(
-                new OldGreaterThan(mask,
-                    valueArrayOf(mask.shape(), greaterThanThis.scalar(), BUFFER_TYPE),
-                    mask,
-                    mask.length()
-                )
-            );
-        } else {
-            INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanThis);
-            mask = INDArrayShim.getGreaterThanMask(mask, greaterThanThisArray, BUFFER_TYPE);
-        }
-
-        return new Nd4jDoubleTensor(mask);
-    }
-
-    @Override
-    public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanOrEqualToThis) {
-
-        INDArray mask = tensor.dup();
-
-        if (greaterThanOrEqualToThis.isScalar()) {
-            Nd4j.getExecutioner().exec(
-                new OldGreaterThanOrEqual(mask,
-                    valueArrayOf(mask.shape(), greaterThanOrEqualToThis.scalar(), BUFFER_TYPE),
-                    mask,
-                    mask.length()
-                )
-            );
-        } else {
-            INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanOrEqualToThis);
-            mask = INDArrayShim.getGreaterThanOrEqualToMask(mask, greaterThanThisArray, BUFFER_TYPE);
-        }
-
-        return new Nd4jDoubleTensor(mask);
-    }
-
-    @Override
-    public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
-
-        INDArray mask = tensor.dup();
-
-        if (lessThanThis.isScalar()) {
-            Nd4j.getExecutioner().exec(
-                new OldLessThan(mask,
-                    valueArrayOf(mask.shape(), lessThanThis.scalar(), BUFFER_TYPE),
-                    mask,
-                    mask.length()
-                )
-            );
-        } else {
-            INDArray lessThanThisArray = unsafeGetNd4J(lessThanThis);
-            mask = INDArrayShim.getLessThanMask(mask, lessThanThisArray, BUFFER_TYPE);
-        }
-
-        return new Nd4jDoubleTensor(mask);
-    }
-
-    @Override
-    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanOrEqualToThis) {
-
-        INDArray mask = tensor.dup();
-
-        if (lessThanOrEqualToThis.isScalar()) {
-            Nd4j.getExecutioner().exec(
-                new OldLessThanOrEqual(mask,
-                    valueArrayOf(mask.shape(), lessThanOrEqualToThis.scalar(), BUFFER_TYPE),
-                    mask,
-                    mask.length()
-                )
-            );
-        } else {
-            INDArray lessThanOrEqualToThisArray = unsafeGetNd4J(lessThanOrEqualToThis);
-            mask = INDArrayShim.getLessThanOrEqualToMask(mask, lessThanOrEqualToThisArray, BUFFER_TYPE);
-        }
-
-        return new Nd4jDoubleTensor(mask);
-    }
-
-    @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
-        if (this.getLength() != mask.getLength()) {
-            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
-        }
-
-        INDArray maskDup = unsafeGetNd4J(mask).dup();
-        double trueValue = 1.0;
-        if (value == 0.0) {
-            trueValue = 1.0 - trueValue;
-            maskDup.negi().addi(1);
-        }
-        double falseValue = 1.0 - trueValue;
-
-        Nd4j.getExecutioner().exec(
-            new CompareAndSet(maskDup, value, Conditions.equals(trueValue))
-        );
-
-        Nd4j.getExecutioner().exec(
-            new CompareAndSet(tensor, maskDup, Conditions.notEquals(falseValue))
-        );
-
-        return this;
-    }
-
-    @Override
-    public DoubleTensor applyInPlace(Function<Double, Double> function) {
-        DataBuffer data = tensor.data();
-        for (int i = 0; i < data.length(); i++) {
-            data.put(i, function.apply(data.getDouble(i)));
-        }
-        return this;
-    }
-
-    @Override
-    public DoubleTensor maxInPlace(DoubleTensor max) {
-        if (max.isScalar()) {
-            Transforms.max(tensor, max.scalar(), false);
-        } else {
-            tensor = INDArrayShim.max(tensor, unsafeGetNd4J(max));
-        }
-        return this;
-    }
-
-    @Override
-    public DoubleTensor minInPlace(DoubleTensor min) {
-        if (min.isScalar()) {
-            Transforms.min(tensor, min.scalar(), false);
-        } else {
-            tensor = INDArrayShim.min(tensor, unsafeGetNd4J(min));
-        }
-        return this;
-    }
-
-    @Override
-    public DoubleTensor standardizeInPlace() {
-        tensor.subi(average()).divi(standardDeviation());
-        return this;
-    }
-
-    @Override
-    public DoubleTensor setAllInPlace(double value) {
-        this.tensor.assign(value);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
-        return minInPlace(max).maxInPlace(min);
-    }
-
-    @Override
-    public DoubleTensor ceilInPlace() {
-        Transforms.ceil(tensor, false);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor floorInPlace() {
-        Transforms.floor(tensor, false);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor roundInPlace() {
-        Transforms.round(tensor, false);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor sigmoidInPlace() {
-        Transforms.sigmoid(tensor, false);
-        return this;
-    }
-
-    @Override
-    public double determinant() {
-        INDArray dup = tensor.dup();
-        double[][] asMatrix = dup.toDoubleMatrix();
-        RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
-        return new LUDecomposition(matrix).getDeterminant();
-    }
-
-    @Override
-    public double product() {
-        return tensor.prod().getDouble(0);
-    }
-
-    @Override
-    public DoubleTensor slice(int dimension, long index) {
-        INDArray dup = tensor.dup();
-        return new Nd4jDoubleTensor(INDArrayShim.slice(dup, dimension, index));
-    }
-
-    @Override
-    public DoubleTensor take(long... index) {
-        return scalar(getValue(index));
-    }
-
-    /**
-     * @param dimension      the dimension to slice on
-     * @param splitAtIndices the indices that the dimension to slice on should be slice on
-     * @return pieces of the tensor slice in the order specified by splitAtIndices. To get
-     * pieces that encompasses the entire tensor, the last index in the splitAtIndices must
-     * be the length of the dimension being slice on.
-     * <p>
-     * e.g A =
-     * [
-     * 1, 2, 3, 4, 5, 6
-     * 7, 8, 9, 1, 2, 3
-     * ]
-     * <p>
-     * A.slice(0, [1]) gives List([1, 2, 3, 4, 5, 6])
-     * A.slice(0, [1, 2]) gives List([1, 2, 3, 4, 5, 6], [7, 8, 9, 1, 2, 3]
-     * <p>
-     * A.slice(1, [1, 3, 6]) gives
-     * List(
-     * [1, [2, 3  , [4, 5, 6,
-     * 7]  8, 9]    1, 2, 3]
-     * )
-     */
-    @Override
-    public List<DoubleTensor> split(int dimension, long... splitAtIndices) {
-
-        long[] shape = getShape();
-        dimension = getAbsoluteDimension(dimension, getRank());
-
-        if (dimension < 0 || dimension >= shape.length) {
-            throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
-        }
-
-        Nd4j.getCompressor().autoDecompress(tensor);
-
-        List<DoubleTensor> splits = new ArrayList<>();
-        long previousSplitIndex = 0;
-        for (int i = 0; i < splitAtIndices.length; i++) {
-
-            INDArrayIndex[] indices = new INDArrayIndex[tensor.rank()];
-
-            if (previousSplitIndex == splitAtIndices[i]) {
-                throw new IllegalArgumentException("Invalid index to split on " + splitAtIndices[i] + " at dimension " + dimension + " for tensor of shape " + Arrays.toString(shape));
-            }
-
-            indices[dimension] = NDArrayIndex.interval(previousSplitIndex, splitAtIndices[i]);
-            previousSplitIndex = splitAtIndices[i];
-
-            for (int j = 0; j < tensor.rank(); j++) {
-                if (j != dimension) {
-                    indices[j] = NDArrayIndex.all();
-                }
-            }
-
-            splits.add(new Nd4jDoubleTensor(tensor.get(indices)));
-        }
-
-        return splits;
-    }
-
-    // Comparisons
-
-    @Override
-    public BooleanTensor lessThan(double value) {
-        return fromMask(tensor.lt(value), copyOf(getShape(), getRank()));
-    }
-
-    @Override
-    public BooleanTensor lessThanOrEqual(double value) {
-        return fromMask(tensor.lte(value), copyOf(getShape(), getRank()));
-    }
-
-    @Override
-    public BooleanTensor lessThan(DoubleTensor value) {
-
-        INDArray mask;
-        if (value.isScalar()) {
-            mask = tensor.lt(value.scalar());
-        } else {
-            INDArray indArray = unsafeGetNd4J(value);
-            mask = INDArrayShim.lt(tensor, indArray);
-        }
-
-        return fromMask(mask, copyOf(mask.shape(), mask.shape().length));
-    }
-
-    @Override
-    public BooleanTensor lessThanOrEqual(DoubleTensor value) {
-
-        INDArray mask;
-        if (value.isScalar()) {
-            mask = tensor.lte(value.scalar());
-        } else {
-
-            INDArray indArray = unsafeGetNd4J(value);
-            mask = tensor.dup();
-            mask = INDArrayShim.getLessThanOrEqualToMask(mask, indArray, BUFFER_TYPE);
-        }
-
-        return fromMask(mask, copyOf(mask.shape(), mask.shape().length));
-    }
-
-    @Override
-    public BooleanTensor greaterThan(double value) {
-        return fromMask(tensor.gt(value), copyOf(getShape(), getRank()));
-    }
-
-    @Override
-    public BooleanTensor greaterThanOrEqual(double value) {
-        return fromMask(tensor.gte(value), copyOf(getShape(), getRank()));
-    }
-
-    @Override
-    public BooleanTensor notNaN() {
-        return this.elementwiseEquals(this);
-    }
-
-    @Override
-    public DoubleTensor replaceNaNInPlace(double value) {
+    public DoubleTensor replaceNaNInPlace(Double value) {
         Nd4j.getExecutioner().exec(new ReplaceNans(tensor, value));
         return this;
     }
 
     @Override
-    public BooleanTensor greaterThan(DoubleTensor value) {
+    public BooleanTensor isFinite() {
+        INDArray result = Nd4j.getExecutioner().exec(
+            new MatchConditionTransform(
+                tensor, Nd4j.createUninitialized(DataType.BOOL, tensor.shape(), tensor.ordering()),
+                Conditions.isFinite())
+        );
+        return BooleanTensor.create(asBoolean(result), tensor.shape());
+    }
 
-        INDArray mask;
-        if (value.isScalar()) {
-            mask = tensor.gt(value.scalar());
-        } else {
-            INDArray indArray = unsafeGetNd4J(value);
-            mask = INDArrayShim.gt(tensor, indArray);
+    @Override
+    public BooleanTensor isInfinite() {
+        INDArray result = tensor.isInfinite();
+        return BooleanTensor.create(asBoolean(result), tensor.shape());
+    }
+
+    @Override
+    public BooleanTensor isNegativeInfinity() {
+        INDArray result = Nd4j.getExecutioner().exec(
+            new MatchConditionTransform(
+                tensor, Nd4j.createUninitialized(DataType.BOOL, tensor.shape(), tensor.ordering()),
+                Conditions.equals(Double.NEGATIVE_INFINITY))
+        );
+        return BooleanTensor.create(asBoolean(result), tensor.shape());
+    }
+
+    @Override
+    public BooleanTensor isPositiveInfinity() {
+        INDArray result = Nd4j.getExecutioner().exec(
+            new MatchConditionTransform(
+                tensor, Nd4j.createUninitialized(DataType.BOOL, tensor.shape(), tensor.ordering()),
+                Conditions.equals(Double.POSITIVE_INFINITY))
+        );
+        return BooleanTensor.create(asBoolean(result), tensor.shape());
+    }
+
+    @Override
+    public DoubleTensor where(BooleanTensor predicate, DoubleTensor els) {
+        final long[] resultShape = getBroadcastResultShape(getBroadcastResultShape(getShape(), predicate.getShape()), els.getShape());
+        final DoubleTensor broadcastedTrue = this.hasShape(resultShape) ? this : this.broadcast(resultShape);
+        final DoubleTensor broadcastedFalse = els.hasShape(resultShape) ? els : els.broadcast(resultShape);
+        final BooleanTensor broadcastedPredicate = predicate.hasShape(resultShape) ? predicate : predicate.broadcast(resultShape);
+
+        FlattenedView<Double> trueValuesFlattened = broadcastedTrue.getFlattenedView();
+        FlattenedView<Double> falseValuesFlattened = broadcastedFalse.getFlattenedView();
+        FlattenedView<Boolean> predicateValuesFlattened = broadcastedPredicate.getFlattenedView();
+
+        double[] result = new double[TensorShape.getLengthAsInt(resultShape)];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = predicateValuesFlattened.get(i) ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
         }
 
-        return fromMask(mask, copyOf(mask.shape(), mask.shape().length));
-    }
-
-    @Override
-    public BooleanTensor greaterThanOrEqual(DoubleTensor value) {
-
-        INDArray mask;
-        if (value.isScalar()) {
-            mask = tensor.gte(value.scalar());
-        } else {
-            INDArray indArray = unsafeGetNd4J(value);
-            mask = tensor.dup();
-            mask = INDArrayShim.getGreaterThanOrEqualToMask(mask, indArray, BUFFER_TYPE);
-        }
-
-        return fromMask(mask, copyOf(mask.shape(), mask.shape().length));
-    }
-
-    @Override
-    public BooleanTensor elementwiseEquals(Tensor that) {
-        if (that instanceof DoubleTensor) {
-            if (isScalar()) {
-                return (that).elementwiseEquals(this.scalar());
-            } else if (that.isScalar()) {
-                return elementwiseEquals(((DoubleTensor) that).scalar());
-            } else {
-                INDArray mask = INDArrayShim.eq(tensor, unsafeGetNd4J((DoubleTensor) that));
-                return fromMask(mask, mask.shape());
-            }
-        } else {
-            return Tensor.elementwiseEquals(this, that);
-        }
-    }
-
-    @Override
-    public BooleanTensor elementwiseEquals(Double value) {
-        return fromMask(tensor.eq(value), copyOf(getShape(), getRank()));
-    }
-
-    @Override
-    public FlattenedView<Double> getFlattenedView() {
-        return new Nd4jDoubleFlattenedView(tensor);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o instanceof Nd4jDoubleTensor) {
-            return tensor.equals(((Nd4jDoubleTensor) o).tensor);
-        } else if (o instanceof Tensor) {
-            Tensor that = (Tensor) o;
-            if (!Arrays.equals(that.getShape(), getShape())) return false;
-            return Arrays.equals(
-                that.asFlatArray(),
-                this.asFlatArray()
-            );
-        }
-
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return tensor.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return tensor.toString();
-    }
-
-    @Override
-    public DoubleTensor toDouble() {
-        return duplicate();
-    }
-
-    @Override
-    public IntegerTensor toInteger() {
-        return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(tensor, true));
-    }
-
-    private BooleanTensor fromMask(INDArray mask, long[] shape) {
-        DataBuffer data = mask.data();
-        boolean[] boolsFromMask = new boolean[checkedCast(mask.length())];
-
-        for (int i = 0; i < boolsFromMask.length; i++) {
-            boolsFromMask[i] = data.getDouble(i) != 0.0;
-        }
-        return new SimpleBooleanTensor(boolsFromMask, shape);
-    }
-
-    @Override
-    public double[] asFlatDoubleArray() {
-        return tensor.dup().data().asDouble();
-    }
-
-    @Override
-    public int[] asFlatIntegerArray() {
-        return tensor.dup().data().asInt();
+        return DoubleTensor.create(result, copyOf(resultShape, resultShape.length));
     }
 
     @Override
@@ -1160,13 +401,18 @@ public class Nd4jDoubleTensor extends DoubleTensor {
         return ArrayUtils.toObject(asFlatDoubleArray());
     }
 
-    private static class Nd4jDoubleFlattenedView implements FlattenedView<Double> {
+    @Override
+    public FlattenedView<Double> getFlattenedView() {
+        return new Nd4jDoubleFlattenedView();
+    }
 
-        INDArray tensor;
+    @Override
+    public DoubleTensor signInPlace() {
+        Nd4j.getExecutioner().exec(new Sign(tensor));
+        return this;
+    }
 
-        public Nd4jDoubleFlattenedView(INDArray tensor) {
-            this.tensor = tensor;
-        }
+    private class Nd4jDoubleFlattenedView implements FlattenedView<Double> {
 
         @Override
         public long size() {

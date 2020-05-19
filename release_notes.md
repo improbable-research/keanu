@@ -1,12 +1,92 @@
+## Version 0.0.27
+
+### Java
+
+#### Breaking changes
+- Moved `io.improbable.keanu.vertices.dbl` classes to `io.improbable.keanu.vertices.tensor.number.floating.dbl`
+- Moved `io.improbable.keanu.vertices.int` classes to `io.improbable.keanu.vertices.tensor.number.fixed.int`
+- Moved `io.improbable.keanu.vertices.bool` classes to `io.improbable.keanu.vertices.tensor.bool`
+- renamed DoubleTensor `determinant()` method `matrixDeterminant()`
+- renamed DoubleTensor `average()` to `mean()` and allowed it to be done on a given dimension
+
+### Common
+
+- Previously some operations were available on the tensor classes but not the vertex classes. All operations
+on the tensor classes have been implemented with vertex operations now. A few operations have been added in order
+to accommodate autodiff for the new vertex operations.
+
+- All Tensor operations now have a corresponding Vertex. This brings the DoubleTensor, IntegerTensor and BooleanTensor
+  in line with the DoubleVertex, IntegerVertex and BooleanVertex.   
+
+- Along with this change, the vertices package has been changed:
+io.improbable.keanu.vertices.* -> io.improbable.keanu.vertices.tensor.*
+
+- There is now an experimental LongTensor implementation.
+- There is now a native JVM implementation of the IntegerTensor. This will bring a significant performance increase 
+to models with lots of small integer operations.
+
+#### New operations
+
+- sign
+- strided slice
+- trigamma
+- triLower
+- triUpper
+- fillTriangular
+- batch matrix multiply
+- batch matrix inverse
+- batch matrix determinant
+- batch cholesky decomposition
+- cholesky inverse (with batch)
+
+
 ## Version 0.0.26
 
 ### Common
 
 * Made constructing the children set of a vertex more efficient by not constantly reconstructing the set.
+* Upgrade to nd4j 1.0.0-beta4
 
 ### Java
 
 * Fixed an error where a space was present in one of the dependencies, which broke some build systems fetching dependencies.
+
+- Fixed issues with MultinomialVertex. The issues with it before were:
+    - It was extremely strict on checking that p summed to 1.0
+    - It disallowed scalar n. This is probably the most common use case.
+    - It didn't support the usual batch sampling nor batch logProb (see MultinomialVertex.java for docs)
+
+- MultinomialVertex Functional changes:
+    - The shape of p expected k to be the far left dimension. It is now the far right in order to allow for broadcasting semantics.
+    - n and p parameter validation was semi-controllable but is now completely toggleable with `vertex.setValidationEnabled(true);`
+
+- Add more generic tensor slice that allows start stop and interval slicing.
+
+- Change name on DoubleTensor compare methods by removing get (e.g. `getGreaterThanMask(...))` -> `greaterThanMask(...)`)
+
+- BooleanTensor now uses boolean arrays instead of Nd4j doubles
+
+- Added custom distribution example to examples
+
+- Added to DoubleTensor operations inspired by numpy: 
+    - cumSum
+    - cumProd
+    - product
+    - logAddExp
+    - logAddExp2
+    - log10
+    - log2
+    - log1p
+    - exp2
+    - expM1
+    - tanh
+    - atanh
+    - sinh
+    - asinh
+    - cosh
+    - acosh
+
+- Fixed bug in NUTS where NaN gradients do not cause a step to be divergent
 
 ### Python
 

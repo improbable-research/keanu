@@ -4,8 +4,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
@@ -16,7 +16,7 @@ public class Pareto implements ContinuousDistribution {
     private final DoubleTensor location;
     private final DoubleTensor scale;
 
-    public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
+    public static Pareto withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Pareto(location, scale);
     }
 
@@ -25,10 +25,9 @@ public class Pareto implements ContinuousDistribution {
         this.scale = scale;
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         DoubleTensor dLogPdx = scale.plus(1.0).divInPlace(x).unaryMinusInPlace();
-        DoubleTensor dLogPdLocation = DoubleTensor.zeros(x.getShape()).plusInPlace(scale).divInPlace(location);
+        DoubleTensor dLogPdLocation = scale.div(location).broadcast(x.getShape());
         DoubleTensor dLogPdScale = scale.reciprocal().plusInPlace(location.log()).minusInPlace(x.log());
 
         return new Diffs()
@@ -56,9 +55,9 @@ public class Pareto implements ContinuousDistribution {
     }
 
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex location, DoublePlaceholderVertex scale) {
-        final DoubleVertex invalidXMask = x.toGreaterThanMask(location)
-            .times(location.toGreaterThanMask(0.))
-            .times(scale.toGreaterThanMask(0.))
+        final DoubleVertex invalidXMask = x.greaterThanMask(location)
+            .times(location.greaterThanMask(0.))
+            .times(scale.greaterThanMask(0.))
             .unaryMinus()
             .plus(1.);
         final DoubleVertex ifValid = scale.log().plus(location.log().times(scale))
@@ -67,11 +66,11 @@ public class Pareto implements ContinuousDistribution {
     }
 
     private boolean checkParamsAreValid() {
-        return location.greaterThan(0.0).allTrue() && scale.greaterThan(0.0).allTrue();
+        return location.greaterThan(0.0).allTrue().scalar() && scale.greaterThan(0.0).allTrue().scalar();
     }
 
     private DoubleTensor setProbToZeroForInvalidX(DoubleTensor x, DoubleTensor result) {
-        DoubleTensor invalids = x.getLessThanOrEqualToMask(location);
+        DoubleTensor invalids = x.lessThanOrEqualToMask(location);
         result.setWithMaskInPlace(invalids, Double.NEGATIVE_INFINITY);
 
         return result;

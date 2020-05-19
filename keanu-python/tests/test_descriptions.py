@@ -1,5 +1,5 @@
 from keanu.description_creator import create_description
-from keanu.vertex import Const, OrBinary, AndBinary, DoubleIf, Binomial
+from keanu.vertex import Const, If
 
 
 def test_simple_if_vertex_description_created_correctly() -> None:
@@ -10,7 +10,7 @@ def test_simple_if_vertex_description_created_correctly() -> None:
     three.set_label("Three")
     four.set_label("Four")
 
-    result = DoubleIf(predicate, three, four)
+    result = If(predicate, three, four)
     assert create_description(result) == "This Vertex = Const(false) ? Three : Four"
 
 

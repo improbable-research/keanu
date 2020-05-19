@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc.testcases;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,12 +26,12 @@ public class MCMCTestDistributions {
         DoubleTensor summed = samples.stream()
             .reduce(DoubleTensor.zeros(shape), DoubleTensor::plusInPlace);
 
-        DoubleTensor averages = summed.divInPlace(samples.size());
+        DoubleTensor averages = summed.divInPlace((double) samples.size());
 
         DoubleTensor sumDiffSquared = samples.stream()
             .reduce(
                 DoubleTensor.zeros(shape),
-                (acc, tensor) -> acc.plusInPlace(tensor.minus(averages).powInPlace(2))
+                (acc, tensor) -> acc.plusInPlace(tensor.minus(averages).powInPlace(2.0))
             );
 
         double[] standardDeviations = sumDiffSquared.div(samples.size() - 1).pow(0.5).asFlatDoubleArray();

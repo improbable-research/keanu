@@ -18,7 +18,7 @@ public class SequenceTest {
     public void youCanGetTheLastItem() {
         int numItems = 10;
         Sequence sequence = new Sequence(numItems, this.hashCode(), null);
-        for (int i = 0; i < numItems-1; i++) {
+        for (int i = 0; i < numItems - 1; i++) {
             sequence.add(mock(SequenceItem.class));
         }
 

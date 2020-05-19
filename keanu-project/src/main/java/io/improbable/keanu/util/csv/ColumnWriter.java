@@ -15,14 +15,14 @@ public class ColumnWriter extends Writer {
 
     private static final String HEADER_STYLE = "{%s}";
 
-    private List<? extends Vertex<? extends Tensor>> vertices;
+    private List<? extends Vertex<? extends Tensor,?>> vertices;
 
-    public ColumnWriter(List<? extends Vertex<? extends Tensor>> vertices, String emptyValue) {
+    public ColumnWriter(List<? extends Vertex<? extends Tensor,?>> vertices, String emptyValue) {
         this.vertices = vertices;
         withEmptyValue(emptyValue);
     }
 
-    public ColumnWriter(List<? extends Vertex<? extends Tensor>> vertices) {
+    public ColumnWriter(List<? extends Vertex<? extends Tensor,?>> vertices) {
         this(vertices, DEFAULT_EMPTY_VALUE);
     }
 
@@ -33,7 +33,7 @@ public class ColumnWriter extends Writer {
 
             for (int i = 0; i < maxSize; i++) {
                 List<String> row = new ArrayList<>();
-                for (Vertex<? extends Tensor> vertex : vertices) {
+                for (Vertex<? extends Tensor,?> vertex : vertices) {
                     List<Object> flatList = vertex.getValue().asFlatList();
                     row.add(i < flatList.size() ? flatList.get(i).toString() : getEmptyValue());
                 }

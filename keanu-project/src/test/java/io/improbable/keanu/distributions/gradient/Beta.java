@@ -1,8 +1,6 @@
 package io.improbable.keanu.distributions.gradient;
 
-
-
-import static org.apache.commons.math3.special.Gamma.*;
+import static org.apache.commons.math3.special.Gamma.digamma;
 
 /**
  * Computer Generation of Statistical Distributions

@@ -7,7 +7,12 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
 import org.nd4j.base.Preconditions;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class GaussianProposalDistribution implements ProposalDistribution {
 
@@ -66,7 +71,7 @@ public class GaussianProposalDistribution implements ProposalDistribution {
             throw new IllegalStateException("A sigma was not specified for variable " + variable);
         }
         Gaussian proposalDistribution = (Gaussian) Gaussian.withParameters((DoubleTensor) ofValue, sigmas.get(variable));
-        return proposalDistribution.logProb((DoubleTensor) givenValue).sum();
+        return proposalDistribution.logProb((DoubleTensor) givenValue).sumNumber();
     }
 
     @Override

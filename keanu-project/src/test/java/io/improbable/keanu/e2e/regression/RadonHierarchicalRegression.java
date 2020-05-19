@@ -10,9 +10,9 @@ import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.HalfCauchyVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.HalfCauchyVertex;
 import lombok.Value;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -63,8 +63,8 @@ public class RadonHierarchicalRegression {
             throw new IllegalArgumentException("Not enough data for " + numberOfModels + " models!");
         }
 
-        GaussianVertex muIntercept = new GaussianVertex(0, 1.0).setLabel("MuIntercept");
-        GaussianVertex muGradient = new GaussianVertex(0, 1.0).setLabel("MuGradient");
+        DoubleVertex muIntercept = new GaussianVertex(0, 1.0).setLabel("MuIntercept");
+        DoubleVertex muGradient = new GaussianVertex(0, 1.0).setLabel("MuGradient");
 
         DoubleVertex sigmaIntercept = new HalfCauchyVertex(1.0).setLabel("SigmaIntercept");
         DoubleVertex sigmaGradient = new HalfCauchyVertex(1.0).setLabel("SigmaGradient");

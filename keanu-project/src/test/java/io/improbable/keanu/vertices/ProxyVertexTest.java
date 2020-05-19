@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
+import io.improbable.keanu.vertices.tensor.number.fixed.intgr.nonprobabilistic.IntegerProxyVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

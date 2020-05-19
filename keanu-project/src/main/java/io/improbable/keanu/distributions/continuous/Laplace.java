@@ -6,8 +6,8 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.BETA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
@@ -23,7 +23,7 @@ public class Laplace implements ContinuousDistribution {
      * @param beta shape
      * @return a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor beta) {
+    public static Laplace withParameters(DoubleTensor mu, DoubleTensor beta) {
         return new Laplace(mu, beta);
     }
 
@@ -34,13 +34,14 @@ public class Laplace implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
-        Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
+        long[] broadcastedShape = TensorShape.getBroadcastResultShape(shape, mu.getShape(), beta.getShape());
+        Tensor.FlattenedView<Double> muWrapped = mu.broadcast(broadcastedShape).getFlattenedView();
+        Tensor.FlattenedView<Double> betaWrapped = beta.broadcast(broadcastedShape).getFlattenedView();
 
-        int length = TensorShape.getLengthAsInt(shape);
+        int length = TensorShape.getLengthAsInt(broadcastedShape);
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
-            samples[i] = sample(muWrapped.getOrScalar(i), betaWrapped.getOrScalar(i), random);
+            samples[i] = sample(muWrapped.get(i), betaWrapped.get(i), random);
         }
 
         return DoubleTensor.create(samples, shape);
@@ -70,7 +71,6 @@ public class Laplace implements ContinuousDistribution {
         return muMinusXAbsNegDivBeta.plus(logTwoBeta).unaryMinus();
     }
 
-    @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor muMinusX = mu.minus(x);
         final DoubleTensor muMinusXAbs = muMinusX.abs();

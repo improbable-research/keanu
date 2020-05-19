@@ -52,7 +52,7 @@ public class Py4jByteArrayConverter {
 
     public static int[] toIntegerArray(byte[] byteArray) {
         int[] ints = new int[byteArray.length / Integer.BYTES];
-        for(int i = 0; i < ints.length; i++) {
+        for (int i = 0; i < ints.length; i++) {
             ints[i] = ByteBuffer.wrap(byteArray, i * Integer.BYTES, Integer.BYTES).order(ByteOrder.LITTLE_ENDIAN).getInt();
         }
         return ints;
@@ -60,7 +60,7 @@ public class Py4jByteArrayConverter {
 
     public static long[] toLongArray(byte[] byteArray) {
         long[] longs = new long[byteArray.length / Long.BYTES];
-        for(int i = 0; i < longs.length; i++) {
+        for (int i = 0; i < longs.length; i++) {
             longs[i] = ByteBuffer.wrap(byteArray, i * Long.BYTES, Long.BYTES).order(ByteOrder.LITTLE_ENDIAN).getLong();
         }
         return longs;
@@ -71,7 +71,8 @@ public class Py4jByteArrayConverter {
      * In Python, the result of this is a byte array where each boolean is represented by a single bit (0 for false, 1 for true).
      * When put into a bytearray, these bits may need to be padded with up to 7 bits to make a whole number of bytes.
      * Therefore, the function requires the parameter numberOfBooleansInArray to know which bits are padding bits and which are booleans.
-     * @param byteArray an array of bytes where booleans (in little endian form) are represented by single bits.
+     *
+     * @param byteArray               an array of bytes where booleans (in little endian form) are represented by single bits.
      * @param numberOfBooleansInArray the number of booleans represented by the bits in the bytearray
      * @return an array of booleans
      */
@@ -88,7 +89,7 @@ public class Py4jByteArrayConverter {
         return bools;
     }
 
-    private int getBigEndianPosition(int index){
+    private int getBigEndianPosition(int index) {
         int byteNumber = index / 8;
         int bitNumber = index % 8;
         return byteNumber * 8 + (7 - bitNumber);

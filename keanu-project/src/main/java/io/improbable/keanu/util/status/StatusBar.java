@@ -1,6 +1,5 @@
 package io.improbable.keanu.util.status;
 
-
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;

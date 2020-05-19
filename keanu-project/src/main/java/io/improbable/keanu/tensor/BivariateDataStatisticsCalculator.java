@@ -32,20 +32,21 @@ public class BivariateDataStatisticsCalculator {
      * @return The mean X value from the data set
      */
     public double xMean() {
-        return xData.average();
+        return xData.mean().scalar();
     }
 
     /**
      * @return The mean Y value from the data set
      */
     public double yMean() {
-        return yData.average();
+        return yData.mean().scalar();
     }
 
     /**
      * Calculate the estimate of the gradient
      * The regression coefficients (gradient and intercept) can be treated as random variables and estimated from the data.
      * From https://www2.isye.gatech.edu/~yxie77/isye2028/lecture12.pdf
+     *
      * @return the estimate of the gradient
      */
     public double estimatedGradient() {
@@ -56,6 +57,7 @@ public class BivariateDataStatisticsCalculator {
      * Calculate the estimate of the intercept
      * The regression coefficients (gradient and intercept) can be treated as random variables and estimated from the data.
      * From https://www2.isye.gatech.edu/~yxie77/isye2028/lecture12.pdf
+     *
      * @return the estimate of the intercept
      */
     public double estimatedIntercept() {
@@ -64,18 +66,20 @@ public class BivariateDataStatisticsCalculator {
 
     /**
      * Calculate the MSE (mean squared error) which is an unbiased estimate of the variance of Y
+     *
      * @return The MSE
      */
     public double meanSquaredError() {
         DoubleTensor calculatedY = xData.times(estimatedGradient()).plusInPlace(estimatedIntercept());
         DoubleTensor residuals = yData.minus(calculatedY);
         long unbiasedMultiplier = size() - 2;
-        return residuals.times(residuals).sum() / unbiasedMultiplier;
+        return residuals.times(residuals).sumNumber() / unbiasedMultiplier;
     }
 
     /**
      * Calculate the standard error, which is the unbiased estimate of the standard deviation of the gradient
      * From https://www2.isye.gatech.edu/~yxie77/isye2028/lecture12.pdf
+     *
      * @return The standard error
      */
     public double standardErrorForGradient() {
@@ -85,6 +89,7 @@ public class BivariateDataStatisticsCalculator {
     /**
      * Calculate the standard error, which is the unbiased estimate of the standard deviation of the intercept
      * From https://www2.isye.gatech.edu/~yxie77/isye2028/lecture12.pdf
+     *
      * @return The standard error
      */
     public double standardErrorForIntercept() {
@@ -99,9 +104,9 @@ public class BivariateDataStatisticsCalculator {
     }
 
     private double secondMomentOf(final DoubleTensor data1, final DoubleTensor data2) {
-        double sum1 = data1.sum();
-        double sum2 = data2.sum();
-        double sumOfSquares = data1.times(data2).sum();
+        double sum1 = data1.sumNumber();
+        double sum2 = data2.sumNumber();
+        double sumOfSquares = data1.times(data2).sumNumber();
 
         return sumOfSquares - (sum1 * sum2 / size());
     }

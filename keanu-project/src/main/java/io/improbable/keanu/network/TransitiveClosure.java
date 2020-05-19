@@ -47,7 +47,7 @@ public class TransitiveClosure {
      * @param includeNonProbabilistic false if only the probabilistic or observed vertices are wanted
      * @return All upstream vertices, not including non probabilistic if includeNonProbabilistic is false.
      */
-    public static TransitiveClosure getUpstreamVertices(Vertex<?> aVertex, boolean includeNonProbabilistic) {
+    public static TransitiveClosure getUpstreamVertices(Vertex<?, ?> aVertex, boolean includeNonProbabilistic) {
         return getUpstreamVerticesForCollection(Collections.singletonList(aVertex), includeNonProbabilistic);
     }
 
@@ -56,14 +56,14 @@ public class TransitiveClosure {
      * @param includeNonProbabilistic false if only the probabilistic and observed are wanted
      * @return All downstream vertices, not including non probabilistic if includeNonProbabilistic is false.
      */
-    public static TransitiveClosure getDownstreamVertices(Vertex<?> aVertex, boolean includeNonProbabilistic) {
+    public static TransitiveClosure getDownstreamVertices(Vertex<?, ?> aVertex, boolean includeNonProbabilistic) {
         return getDownstreamVerticesForCollection(Collections.singletonList(aVertex), includeNonProbabilistic);
     }
 
     /**
      * @param vertices                the starting vertices
      * @param includeNonProbabilistic false if only the probabilistic or observed vertices are wanted
-     * @return  All upstream vertices, not including non probabilistic if includeNonProbabilistic is false.
+     * @return All upstream vertices, not including non probabilistic if includeNonProbabilistic is false.
      */
     public static TransitiveClosure getUpstreamVerticesForCollection(List<Vertex> vertices, boolean includeNonProbabilistic) {
 
@@ -82,7 +82,7 @@ public class TransitiveClosure {
     /**
      * @param vertices                the starting vertices
      * @param includeNonProbabilistic false if only the probabilistic or observed vertices are wanted
-     * @return  All upstream vertices, not including non probabilistic if includeNonProbabilistic is false.
+     * @return All upstream vertices, not including non probabilistic if includeNonProbabilistic is false.
      */
     public static TransitiveClosure getDownstreamVerticesForCollection(List<Vertex> vertices, boolean includeNonProbabilistic) {
 
