@@ -7,16 +7,16 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 
-import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertDivideInPlaceOperationEquals;
-import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertDivideOperationEquals;
-import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertMinusInPlaceOperationEquals;
-import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertMinusOperationEquals;
-import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertPlusInPlaceOperationEquals;
-import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertPlusOperationEquals;
-import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertPowInPlaceOperationEquals;
-import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertPowOperationEquals;
-import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesInPlaceOperationEquals;
-import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesOperationEquals;
+import static io.improbable.keanu.tensor.dbl.DoubleTensorTestHelpers.assertDivideInPlaceOperationEquals;
+import static io.improbable.keanu.tensor.dbl.DoubleTensorTestHelpers.assertDivideOperationEquals;
+import static io.improbable.keanu.tensor.dbl.DoubleTensorTestHelpers.assertMinusInPlaceOperationEquals;
+import static io.improbable.keanu.tensor.dbl.DoubleTensorTestHelpers.assertMinusOperationEquals;
+import static io.improbable.keanu.tensor.dbl.DoubleTensorTestHelpers.assertPlusInPlaceOperationEquals;
+import static io.improbable.keanu.tensor.dbl.DoubleTensorTestHelpers.assertPlusOperationEquals;
+import static io.improbable.keanu.tensor.dbl.DoubleTensorTestHelpers.assertPowInPlaceOperationEquals;
+import static io.improbable.keanu.tensor.dbl.DoubleTensorTestHelpers.assertPowOperationEquals;
+import static io.improbable.keanu.tensor.dbl.DoubleTensorTestHelpers.assertTimesInPlaceOperationEquals;
+import static io.improbable.keanu.tensor.dbl.DoubleTensorTestHelpers.assertTimesOperationEquals;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)

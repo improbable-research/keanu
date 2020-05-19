@@ -1,14 +1,21 @@
 package io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.VertexVariationalMAP;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -169,5 +176,50 @@ public class GeometricVertexTest {
             .count() / (double) samples.getLength();
 
         assertEquals(expectedProportion, actualProportion, 5e-3);
+    }
+
+    @Test
+    public void inferHyperParamsFromSamples() {
+
+        double trueP = 0.7;
+
+        List<DoubleVertex> p = new ArrayList<>();
+        p.add(ConstantVertex.of(trueP));
+
+        List<DoubleVertex> latents = new ArrayList<>();
+        UniformVertex latentP = new UniformVertex(0.01, 10.0);
+        latentP.setAndCascade(DoubleTensor.scalar(0.2));
+        latents.add(latentP);
+
+        int numSamples = 1000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new GeometricVertex(new long[]{numSamples}, hyperParams.get(0)),
+            p,
+            latents,
+            1e-2,
+            KeanuRandom.getDefaultRandom()
+        );
+    }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueP = DoubleTensor.create(0.7, 0.35);
+
+        List<DoubleVertex> p = new ArrayList<>();
+        p.add(ConstantVertex.of(trueP));
+
+        List<DoubleVertex> latents = new ArrayList<>();
+        UniformVertex latentP = new UniformVertex(0.01, 10.0);
+        latentP.setAndCascade(DoubleTensor.create(0.2, 0.8));
+        latents.add(latentP);
+
+        int numSamples = 1000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new GeometricVertex(new long[]{numSamples, 2}, hyperParams.get(0)),
+            p,
+            latents,
+            KeanuRandom.getDefaultRandom()
+        );
     }
 }

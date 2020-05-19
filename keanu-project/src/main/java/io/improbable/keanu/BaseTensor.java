@@ -187,6 +187,7 @@ public interface BaseTensor<
 
     default T expandDims(int axis) {
         final long[] shape = getShape();
+        axis = getAbsoluteDimension(axis, shape.length + 1);
         return reshape(ArrayUtils.insert(axis, shape, 1L));
     }
 

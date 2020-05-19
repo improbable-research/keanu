@@ -12,7 +12,7 @@ buildscript {
 
 plugins {
     id 'io.franzbecker.gradle-lombok' version '1.14'
-    id "de.marcphilipp.nexus-publish" version "0.1.1"
+    id "de.marcphilipp.nexus-publish" version "0.4.0"
     id 'maven'
     id 'jacoco'
 }
@@ -138,10 +138,14 @@ publishing {
 }
 
 nexusPublishing {
-    serverUrl = uri("https://oss.sonatype.org/service/local/")
-    snapshotRepositoryUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-    username = nexusUser
-    password = nexusPassword
+    repositories {
+        sonatype {
+            username = nexusUser
+            password = nexusPassword
+        }
+    }
+    clientTimeout = Duration.ofMinutes(5)
+    connectTimeout = Duration.ofMinutes(5)
 }
 
 compileKotlin {

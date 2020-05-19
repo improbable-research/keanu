@@ -195,7 +195,29 @@ public class ExponentialVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new ExponentialVertex(new long[]{numSamples, 1}, hyperParams.get(0)),
+            hyperParams -> new ExponentialVertex(new long[]{numSamples}, hyperParams.get(0)),
+            generationParameters,
+            latents,
+            random
+        );
+    }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueLambda = DoubleTensor.create(2.0, 3.0);
+
+        List<DoubleVertex> generationParameters = new ArrayList<>();
+        generationParameters.add(ConstantVertex.of(trueLambda));
+
+        List<DoubleVertex> latents = new ArrayList<>();
+        UniformVertex latentLambda = new UniformVertex(0.01, 10.0);
+        latentLambda.setAndCascade(DoubleTensor.create(0.1, 0.1));
+        latents.add(latentLambda);
+
+        int numSamples = 2000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new ExponentialVertex(new long[]{numSamples, 2}, hyperParams.get(0)),
             generationParameters,
             latents,
             random

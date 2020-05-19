@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
@@ -91,7 +90,7 @@ public class UniformIntVertexTest {
     @Test
     public void logProbUpperBoundIsNegativeInfinity() {
         UniformIntVertex testUniformVertex = new UniformIntVertex(new long[]{1, N}, lowerBound, upperBound);
-        assertEquals(testUniformVertex.logProb(Nd4jIntegerTensor.scalar(upperBound)), Double.NEGATIVE_INFINITY, 1e-6);
+        assertEquals(testUniformVertex.logProb(IntegerTensor.scalar(upperBound)), Double.NEGATIVE_INFINITY, 1e-6);
     }
 
     @Test
@@ -109,7 +108,7 @@ public class UniformIntVertexTest {
     @Test
     public void logProbLowerBoundIsNotNegativeInfinity() {
         UniformIntVertex testUniformVertex = new UniformIntVertex(new long[]{1, N}, lowerBound, upperBound);
-        assertNotEquals(testUniformVertex.logProb(Nd4jIntegerTensor.scalar(lowerBound)), Double.NEGATIVE_INFINITY, 1e-6);
+        assertNotEquals(testUniformVertex.logProb(IntegerTensor.scalar(lowerBound)), Double.NEGATIVE_INFINITY, 1e-6);
     }
 
     @Test

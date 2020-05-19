@@ -2,7 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import static org.junit.Assert.assertEquals;
 
-public class Nd4jTensorTestHelpers {
+public class DoubleTensorTestHelpers {
 
     public static void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         DoubleTensor actual = left.times(right);

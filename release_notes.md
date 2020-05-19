@@ -11,9 +11,19 @@
 
 ### Common
 
-Previously some operations were available on the tensor classes but not the vertex classes. All operations
+- Previously some operations were available on the tensor classes but not the vertex classes. All operations
 on the tensor classes have been implemented with vertex operations now. A few operations have been added in order
 to accommodate autodiff for the new vertex operations.
+
+- All Tensor operations now have a corresponding Vertex. This brings the DoubleTensor, IntegerTensor and BooleanTensor
+  in line with the DoubleVertex, IntegerVertex and BooleanVertex.   
+
+- Along with this change, the vertices package has been changed:
+io.improbable.keanu.vertices.* -> io.improbable.keanu.vertices.tensor.*
+
+- There is now an experimental LongTensor implementation.
+- There is now a native JVM implementation of the IntegerTensor. This will bring a significant performance increase 
+to models with lots of small integer operations.
 
 #### New operations
 

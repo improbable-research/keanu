@@ -47,7 +47,7 @@ public class Nd4jIntegerTensor extends Nd4jFixedPointTensor<Integer, IntegerTens
 
     @Override
     protected IntegerTensor toJVM() {
-        throw new IllegalStateException("No JVM Integer tensor implementation");
+        return JVMIntegerTensorFactory.INSTANCE.create(asFlatIntegerArray(), getShape());
     }
 
     @Override

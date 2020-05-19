@@ -5,29 +5,28 @@ import io.improbable.keanu.tensor.FixedPointTensorFactory;
 public interface IntegerTensorFactory extends FixedPointTensorFactory<Integer, IntegerTensor> {
 
     @Override
+    IntegerTensor create(long value, long[] shape);
+
+    @Override
     IntegerTensor create(int value, long[] shape);
 
     @Override
-    IntegerTensor create(long value, long[] shape);
-
-
-    @Override
-    IntegerTensor create(long[] values, long[] shape);
+    IntegerTensor create(long[] values, long... shape);
 
     @Override
-    IntegerTensor create(int[] values, long[] shape);
+    IntegerTensor create(int[] values, long... shape);
 
     @Override
-    IntegerTensor create(long[] values);
+    IntegerTensor create(long... values);
 
     @Override
-    IntegerTensor create(int[] values);
+    IntegerTensor create(int... values);
 
     @Override
-    IntegerTensor ones(long[] shape);
+    IntegerTensor ones(long... shape);
 
     @Override
-    IntegerTensor zeros(long[] shape);
+    IntegerTensor zeros(long... shape);
 
     @Override
     IntegerTensor eye(long n);

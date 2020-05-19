@@ -268,7 +268,7 @@ public class ParetoVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new ParetoVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new ParetoVertex(new long[]{numSamples}, hyperParams.get(0), hyperParams.get(1)),
             trueParams,
             latentParams,
             random
@@ -316,10 +316,34 @@ public class ParetoVertexTest {
         latentParams.add(latentLocation);
         latentParams.add(latentScale);
 
+        int numSamples = 2000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new ParetoVertex(new long[]{numSamples}, hyperParams.get(0), hyperParams.get(1)),
+            trueParams,
+            latentParams,
+            random
+        );
+    }
+
+    @Test
+    public void inferBatchHyperParamsFromSamplesFixedScale() {
+        DoubleTensor trueLocation = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
+        DoubleTensor trueScale = DoubleTensor.create(3.5, 2.0);
+
+        List<DoubleVertex> trueParams = new ArrayList<>();
+        trueParams.add(ConstantVertex.of(trueLocation));
+        trueParams.add(ConstantVertex.of(trueScale));
+
+        List<DoubleVertex> latentParams = new ArrayList<>();
+        ConstantDoubleVertex latentLocation = new ConstantDoubleVertex(trueLocation);
+        UniformVertex latentScale = new UniformVertex(0.01, 100);
+        latentScale.setAndCascade(DoubleTensor.create(10.0, 9.0));
+        latentParams.add(latentLocation);
+        latentParams.add(latentScale);
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new ParetoVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new ParetoVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0).abs(), hyperParams.get(1)),
             trueParams,
             latentParams,
             random

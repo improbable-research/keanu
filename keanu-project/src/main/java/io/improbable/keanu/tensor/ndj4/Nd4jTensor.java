@@ -74,6 +74,10 @@ public abstract class Nd4jTensor<T, TENSOR extends Tensor<T, TENSOR>> implements
 
     @Override
     public TENSOR broadcast(long... toShape) {
+        //TODO: ND4J bug can't broadcast passed rank 2
+        if (toShape.length > 2) {
+            return fromJVM(toJVM().broadcast(toShape));
+        }
         return create(tensor.broadcast(toShape));
     }
 

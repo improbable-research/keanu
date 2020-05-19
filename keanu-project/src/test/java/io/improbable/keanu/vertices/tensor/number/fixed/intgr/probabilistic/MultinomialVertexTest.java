@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.distributions.discrete.Binomial;
@@ -16,6 +17,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.tensor.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.tensor.number.fixed.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.tensor.number.floating.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -28,6 +30,7 @@ import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static io.improbable.keanu.tensor.TensorMatchers.allValues;
 import static io.improbable.keanu.tensor.TensorMatchers.hasShape;
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.closeTo;
@@ -48,27 +51,31 @@ public class MultinomialVertexTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void itThrowsIfTheProbabilitiesDontSumToOne() {
+    public void inDebugModeItThrowsIfAnyOfTheProbabilitiesIsLessThanZero() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Probabilities must sum to 1 but summed to [0.4]");
+        thrown.expectMessage("Probabilities must be >= 0 but were [-0.1, 0.0, 1.0, 0.0]");
 
         int n = 100;
-        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.1, 0.1, 0.1, 0.1));
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(-0.1, 0, 1, 0));
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
         multinomialVertex.setValidationEnabled(true);
         multinomialVertex.sample();
     }
 
     @Test
-    public void inDebugModeItThrowsIfAnyOfTheProbabilitiesIsZero() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Probabilities must be > 0 < 1 but were [0.0, 0.0, 1.0, 0.0]");
+    public void itAllowsProbabilitiesToBeZero() {
 
-        int n = 100;
-        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0, 0, 1, 0));
+        int n = 5000;
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(2, 0, 1, 0));
         MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
         multinomialVertex.setValidationEnabled(true);
-        multinomialVertex.sample();
+        IntegerTensor sample = multinomialVertex.sample();
+
+        DoubleTensor sampleFreq = sample.toDouble().div(n);
+
+        assertThat(sampleFreq, valuesWithinEpsilonAndShapesMatch(DoubleTensor.create(2.0 / 3.0, 0, 1.0 / 3.0, 0), 1e-2));
+        assertThat(sampleFreq.getValue(1), equalTo(0.0));
+        assertThat(sampleFreq.getValue(3), equalTo(0.0));
     }
 
     @Test
@@ -222,25 +229,14 @@ public class MultinomialVertexTest {
     }
 
     @Test
-    public void itWorksWithAlmostOneProbabilityAsDefinedByTheUser() {
+    public void itWorksWithNormalizedProbability() {
 
-        int n = 100;
-        DoubleTensor p = DoubleTensor.create(0.1, new long[]{10});
-        Double pSum = p.sumNumber();
+        int n = 5000;
+        DoubleTensor p = DoubleTensor.create(1.0, new long[]{10});
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+        IntegerTensor sample = multinomialVertex.sample();
 
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Probabilities must sum to 1 but summed to [" + pSum + "]");
-
-        assertThat(pSum, not(equalTo(1.0)));
-
-        Multinomial.setAllowedProbabilityError(0.0);
-        try {
-            MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
-            multinomialVertex.setValidationEnabled(true);
-            multinomialVertex.sample();
-        } finally {
-            Multinomial.setAllowedProbabilityError(Multinomial.DEFAULT_ALLOWED_PROBABILITY_ERROR);
-        }
+        assertThat(sample.toDouble().div(n), valuesWithinEpsilonAndShapesMatch(DoubleTensor.create(0.1, new long[]{10}), 1e-2));
     }
 
     @Test
@@ -555,6 +551,41 @@ public class MultinomialVertexTest {
             assertEquals(n * probability, mean, epsilonForMean);
             assertEquals(n * probability * (1 - probability), std * std, epsilonForVariance);
         }
+    }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        IntegerTensor trueN = IntegerTensor.create(10, 8, 7);
+        DoubleTensor trueP = DoubleTensor.create(
+            0.5, 0.5,
+            25, 75,
+            0, 3
+        ).reshape(3, 2);
+
+        UniformVertex latentP = new UniformVertex(0.01, 100.0);
+        latentP.setAndCascade(DoubleTensor.create(9.9, 9.9, 5, 5, 5, 5).reshape(3, 2));
+
+        int numSamples = 500;
+
+        //Generate data
+        IntegerTensor data = new MultinomialVertex(new long[]{numSamples, 3, 2}, ConstantVertex.of(trueN), ConstantVertex.of(trueP)).sample();
+
+        //Observe data and infer probabilities
+        MultinomialVertex multinomialVertex = new MultinomialVertex(new long[]{numSamples, 3, 2}, ConstantVertex.of(trueN), latentP.abs());
+        multinomialVertex.observe(data);
+
+        Keanu.Optimizer.Gradient.ofConnectedGraph(multinomialVertex).maxAPosteriori();
+
+        DoubleTensor optimalP = latentP.getValue();
+
+        DoubleTensor normalizedP = normalizeProbabilities(optimalP);
+
+        assertThat(normalizedP, valuesWithinEpsilonAndShapesMatch(normalizeProbabilities(trueP), 1e-1));
+    }
+
+    private DoubleTensor normalizeProbabilities(DoubleTensor p) {
+        return p.div(p.sum(-1).expandDims(-1));
     }
 
 }

@@ -132,9 +132,6 @@ public class JsonTest {
     @Test
     public void loadFailsIfWrongArgumentTypeSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("For ConstantDoubleVertex got incorrect parameter type specified.  " +
-            "Got: class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, " +
-            "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
         tryLoadingNetwork(JSON_WRONG_ARGUMENT_TYPE_FILE);
     }
 

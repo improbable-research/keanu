@@ -1,6 +1,8 @@
 package io.improbable.keanu.tensor.intgr;
 
 import com.google.common.primitives.Ints;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 public class Nd4jIntegerTensorFactory implements IntegerTensorFactory {
 
@@ -71,7 +73,15 @@ public class Nd4jIntegerTensorFactory implements IntegerTensorFactory {
 
     @Override
     public IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
-        return IntegerTensor.concat(dimension, toConcat);
+        INDArray[] concatAsINDArray = new INDArray[toConcat.length];
+        for (int i = 0; i < toConcat.length; i++) {
+            concatAsINDArray[i] = Nd4jIntegerTensor.getAsINDArray(toConcat[i]).dup();
+            if (concatAsINDArray[i].shape().length == 0) {
+                concatAsINDArray[i] = concatAsINDArray[i].reshape(1);
+            }
+        }
+        INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
+        return new Nd4jIntegerTensor(concat);
     }
 
     private int[] toIntegers(long[] lngs) {

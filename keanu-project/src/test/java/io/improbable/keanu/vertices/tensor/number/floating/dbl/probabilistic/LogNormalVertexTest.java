@@ -206,7 +206,34 @@ public class LogNormalVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new LogNormalVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new LogNormalVertex(new long[]{numSamples}, hyperParams.get(0), hyperParams.get(1)),
+            muSigma,
+            latentMuSigma,
+            random
+        );
+    }
+
+    @Test
+    public void inferBatchHyperParamsFromSamples() {
+
+        DoubleTensor trueMu = DoubleTensor.create(4.5, 2.0);
+        DoubleTensor trueSigma = DoubleTensor.create(2.0, 1.5, 3.0, 2.5).reshape(2, 2);
+
+        List<DoubleVertex> muSigma = new ArrayList<>();
+        muSigma.add(ConstantVertex.of(trueMu));
+        muSigma.add(ConstantVertex.of(trueSigma));
+
+        List<DoubleVertex> latentMuSigma = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(0.01, 10.0);
+        latentMu.setAndCascade(DoubleTensor.create(9.9, 9.9));
+        UniformVertex latentSigma = new UniformVertex(0.01, 10.0);
+        latentSigma.setAndCascade(DoubleTensor.create(0.1, 0.1, 0.1, 0.1).reshape(2, 2));
+        latentMuSigma.add(latentMu);
+        latentMuSigma.add(latentSigma);
+
+        int numSamples = 1000;
+        VertexVariationalMAP.inferHyperParamsFromSamples(
+            hyperParams -> new LogNormalVertex(new long[]{numSamples, 2, 2}, hyperParams.get(0), hyperParams.get(1).abs()),
             muSigma,
             latentMuSigma,
             random

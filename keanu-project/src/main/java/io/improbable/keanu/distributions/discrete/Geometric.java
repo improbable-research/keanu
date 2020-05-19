@@ -18,7 +18,7 @@ public class Geometric implements DiscreteDistribution {
 
     private final DoubleTensor p;
 
-    public static DiscreteDistribution withParameters(DoubleTensor p) {
+    public static Geometric withParameters(DoubleTensor p) {
         return new Geometric(p);
     }
 
@@ -55,8 +55,8 @@ public class Geometric implements DiscreteDistribution {
 
     private DoubleTensor calculateLogProb(IntegerTensor k) {
         DoubleTensor kAsDouble = k.toDouble();
-        DoubleTensor oneMinusP = p.unaryMinus().plusInPlace(1.0);
-        DoubleTensor results = kAsDouble.minusInPlace(1.0).timesInPlace(oneMinusP.logInPlace()).plusInPlace(p.log());
+        DoubleTensor oneMinusP = p.reverseMinus(1.0);
+        DoubleTensor results = oneMinusP.safeLogTimesInPlace(kAsDouble.minusInPlace(1.0)).plusInPlace(p.log());
 
         return setProbToZeroForInvalidK(k, results);
     }
@@ -83,6 +83,17 @@ public class Geometric implements DiscreteDistribution {
 
     private boolean checkParameterIsValid() {
         return p.greaterThan(0.0).allTrue().scalar() && p.lessThan(1.0).allTrue().scalar();
+    }
+
+    public DoubleTensor[] dLogProb(IntegerTensor k, boolean wrtP) {
+        DoubleTensor[] result = new DoubleTensor[1];
+
+        if (wrtP) {
+            DoubleTensor diffWhereValid = p.reciprocal().minusInPlace(k.toDouble().minusInPlace(1.0).divInPlace(p.reverseMinus(1.0)));
+            result[0] = diffWhereValid.where(k.greaterThanOrEqual(1), DoubleTensor.scalar(0.0));
+        }
+
+        return result;
     }
 
 }

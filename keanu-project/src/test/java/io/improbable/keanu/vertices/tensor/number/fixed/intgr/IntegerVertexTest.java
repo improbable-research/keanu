@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.tensor.number.fixed.intgr;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.tensor.number.fixed.intgr.probabilistic.PoissonVertex;
@@ -93,7 +92,7 @@ public class IntegerVertexTest {
     @Test
     public void canObserveTensor() {
         IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
-        IntegerTensor observation = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        IntegerTensor observation = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         binomialVertex.observe(observation);
         assertArrayEquals(observation.asFlatIntegerArray(), binomialVertex.getValue().asFlatIntegerArray());
         assertArrayEquals(observation.getShape(), binomialVertex.getShape());

@@ -4,6 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -24,8 +25,6 @@ import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static io.improbable.keanu.vertices.tensor.number.floating.dbl.DoubleVertexWrapper.wrapIfNeeded;
 
 public class ExponentialVertex extends VertexImpl<DoubleTensor, DoubleVertex> implements DoubleVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
@@ -46,8 +45,7 @@ public class ExponentialVertex extends VertexImpl<DoubleTensor, DoubleVertex> im
      */
     public ExponentialVertex(@LoadShape long[] tensorShape,
                              @LoadVertexParam(RATE_NAME) Vertex<DoubleTensor, ?> rate) {
-        super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, rate.getShape());
+        super(TensorShape.getBroadcastResultShape(tensorShape, rate.getShape()));
 
         this.rate = wrapIfNeeded(rate);
         setParents(rate);
@@ -60,7 +58,7 @@ public class ExponentialVertex extends VertexImpl<DoubleTensor, DoubleVertex> im
      */
     @ExportVertexToPythonBindings
     public ExponentialVertex(Vertex<DoubleTensor, ?> rate) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(rate.getShape()), rate);
+        this(rate.getShape(), rate);
     }
 
     public ExponentialVertex(double rate) {

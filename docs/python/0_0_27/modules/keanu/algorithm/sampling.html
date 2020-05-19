@@ -1,0 +1,446 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>keanu.algorithm.sampling &#8212; keanu 0.0.26 documentation</title>
+    <link rel="stylesheet" href="../../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">keanu</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../keanu.html">keanu</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for keanu.algorithm.sampling</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">ndenumerate</span><span class="p">,</span> <span class="n">ndarray</span>
+<span class="kn">from</span> <span class="nn">py4j.java_collections</span> <span class="k">import</span> <span class="n">JavaList</span>
+<span class="kn">from</span> <span class="nn">py4j.java_gateway</span> <span class="k">import</span> <span class="n">java_import</span><span class="p">,</span> <span class="n">JavaObject</span>
+
+<span class="kn">from</span> <span class="nn">keanu.algorithm._proposal_distribution</span> <span class="k">import</span> <span class="n">ProposalDistribution</span>
+<span class="kn">from</span> <span class="nn">keanu.context</span> <span class="k">import</span> <span class="n">KeanuContext</span>
+<span class="kn">from</span> <span class="nn">keanu.net</span> <span class="k">import</span> <span class="n">BayesNet</span><span class="p">,</span> <span class="n">ProbabilisticModel</span><span class="p">,</span> <span class="n">ProbabilisticModelWithGradient</span>
+<span class="kn">from</span> <span class="nn">keanu.plots</span> <span class="k">import</span> <span class="n">traceplot</span>
+<span class="kn">from</span> <span class="nn">keanu.tensor</span> <span class="k">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">keanu.vartypes</span> <span class="k">import</span> <span class="n">sample_types</span><span class="p">,</span> <span class="n">sample_generator_types</span><span class="p">,</span> <span class="n">numpy_types</span><span class="p">,</span> <span class="n">sample_generator_dict_type</span><span class="p">,</span> <span class="n">tensor_arg_types</span>
+<span class="kn">from</span> <span class="nn">keanu.vertex.base</span> <span class="k">import</span> <span class="n">Vertex</span>
+
+<span class="n">COLUMN_HEADER_FOR_SCALAR</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span>
+
+<span class="n">k</span> <span class="o">=</span> <span class="n">KeanuContext</span><span class="p">()</span>
+
+<span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.mcmc.MetropolisHastings&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.mcmc.nuts.NUTS&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.sampling.Forward&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">PosteriorSamplingAlgorithm</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampler</span><span class="p">:</span> <span class="n">JavaObject</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sampler</span> <span class="o">=</span> <span class="n">sampler</span>
+
+    <span class="k">def</span> <span class="nf">get_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JavaObject</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampler</span>
+
+
+<span class="k">class</span> <span class="nc">ForwardSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">Forward</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="MetropolisHastingsSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.MetropolisHastingsSampler">[docs]</a><span class="k">class</span> <span class="nc">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param proposal_distribution: The proposal distribution for Metropolis Hastings. Options are &#39;gaussian&#39; and &#39;prior&#39;.</span>
+<span class="sd">    :param latents: All latent vertices.</span>
+<span class="sd">    :param proposal_listeners: Listeners for proposal creation and rejection. Options are :class:`keanu.algorithm.AcceptanceRateTracker`.</span>
+<span class="sd">    :param proposal_distribution_sigma: Parameter sigma (a single sigma or a list of sigmas for each latent) for &#39;gaussian&#39; proposal distribution</span>
+
+<span class="sd">    :raises TypeError: If you pass `proposal_listener` without specifying `proposal_distribution`.</span>
+<span class="sd">    :raises TypeError: If you choose &#39;gaussian&#39; as `proposal_distribution` but did not specify `latents`.</span>
+<span class="sd">    :raises TypeError: If you choose &#39;gaussian&#39; as `proposal_distribution` but did not specify `proposal_distribution_sigma`.</span>
+<span class="sd">    :raises TypeError: If you choose &#39;prior&#39; as `proposal_distribution` but did not pass latent vertices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">proposal_distribution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">latents</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Vertex</span><span class="p">],</span>
+                 <span class="n">proposal_listeners</span><span class="o">=</span><span class="p">[],</span>
+                 <span class="n">proposal_distribution_sigma</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">tensor_arg_types</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">tensor_arg_types</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">proposal_distribution</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">proposal_listeners</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;If you pass in proposal_listeners you must also specify proposal_distribution&quot;</span><span class="p">)</span>
+
+        <span class="n">builder</span><span class="p">:</span> <span class="n">JavaObject</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">MetropolisHastings</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span>
+
+        <span class="n">latents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">latents</span><span class="p">)</span>
+
+        <span class="n">proposal_distribution_object</span> <span class="o">=</span> <span class="n">ProposalDistribution</span><span class="p">(</span>
+            <span class="n">type_</span><span class="o">=</span><span class="n">proposal_distribution</span><span class="p">,</span>
+            <span class="n">sigma</span><span class="o">=</span><span class="n">proposal_distribution_sigma</span><span class="p">,</span>
+            <span class="n">latents</span><span class="o">=</span><span class="n">latents</span><span class="p">,</span>
+            <span class="n">listeners</span><span class="o">=</span><span class="n">proposal_listeners</span><span class="p">)</span>
+
+        <span class="n">rejection_strategy</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">RollBackToCachedValuesOnRejection</span><span class="p">()</span>
+
+        <span class="n">builder</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">proposalDistribution</span><span class="p">(</span><span class="n">proposal_distribution_object</span><span class="o">.</span><span class="n">unwrap</span><span class="p">())</span>
+        <span class="n">builder</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">rejectionStrategy</span><span class="p">(</span><span class="n">rejection_strategy</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="NUTSSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.NUTSSampler">[docs]</a><span class="k">class</span> <span class="nc">NUTSSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param adapt_count: The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value. Defaults to 1000.</span>
+<span class="sd">    :param adapt_step_size_enabled: enable the step size adaption. Defaults to true.</span>
+<span class="sd">    :param adapt_potential_enabled: enable the potential adaption. Defaults to true.</span>
+<span class="sd">    :param target_acceptance_prob: The target acceptance probability. Defaults to 0.8.</span>
+<span class="sd">    :param initial_step_size: Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.</span>
+<span class="sd">    :param max_energy_change: the maximum energy change before a step is considered divergent.</span>
+<span class="sd">    :param max_tree_height: The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample. Defaults to 10.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">adapt_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">adapt_step_size_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">adapt_potential_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">target_acceptance_prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">initial_step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">potential_adapt_window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">max_energy_change</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">max_tree_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">builder</span><span class="p">:</span> <span class="n">JavaObject</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">NUTS</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">adapt_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">adaptCount</span><span class="p">(</span><span class="n">adapt_count</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">target_acceptance_prob</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">targetAcceptanceProb</span><span class="p">(</span><span class="n">target_acceptance_prob</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">adapt_step_size_enabled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">adaptStepSizeEnabled</span><span class="p">(</span><span class="n">adapt_step_size_enabled</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">adapt_potential_enabled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">adaptPotentialEnabled</span><span class="p">(</span><span class="n">adapt_potential_enabled</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">potential_adapt_window_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">potentialAdaptWindowSize</span><span class="p">(</span><span class="n">potential_adapt_window_size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">initial_step_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">initialStepSize</span><span class="p">(</span><span class="n">initial_step_size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">max_energy_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">maxEnergyChange</span><span class="p">(</span><span class="n">max_energy_change</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">max_tree_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">maxTreeHeight</span><span class="p">(</span><span class="n">max_tree_height</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="sample"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.sample">[docs]</a><span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="n">net</span><span class="p">:</span> <span class="n">BayesNet</span><span class="p">,</span>
+           <span class="n">sample_from</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Vertex</span><span class="p">],</span>
+           <span class="n">sampling_algorithm</span><span class="p">:</span> <span class="n">PosteriorSamplingAlgorithm</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="n">draws</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+           <span class="n">drop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+           <span class="n">down_sample_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+           <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+           <span class="n">ax</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sample_types</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param net: Bayesian Network containing latent variables.</span>
+<span class="sd">    :param sample_from: Vertices to include in the returned samples.</span>
+<span class="sd">    :param sampling_algorithm: The posterior sampling algorithm to use.</span>
+<span class="sd">        Options are :class:`keanu.algorithm.MetropolisHastingsSampler`, :class:`keanu.algorithm.NUTSSampler` and :class:`keanu.algorithm.ForwardSampler`</span>
+<span class="sd">        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with &#39;prior&#39; as its proposal distribution.</span>
+<span class="sd">    :param draws: The number of samples to take.</span>
+<span class="sd">    :param drop: The number of samples to drop before collecting anything.</span>
+<span class="sd">        If this is zero then no samples will be dropped before collecting.</span>
+<span class="sd">    :param down_sample_interval: Collect 1 sample for every `down_sample_interval`.</span>
+<span class="sd">        If this is 1 then there will be no down-sampling.</span>
+<span class="sd">        If this is 2 then every other sample will be taken.</span>
+<span class="sd">        If this is 3 then 2 samples will be dropped before one is taken.</span>
+<span class="sd">        And so on.</span>
+<span class="sd">    :param plot: Flag for plotting the trace after sampling.</span>
+<span class="sd">        Call `matplotlib.pyplot.show &lt;https://matplotlib.org/api/_as_gen/matplotlib.pyplot.show.html&gt;`_ to display the plot.</span>
+<span class="sd">    :param Axes ax: `matplotlib.axes.Axes &lt;https://matplotlib.org/api/axes_api.html&gt;`_.</span>
+<span class="sd">        If not set, a new one is created.</span>
+
+<span class="sd">    :raises ValueError: If `sample_from` contains vertices without labels.</span>
+
+<span class="sd">    :return: Dictionary of samples at an index (tuple) for each vertex label (str). If all the vertices in `sample_from` are scalar, the dictionary is only keyed by label.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sample_from</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
+    <span class="n">id_to_label</span> <span class="o">=</span> <span class="n">__check_if_vertices_are_labelled</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sampling_algorithm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sampling_algorithm</span> <span class="o">=</span> <span class="n">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">proposal_distribution</span><span class="o">=</span><span class="s2">&quot;prior&quot;</span><span class="p">,</span> <span class="n">latents</span><span class="o">=</span><span class="n">sample_from</span><span class="p">)</span>
+
+    <span class="n">vertices_unwrapped</span><span class="p">:</span> <span class="n">JavaList</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">to_java_object_list</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
+
+    <span class="n">probabilistic_model</span> <span class="o">=</span> <span class="n">ProbabilisticModel</span><span class="p">(</span><span class="n">net</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">sampling_algorithm</span><span class="p">,</span> <span class="n">MetropolisHastingsSampler</span><span class="p">)</span> <span class="ow">or</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">sampling_algorithm</span><span class="p">,</span> <span class="n">ForwardSampler</span><span class="p">))</span> <span class="k">else</span> <span class="n">ProbabilisticModelWithGradient</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+
+    <span class="n">network_samples</span><span class="p">:</span> <span class="n">JavaObject</span> <span class="o">=</span> <span class="n">sampling_algorithm</span><span class="o">.</span><span class="n">get_sampler</span><span class="p">()</span><span class="o">.</span><span class="n">getPosteriorSamples</span><span class="p">(</span>
+        <span class="n">probabilistic_model</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(),</span> <span class="n">vertices_unwrapped</span><span class="p">,</span> <span class="n">draws</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span><span class="o">.</span><span class="n">downSample</span><span class="p">(</span><span class="n">down_sample_interval</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">__all_scalar</span><span class="p">(</span><span class="n">sample_from</span><span class="p">):</span>
+        <span class="n">vertex_samples</span> <span class="o">=</span> <span class="n">__create_single_indexed_samples</span><span class="p">(</span><span class="n">network_samples</span><span class="p">,</span> <span class="n">vertices_unwrapped</span><span class="p">,</span> <span class="n">id_to_label</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vertex_samples</span> <span class="o">=</span> <span class="n">__create_multi_indexed_samples</span><span class="p">(</span><span class="n">vertices_unwrapped</span><span class="p">,</span> <span class="n">network_samples</span><span class="p">,</span> <span class="n">id_to_label</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">traceplot</span><span class="p">(</span><span class="n">vertex_samples</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">vertex_samples</span></div>
+
+
+<div class="viewcode-block" id="generate_samples"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.generate_samples">[docs]</a><span class="k">def</span> <span class="nf">generate_samples</span><span class="p">(</span><span class="n">net</span><span class="p">:</span> <span class="n">BayesNet</span><span class="p">,</span>
+                     <span class="n">sample_from</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Vertex</span><span class="p">],</span>
+                     <span class="n">sampling_algorithm</span><span class="p">:</span> <span class="n">PosteriorSamplingAlgorithm</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">drop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">down_sample_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                     <span class="n">live_plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                     <span class="n">refresh_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+                     <span class="n">ax</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sample_generator_types</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param net: Bayesian Network containing latent variables.</span>
+<span class="sd">    :param sample_from: Vertices to include in the returned samples.</span>
+<span class="sd">    :param sampling_algorithm: The posterior sampling algorithm to use.</span>
+<span class="sd">        Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.</span>
+<span class="sd">        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with &#39;prior&#39; as its proposal distribution.</span>
+<span class="sd">    :param drop: The number of samples to drop before collecting anything.</span>
+<span class="sd">        If this is zero then no samples will be dropped before collecting.</span>
+<span class="sd">    :param down_sample_interval: Collect 1 sample for every `down_sample_interval`.</span>
+<span class="sd">        If this is 1 then there will be no down-sampling.</span>
+<span class="sd">        If this is 2 then every other sample will be taken.</span>
+<span class="sd">        If this is 3 then 2 samples will be dropped before one is taken.</span>
+<span class="sd">    :param live_plot: Flag for plotting the trace while sampling.</span>
+<span class="sd">        Call `matplotlib.pyplot.show &lt;https://matplotlib.org/api/_as_gen/matplotlib.pyplot.show.html&gt;`_ to display the plot.</span>
+<span class="sd">    :param refresh_every: Period of plot updates (in sample number).</span>
+<span class="sd">    :param Axes ax: `matplotlib.axes.Axes &lt;https://matplotlib.org/api/axes_api.html&gt;`_.</span>
+<span class="sd">        If not set, a new one is created.</span>
+
+<span class="sd">    :raises ValueError: If `sample_from` contains vertices without labels.</span>
+
+<span class="sd">    :return: Dictionary of samples at an index (tuple) for each vertex label (str). If all the vertices in `sample_from` are scalar, the dictionary is only keyed by label.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sample_from</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
+    <span class="n">id_to_label</span> <span class="o">=</span> <span class="n">__check_if_vertices_are_labelled</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sampling_algorithm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sampling_algorithm</span> <span class="o">=</span> <span class="n">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">proposal_distribution</span><span class="o">=</span><span class="s2">&quot;prior&quot;</span><span class="p">,</span> <span class="n">latents</span><span class="o">=</span><span class="n">sample_from</span><span class="p">)</span>
+
+    <span class="n">vertices_unwrapped</span><span class="p">:</span> <span class="n">JavaList</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">to_java_object_list</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
+
+    <span class="n">probabilistic_model</span> <span class="o">=</span> <span class="n">ProbabilisticModel</span><span class="p">(</span><span class="n">net</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">sampling_algorithm</span><span class="p">,</span> <span class="n">MetropolisHastingsSampler</span><span class="p">)</span> <span class="k">else</span> <span class="n">ProbabilisticModelWithGradient</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+    <span class="n">samples</span><span class="p">:</span> <span class="n">JavaObject</span> <span class="o">=</span> <span class="n">sampling_algorithm</span><span class="o">.</span><span class="n">get_sampler</span><span class="p">()</span><span class="o">.</span><span class="n">generatePosteriorSamples</span><span class="p">(</span><span class="n">probabilistic_model</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(),</span>
+                                                                                    <span class="n">vertices_unwrapped</span><span class="p">)</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">dropCount</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span><span class="o">.</span><span class="n">downSampleInterval</span><span class="p">(</span><span class="n">down_sample_interval</span><span class="p">)</span>
+    <span class="n">sample_iterator</span><span class="p">:</span> <span class="n">JavaObject</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">stream</span><span class="p">()</span><span class="o">.</span><span class="n">iterator</span><span class="p">()</span>
+
+    <span class="n">all_are_scalar</span> <span class="o">=</span> <span class="n">__all_scalar</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_samples_generator</span><span class="p">(</span>
+        <span class="n">sample_iterator</span><span class="p">,</span>
+        <span class="n">vertices_unwrapped</span><span class="p">,</span>
+        <span class="n">live_plot</span><span class="o">=</span><span class="n">live_plot</span><span class="p">,</span>
+        <span class="n">refresh_every</span><span class="o">=</span><span class="n">refresh_every</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">all_scalar</span><span class="o">=</span><span class="n">all_are_scalar</span><span class="p">,</span>
+        <span class="n">id_to_label</span><span class="o">=</span><span class="n">id_to_label</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">__all_scalar</span><span class="p">(</span><span class="n">sample_from</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Vertex</span><span class="p">]):</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">((</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">()</span> <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">sample_from</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_samples_generator</span><span class="p">(</span><span class="n">sample_iterator</span><span class="p">:</span> <span class="n">JavaObject</span><span class="p">,</span> <span class="n">vertices_unwrapped</span><span class="p">:</span> <span class="n">JavaList</span><span class="p">,</span> <span class="n">live_plot</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">refresh_every</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                       <span class="n">ax</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">all_scalar</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">id_to_label</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">sample_generator_types</span><span class="p">:</span>
+    <span class="n">traces</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="p">(</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">network_sample</span> <span class="o">=</span> <span class="n">sample_iterator</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">all_scalar</span><span class="p">:</span>
+            <span class="n">sample</span><span class="p">:</span> <span class="n">sample_generator_dict_type</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">id_to_label</span><span class="p">[</span><span class="n">Vertex</span><span class="o">.</span><span class="n">_get_python_id</span><span class="p">(</span><span class="n">vertex_unwrapped</span><span class="p">)]:</span> <span class="n">Tensor</span><span class="o">.</span><span class="n">_to_ndarray</span><span class="p">(</span>
+                    <span class="n">network_sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">vertex_unwrapped</span><span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">vertex_unwrapped</span> <span class="ow">in</span> <span class="n">vertices_unwrapped</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="n">__create_multi_indexed_samples_generated</span><span class="p">(</span><span class="n">vertices_unwrapped</span><span class="p">,</span> <span class="n">network_sample</span><span class="p">,</span> <span class="n">id_to_label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">live_plot</span><span class="p">:</span>
+            <span class="n">traces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">traces</span><span class="p">)</span> <span class="o">%</span> <span class="n">refresh_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">joined_trace</span><span class="p">:</span> <span class="n">sample_types</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">traces</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sample</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+                <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">ax</span> <span class="o">=</span> <span class="n">traceplot</span><span class="p">(</span><span class="n">joined_trace</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">traceplot</span><span class="p">(</span><span class="n">joined_trace</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+                <span class="n">x0</span> <span class="o">+=</span> <span class="n">refresh_every</span>
+                <span class="n">traces</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">yield</span> <span class="n">sample</span>
+
+
+<span class="k">def</span> <span class="nf">__check_if_vertices_are_labelled</span><span class="p">(</span><span class="n">vertices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Vertex</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="n">id_to_label</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">vertices</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">get_label</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Vertices in sample_from must be labelled.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">id_to_label</span><span class="p">[</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_id</span><span class="p">()]</span> <span class="o">=</span> <span class="n">label</span>
+    <span class="k">return</span> <span class="n">id_to_label</span>
+
+
+<span class="k">def</span> <span class="nf">__create_single_indexed_samples</span><span class="p">(</span><span class="n">network_samples</span><span class="p">:</span> <span class="n">JavaObject</span><span class="p">,</span> <span class="n">vertices_unwrapped</span><span class="p">:</span> <span class="n">JavaList</span><span class="p">,</span>
+                                    <span class="n">id_to_label</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">sample_types</span><span class="p">:</span>
+    <span class="n">vertex_samples</span><span class="p">:</span> <span class="n">sample_types</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">vertex_unwrapped</span> <span class="ow">in</span> <span class="n">vertices_unwrapped</span><span class="p">:</span>
+        <span class="n">vertex_label</span> <span class="o">=</span> <span class="n">id_to_label</span><span class="p">[</span><span class="n">Vertex</span><span class="o">.</span><span class="n">_get_python_id</span><span class="p">(</span><span class="n">vertex_unwrapped</span><span class="p">)]</span>
+        <span class="n">samples_for_vertex</span> <span class="o">=</span> <span class="n">__get_vertex_samples</span><span class="p">(</span><span class="n">network_samples</span><span class="p">,</span> <span class="n">vertex_unwrapped</span><span class="p">)</span>
+        <span class="n">vertex_samples</span><span class="p">[</span><span class="n">vertex_label</span><span class="p">]</span> <span class="o">=</span> <span class="n">samples_for_vertex</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">vertex_samples</span>
+
+
+<span class="k">def</span> <span class="nf">__create_multi_indexed_samples</span><span class="p">(</span><span class="n">vertices_unwrapped</span><span class="p">:</span> <span class="n">JavaList</span><span class="p">,</span> <span class="n">network_samples</span><span class="p">:</span> <span class="n">JavaObject</span><span class="p">,</span>
+                                   <span class="n">id_to_label</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">sample_types</span><span class="p">:</span>
+    <span class="n">vertex_samples_multi</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">vertices_unwrapped</span><span class="p">:</span>
+        <span class="n">vertex_label</span> <span class="o">=</span> <span class="n">id_to_label</span><span class="p">[</span><span class="n">Vertex</span><span class="o">.</span><span class="n">_get_python_id</span><span class="p">(</span><span class="n">vertex</span><span class="p">)]</span>
+        <span class="n">vertex_samples_multi</span><span class="p">[</span><span class="n">vertex_label</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">samples_for_vertex</span> <span class="o">=</span> <span class="n">__get_vertex_samples</span><span class="p">(</span><span class="n">network_samples</span><span class="p">,</span> <span class="n">vertex</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples_for_vertex</span><span class="p">:</span>
+            <span class="n">__add_sample_to_dict</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">vertex_samples_multi</span><span class="p">[</span><span class="n">vertex_label</span><span class="p">])</span>
+
+    <span class="n">tuple_hierarchy</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{(</span><span class="n">vertex_label</span><span class="p">,</span> <span class="n">shape_index</span><span class="p">):</span> <span class="n">values</span>
+                             <span class="k">for</span> <span class="n">vertex_label</span><span class="p">,</span> <span class="n">samples</span> <span class="ow">in</span> <span class="n">vertex_samples_multi</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                             <span class="k">for</span> <span class="n">shape_index</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">return</span> <span class="n">tuple_hierarchy</span>
+
+
+<span class="k">def</span> <span class="nf">__create_multi_indexed_samples_generated</span><span class="p">(</span><span class="n">vertices_unwrapped</span><span class="p">:</span> <span class="n">JavaList</span><span class="p">,</span> <span class="n">network_samples</span><span class="p">:</span> <span class="n">JavaObject</span><span class="p">,</span>
+                                             <span class="n">id_to_label</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">sample_generator_dict_type</span><span class="p">:</span>
+    <span class="n">vertex_samples_multi</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">vertices_unwrapped</span><span class="p">:</span>
+        <span class="n">vertex_label</span> <span class="o">=</span> <span class="n">id_to_label</span><span class="p">[</span><span class="n">Vertex</span><span class="o">.</span><span class="n">_get_python_id</span><span class="p">(</span><span class="n">vertex</span><span class="p">)]</span>
+        <span class="n">vertex_samples_multi</span><span class="p">[</span><span class="n">vertex_label</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">Tensor</span><span class="o">.</span><span class="n">_to_ndarray</span><span class="p">(</span><span class="n">network_samples</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span>
+        <span class="n">__add_sample_to_dict</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">vertex_samples_multi</span><span class="p">[</span><span class="n">vertex_label</span><span class="p">])</span>
+
+    <span class="n">tuple_hierarchy</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{(</span><span class="n">vertex_label</span><span class="p">,</span> <span class="n">tensor_index</span><span class="p">):</span> <span class="n">values</span>
+                             <span class="k">for</span> <span class="n">vertex_label</span><span class="p">,</span> <span class="n">tensor_index</span> <span class="ow">in</span> <span class="n">vertex_samples_multi</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                             <span class="k">for</span> <span class="n">tensor_index</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">tensor_index</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">return</span> <span class="n">tuple_hierarchy</span>
+
+
+<span class="k">def</span> <span class="nf">__add_sample_to_dict</span><span class="p">(</span><span class="n">sample_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">vertex_sample</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">sample_value</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">():</span>
+        <span class="n">vertex_sample</span><span class="p">[</span><span class="n">COLUMN_HEADER_FOR_SCALAR</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_value</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ndenumerate</span><span class="p">(</span><span class="n">sample_value</span><span class="p">):</span>
+            <span class="n">vertex_sample</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+
+<span class="k">def</span> <span class="nf">__get_vertex_samples</span><span class="p">(</span><span class="n">network_samples</span><span class="p">,</span> <span class="n">vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">samples_for_vertex</span> <span class="o">=</span> <span class="n">network_samples</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span><span class="o">.</span><span class="n">asTensor</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Tensor</span><span class="o">.</span><span class="n">_to_ndarray</span><span class="p">(</span><span class="n">samples_for_vertex</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2018, Improbable.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
