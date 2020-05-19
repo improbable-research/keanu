@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorFactories;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorTestHelper;
@@ -15,10 +16,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
+import static junit.framework.TestCase.assertSame;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
@@ -925,6 +928,50 @@ public class IntegerTensorTest {
         IntegerTensor result = a.get(BooleanTensor.scalar(false));
 
         assertThat(result.getLength(), equalTo(0L));
+    }
+
+    @Test
+    public void canScalarOpInPlace() {
+        canScalarInPlace(NumberTensor::minusInPlace, 10, new int[]{2, 5}, new int[]{8, 5});
+        canScalarInPlace(NumberTensor::reverseMinusInPlace, 10, new int[]{2, 5}, new int[]{-8, -5});
+        canScalarInPlace(NumberTensor::plusInPlace, 10, new int[]{2, 5}, new int[]{12, 15});
+        canScalarInPlace(NumberTensor::timesInPlace, 10, new int[]{2, 5}, new int[]{20, 50});
+        canScalarInPlace(NumberTensor::divInPlace, 10, new int[]{2, 5}, new int[]{5, 2});
+        canScalarInPlace(NumberTensor::reverseDivInPlace, 2, new int[]{10, 20}, new int[]{5, 10});
+    }
+
+    @Test
+    public void canOpInPlaceScalar() {
+        canOpInPlaceScalar(NumberTensor::minusInPlace, 10, new int[]{2, 5}, new int[]{-8, -5});
+        canOpInPlaceScalar(NumberTensor::reverseMinusInPlace, 10, new int[]{2, 5}, new int[]{8, 5});
+        canOpInPlaceScalar(NumberTensor::plusInPlace, 10, new int[]{2, 5}, new int[]{12, 15});
+        canOpInPlaceScalar(NumberTensor::timesInPlace, 10, new int[]{2, 5}, new int[]{20, 50});
+        canOpInPlaceScalar(NumberTensor::divInPlace, 2, new int[]{10, 20}, new int[]{5, 10});
+        canOpInPlaceScalar(NumberTensor::reverseDivInPlace, 10, new int[]{2, 5}, new int[]{5, 2});
+    }
+
+    public void canScalarInPlace(BiFunction<IntegerTensor, IntegerTensor, IntegerTensor> inPlaceOp,
+                                 int scalarValue, int[] vectorValues, int[] resultValues) {
+        IntegerTensor scalar = IntegerTensor.scalar(scalarValue);
+        IntegerTensor vector = IntegerTensor.create(vectorValues);
+
+        IntegerTensor result = inPlaceOp.apply(scalar, vector);
+
+        assertSame(result, scalar);
+        assertThat(result, valuesAndShapesMatch(IntegerTensor.create(resultValues)));
+        assertThat(vector, valuesAndShapesMatch(IntegerTensor.create(vectorValues)));
+    }
+
+    public void canOpInPlaceScalar(BiFunction<IntegerTensor, IntegerTensor, IntegerTensor> inPlaceOp,
+                                   int scalarValue, int[] vectorValues, int[] resultValues) {
+        IntegerTensor vector = IntegerTensor.create(vectorValues);
+        IntegerTensor scalar = IntegerTensor.scalar(scalarValue);
+
+        IntegerTensor result = inPlaceOp.apply(vector, scalar);
+
+        assertSame(result, vector);
+        assertThat(result, valuesAndShapesMatch(IntegerTensor.create(resultValues)));
+        assertThat(scalar, valuesAndShapesMatch(IntegerTensor.scalar(scalarValue)));
     }
 
 }

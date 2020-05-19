@@ -11,7 +11,7 @@ keanu = {editable = true, path = "."}
 nd4j = {editable = true, path = "./nd4j/"}
 
 [dev-packages]
-pytest = "==4.2.0"
+pytest = "==5.2.0"
 mypy = "==0.670"
 sphinx = "==1.8.4"
 yapf = "==0.26.0"

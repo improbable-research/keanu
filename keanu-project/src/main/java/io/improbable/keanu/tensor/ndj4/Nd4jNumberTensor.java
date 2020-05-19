@@ -262,12 +262,9 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
         if (that.isScalar()) {
             tensor.subi(that.scalar());
         } else if (this.isScalar()) {
-            return this.minus(that);
+            tensor = getTensor(that).rsub(this.scalar());
         } else {
-            INDArray result = INDArrayShim.subi(tensor, getTensor(that).dup());
-            if (result != tensor) {
-                return create(result);
-            }
+            tensor = INDArrayShim.subi(tensor, getTensor(that).dup());
         }
         return set(tensor);
     }
@@ -275,14 +272,11 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     @Override
     public TENSOR reverseMinusInPlace(TENSOR that) {
         if (that.isScalar()) {
-            tensor.subi(that.scalar());
+            tensor.rsubi(that.scalar());
         } else if (this.isScalar()) {
-            return this.minus(that);
+            tensor = getTensor(that).sub(this.scalar());
         } else {
-            INDArray result = INDArrayShim.rsubi(tensor, getTensor(that).dup());
-            if (result != tensor) {
-                return create(result);
-            }
+            tensor = INDArrayShim.rsubi(tensor, getTensor(that).dup());
         }
         return set(tensor);
     }
@@ -302,12 +296,9 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
         if (that.isScalar()) {
             tensor.addi(that.scalar());
         } else if (this.isScalar()) {
-            return this.plus(that);
+            tensor = getTensor(that).add(this.scalar());
         } else {
-            INDArray result = INDArrayShim.addi(tensor, getTensor(that).dup());
-            if (result != tensor) {
-                return create(result);
-            }
+            tensor = INDArrayShim.addi(tensor, getTensor(that).dup());
         }
         return set(tensor);
     }
@@ -322,12 +313,9 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
         if (that.isScalar()) {
             tensor.muli(that.scalar());
         } else if (this.isScalar()) {
-            return this.times(that);
+            tensor = getTensor(that).mul(this.scalar());
         } else {
-            INDArray result = INDArrayShim.muli(tensor, getTensor(that).dup());
-            if (result != tensor) {
-                return create(result);
-            }
+            tensor = INDArrayShim.muli(tensor, getTensor(that).dup());
         }
         return set(tensor);
     }
@@ -342,12 +330,9 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
         if (that.isScalar()) {
             tensor.divi(that.scalar());
         } else if (this.isScalar()) {
-            return this.div(that);
+            tensor = getTensor(that).rdiv(this.scalar());
         } else {
-            INDArray result = INDArrayShim.divi(tensor, getTensor(that).dup());
-            if (result != tensor) {
-                return create(result);
-            }
+            tensor = INDArrayShim.divi(tensor, getTensor(that).dup());
         }
         return set(tensor);
     }
@@ -360,14 +345,11 @@ public abstract class Nd4jNumberTensor<T extends Number, TENSOR extends NumberTe
     @Override
     public TENSOR reverseDivInPlace(TENSOR that) {
         if (that.isScalar()) {
-            tensor.subi(that.scalar());
+            tensor.rdivi(that.scalar());
         } else if (this.isScalar()) {
-            return this.minus(that);
+            tensor = getTensor(that).div(this.scalar());
         } else {
-            INDArray result = INDArrayShim.rdivi(tensor, getTensor(that).dup());
-            if (result != tensor) {
-                return create(result);
-            }
+            tensor = INDArrayShim.rdivi(tensor, getTensor(that).dup());
         }
         return set(tensor);
     }
