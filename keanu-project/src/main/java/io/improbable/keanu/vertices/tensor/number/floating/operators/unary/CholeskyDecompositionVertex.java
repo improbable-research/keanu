@@ -19,9 +19,9 @@ import java.util.Map;
 /**
  * Gradient calculations sourced from https://arxiv.org/pdf/1602.07527.pdf
  *
- * @param <T>
- * @param <TENSOR>
- * @param <VERTEX>
+ * @param <T> type of floating point number
+ * @param <TENSOR> type of floating point tensor
+ * @param <VERTEX> type of number tensor
  */
 public class CholeskyDecompositionVertex<T extends Number, TENSOR extends FloatingPointTensor<T, TENSOR>, VERTEX extends NumberTensorVertex<T, TENSOR, VERTEX>>
     extends UnaryTensorOpVertex<T, TENSOR, VERTEX> implements NonProbabilisticVertex<TENSOR, VERTEX>, Differentiable {
